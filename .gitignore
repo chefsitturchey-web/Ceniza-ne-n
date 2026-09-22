@@ -1,0 +1,4 @@
+.godot/
+exports/
+*.tmp
+validation*.log
