@@ -1,42 +1,58 @@
-# CENIZA NEÓN — primera sesión
+# CENIZA NEÓN — prototipo de colonia y asedio
 
-Proyecto para Godot 4.x. No requiere plugins ni assets externos.
+Abre `project.godot` con Godot 4 y pulsa F5. Partida nueva de aproximadamente ocho minutos: tres ciclos de 90 segundos de día, 10 de aviso y 60 de noche. La noche se prolonga si quedan enemigos vivos. Sin guardado todavía.
 
-1. Abre Godot y pulsa **Importar** en el administrador de proyectos.
-2. Selecciona `project.godot` en esta carpeta y abre el proyecto.
-3. Presiona **F6** con `scenes/main.tscn` abierta, o **F5** para ejecutar el proyecto.
-4. Muévete con A/D, flechas, stick izquierdo o cruceta del mando.
-5. Detén la ejecución con F8 desde el editor.
+## Controles
 
-## Qué aprender aquí
+| Acción | Teclado | Mando Xbox |
+|---|---|---|
+| Mover | A/D o flechas | Stick izquierdo / cruceta |
+| Atacar (puedes mantener) | J | X |
+| Esquivar, cuesta 30 de resistencia | Espacio | A |
+| Construir, reparar, reclutar o curar | Mantener E | Mantener Y |
+| Sobrecargar tu frente | Q | LB |
+| Pausar | Esc | Start |
+| Reiniciar después del resultado | R | Select / Back |
 
-- **Escena:** `scenes/player.tscn` agrupa el personaje, su colisión y su cámara.
-- **Nodo:** cada elemento del árbol tiene una responsabilidad. `CharacterBody2D` permite mover un cuerpo con colisiones.
-- **Script:** `scripts/player.gd` define el movimiento. `_physics_process` se ejecuta a intervalos de física.
-- **Input Map:** relaciona acciones como `move_left` con teclas y mando. En esta primera escena se configura al arrancar en `scripts/world.gd`.
-- El escenario y la interfaz se crean desde `world.gd`; aparecerán en el árbol **Remoto** mientras ejecutas el juego.
+PlayStation: X de Xbox corresponde a Cuadrado; A a Cruz; Y a Triángulo; LB a L1. El HUD de mando usa etiquetas Xbox.
 
-## Primera práctica
+## Primera partida
 
-Abre `scenes/player.tscn`, selecciona el nodo Player y cambia **Speed** en el Inspector de 150 a 220. Guarda y ejecuta. Compara qué velocidad te resulta cómoda y vuelve a ajustarla.
+1. Empiezas con 90 de chatarra, un constructor y un recuperador. Los marcos vacíos a ambos lados son puntos de construcción.
+2. Acércate a cada punto y mantén E: muralla 20, torreta 25. Las cuatro obras cuestan 90. El constructor las realiza automáticamente: encargar no significa completar instantáneamente.
+3. El recuperador sale de día y deposita ocho unidades por viaje. En el centro, mantén E para contratar un segundo constructor y después un segundo recuperador, por 15 cada uno.
+4. Al llegar el aviso, los recuperadores regresan. Los constructores evitan obras cercanas a enemigos. Puedes encargar reparaciones por ocho de chatarra, pero debes despejar la zona para que trabajen.
+5. Durante la noche, consulta las amenazas de ambos lados, apoya la muralla más presionada y esquiva los ataques anunciados con un signo sobre el enemigo.
+6. Q sobrecarga el lado donde estás: seis segundos de disparos y obras más rápidos, después dieciocho segundos de enfriamiento. Cada frente tiene su propio temporizador.
+7. Sobrevive tres noches. Si te derrotan, reapareces a los cuatro segundos mientras la colonia sigue luchando. Si cae el núcleo, termina la partida.
 
-## Comprobación manual
+En el centro puedes curarte de día con E. Al amanecer se restauran 40 puntos del núcleo, se cura al personaje y recibes 25 de chatarra. El dron cercano al personaje dispara automáticamente, con alcance y daño limitados.
 
-- El personaje se apoya en el suelo y no lo atraviesa.
-- Puedes caminar en ambos sentidos y detenerte al soltar el control.
-- La cámara sigue al personaje; los extremos del mapa bloquean el paso.
-- Las instrucciones permanecen en pantalla.
-- Si tienes mando, comprueba stick y cruceta.
+## Alcance de esta entrega
 
-## Segunda práctica: ataque y vida
+- Dos enemigos: errante y corredor; ataque con aviso, vida, muerte y recompensa.
+- Cuatro habitantes como máximo, con oficios automáticos y reserva individual de obras.
+- Dos murallas, dos torretas, energía de capacidad fija (4), sobrecarga por frente.
+- HUD de recursos, salud, resistencia, amenazas, obras y temporizadores.
+- Pausa, victoria, derrota y reinicio completo.
 
-Ejecuta con F5 y acércate al blanco rosado a la derecha del núcleo. Mira hacia él y pulsa **J**, o el botón **X de Xbox / Cuadrado de PlayStation**. Cada pulsación hace un ataque; mantener el botón no repite golpes.
+Simplificaciones del prototipo: trabajadores sin daño ni selección de herramientas; chatarra en una bolsa común; generación eléctrica fija; torretas no son objetivo de enemigos; no hay progresión, guardado, jefes, sonido ni arte final. Al perder se reinicia toda la sesión, todavía no se restaura el inicio del día como propone el GDD. La dificultad necesita pruebas con jugadores.
 
-- El blanco tiene 100 de vida y cada golpe quita 25: cae con cuatro golpes.
-- Desde lejos o mirando hacia el otro lado, el ataque falla.
-- Hay 0,4 segundos de espera entre ataques. El destello amarillo muestra el alcance.
-- El blanco reaparece tres segundos después de caer. Puedes atravesarlo: todavía es un blanco de práctica, sin contacto físico ni ataques propios.
+Tus ajustes del personaje siguen en `scenes/player.tscn`: velocidad 220 y daño 50. Los tiempos del ciclo se pueden editar seleccionando PrimerDistrito en `scenes/main.tscn`.
 
-En `player.tscn`, selecciona Player y cambia **Attack Damage** a 50. Guarda y comprueba que ahora cae con dos golpes. Vuelve a 25 al terminar. Conserva la velocidad que hayas elegido.
+## Arte
 
-El método `attack()` comprueba alcance y aplica daño; `take_damage()` en `scripts/training_enemy.gd` actualiza la vida. Todavía no hay construcción ni guardado. El siguiente incremento será que el enemigo avance y ataque.
+La dirección visual y los prompts están en `docs/GUIA_ARTE.md`. Primero prepara un cuadro maestro del personaje, del errante y del corredor. No generes todas las animaciones hasta aprobar esos tres.
+
+## Verificación técnica
+
+Con el ejecutable de Godot desde esta carpeta:
+
+```text
+godot --headless --path . --script res://tests/combat_smoke.gd
+godot --headless --path . --script res://tests/siege_smoke.gd
+godot --headless --path . --script res://tests/session_simulation.gd
+godot --headless --path . --script res://tests/session_simulation.gd -- --assist
+```
+
+Las simulaciones parten de defensas ya construidas. Sin apoyo, la colonia debe caer; con --assist, un jugador automatizado se desplaza, ataca, sobrecarga y encarga reparaciones durante el día. Esta segunda prueba no valida la construcción inicial ni sustituye la prueba de dificultad humana.

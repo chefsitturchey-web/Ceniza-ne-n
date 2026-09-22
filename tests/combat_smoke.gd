@@ -8,7 +8,10 @@ func run_checks() -> void:
 	root.add_child(world)
 	var player = world.get_node("Player")
 	player.attack_damage = 25
-	var enemy = get_first_node_in_group("enemies")
+	var enemy := Node2D.new()
+	enemy.set_script(load("res://scripts/training_enemy.gd"))
+	enemy.position = Vector2(150, 260)
+	world.add_child(enemy)
 	player.position = Vector2(0, 260)
 	player.attack()
 	assert(enemy.health == 100, "Un ataque fuera de alcance no debe causar daño")
