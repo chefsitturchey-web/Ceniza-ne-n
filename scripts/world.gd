@@ -2,6 +2,7 @@ extends Node2D
 ## Partida corta: economía, obras, tres asedios y resultado final.
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
 const ENEMY_SCRIPT: Script = preload("res://scripts/siege_enemy.gd")
+const ERRANTE_SCENE: PackedScene = preload("res://scenes/errante.tscn")
 const FLOOR_Y: float = 260.0
 @export var day_duration: float = 90.0
 @export var warning_duration: float = 10.0
@@ -163,8 +164,12 @@ func update_phase(delta: float) -> void:
 			show_notice("Amanecer: +25 chatarra. Repara y prepara el siguiente asedio.")
 
 func spawn_enemy(side: float, runner: bool) -> Node2D:
-	var enemy := Node2D.new()
-	enemy.set_script(ENEMY_SCRIPT)
+	var enemy: Node2D
+	if runner:
+		enemy = Node2D.new()
+		enemy.set_script(ENEMY_SCRIPT)
+	else:
+		enemy = ERRANTE_SCENE.instantiate() as Node2D
 	enemy.world = self
 	enemy.runner = runner
 	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE

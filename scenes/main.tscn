@@ -4,3 +4,4 @@
 
 [node name="PrimerDistrito" type="Node2D" unique_id=1530451222]
 script = ExtResource("1")
+day_duration = 10.0
