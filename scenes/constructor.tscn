@@ -1,0 +1,178 @@
+[gd_scene format=3 uid="uid://bcgd4eocc2qb"]
+
+[ext_resource type="Texture2D" uid="uid://dhtw0umej10he" path="res://assets/unidades/constructor/caminar/caminar_00.png" id="1_yt5k8"]
+[ext_resource type="Texture2D" uid="uid://31cfhhanex7c" path="res://assets/unidades/constructor/caminar/caminar_02.png" id="2_2lj3w"]
+[ext_resource type="Texture2D" uid="uid://dabi0t742c35c" path="res://assets/unidades/constructor/caminar/caminar_03.png" id="3_4bii0"]
+[ext_resource type="Texture2D" uid="uid://b8xipoxksntfn" path="res://assets/unidades/constructor/caminar/caminar_04.png" id="4_su8dv"]
+[ext_resource type="Texture2D" uid="uid://cspq45g2ybtjw" path="res://assets/unidades/constructor/huir/huir_00.png" id="5_6peym"]
+[ext_resource type="Texture2D" uid="uid://wyk60l2xyfce" path="res://assets/unidades/constructor/huir/huir_02.png" id="6_be6th"]
+[ext_resource type="Texture2D" uid="uid://djv0cp78ltnul" path="res://assets/unidades/constructor/huir/huir_03.png" id="7_s8vur"]
+[ext_resource type="Texture2D" uid="uid://bwk2qape1m3pd" path="res://assets/unidades/constructor/huir/huir_04.png" id="8_jw12o"]
+[ext_resource type="Texture2D" uid="uid://ccr8l05f1kkhv" path="res://assets/unidades/constructor/huir/huir_05.png" id="9_aryew"]
+[ext_resource type="Texture2D" uid="uid://dmngg1mebxj70" path="res://assets/unidades/constructor/huir/huir_06.png" id="10_ho0xo"]
+[ext_resource type="Texture2D" uid="uid://brgms44mhbgtd" path="res://assets/unidades/constructor/huir/huir_07.png" id="11_na4nb"]
+[ext_resource type="Texture2D" uid="uid://b2gejoic0wmuj" path="res://assets/unidades/constructor/morir/morir_00.png" id="12_ff0x3"]
+[ext_resource type="Texture2D" uid="uid://cpal3tabjqfew" path="res://assets/unidades/constructor/morir/morir_01.png" id="13_fhogs"]
+[ext_resource type="Texture2D" uid="uid://b2vu4ie63vw51" path="res://assets/unidades/constructor/morir/morir_02.png" id="14_42xnp"]
+[ext_resource type="Texture2D" uid="uid://yl0xrcndsqd7" path="res://assets/unidades/constructor/morir/morir_03.png" id="15_nl7qq"]
+[ext_resource type="Texture2D" uid="uid://dyaok05ofbkei" path="res://assets/unidades/constructor/morir/morir_04.png" id="16_fs1ep"]
+[ext_resource type="Texture2D" uid="uid://btq6ndquuo2p3" path="res://assets/unidades/constructor/morir/morir_05.png" id="17_38kxq"]
+[ext_resource type="Texture2D" uid="uid://drnadxv6gqeaj" path="res://assets/unidades/constructor/morir/morir_06.png" id="18_oj5m5"]
+[ext_resource type="Texture2D" uid="uid://7cwls67bcl3k" path="res://assets/unidades/constructor/morir/morir_07.png" id="19_cgffb"]
+[ext_resource type="Texture2D" uid="uid://bhwx0eg8oud7q" path="res://assets/unidades/constructor/reparar/reparar_00.png" id="20_u7e0e"]
+[ext_resource type="Texture2D" uid="uid://bfwg4ptqikwxf" path="res://assets/unidades/constructor/reparar/reparar_01.png" id="21_aetth"]
+[ext_resource type="Texture2D" uid="uid://dvsfx8j2ifh53" path="res://assets/unidades/constructor/reparar/reparar_02.png" id="22_6yxhp"]
+[ext_resource type="Texture2D" uid="uid://e7fj32nu5an5" path="res://assets/unidades/constructor/reparar/reparar_03.png" id="23_n5ddv"]
+[ext_resource type="Texture2D" uid="uid://tdlln0mu1ha2" path="res://assets/unidades/constructor/reparar/reparar_04.png" id="24_4n2wj"]
+[ext_resource type="Texture2D" uid="uid://d0wb3xqh1ajlu" path="res://assets/unidades/constructor/reparar/reparar_05.png" id="25_u6l7q"]
+[ext_resource type="Texture2D" uid="uid://chct6ar1w756w" path="res://assets/unidades/constructor/reparar/reparar_06.png" id="26_qdqay"]
+[ext_resource type="Texture2D" uid="uid://e4pbbd3sf6ia" path="res://assets/unidades/constructor/reparar/reparar_07.png" id="27_d251u"]
+[ext_resource type="Texture2D" uid="uid://dg3bahbwkfxte" path="res://assets/unidades/constructor/reposo/reposo_00.png" id="28_fa06r"]
+[ext_resource type="Texture2D" uid="uid://gq5kl8yirw1i" path="res://assets/unidades/constructor/reposo/reposo_01.png" id="29_ryifu"]
+[ext_resource type="Texture2D" uid="uid://bg4ltk37pbcj4" path="res://assets/unidades/constructor/reposo/reposo_02.png" id="30_brhml"]
+[ext_resource type="Texture2D" uid="uid://irn0riqsv33u" path="res://assets/unidades/constructor/reposo/reposo_03.png" id="31_mdik4"]
+[ext_resource type="Texture2D" uid="uid://bjsa8e5vyg2ne" path="res://assets/unidades/constructor/reposo/reposo_04.png" id="32_v0cwf"]
+[ext_resource type="Texture2D" uid="uid://b6yctmjrjql7o" path="res://assets/unidades/constructor/reposo/reposo_05.png" id="33_f05n5"]
+[ext_resource type="Texture2D" uid="uid://dp6bq7by8vstv" path="res://assets/unidades/constructor/reposo/reposo_06.png" id="34_qrigj"]
+[ext_resource type="Texture2D" uid="uid://uhrgovpy66bl" path="res://assets/unidades/constructor/reposo/reposo_07.png" id="35_x4t7a"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_kn1s8"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_yt5k8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_2lj3w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_4bii0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_su8dv")
+}],
+"loop": 1,
+"name": &"caminar",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_6peym")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_be6th")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_s8vur")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_jw12o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_aryew")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_ho0xo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_na4nb")
+}],
+"loop": 1,
+"name": &"huir",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_ff0x3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_fhogs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_42xnp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_nl7qq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_fs1ep")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_38kxq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_oj5m5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_cgffb")
+}],
+"loop": 1,
+"name": &"morir",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("20_u7e0e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_aetth")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_6yxhp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_n5ddv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_4n2wj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_u6l7q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_qdqay")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_d251u")
+}],
+"loop": 1,
+"name": &"reparar",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("28_fa06r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_ryifu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_brhml")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_mdik4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_v0cwf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("33_f05n5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_qrigj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("35_x4t7a")
+}],
+"loop": 1,
+"name": &"reposo",
+"speed": 5.0
+}]
+
+[node name="constructor" type="Node2D" unique_id=1324901754]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1436437691]
+sprite_frames = SubResource("SpriteFrames_kn1s8")
+animation = &"reposo"
+frame = 6
+frame_progress = 0.85460275

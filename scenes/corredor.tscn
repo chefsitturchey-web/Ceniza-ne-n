@@ -1,0 +1,202 @@
+[gd_scene format=3 uid="uid://ybhlujrhsh8y"]
+
+[ext_resource type="Texture2D" uid="uid://b3jcstha12op4" path="res://assets/enemies/corredor/ataque/ataque_00.png" id="1_e2rsl"]
+[ext_resource type="Texture2D" uid="uid://ct5waerbtnhs6" path="res://assets/enemies/corredor/ataque/ataque_01.png" id="2_tmooh"]
+[ext_resource type="Texture2D" uid="uid://cvvowcw1ntfh1" path="res://assets/enemies/corredor/ataque/ataque_02.png" id="3_2xs46"]
+[ext_resource type="Texture2D" uid="uid://pm3c2ft6qr4h" path="res://assets/enemies/corredor/ataque/ataque_03.png" id="4_ql717"]
+[ext_resource type="Texture2D" uid="uid://da6grllivgfgp" path="res://assets/enemies/corredor/ataque/ataque_04.png" id="5_d4uxb"]
+[ext_resource type="Texture2D" uid="uid://cu5yds3q61lf3" path="res://assets/enemies/corredor/ataque/ataque_05.png" id="6_3tlki"]
+[ext_resource type="Texture2D" uid="uid://cm71vsj7lrqh" path="res://assets/enemies/corredor/ataque/ataque_06.png" id="7_rggp7"]
+[ext_resource type="Texture2D" uid="uid://cescxg741anfl" path="res://assets/enemies/corredor/ataque/ataque_07.png" id="8_chgb7"]
+[ext_resource type="Texture2D" uid="uid://ccybetq06otwb" path="res://assets/enemies/corredor/caminar/caminar_00.png" id="9_t1450"]
+[ext_resource type="Texture2D" uid="uid://bcxh7587yp510" path="res://assets/enemies/corredor/caminar/caminar_01.png" id="10_fx523"]
+[ext_resource type="Texture2D" uid="uid://cayn55j0lipud" path="res://assets/enemies/corredor/caminar/caminar_02.png" id="11_hgab6"]
+[ext_resource type="Texture2D" uid="uid://dro4ax8u8dqh" path="res://assets/enemies/corredor/caminar/caminar_03.png" id="12_un6jr"]
+[ext_resource type="Texture2D" uid="uid://ks4oreir7u16" path="res://assets/enemies/corredor/caminar/caminar_04.png" id="13_3uydj"]
+[ext_resource type="Texture2D" uid="uid://dpubhu4yctj0a" path="res://assets/enemies/corredor/caminar/caminar_05.png" id="14_f37cf"]
+[ext_resource type="Texture2D" uid="uid://c7h1wod816wfx" path="res://assets/enemies/corredor/caminar/caminar_06.png" id="15_6stid"]
+[ext_resource type="Texture2D" uid="uid://bg0coie05grcb" path="res://assets/enemies/corredor/caminar/caminar_07.png" id="16_4ypps"]
+[ext_resource type="Texture2D" uid="uid://cm3pjeue30g3x" path="res://assets/enemies/corredor/correr/correr_00.png" id="17_0l4tb"]
+[ext_resource type="Texture2D" uid="uid://bpdl4h4ocpoat" path="res://assets/enemies/corredor/correr/correr_01.png" id="18_0rnbg"]
+[ext_resource type="Texture2D" uid="uid://bvsgihh6eiwa7" path="res://assets/enemies/corredor/correr/correr_02.png" id="19_b8sng"]
+[ext_resource type="Texture2D" uid="uid://bqbkoaj0wiga2" path="res://assets/enemies/corredor/correr/correr_03.png" id="20_6yt08"]
+[ext_resource type="Texture2D" uid="uid://b3w70e0to5rav" path="res://assets/enemies/corredor/correr/correr_04.png" id="21_n88co"]
+[ext_resource type="Texture2D" uid="uid://cqctfat41xtjb" path="res://assets/enemies/corredor/correr/correr_05.png" id="22_sjsr1"]
+[ext_resource type="Texture2D" uid="uid://bfra880w7c51y" path="res://assets/enemies/corredor/correr/correr_06.png" id="23_bq85g"]
+[ext_resource type="Texture2D" uid="uid://ctyxa2qpgwf3w" path="res://assets/enemies/corredor/correr/correr_07.png" id="24_8hnli"]
+[ext_resource type="Texture2D" uid="uid://dc3bf7ty0742k" path="res://assets/enemies/corredor/dano/dano_00.png" id="25_un6jr"]
+[ext_resource type="Texture2D" uid="uid://4rr3ndprccpq" path="res://assets/enemies/corredor/dano/dano_01.png" id="26_3uydj"]
+[ext_resource type="Texture2D" uid="uid://b073qe4aj8xr5" path="res://assets/enemies/corredor/dano/dano_02.png" id="27_f37cf"]
+[ext_resource type="Texture2D" uid="uid://cjhqvvcqcg58b" path="res://assets/enemies/corredor/destruccion/destruccion_00.png" id="28_0l4tb"]
+[ext_resource type="Texture2D" uid="uid://btu4co7kxfc8f" path="res://assets/enemies/corredor/destruccion/destruccion_01.png" id="29_0rnbg"]
+[ext_resource type="Texture2D" uid="uid://d2fn3t0tnf2dc" path="res://assets/enemies/corredor/destruccion/destruccion_02.png" id="30_b8sng"]
+[ext_resource type="Texture2D" uid="uid://737k63p3rqbs" path="res://assets/enemies/corredor/destruccion/destruccion_03.png" id="31_6yt08"]
+[ext_resource type="Texture2D" uid="uid://df1s0l1o57cl6" path="res://assets/enemies/corredor/destruccion/destruccion_04.png" id="32_n88co"]
+[ext_resource type="Texture2D" uid="uid://d20cs5r2li5ou" path="res://assets/enemies/corredor/reposo/reposo_00.png" id="33_54alf"]
+[ext_resource type="Texture2D" uid="uid://dssyy7cit6cuq" path="res://assets/enemies/corredor/reposo/reposo_01.png" id="34_06kem"]
+[ext_resource type="Texture2D" uid="uid://dvyklkbx2nyi6" path="res://assets/enemies/corredor/reposo/reposo_02.png" id="35_xk402"]
+[ext_resource type="Texture2D" uid="uid://ik212ip4u7x0" path="res://assets/enemies/corredor/reposo/reposo_03.png" id="36_prkya"]
+[ext_resource type="Texture2D" uid="uid://cwyf6q48nuneb" path="res://assets/enemies/corredor/reposo/reposo_04.png" id="37_apkxu"]
+[ext_resource type="Texture2D" uid="uid://cdpi0kect2st3" path="res://assets/enemies/corredor/reposo/reposo_05.png" id="38_bk7ay"]
+[ext_resource type="Texture2D" uid="uid://hm7hxv6du6hf" path="res://assets/enemies/corredor/reposo/reposo_06.png" id="39_wuqdl"]
+[ext_resource type="Texture2D" uid="uid://evr2anumcp42" path="res://assets/enemies/corredor/reposo/reposo_07.png" id="40_7tba3"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_44p7d"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_e2rsl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_tmooh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_2xs46")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ql717")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_d4uxb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_3tlki")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_rggp7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_chgb7")
+}],
+"loop": 1,
+"name": &"ataque",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_t1450")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_fx523")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_hgab6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_un6jr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_3uydj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_f37cf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_6stid")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_4ypps")
+}],
+"loop": 1,
+"name": &"caminar",
+"speed": 7.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_0l4tb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_0rnbg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_b8sng")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_6yt08")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_n88co")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_sjsr1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_bq85g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_8hnli")
+}],
+"loop": 1,
+"name": &"correr",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("25_un6jr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_3uydj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_f37cf")
+}],
+"loop": 1,
+"name": &"daño",
+"speed": 7.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("28_0l4tb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_0rnbg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_b8sng")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_6yt08")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_n88co")
+}],
+"loop": 1,
+"name": &"destruccion",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("33_54alf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_06kem")
+}, {
+"duration": 1.0,
+"texture": ExtResource("35_xk402")
+}, {
+"duration": 1.0,
+"texture": ExtResource("36_prkya")
+}, {
+"duration": 1.0,
+"texture": ExtResource("37_apkxu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("38_bk7ay")
+}, {
+"duration": 1.0,
+"texture": ExtResource("39_wuqdl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_7tba3")
+}],
+"loop": 1,
+"name": &"reposo",
+"speed": 8.0
+}]
+
+[node name="corredor" type="Node2D" unique_id=5549430]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=577786296]
+sprite_frames = SubResource("SpriteFrames_44p7d")
+animation = &"reposo"
+frame_progress = 0.98109
