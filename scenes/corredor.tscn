@@ -40,6 +40,7 @@
 [ext_resource type="Texture2D" uid="uid://cdpi0kect2st3" path="res://assets/enemies/corredor/reposo/reposo_05.png" id="38_bk7ay"]
 [ext_resource type="Texture2D" uid="uid://hm7hxv6du6hf" path="res://assets/enemies/corredor/reposo/reposo_06.png" id="39_wuqdl"]
 [ext_resource type="Texture2D" uid="uid://evr2anumcp42" path="res://assets/enemies/corredor/reposo/reposo_07.png" id="40_7tba3"]
+[ext_resource type="Script" path="res://scripts/siege_enemy.gd" id="41_behavior"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_44p7d"]
 animations = [{
@@ -68,7 +69,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("8_chgb7")
 }],
-"loop": 1,
+"loop": false,
 "name": &"ataque",
 "speed": 9.0
 }, {
@@ -77,16 +78,16 @@ animations = [{
 "texture": ExtResource("9_t1450")
 }, {
 "duration": 1.0,
-"texture": ExtResource("10_fx523")
-}, {
-"duration": 1.0,
 "texture": ExtResource("11_hgab6")
 }, {
 "duration": 1.0,
-"texture": ExtResource("12_un6jr")
+"texture": ExtResource("13_3uydj")
 }, {
 "duration": 1.0,
-"texture": ExtResource("13_3uydj")
+"texture": ExtResource("10_fx523")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_un6jr")
 }, {
 "duration": 1.0,
 "texture": ExtResource("14_f37cf")
@@ -140,7 +141,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("27_f37cf")
 }],
-"loop": 1,
+"loop": false,
 "name": &"daño",
 "speed": 7.0
 }, {
@@ -160,7 +161,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("32_n88co")
 }],
-"loop": 1,
+"loop": false,
 "name": &"destruccion",
 "speed": 5.0
 }, {
@@ -195,8 +196,10 @@ animations = [{
 }]
 
 [node name="corredor" type="Node2D" unique_id=5549430]
+script = ExtResource("41_behavior")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=577786296]
+texture_filter = 1
+position = Vector2(0, -21)
 sprite_frames = SubResource("SpriteFrames_44p7d")
 animation = &"reposo"
-frame_progress = 0.98109

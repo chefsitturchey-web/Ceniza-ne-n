@@ -49,9 +49,10 @@ func run_checks() -> void:
 	verify(not is_instance_valid(enemy), "Desaparición al terminar la animación")
 	var runner = world.spawn_enemy(-1, true)
 	runner.set_physics_process(false)
-	verify(runner.get_node_or_null("AnimatedSprite2D") == null, "Conservar corredor provisional")
+	var runner_sprite: AnimatedSprite2D = runner.get_node_or_null("AnimatedSprite2D")
+	verify(runner_sprite != null, "Corredor integra AnimatedSprite2D")
 	runner.take_damage(1000)
-	verify(runner.is_queued_for_deletion(), "Corredor conserva muerte inmediata")
+	verify(runner_sprite.animation == &"destruccion" and not runner.is_queued_for_deletion(), "Corredor muestra destrucción antes de desaparecer")
 	world.queue_free()
 	await process_frame
 	print("Animaciones: %d comprobaciones; %d fallos" % [checks, failures])

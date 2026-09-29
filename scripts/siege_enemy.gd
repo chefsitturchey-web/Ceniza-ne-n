@@ -62,7 +62,10 @@ func update_visual(moving: bool = false) -> void:
 		play_visual(&"daño", 0.32)
 	elif moving:
 		attack_visual_remaining = 0.0
-		play_visual(&"caminar")
+		if runner and sprite != null and sprite.sprite_frames.has_animation(&"correr"):
+			play_visual(&"correr")
+		else:
+			play_visual(&"caminar")
 	elif attack_visual_remaining > 0.0:
 		# Si recibió daño, deja terminar la reacción en vez de reiniciar el golpe.
 		if sprite != null and sprite.animation != &"ataque":
