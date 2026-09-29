@@ -2,3 +2,8 @@
 exports/
 *.tmp
 validation*.log
+
+# Editor y herramientas locales
+.idea/
+.vscode/
+.atl/
