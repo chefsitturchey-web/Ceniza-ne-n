@@ -172,7 +172,7 @@ animations = [{
 [node name="constructor" type="Node2D" unique_id=1324901754]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1436437691]
+texture_filter = 1
+position = Vector2(0, -21)
 sprite_frames = SubResource("SpriteFrames_kn1s8")
 animation = &"reposo"
-frame = 6
-frame_progress = 0.85460275

@@ -3,6 +3,7 @@ extends Node2D
 const PLAYER_SCENE: PackedScene = preload("res://scenes/player.tscn")
 const ERRANTE_SCENE: PackedScene = preload("res://scenes/errante.tscn")
 const CORREDOR_SCENE: PackedScene = preload("res://scenes/corredor.tscn")
+const CONSTRUCTOR_SCENE: PackedScene = preload("res://scenes/constructor.tscn")
 const FLOOR_Y: float = 260.0
 @export var day_duration: float = 90.0
 @export var warning_duration: float = 10.0
@@ -96,8 +97,15 @@ func add_solid(at: Vector2, dimensions: Vector2) -> void:
 	add_child(body)
 
 func add_worker(role: String) -> void:
-	workers.append({"role": role, "x": 0.0, "job": -1, "gather": 0.0,
-		"cargo": 0, "side": -1.0 if workers.size() < 2 else 1.0})
+	var worker := {"role": role, "x": 0.0, "job": -1, "gather": 0.0,
+		"cargo": 0, "side": -1.0 if workers.size() < 2 else 1.0}
+	if role == "builder":
+		var visual := CONSTRUCTOR_SCENE.instantiate() as Node2D
+		visual.process_mode = Node.PROCESS_MODE_PAUSABLE
+		visual.position = Vector2(worker.x, FLOOR_Y)
+		add_child(visual)
+		worker["visual"] = visual
+	workers.append(worker)
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("restart") and finished:
@@ -220,6 +228,24 @@ func update_workers(delta: float) -> void:
 				job.ordered = false
 				job.progress = 0.0
 				worker.job = -1
+		update_worker_visual(worker, destination)
+
+func update_worker_visual(worker: Dictionary, destination: float) -> void:
+	var visual: Node2D = worker.get("visual") as Node2D
+	if visual == null:
+		return
+	visual.position = Vector2(worker.x, FLOOR_Y)
+	var sprite: AnimatedSprite2D = visual.get_node("AnimatedSprite2D") as AnimatedSprite2D
+	var animation: StringName
+	if worker.job >= 0 and absf(worker.x - destination) < 2.0:
+		animation = &"reparar"
+	elif absf(worker.x - destination) > 0.5:
+		sprite.flip_h = destination < worker.x
+		animation = &"huir" if unsafe_at(worker.x) else &"caminar"
+	else:
+		animation = &"reposo"
+	if sprite.animation != animation or not sprite.is_playing():
+		sprite.play(animation)
 
 func unsafe_at(x: float) -> bool:
 	for enemy in get_tree().get_nodes_in_group("enemies"):
@@ -460,6 +486,8 @@ func _draw() -> void:
 		if site.ordered:
 			draw_rect(Rect2(x - 14, FLOOR_Y - 60, 28.0 * site.progress / 4.0, 3), Color("ffce75"))
 	for worker in workers:
+		if worker.has("visual"):
+			continue
 		var color := Color("ffce75") if worker.role == "builder" else Color("b075ae")
 		draw_rect(Rect2(worker.x - 5, FLOOR_Y - 19, 10, 19), color)
 		if worker.cargo > 0:
