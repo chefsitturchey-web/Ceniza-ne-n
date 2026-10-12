@@ -1,6 +1,9 @@
 class_name ConstructionSite
 extends Node2D
 
+## El estado del mundo se comunica con efectos, nunca con barras.
+const WORLD_BARS_ENABLED: bool = false
+
 signal destroyed
 @export var data: StructureData
 var health_component: HealthComponent = HealthComponent.new()
@@ -94,7 +97,6 @@ func _draw() -> void:
 		draw_set_transform(Vector2(kick, 0), 0.0, Vector2(-1.0 if x < 0.0 else 1.0, 1.0))
 		draw_texture(data.texture, Vector2(-size.x / 2.0, -size.y), Color(0.75, 1.5, 1.45) if boosted else Color.WHITE)
 		draw_set_transform(Vector2.ZERO)
-		draw_rect(Rect2(-14, -size.y - 6, 28.0 * hp / max_hp, 3), Color("47dacb"))
 	elif hp > 0:
 		if data.blocks_enemies:
 			draw_rect(Rect2(-10, -45, 20, 45), color)
@@ -102,8 +104,5 @@ func _draw() -> void:
 		else:
 			draw_rect(Rect2(-5, -35, 10, 35), color)
 			draw_rect(Rect2(-14, -45, 28, 12), color)
-		draw_rect(Rect2(-14, -54, 28.0 * hp / max_hp, 3), Color("47dacb"))
 	else:
 		draw_rect(Rect2(-12, -40, 24, 40), Color("b075ae"), false, 1.0)
-	if ordered:
-		draw_rect(Rect2(-14, -60, 28.0 * progress / GameRules.BUILD_TIME, 3), Color("ffce75"))

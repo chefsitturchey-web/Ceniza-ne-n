@@ -1,6 +1,9 @@
 class_name EnemyVisual
 extends EntityVisual
 
+## El estado del mundo se comunica con efectos, nunca con barras.
+const WORLD_BARS_ENABLED: bool = false
+
 var actor: SiegeEnemy
 var effects: DebrisEmitter = DebrisEmitter.new()
 var smoke_timer: float = 0.0
@@ -57,6 +60,5 @@ func _draw() -> void:
 	if sprite == null:
 		draw_rect(Rect2(-10, -height, 20, height), color)
 		draw_rect(Rect2(-7, -height + 5, 14, 6), Color("271d33"))
-	draw_rect(Rect2(-12, -height - 7, 24.0 * actor.health / actor.max_health, 3), color)
 	if actor.windup > 0.0:
 		draw_line(Vector2(0, -height - 13), Vector2(0, -height - 22), Color("ffce75"), 3.0)
