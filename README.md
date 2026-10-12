@@ -1,179 +1,193 @@
-# CENIZA NEÓN
+<p align="center">
+  <img src="docs/media/banner.png" alt="Ceniza Neón" width="100%">
+</p>
 
-**Construye de día. Resiste de noche. Recupera la ciudad.**
+<p align="center">
+  <b>Construye de día. Resiste de noche. Recupera la ciudad.</b><br>
+  Supervivencia, construcción y acción táctica en 2D con pixel art industrial cyberpunk.
+</p>
 
-Prototipo de supervivencia y defensa lateral en 2D, desarrollado con **Godot y GDScript**. En unas ruinas industriales cyberpunk, diriges a un portador de una llave neuronal capaz de reactivar infraestructura y proteger a los últimos supervivientes de una red de máquinas hostiles.
+<p align="center">
+  <img alt="Godot 4.7.2" src="https://img.shields.io/badge/Godot-4.7.2-478cbf?logo=godotengine&logoColor=white">
+  <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
+  <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
+  <img alt="Estado" src="https://img.shields.io/badge/estado-prototipo%20jugable-e89e54">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-15%20suites-47dacb">
+</p>
 
-La colonia es tu defensa principal. Tu personaje combate, repara la situación en el frente más presionado y activa sobrecargas eléctricas para cambiar el rumbo del asedio.
+<p align="center">
+  <a href="#el-juego">El juego</a> ·
+  <a href="#características">Características</a> ·
+  <a href="#cómo-jugar">Cómo jugar</a> ·
+  <a href="#controles">Controles</a> ·
+  <a href="#hoja-de-ruta">Hoja de ruta</a> ·
+  <a href="#desarrollo">Desarrollo</a> ·
+  <a href="#créditos-y-licencias">Créditos</a>
+</p>
 
-> **Estado: prototipo jugable en desarrollo (Distrito 1).** Defensa lateral de tres noches con ciclo de luz día/atardecer/noche, dos repetidores enemigos, estación ferroviaria y una expedición en vista cenital contra el primer jefe, **El Recaudador**. Arte pixel de perfil plano para personajes, estructuras, decoración y fondo con parallax; efectos de construcción, daño y escombros; HUD mínimo con panel de pausa y fuente pixel. Guardado automático al comenzar cada día. Todavía no hay sonido (en curso). El ajuste de pruebas usa días de 10 segundos.
+---
 
-[Cómo jugar](#cómo-probarlo) · [Controles](#controles) · [Estado del proyecto](#estado-del-proyecto) · [Reportar un problema](https://github.com/chefsitturchey-web/Ceniza-ne-n/issues)
+## El juego
 
-## Qué puedes probar
+Tras un colapso tecnológico, una red autónoma de máquinas intenta borrar los últimos asentamientos humanos. Eres el **Portador**, la persona que lleva una llave neuronal capaz de reactivar la infraestructura antigua. De día recuperas chatarra, reclutas supervivientes y levantas defensas; de noche las máquinas vuelven a conectarse y atacan la colonia por ambos lados.
 
-- Movimiento lateral, combate cuerpo a cuerpo y esquiva con resistencia; el cansancio se ve en la animación.
-- Construcción y reparación de murallas y torretas: la obra se levanta por etapas, se agrieta, echa humo y se rompe en pedazos.
-- Reclutamiento de hasta cuatro habitantes: constructores y recuperadores con tareas automáticas.
-- Producción de chatarra, capacidad energética y sobrecarga independiente por frente.
-- Un dron de apoyo y dos enemigos (Errante y Corredor) con chispas, esquirlas y humo al recibir daño.
-- Ciclo de luz día, atardecer y noche, con ataques desde ambos lados.
-- **Repetidores enemigos** en ambos extremos: al destruir los dos llega el **tren blindado** a la estación.
-- **Expedición al jefe** en vista cenital (estilo Enter the Gungeon): El Recaudador con escudo, abanicos de fichas, garrazo y embestida que expone su núcleo; segunda fase al 50 %. Si pierdes vuelves a la colonia en el mismo momento; si ganas, completas el Distrito 1.
-- HUD mínimo: recursos en una esquina, viñeta roja de daño, flechas de amenaza en los bordes, carteles de fase y panel completo al pausar.
+Para liberar un distrito destruyes sus **repetidores enemigos**, tomas el **tren blindado** y enfrentas al jefe que protege el enlace de transporte en una arena con vista cenital.
 
-## Cómo probarlo
+> *"De día, la ciudad parecía muerta. De noche, las máquinas vuelven a conectarse."*
+
+Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión), **Dark Souls** (resistencia, esquiva y jefes legibles), **Enter the Gungeon** (arenas de jefe) y **Vampire Survivors** (armamento automático, en desarrollo).
+
+<p align="center">
+  <img src="docs/media/ciclo.gif" alt="Ciclo de día, atardecer y noche" width="80%"><br>
+  <sub>Ciclo de luz: día con calima, atardecer de aviso y noche de asedio.</sub>
+</p>
+
+## Características
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/media/efectos.gif" alt="Construcción, daño y destrucción"><br>
+      <b>Defensa viva.</b> Las obras se levantan por etapas, se agrietan, echan humo y se rompen en pedazos reales del sprite. Sin barras de vida: el estado se lee mirando el juego.
+    </td>
+    <td width="50%">
+      <img src="docs/media/tren.gif" alt="Repetidores y tren blindado"><br>
+      <b>Repetidores y tren.</b> Destruye las dos antenas enemigas de los extremos del distrito y el tren blindado llega a la estación.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/media/jefe.gif" alt="Arena del Recaudador"><br>
+      <b>El Recaudador.</b> Primer jefe, en arena cenital: escudo frontal, abanicos de fichas, garrazo y una embestida que, si choca, deja su núcleo expuesto. Segunda fase al 50 %.
+    </td>
+    <td width="50%">
+      <img src="docs/media/pausa.png" alt="HUD mínimo y panel de pausa"><br>
+      <b>HUD mínimo.</b> Recursos en una esquina, viñeta roja al recibir daño, flechas de amenaza en los bordes y todo el detalle solo al pausar.
+    </td>
+  </tr>
+</table>
+
+- **Combate exigente:** ataque cuerpo a cuerpo, esquiva con invulnerabilidad y resistencia; el cansancio se nota en la animación.
+- **Colonia automática:** constructores y recuperadores con tareas propias; recluta hasta cuatro habitantes.
+- **Economía y energía:** chatarra para construir, capacidad energética para mantener torretas y sobrecarga independiente por frente.
+- **Expediciones:** la colonia se pausa mientras luchas contra el jefe; si caes, vuelves al mismo momento para prepararte mejor.
+- **Guardado automático** al comenzar cada día (incluye repetidores destruidos y el tren).
+- **Arte pixel coherente:** todo en vista lateral plana (la arena es cenital), paleta propia, fuentes pixel y fondo con parallax.
+
+## Cómo jugar
 
 ### Requisitos
 
-| Componente | Configuración utilizada |
+| | |
 |---|---|
-| Motor | Godot **4.7.2**, edición estándar; no requiere .NET |
-| Plataforma de desarrollo y pruebas | Windows |
-| Renderizador | Compatibility |
-| Controles | Teclado; soporte de mando implementado |
-| Dependencias adicionales | Ninguna |
+| Motor | [Godot 4.7.2](https://godotengine.org/download), edición estándar (no requiere .NET) |
+| Sistema | Windows (otros sistemas sin probar) |
+| Controles | Teclado o mando (Xbox / PlayStation) |
+| Dependencias | Ninguna |
 
-La versión indicada es la utilizada para desarrollar y comprobar este prototipo, no una garantía de compatibilidad con todas las versiones de Godot 4. Otros sistemas operativos y modelos de mando todavía necesitan pruebas. No se han establecido requisitos mínimos de hardware.
-
-### 1. Obtén el proyecto
-
-Con Git:
+### Instalación
 
 ```bash
 git clone https://github.com/chefsitturchey-web/Ceniza-ne-n.git
-cd Ceniza-ne-n
 ```
 
-También puedes pulsar **Code → Download ZIP** en GitHub y extraer el archivo en una carpeta local. No necesitas Git si utilizas esta opción.
+1. Abre Godot y pulsa **Importar**; elige `project.godot` dentro de la carpeta.
+2. Espera la importación inicial (la primera vez importa fuentes y sprites).
+3. Pulsa **F5** para jugar.
 
-### 2. Ábrelo en Godot
+También puedes usar **Code → Download ZIP**. Este repositorio no incluye ejecutable: el juego se prueba desde el editor.
 
-1. Abre el administrador de proyectos de Godot.
-2. Pulsa **Importar** y selecciona `project.godot` dentro de la carpeta descargada.
-3. Abre el proyecto y espera a que termine la importación inicial.
-4. Presiona **F5** para ejecutar el juego.
+### Primera partida
 
-El proyecto se prueba desde el editor; este repositorio no incluye un ejecutable de Windows. No necesitas instalar plugins ni descargar recursos adicionales.
+1. **Construye ambos frentes.** Acércate a los marcos de obra y mantén **E**. Empiezas con 90 de chatarra.
+2. **Deja trabajar a la colonia.** El constructor levanta las obras y el recuperador trae chatarra durante el día.
+3. **Recluta** en el núcleo central (15 de chatarra por habitante, hasta cuatro).
+4. **Resiste la noche.** Las flechas rosas en los bordes indican por dónde vienen. Usa **Q** para sobrecargar el frente donde estás.
+5. **Abre el camino.** Destruye los repetidores de ambos extremos; cuando llegue el tren, de día, mantén **E** en la estación para viajar al jefe.
 
-### 3. Sobrevive a tu primera noche
-
-1. **Construye ambos frentes.** Empiezas con 90 de chatarra, un constructor y un recuperador. Acércate a los marcos de construcción y mantén **E**: cada muralla cuesta 20 y cada torreta 25. Las cuatro obras suman 90.
-2. **Deja trabajar a la colonia.** Encargar una obra no la completa inmediatamente. El constructor se desplaza hasta ella; el recuperador sale de día y deposita chatarra automáticamente.
-3. **Amplía el equipo.** Con los recursos producidos, vuelve al núcleo central y mantén **E** para reclutar. Cada nuevo habitante cuesta 15, hasta un máximo de cuatro. Si estás herido, la interacción primero te cura; ambas acciones están disponibles durante el día.
-4. **Responde al asedio.** Al anochecer, revisa los indicadores de amenazas de ambos lados. Ataca con **J**, esquiva con **Espacio** y utiliza **Q** para sobrecargar el frente donde te encuentras.
-5. **Recupera las defensas.** Encarga reparaciones en las estructuras dañadas por ocho de chatarra. Los constructores esperan si hay enemigos cerca: despejar la zona también es parte de tu trabajo.
-
-La configuración base tiene **90 segundos de día, 10 de aviso y 60 de noche**. El distrito actual conserva tu ajuste de **10 segundos de día**: en `levels/main.tscn`, selecciona `Cycle` y asigna `data/cycles/standard.tres` a `config` si quieres el tiempo completo de preparación. La noche se prolonga si quedan enemigos. Sobrevive a las tres noches para ganar; si destruyen el núcleo, pierdes. Al morir, el personaje reaparece después de cuatro segundos mientras la colonia sigue defendiéndose.
-
-**Consejo:** la sobrecarga dura seis segundos y después necesita dieciocho de enfriamiento. Cada frente tiene su propio temporizador: úsala cuando la defensa esté bajo presión.
+La guía detallada de esta versión está en [INICIO.md](INICIO.md).
 
 ## Controles
 
-| Acción | Teclado | Mando Xbox |
+| Acción | Teclado | Mando |
 |---|---|---|
-| Movimiento | A / D o flechas izquierda / derecha | Stick izquierdo o cruceta |
-| Ataque, repetible al mantener | J | X |
-| Esquiva | Espacio | A |
-| Construir, reparar, reclutar o curar | Mantener E | Mantener Y |
-| Sobrecarga del frente actual | Q | LB |
-| Pausar / continuar | Esc | Start |
-| Nueva partida después de ganar o perder | R | Select / Back |
-| Viajar en el tren (de día, con el tren en la estación) | Mantener E | Mantener Y |
+| Moverse | A / D (W / S en la arena) | Stick izquierdo / cruceta |
+| Atacar | J | X / Cuadrado |
+| Esquivar | Espacio | A / Cruz |
+| Construir, reparar, reclutar, viajar | Mantener E | Mantener Y / Triángulo |
+| Sobrecarga del frente | Q | LB / L1 |
+| Pausa y estadísticas | Esc | Start |
+| Nueva partida tras el final | R | Select |
 
-En la **arena del jefe** el movimiento es en ocho direcciones (W/A/S/D o flechas, stick izquierdo); ataque, esquiva y pausa usan los mismos botones.
+## Hoja de ruta
 
-En PlayStation, las equivalencias principales son **Cuadrado** para atacar, **Cruz** para esquivar, **Triángulo** para interactuar y **L1** para sobrecargar. El HUD utiliza las etiquetas de Xbox.
+| Hecho | En curso | Próximo |
+|---|---|---|
+| Distrito 1 completo con dos frentes, repetidores y estación | Música y efectos de sonido | Datos neuronales, niveles y Clínica de enlace |
+| Primer jefe: El Recaudador | Animaciones norte/sur del Portador en la arena | Módulos automáticos, pasivas y evoluciones |
+| Errante, Corredor, constructores y recuperadores | Nuevo Corredor y Constructor con el estilo actual | Blindado, Saltador, Ariete y más arquetipos |
+| Efectos, ciclo de luz, HUD mínimo y fuentes pixel | Menús principal, de opciones y de pausa | Distritos 2 a 4 y los demás jefes |
 
-Para detener la ejecución desde el editor, utiliza **F8**.
+El alcance completo está en el [documento de diseño (GDD)](CENIZA_NEON_GDD.docx).
 
-Al volver a ejecutar con **F5**, continúas desde el inicio del último día guardado en `user://partida.json`. Se conservan recursos, habitantes, obras pendientes, defensas y vida. Ganar, perder o reiniciar elimina ese guardado. Un archivo corrupto o de versión desconocida inicia una partida nueva.
+## Desarrollo
 
-## Estado del proyecto
-
-Esta versión valida el ciclo de construcción y defensa. El alcance completo del documento de diseño todavía está en desarrollo.
-
-| Disponible | Pendiente |
-|---|---|
-| Distrito 1 con dos frentes, repetidores y estación | Distritos 2-4 y campaña |
-| Primer jefe (El Recaudador) en arena cenital | Otros cuatro jefes; pulido y ambientación de la arena |
-| Errante y Corredor | Blindado, Saltador, Ariete y el resto de arquetipos del GDD |
-| Combate manual, esquiva y dron | Datos neuronales, niveles, Clínica de enlace, módulos y pasivas |
-| Constructores y recuperadores | Tirador, guardián, técnico, médico y más edificios |
-| Arte pixel, efectos y ciclo de luz | Animaciones norte/sur en la arena, nuevo Corredor y Constructor |
-| Guardado al amanecer (incluye repetidores y tren) | Música y sonido (en curso) |
-
-**Limitaciones actuales:** la chatarra se almacena en una bolsa común, la capacidad energética es fija, los trabajadores no reciben daño y las torretas no son objetivos de los enemigos. Al cerrar se pierde lo realizado después del último amanecer; perder elimina la partida. La dificultad y la legibilidad visual requieren pruebas con jugadores.
-
-## Documentación y estructura
-
-- [Guía de la versión actual](INICIO.md): reglas y detalles para probar el prototipo.
-- [Dirección de arte y prompts](docs/GUIA_ARTE.md): paleta, dimensiones y referencias para producir recursos consistentes.
-- [Documento de diseño — GDD](CENIZA_NEON_GDD.docx): visión y alcance previsto del juego; no es una lista de funciones ya implementadas.
-- [Registro de recursos](docs/ASSET_SOURCES.csv): procedencia y condiciones de uso de los futuros assets.
-- [Arquitectura y señales](docs/ARQUITECTURA.md): responsabilidades, configuración y pruebas.
-
-**Herramientas de arte** (carpeta `tools/`): `generar_fondo.py` (capas del fondo), `bocetos_arena.py` y `bocetos_recaudador.py` (bocetos planos que se detallan con IA local), `integrar_pixellab.py` (convierte las animaciones exportadas de PixelLab en `SpriteFrames`). Los personajes animados se generan con PixelLab; estructuras, decoración y piezas del jefe con Stable Diffusion local (ComfyUI) a partir de bocetos planos, siempre en vista lateral plana salvo la arena cenital. Fuentes: Micro 5 y Silkscreen (SIL OFL, licencias en `assets/fonts/`).
-
-**Trabajo en equipo:** cada tarea va en su propia rama (`audio/...`, `ui/...`, `feature/...`) y se integra en `main` con Pull Request cuando `tests/run_all.gd` termina sin fallos. El tablero de sprints está en Notion (acceso por invitación).
+### Estructura
 
 ```text
-core/           Controles y constantes de capas, grupos y reglas compartidas
-components/     Vida, hitbox, hurtbox e interfaz visual reutilizables
-entities/       Jugador, enemigos, trabajadores, estructuras y núcleo
-systems/        Ciclo, economía, obras, colonia, asedio, defensas y sesión
-ui/             HUD mínimo, panel de pausa, tema y fuentes
-data/           Definiciones Resource y configuraciones .tres
-levels/         Distrito principal y expedición (arena del Recaudador)
-assets/         PNG originales y sus ajustes de importación
-tests/          Pruebas de reglas y simulaciones de sesión
-docs/           Dirección de arte y registro de recursos
-tools/          Scripts para generar e integrar arte
-project.godot   Configuración y punto de entrada del proyecto
+core/        Controles y reglas compartidas
+components/  Vida, golpes, efectos y escombros reutilizables
+entities/    Jugador, enemigos, jefe, trabajadores y estructuras
+systems/     Ciclo, economía, obras, colonia, asedio, defensas, guardado y expediciones
+ui/          HUD, panel de pausa, tema y fuentes
+data/        Recursos .tres de enemigos, estructuras, oleadas y ciclos
+levels/      Distrito principal y arena del jefe
+assets/      Sprites, fondos, íconos y fuentes
+tools/       Scripts para generar e integrar arte
+tests/       Pruebas automatizadas y simulaciones
+docs/        Arquitectura, guía de arte, registro de recursos y medios del README
 ```
 
-## Pruebas automatizadas
-
-Desde la carpeta del proyecto, con el ejecutable de Godot disponible como `godot`:
+### Pruebas
 
 ```bash
 godot --headless --path . --import
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta 15 suites: combate, asedio, animaciones, vida, Resources, oleadas, integración visual, compilación, guardado, efectos, HUD, expedición, el jefe y ambas simulaciones. Sale con código distinto de cero ante un fallo. Para ejecutar pruebas individuales:
+`run_all.gd` ejecuta 15 suites (combate, asedio, animaciones, guardado, efectos, HUD, expedición, jefe, Resources y dos simulaciones completas de partida) y termina con error ante cualquier fallo. En Windows sustituye `godot` por la ruta del ejecutable de consola.
 
-```bash
-godot --headless --path . --script res://tests/combat_smoke.gd
-godot --headless --path . --script res://tests/siege_smoke.gd
-godot --headless --path . --script res://tests/errante_animation_smoke.gd
-godot --headless --path . --script res://tests/session_simulation.gd
-godot --headless --path . --script res://tests/session_simulation.gd -- --assist
-```
+### Flujo de trabajo
 
-En Windows puedes sustituir `godot` por la ruta de tu ejecutable de consola. En PowerShell, una ruta entre comillas se ejecuta anteponiendo `&`.
+- Cada tarea va en su propia rama (`feature/...`, `audio/...`, `ui/...`) y entra en `main` con Pull Request cuando las pruebas pasan sin fallos.
+- El tablero de sprints y tareas está en Notion (acceso por invitación).
+- Arte: personajes animados con PixelLab; estructuras, decoración y piezas del jefe con Stable Diffusion local a partir de bocetos planos (`tools/`). Todo recurso externo se registra en [docs/ASSET_SOURCES.csv](docs/ASSET_SOURCES.csv).
 
-Las pruebas cubren alcance, daño, economía, obras, energía, esquiva y condiciones de finalización. Las simulaciones parten de defensas construidas: sin apoyo se espera una derrota; con apoyo automatizado, una victoria. No sustituyen la prueba visual, la comprobación del mando ni el ajuste de dificultad con jugadores.
+### Documentación
 
-## Añadir contenido con Resources
+- [Arquitectura y señales](docs/ARQUITECTURA.md)
+- [Guía de arte y paleta](docs/GUIA_ARTE.md)
+- [Guía de la versión actual](INICIO.md)
+- [Documento de diseño (GDD)](CENIZA_NEON_GDD.docx)
 
-**Enemigo:** duplica una escena de `entities/enemies/`, conserva su raíz con `SiegeEnemy` (o un script que lo extienda) y configura `AnimatedSprite2D`. Usa `reposo`, `ataque`, `daño`, `destruccion` y la animación de avance indicada por `move_animation`. Crea un `EnemyData` en `data/enemies/`, asigna la escena, identidad, estadísticas y recompensa. Añádelo al array `enemies` de una oleada en `data/waves/`, con una entrada correspondiente en `sides` (-1 izquierda, +1 derecha). El director no necesita cambios de código. El número de elementos determina la cantidad; puedes repetir referencias.
+### Añadir contenido
 
-**Estructura:** duplica un `StructureData` de `data/structures/`. Ajusta nombre, costo, vida, reparación, energía, posición y ataque. Asigna una escena con raíz `ConstructionSite` (puedes reutilizar `entities/structures/site.tscn` o extenderla para otro aspecto). Añade el Resource a `Construction.blueprints` en `levels/main.tscn`: aparecerá en ambos lados, a la distancia `offset`. `blocks_enemies` define si bloquea; `damage` mayor que cero habilita disparos. Las reglas de obra, vida, reparación y energía son compartidas.
+- **Enemigo:** duplica una escena de `entities/enemies/`, crea su `EnemyData` en `data/enemies/` y añádelo a una oleada de `data/waves/`. El director de asedio no necesita cambios de código.
+- **Estructura:** duplica un `StructureData` de `data/structures/`, asígnale textura y añádelo a `Construction.blueprints` en `levels/main.tscn`.
 
-Para modificar trabajadores, edita sus `WorkerData`; para tiempos y premios, el `CycleConfig` asignado a `Cycle`. No cambies los Resources durante una partida: cada entidad mantiene su estado por separado. Al mover scripts, mueve también sus `.gd.uid` y reimporta.
+## Equipo
 
-## Comentarios y problemas
+| | |
+|---|---|
+| **Carlos Alberto Llano Flores — Turchey** | Dirección, diseño y programación |
+| **Timoteo** | Música, efectos de sonido y menús |
 
-Puedes compartir tus resultados o abrir un [issue](https://github.com/chefsitturchey-web/Ceniza-ne-n/issues). Para facilitar la revisión, incluye:
+Con apoyo de asistentes de IA (Claude y Codex) para programación, herramientas y arte, siempre revisado por el equipo.
 
-- Qué esperabas y qué ocurrió, con pasos para reproducirlo.
-- Versión de Godot, sistema operativo y teclado o modelo de mando utilizado.
-- Noche y situación en la que apareció el problema.
-- Captura, vídeo breve o mensaje de error, si corresponde.
+## Créditos y licencias
 
-También nos interesa saber si se entiende cómo construir, si puedes atender ambos frentes y en qué momento la dificultad deja de sentirse justa.
+- **Motor:** [Godot Engine](https://godotengine.org) (licencia MIT).
+- **Fuentes:** Micro 5 y Silkscreen, bajo [SIL Open Font License](assets/fonts/) (licencias incluidas).
+- **Arte generado:** PixelLab (según sus [términos de servicio](https://pixellab.ai/termsofservice)) y Stable Diffusion 1.5 (CreativeML OpenRAIL-M) con un LoRA de pixel art. Detalle por recurso en [docs/ASSET_SOURCES.csv](docs/ASSET_SOURCES.csv).
 
----
-
-Creado por **Carlos Alberto Llano Flores — Turchey**. Desarrollado con Godot y GDScript.
+El código y el contenido original de Ceniza Neón son de su autor; **todos los derechos reservados** mientras no se publique una licencia. ¿Encontraste un problema o tienes una idea? Abre un [issue](https://github.com/chefsitturchey-web/Ceniza-ne-n/issues) indicando qué esperabas, qué ocurrió y cómo reproducirlo.
