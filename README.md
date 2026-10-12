@@ -6,7 +6,7 @@ Prototipo de supervivencia y defensa lateral en 2D, desarrollado con **Godot y G
 
 La colonia es tu defensa principal. Tu personaje combate, repara la situación en el frente más presionado y activa sobrecargas eléctricas para cambiar el rumbo del asedio.
 
-> **Estado: prototipo jugable en desarrollo.** Partida de tres noches; configuración base de aproximadamente ocho minutos. Este worktree conserva el ajuste de pruebas con días de 10 segundos (unos cuatro minutos). Errante, corredor y constructor tienen animaciones; el resto del arte es provisional. Todavía no hay sonido ni guardado de partida.
+> **Estado: prototipo jugable en desarrollo.** Partida de tres noches; configuración base de aproximadamente ocho minutos. Este worktree conserva el ajuste de pruebas con días de 10 segundos (unos cuatro minutos). Errante, corredor y constructor tienen animaciones; el resto del arte es provisional. Guardado automático al comenzar cada día. Todavía no hay sonido.
 
 [Cómo jugar](#cómo-probarlo) · [Controles](#controles) · [Estado del proyecto](#estado-del-proyecto) · [Reportar un problema](https://github.com/chefsitturchey-web/Ceniza-ne-n/issues)
 
@@ -82,6 +82,8 @@ En PlayStation, las equivalencias principales son **Cuadrado** para atacar, **Cr
 
 Para detener la ejecución desde el editor, utiliza **F8**.
 
+Al volver a ejecutar con **F5**, continúas desde el inicio del último día guardado en `user://partida.json`. Se conservan recursos, habitantes, obras pendientes, defensas y vida. Ganar, perder o reiniciar elimina ese guardado. Un archivo corrupto o de versión desconocida inicia una partida nueva.
+
 ## Estado del proyecto
 
 Esta versión valida el ciclo de construcción y defensa. El alcance completo del documento de diseño todavía está en desarrollo.
@@ -93,9 +95,9 @@ Esta versión valida el ciclo de construcción y defensa. El alcance completo de
 | Combate manual, esquiva y dron | Equipo, evoluciones y progresión |
 | Economía y trabajadores simplificados | Infraestructura y profesiones ampliadas |
 | Formas y efectos provisionales | Sprites, animaciones, música y sonido |
-| Reinicio de sesión | Guardado y carga |
+| Reinicio de sesión y guardado al amanecer | Guardado durante el asedio |
 
-**Limitaciones actuales:** la chatarra se almacena en una bolsa común, la capacidad energética es fija, los trabajadores no reciben daño y las torretas no son objetivos de los enemigos. Perder o cerrar el juego no conserva el progreso. La dificultad y la legibilidad visual requieren pruebas con jugadores.
+**Limitaciones actuales:** la chatarra se almacena en una bolsa común, la capacidad energética es fija, los trabajadores no reciben daño y las torretas no son objetivos de los enemigos. Al cerrar se pierde lo realizado después del último amanecer; perder elimina la partida. La dificultad y la legibilidad visual requieren pruebas con jugadores.
 
 ## Documentación y estructura
 

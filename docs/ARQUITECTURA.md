@@ -41,6 +41,10 @@ Estados del jugador: `IDLE`, `MOVE`, `ATTACK`, `DODGE`, `DEAD`; los temporizador
 
 ## Validación
 
+`SaveSystem` pertenece a cada sesión, sin autoload. `District` llama a `SessionController.initialize()` una vez conectadas las referencias. La sesión carga `user://partida.json` (JSON, versión 1) o guarda el primer día; `phase_changed` guarda los siguientes días después de las recompensas de `dawn`. Victoria, derrota y reinicio eliminan el archivo. La carga valida el documento completo antes de aplicar cambios y reinicia el temporizador del día con la configuración existente. Conserva recursos, vida, estructuras, trabajos y carga de habitantes, además de posición y temporizadores del jugador, defensas y sobrecargas. La energía usada se deriva de las estructuras y sus reservas.
+
+`save_system_test.gd` comprueba ida y vuelta, reapertura, documentos inválidos, amanecer y finales con `user://partida_test.json`. Las demás suites desactivan la persistencia antes de añadir el distrito al árbol para no leer ni modificar la partida real.
+
 `tests/run_all.gd` ejecuta diez suites en procesos separados, comprueba códigos de salida, errores y marcadores de finalización. Devuelve 1 si alguna falla. Solo reconoce como externo el mensaje exacto de acceso denegado al almacén de certificados de Windows; lo muestra en la salida. No ignora errores de scripts ni avisos del proyecto. Los registros `validation*.log` están excluidos de Git.
 
 `static_check.gd` carga y recompila todos los demás scripts (42); los avisos del proyecto están configurados como warning. Para la revisión final se compilaron también con todos los avisos habilitados elevados temporalmente a error, restaurando después la configuración normal. Referencia: [sistema de avisos y niveles de GDScript](https://docs.godotengine.org/en/stable/classes/class_projectsettings.html#class-projectsettings-property-debug-gdscript-warnings-inferred-declaration).

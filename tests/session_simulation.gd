@@ -6,6 +6,7 @@ func _initialize() -> void:
 func simulate() -> void:
 	var assist: bool = "--assist" in OS.get_cmdline_user_args()
 	var world: District = load("res://levels/main.tscn").instantiate() as District
+	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
