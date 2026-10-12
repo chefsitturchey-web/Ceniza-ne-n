@@ -38,21 +38,21 @@ func update_interaction(delta: float) -> void:
 func perform_interaction(target: int) -> bool:
 	if target == -1:
 		if cycle.phase != "DÍA":
-			notice_requested.emit("El refugio recluta y cura durante el día.")
+			notice_requested.emit("Solo de día")
 			return false
 		if player.health < Player.MAX_HEALTH:
 			player.health = Player.MAX_HEALTH
-			notice_requested.emit("Salud restaurada en el núcleo.")
+			notice_requested.emit("Salud restaurada")
 			return true
 		if colony.workers.size() >= GameRules.POPULATION:
-			notice_requested.emit("Colonia completa: dos constructores y dos recuperadores.")
+			notice_requested.emit("Colonia completa")
 			return false
 		var data: WorkerData = colony.builder_data if colony.workers.size() == GameRules.INITIAL_POPULATION else colony.collector_data
 		if bank.scrap < data.cost:
-			notice_requested.emit("Necesitas %d de chatarra para reclutar." % data.cost)
+			notice_requested.emit("Necesitas %d chatarra" % data.cost)
 			return false
 		bank.spend(data.cost)
 		colony.add_worker(data.id)
-		notice_requested.emit("Habitante reclutado. Su trabajo es automático.")
+		notice_requested.emit("Habitante reclutado")
 		return true
 	return construction.order(target)

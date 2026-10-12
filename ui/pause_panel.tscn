@@ -8,11 +8,12 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.188, 0.263, 0.337, 0.8)
 [node name="PausePanel" type="PanelContainer"]
+texture_filter = 1
 visible = false
-offset_left = 72.0
-offset_top = 48.0
-offset_right = 568.0
-offset_bottom = 312.0
+offset_left = 112.0
+offset_top = 64.0
+offset_right = 528.0
+offset_bottom = 296.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("Background")
 script = ExtResource("1")

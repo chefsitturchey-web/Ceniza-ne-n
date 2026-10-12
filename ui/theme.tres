@@ -1,0 +1,17 @@
+[gd_resource type="Theme" load_steps=3 format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/Micro5-Regular.ttf" id="1"]
+[ext_resource type="FontFile" path="res://assets/fonts/Silkscreen-Regular.ttf" id="2"]
+
+[resource]
+default_font = ExtResource("1")
+default_font_size = 10
+Label/colors/font_shadow_color = Color(0.043137, 0.07451, 0.133333, 1)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 1
+Title/base_type = &"Label"
+Title/fonts/font = ExtResource("2")
+Title/font_sizes/font_size = 16
+SmallTitle/base_type = &"Label"
+SmallTitle/fonts/font = ExtResource("2")
+SmallTitle/font_sizes/font_size = 8

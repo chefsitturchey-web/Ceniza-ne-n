@@ -9,9 +9,14 @@ var phase_key: String = ""
 var phase_remaining: float = 0.0
 var phase_banner: HBoxContainer
 var context_label: Label
+var context_row: HBoxContainer
+var context_keycap: PanelContainer
+var context_cost: Label
+var context_icon: TextureRect
+var context_progress: ColorRect
 var toast: Label
-var left_arrow: Label
-var right_arrow: Label
+var left_arrow: Control
+var right_arrow: Control
 var left_count: int = 0
 var right_count: int = 0
 @onready var pause_panel: PausePanel = $PausePanel
@@ -32,32 +37,40 @@ func _ready() -> void:
 	for key: String in ["dia", "aviso", "noche"]:
 		_icon(phase_banner, key)
 	values.phase = _label(phase_banner)
-	context_label = _label($Gameplay)
+	values.phase.theme_type_variation = &"Title"
+	context_row = HBoxContainer.new()
+	context_row.add_theme_constant_override("separation", 4)
+	$Gameplay.add_child(context_row)
+	context_keycap = PanelContainer.new()
+	var key_style: StyleBoxFlat = StyleBoxFlat.new()
+	key_style.bg_color = Color("0b1322")
+	key_style.border_color = Color("8299a8")
+	key_style.set_border_width_all(1)
+	key_style.content_margin_left = 3
+	key_style.content_margin_right = 3
+	context_keycap.add_theme_stylebox_override("panel", key_style)
+	context_row.add_child(context_keycap)
+	_label(context_keycap).text = "E"
+	context_label = _label(context_row)
 	context_label.add_theme_color_override("font_color", Color("ffce75"))
-	context_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	context_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	context_label.size = Vector2(280, 36)
+	context_icon = _icon(context_row, "chatarra")
+	context_cost = _label(context_row)
+	context_progress = ColorRect.new()
+	context_progress.color = Color("ffce75")
+	context_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$Gameplay.add_child(context_progress)
 	toast = _label($Gameplay)
 	toast.position = Vector2(100, 303)
 	toast.size = Vector2(440, 30)
 	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	left_arrow = _label($Gameplay)
-	left_arrow.text = "‹"
-	left_arrow.position = Vector2(3, 168)
-	right_arrow = _label($Gameplay)
-	right_arrow.text = "›"
-	right_arrow.position = Vector2(627, 168)
-	for arrow: Label in [left_arrow, right_arrow]:
-		arrow.add_theme_font_size_override("font_size", 20)
-		arrow.add_theme_color_override("font_color", Color("dd6482"))
-		arrow.hide()
+	left_arrow = _arrow(Vector2(4, 174), -1)
+	right_arrow = _arrow(Vector2(628, 174), 1)
 	phase_banner.hide()
 
 func _label(parent: Node) -> Label:
 	var label: Label = Label.new()
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.add_theme_font_size_override("font_size", 11)
 	label.add_theme_color_override("font_color", Color("8299a8"))
 	label.add_theme_color_override("font_shadow_color", Color("0b1322"))
 	label.add_theme_constant_override("shadow_offset_x", 1)
@@ -90,8 +103,8 @@ func display_dashboard(data: Dictionary) -> void:
 		phase_remaining = PHASE_DURATION
 		phase_banner.show()
 		phase_banner.modulate.a = 1.0
-		values.phase.text = {"DÍA": "AMANECE · Día %d" % data.day,
-			"AVISO": "ATARDECER · Prepárate", "NOCHE": "NOCHE %d · Llegan por ambos lados" % data.day}[data.phase]
+		values.phase.text = {"DÍA": "DÍA %d" % data.day,
+			"AVISO": "ATARDECER", "NOCHE": "NOCHE %d" % data.day}[data.phase]
 		icons.dia.visible = data.phase == "DÍA"
 		icons.aviso.visible = data.phase == "AVISO"
 		icons.noche.visible = data.phase == "NOCHE"
@@ -101,10 +114,21 @@ func display_dashboard(data: Dictionary) -> void:
 	left_arrow.visible = left_count > 0
 	right_arrow.visible = right_count > 0
 	context_label.text = data.get("context", "")
-	context_label.visible = not context_label.text.is_empty() and data.health > 0
+	context_row.visible = not context_label.text.is_empty() and data.health > 0
+	context_keycap.visible = data.get("context_key", true)
+	var cost: int = data.get("context_cost", -1)
+	context_icon.visible = cost >= 0
+	context_cost.visible = cost >= 0
+	context_cost.text = str(cost) if cost >= 0 else ""
+	context_row.reset_size()
 	var anchor: Vector2 = data.get("context_screen", Vector2.ZERO)
-	context_label.position = Vector2(clampf(anchor.x - 140, 8, 352), clampf(anchor.y - 40, 50, 260)).round()
+	context_row.position = Vector2(clampf(anchor.x - context_row.size.x / 2, 8, 632 - context_row.size.x), clampf(anchor.y - 24, 50, 280)).round()
+	var progress: float = clampf(data.get("context_progress", 0.0), 0, 1)
+	context_progress.visible = context_row.visible and progress > 0
+	context_progress.position = context_row.position + Vector2(0, context_row.size.y + 2)
+	context_progress.size = Vector2(roundf(context_row.size.x * progress), 1)
 	toast.text = data.get("notice", "")
+	toast.theme_type_variation = &"SmallTitle" if toast.text == "DEFIENDE EL NÚCLEO" else &"Label"
 	toast.modulate.a = clampf(data.get("notice_time", 0.0) / 0.6, 0, 1)
 	$DamageEdges.set_state(data)
 
@@ -126,3 +150,18 @@ func _threat_alpha(count: int) -> float:
 func display(text: String, _hint: String, result: String) -> void:
 	$Status.text = text
 	$Result.text = result
+
+
+func _arrow(at: Vector2, direction: int) -> Control:
+	var arrow: Control = Control.new()
+	arrow.position = at
+	arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	arrow.draw.connect(func() -> void:
+		var tip: float = 0 if direction < 0 else 6
+		var tail: float = 6 if direction < 0 else 0
+		arrow.draw_line(Vector2(tail, 0), Vector2(tip, 4), Color("dd6482"), 1)
+		arrow.draw_line(Vector2(tip, 4), Vector2(tail, 8), Color("dd6482"), 1)
+	)
+	$Gameplay.add_child(arrow)
+	arrow.hide()
+	return arrow

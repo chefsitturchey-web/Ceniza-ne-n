@@ -14,7 +14,7 @@ var construction: ConstructionSystem
 var overload: OverloadSystem
 var interaction: InteractionSystem
 var session: SessionController
-var notice: String = "Construye ambas murallas y torretas antes de la noche."
+var notice: String = "DEFIENDE EL NÚCLEO"
 var notice_time: float = INITIAL_NOTICE_DURATION
 
 func tick(delta: float) -> void:
@@ -42,7 +42,7 @@ func publish() -> void:
 		damage_connected = true
 	if cycle.phase == "NOCHE" and core.health > 0 and core.health <= GameRules.CORE_HEALTH * 0.3 and warned_night != cycle.day:
 		warned_night = cycle.day
-		show_notice("¡El núcleo se está rompiendo!")
+		show_notice("Núcleo dañado")
 	var offscreen_left: int = 0
 	var offscreen_right: int = 0
 	var screen_width: float = get_viewport().get_visible_rect().size.x
@@ -63,42 +63,40 @@ func publish() -> void:
 			left_count += 1
 		else:
 			right_count += 1
-	var text: String = "CENIZA NEÓN  |  %s %d/%d · %ds  |  Chatarra %d  |  Energía %d/%d\n" % [cycle.phase, cycle.day, cycle.config.nights, ceili(cycle.phase_remaining), bank.scrap, bank.energy_used(), bank.energy_capacity]
-	text += "Vida %d  ·  Resistencia %d  ·  Núcleo %d/%d  ·  Habitantes %d/%d\n" % [player.health, int(player.stamina), core.health, GameRules.CORE_HEALTH, colony.workers.size(), GameRules.POPULATION]
-	text += "Amenazas  ◀ %d / %d ▶  |  Sobrecarga IZQ %s / DER %s\n" % [left_count, right_count, overload.overload_status(true), overload.overload_status(false)]
-	text += "A/D mover · J ataque · Espacio esquiva · E obra · Q sobrecarga · Esc pausa"
+	var text: String = "%s %d" % [cycle.phase, cycle.day]
 	var context: String = ""
+	var context_cost: int = -1
+	var context_progress: float = interaction.hold_time / GameRules.INTERACT_HOLD
+	var context_key: bool = true
 	var context_screen: Vector2 = Vector2.ZERO
 	var target: int = interaction.interaction_target()
 	if target == -1:
-		context = "Mantén E: curarte gratis · Solo de día" if player.health < Player.MAX_HEALTH else "Mantén E: reclutar (15 chatarra) · Solo de día"
+		context = "Curarte" if player.health < Player.MAX_HEALTH else "Reclutar"
+		context_cost = -1 if player.health < Player.MAX_HEALTH else (colony.builder_data.cost if colony.workers.size() == GameRules.INITIAL_POPULATION else colony.collector_data.cost)
 		context_screen = core.get_global_transform_with_canvas() * Vector2(0, -ColonyCore.TEXTURE.get_height())
 	elif target >= 0:
 		var site: ConstructionSite = construction.sites[target]
 		context_screen = site.get_global_transform_with_canvas() * Vector2(0, -site.data.texture.get_height() if site.data.texture != null else -45)
-		var title: String = site.data.display_name
-		if site.data.energy > 0:
-			title += " (%d energía)" % site.data.energy
 		if site.ordered:
-			context = "%s · Obra %d%% · Esperando trabajo seguro" % [title, int(site.progress / GameRules.BUILD_TIME * 100)]
-		elif site.hp == site.max_hp:
-			context = ""
-		else:
-			context = "%s · Mantén E: %s (%d chatarra)" % [title, "construir" if site.hp == 0 else "reparar", site.cost if site.hp == 0 else site.data.repair_cost]
-	if interaction.hold_time > 0.0 and not context.is_empty():
-		context += "  %d%%" % int(interaction.hold_time / GameRules.INTERACT_HOLD * 100)
-	var hint_text: String = context + "\n" + (notice if notice_time > 0.0 else "Mando: X ataque · A esquiva · Y obra · LB sobrecarga · Start pausa")
+			context = "Construyendo"
+			context_key = false
+			context_progress = site.progress / GameRules.BUILD_TIME
+		elif site.hp != site.max_hp:
+			context = "Construir" if site.hp == 0 else "Reparar"
+			context_cost = site.cost if site.hp == 0 else site.data.repair_cost
+	var hint_text: String = context
 	var result_text: String = ""
 	if player.health <= 0:
-		result_text = "Reenlace en %d s\n¡La colonia sigue defendiéndose!" % ceili(player.respawn_remaining)
+		result_text = "Reenlace %d s" % ceili(player.respawn_remaining)
 	if get_tree().paused:
 		result_text = ""
 	if session.finished:
-		result_text = ("DISTRITO ESTABILIZADO" if session.won else "NÚCLEO DESTRUIDO") + "\n\nR / Select: nueva partida"
+		result_text = ("DISTRITO ESTABILIZADO" if session.won else "NÚCLEO DESTRUIDO") + "\n\n[R] Reintentar"
 	updated.emit(text, hint_text, result_text)
 	dashboard_updated.emit({
 		"paused": get_tree().paused, "finished": session.finished,
-		"context": context, "context_screen": context_screen,
+		"context": context, "context_cost": context_cost,
+		"context_progress": context_progress, "context_key": context_key, "context_screen": context_screen,
 		"notice": notice if notice_time > 0 else "", "notice_time": notice_time,
 		"player_hit": player_hit, "core_hit": core_hit, "health_max": Player.MAX_HEALTH,
 		"offscreen_left": offscreen_left, "offscreen_right": offscreen_right,

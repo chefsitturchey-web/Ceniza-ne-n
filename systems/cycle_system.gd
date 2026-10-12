@@ -24,7 +24,7 @@ func update_phase(delta: float) -> void:
 	if phase == "DÍA":
 		phase = "AVISO"
 		phase_remaining = config.warning_duration
-		notice_requested.emit("¡Ataque por ambos frentes! Los recuperadores regresan.")
+		notice_requested.emit("Ataque en ambos frentes")
 	elif phase == "AVISO":
 		phase = "NOCHE"
 		phase_remaining = config.night_duration
@@ -37,6 +37,6 @@ func update_phase(delta: float) -> void:
 			phase = "DÍA"
 			phase_remaining = config.day_duration
 			dawn.emit(config)
-			notice_requested.emit("Amanecer: +25 chatarra. Repara y prepara el siguiente asedio.")
+			notice_requested.emit("+25 chatarra")
 	if phase != previous_phase:
 		phase_changed.emit(phase, day)
