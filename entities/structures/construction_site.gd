@@ -21,6 +21,7 @@ var hp: int:
 	set(value): health_component.reset(value)
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	add_child(health_component)
 	health_component.maximum = data.health
 	health_component.reset(0)
@@ -45,7 +46,14 @@ func update_overload(left_active: bool, right_active: bool) -> void:
 
 func _draw() -> void:
 	var color: Color = Color("47dacb") if boosted else Color("8299a8")
-	if hp > 0:
+	if hp > 0 and data.texture != null:
+		var size: Vector2 = data.texture.get_size()
+		# Los sprites miran a la derecha; en el frente izquierdo deben mirar hacia afuera.
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2(-1.0 if x < 0.0 else 1.0, 1.0))
+		draw_texture(data.texture, Vector2(-size.x / 2.0, -size.y), Color(0.75, 1.5, 1.45) if boosted else Color.WHITE)
+		draw_set_transform(Vector2.ZERO)
+		draw_rect(Rect2(-14, -size.y - 6, 28.0 * hp / max_hp, 3), Color("47dacb"))
+	elif hp > 0:
 		if data.blocks_enemies:
 			draw_rect(Rect2(-10, -45, 20, 45), color)
 			draw_rect(Rect2(-5, -40, 10, 30), Color("304356"))

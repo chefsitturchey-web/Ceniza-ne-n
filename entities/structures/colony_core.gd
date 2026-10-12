@@ -1,6 +1,8 @@
 class_name ColonyCore
 extends Node2D
 
+const TEXTURE: Texture2D = preload("res://assets/structures/core_01.png")
+
 var health_component: HealthComponent = HealthComponent.new()
 var health: int:
 	get: return health_component.current
@@ -9,6 +11,7 @@ var health: int:
 		queue_redraw()
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	health_component.maximum = GameRules.CORE_HEALTH
 	health_component.reset()
 	add_child(health_component)
@@ -22,6 +25,6 @@ func _on_health_changed(_amount: int, _remaining: int) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	draw_rect(Rect2(-30, -65, 60, 65), Color("304356"))
-	draw_rect(Rect2(-14, -52, 28, 32), Color("e89e54"))
-	draw_rect(Rect2(-30, -74, 60.0 * health / GameRules.CORE_HEALTH, 4), Color("47dacb"))
+	var size: Vector2 = TEXTURE.get_size()
+	draw_texture(TEXTURE, Vector2(-size.x / 2.0, -size.y))
+	draw_rect(Rect2(-30, -size.y - 8, 60.0 * health / GameRules.CORE_HEALTH, 4), Color("47dacb"))
