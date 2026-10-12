@@ -1,0 +1,88 @@
+[gd_resource type="SpriteFrames" load_steps=18 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/reposo/reposo_00.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/reposo/reposo_01.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/reposo/reposo_02.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/reposo/reposo_03.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/caminar/caminar_00.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/caminar/caminar_01.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/caminar/caminar_02.png" id="7"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/caminar/caminar_03.png" id="8"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/caminar/caminar_04.png" id="9"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/caminar/caminar_05.png" id="10"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/caminar/caminar_06.png" id="11"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/caminar/caminar_07.png" id="12"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/reparar/reparar_00.png" id="13"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/reparar/reparar_01.png" id="14"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/reparar/reparar_02.png" id="15"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/reparar/reparar_03.png" id="16"]
+[ext_resource type="Texture2D" path="res://assets/unidades/recuperador/reparar/reparar_04.png" id="17"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4")
+}],
+"loop": true,
+"name": &"reposo",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12")
+}],
+"loop": true,
+"name": &"caminar",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17")
+}],
+"loop": true,
+"name": &"reparar",
+"speed": 6.0
+}]
