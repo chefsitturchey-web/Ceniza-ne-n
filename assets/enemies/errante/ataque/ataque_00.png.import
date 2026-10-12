@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://1u1sjpcpx026"
-path="res://.godot/imported/reposo_04.png-c779f626e29bf5ef1d6a60125d99e2de.ctex"
+uid="uid://dxac00ewfbx57"
+path="res://.godot/imported/ataque_00.png-21d2f89fd72a69b2444afcb1fde5fb93.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/enemies/errante/reposo/reposo_04.png"
-dest_files=["res://.godot/imported/reposo_04.png-c779f626e29bf5ef1d6a60125d99e2de.ctex"]
+source_file="res://assets/enemies/errante/ataque/ataque_00.png"
+dest_files=["res://.godot/imported/ataque_00.png-21d2f89fd72a69b2444afcb1fde5fb93.ctex"]
 
 [params]
 

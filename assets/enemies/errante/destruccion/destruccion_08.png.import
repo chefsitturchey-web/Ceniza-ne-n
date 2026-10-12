@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b3b5f4wti06jm"
-path="res://.godot/imported/ataque_09.png-cc3c9c68fd3151678619f7693954e9f4.ctex"
+uid="uid://bey85uu4ssgn1"
+path="res://.godot/imported/destruccion_08.png-d3730df52709548e20c12b3a336a35a3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/enemies/errante/ataque/ataque_09.png"
-dest_files=["res://.godot/imported/ataque_09.png-cc3c9c68fd3151678619f7693954e9f4.ctex"]
+source_file="res://assets/enemies/errante/destruccion/destruccion_08.png"
+dest_files=["res://.godot/imported/destruccion_08.png-d3730df52709548e20c12b3a336a35a3.ctex"]
 
 [params]
 
