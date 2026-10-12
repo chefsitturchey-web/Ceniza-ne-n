@@ -10,6 +10,17 @@ var boosted: bool = false
 var ordered: bool = false
 var progress: float = 0.0
 var shot: float = 0.0
+var recoil: float = 0.0
+
+func muzzle_position() -> Vector2:
+	# Sprite 40x50: cañón a 9 px desde arriba, reflejado en el frente izquierdo.
+	var extent: Vector2 = data.texture.get_size() if data.texture != null else Vector2(28, 50)
+	return global_position + Vector2((extent.x / 2.0 - 2) * (-1.0 if x < 0 else 1.0), -extent.y + 9)
+
+func fire_effects() -> void:
+	recoil = 0.09
+	effects.emit_shot(muzzle_position(), -1.0 if x < 0 else 1.0)
+	queue_redraw()
 var x: float:
 	get: return position.x
 var kind: StringName:
@@ -51,6 +62,7 @@ func update_overload(left_active: bool, right_active: bool) -> void:
 	queue_redraw()
 
 func _process(delta: float) -> void:
+	recoil = maxf(0.0, recoil - delta)
 	weld_timer -= delta
 	if ordered and weld_timer <= 0.0:
 		weld_timer = 0.18
@@ -78,7 +90,8 @@ func _draw() -> void:
 	elif hp > 0 and data.texture != null:
 		var size: Vector2 = data.texture.get_size()
 		# Los sprites miran a la derecha; en el frente izquierdo deben mirar hacia afuera.
-		draw_set_transform(Vector2.ZERO, 0.0, Vector2(-1.0 if x < 0.0 else 1.0, 1.0))
+		var kick: float = (1.0 if x < 0 else -1.0) if recoil > 0 else 0.0
+		draw_set_transform(Vector2(kick, 0), 0.0, Vector2(-1.0 if x < 0.0 else 1.0, 1.0))
 		draw_texture(data.texture, Vector2(-size.x / 2.0, -size.y), Color(0.75, 1.5, 1.45) if boosted else Color.WHITE)
 		draw_set_transform(Vector2.ZERO)
 		draw_rect(Rect2(-14, -size.y - 6, 28.0 * hp / max_hp, 3), Color("47dacb"))

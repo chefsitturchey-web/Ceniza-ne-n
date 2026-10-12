@@ -97,6 +97,8 @@ func _physics_process(delta: float) -> void:
 		refresh_state()
 		return
 	var direction: float = Input.get_axis("move_left", "move_right")
+	var was_grounded: bool = is_on_floor()
+	var previous_speed: float = velocity.x
 	if dodge_remaining <= 0.0 and absf(direction) > MOVE_THRESHOLD:
 		facing = signf(direction)
 	if Input.is_action_just_pressed("dodge"):
@@ -109,6 +111,7 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	move_and_slide()
+	visual.movement_dust(delta, was_grounded, previous_speed)
 	if Input.is_action_pressed("attack"):
 		attack()
 	refresh_state()

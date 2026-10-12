@@ -35,6 +35,7 @@ func update_defenses(delta: float) -> void:
 		if site.shot == 0.0:
 			var target: Node2D = nearest_enemy(site.x, site.data.attack_range)
 			if target != null:
+				site.fire_effects()
 				fire_from(Vector2(site.x, GameRules.FLOOR_Y - 42), target, site.data.damage)
 				site.shot = site.data.overloaded_interval if overload.overloaded(site.x) else site.data.interval
 	drone_timer = maxf(0.0, drone_timer - delta)

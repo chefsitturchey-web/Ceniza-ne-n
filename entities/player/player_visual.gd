@@ -7,6 +7,18 @@ var rest_position: Vector2
 var elapsed: float = 0.0
 var sweat_timer: float = 0.0
 var shake: float = 0.0
+var dust_timer: float = 0.0
+
+func movement_dust(delta: float, was_grounded: bool, previous_speed: float) -> void:
+	dust_timer = maxf(0.0, dust_timer - delta)
+	if actor.health <= 0 or not actor.is_on_floor():
+		return
+	var braking: bool = absf(previous_speed) > 10 and (absf(actor.velocity.x) <= 10 or previous_speed * actor.velocity.x < 0)
+	if not was_grounded or braking:
+		effects.emit_dust(actor.global_position, 5)
+	elif absf(actor.velocity.x) > 10 and dust_timer <= 0:
+		effects.emit_dust(actor.global_position, 4 if actor.dodge_remaining > 0 else 2)
+		dust_timer = 0.07 if actor.dodge_remaining > 0 else 0.15
 
 func bind(value: AnimatedSprite2D) -> void:
 	super.bind(value)
