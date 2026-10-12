@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://entities/enemies/blindado.tscn" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"blindado"
+health = 180
+speed = 24.0
+damage = 12
+reward = 5
+scene = ExtResource("2")
+move_animation = &"caminar"

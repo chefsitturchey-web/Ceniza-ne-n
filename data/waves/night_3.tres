@@ -4,8 +4,10 @@
 [ext_resource type="Resource" path="res://data/enemies/errante.tres" id="2"]
 [ext_resource type="Resource" path="res://data/enemies/corredor.tres" id="3"]
 [ext_resource type="Script" path="res://data/enemy_data.gd" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/ariete.tres" id="ariete"]
+[ext_resource type="Resource" path="res://data/enemies/blindado.tres" id="blindado"]
 [resource]
 script = ExtResource("1")
-enemies = Array[ExtResource("4")]([ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2")])
-sides = Array[float]([-1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0])
+enemies = Array[ExtResource("4")]([ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("2"), ExtResource("2"), ExtResource("ariete"), ExtResource("blindado"), ExtResource("ariete")])
+sides = Array[float]([-1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0])
 cadence_steps = 3

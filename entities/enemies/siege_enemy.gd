@@ -11,6 +11,7 @@ var player: Player
 var construction: ConstructionSystem
 var core: ColonyCore
 var session: SessionController
+var facing: float = 1.0
 var night: int = 1
 var state: State = State.APPROACH
 var health_component: HealthComponent = HealthComponent.new()
@@ -47,15 +48,14 @@ func _ready() -> void:
 	if sprite != null:
 		sprite.animation_finished.connect(_on_animation_finished)
 		visual.play_visual(&"reposo")
-	if session == null:
-		return # F6 permite previsualizar sin una partida activa.
-	add_to_group(GameRules.ENEMIES)
 	max_health = data.health + (night - 1) * data.health_per_night
 	health_component.maximum = max_health
 	health_component.reset()
 	speed = data.speed
 	damage = data.damage
 	face_toward(0.0)
+	if session != null:
+		add_to_group(GameRules.ENEMIES)
 
 func set_state(value: State) -> void:
 	if state != value:
@@ -63,6 +63,9 @@ func set_state(value: State) -> void:
 		state_changed.emit(state)
 
 func face_toward(x: float) -> void:
+	if not is_equal_approx(position.x, x):
+		facing = signf(x - position.x)
+	queue_redraw()
 	if sprite != null and not is_equal_approx(position.x, x):
 		sprite.flip_h = (x < position.x) if sprite_faces_right else (x > position.x)
 
@@ -72,10 +75,15 @@ func update_visual(moving: bool = false) -> void:
 func get_hurt_rect() -> Rect2:
 	return hurtbox.world_rect()
 
+## Los disparos llevan origen y tipo; el cuerpo a cuerpo conserva Hurtbox.receive.
+func receive_shot(amount: int, _origin: Vector2, _electric: bool = false) -> void:
+	hurtbox.receive(amount)
+
 func take_damage(amount: int) -> void:
 	if health <= 0 or amount <= 0:
 		return
 	health_component.take_damage(amount)
+	queue_redraw()
 	visual.hit_effects(health == 0)
 	flash = data.flash_duration
 	hurt_remaining = data.hurt_duration
@@ -85,7 +93,7 @@ func take_damage(amount: int) -> void:
 		reward_requested.emit(data.reward)
 		windup = 0.0
 		if sprite != null and visual.animation_duration(&"destruccion") > 0.0:
-			sprite.modulate = Color.WHITE
+			sprite.modulate = visual.base_tint
 			visual.play_visual(&"destruccion")
 			death_remaining = visual.animation_duration(&"destruccion") + DEATH_VISUAL_GRACE
 		else:

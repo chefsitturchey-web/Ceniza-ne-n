@@ -37,7 +37,7 @@ func run_checks() -> void:
 		verify(spawned.size() == 2, "Aparición al completar cadencia")
 		for index: int in range(2, wave.enemies.size()):
 			world.director.tick(wave.cadence)
-		verify(spawned.size() == 8 + night * 4, "Cantidad de enemigos por noche")
+		verify(spawned.size() == [12, 18, 23][night - 1], "Cantidad de enemigos por noche")
 		for index: int in range(spawned.size()):
 			var enemy: SiegeEnemy = spawned[index]
 			verify(enemy.data == wave.enemies[index] and sides[index] == wave.sides[index], "Tipo y lado desde WaveData")
