@@ -14,6 +14,7 @@ func verify(condition: bool, description: String) -> void:
 
 func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
+	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
 	world.session.set_process(false)
 	world.player.set_physics_process(false)

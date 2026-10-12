@@ -74,4 +74,5 @@ func _ready() -> void:
 	overload.notice_requested.connect(presenter.show_notice)
 	session.frame_finished.connect(view.queue_redraw)
 	presenter.updated.connect($HUD.display)
+	session.initialize()
 	presenter.publish()
