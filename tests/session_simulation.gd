@@ -5,17 +5,17 @@ func _initialize() -> void:
 
 func simulate() -> void:
 	var assist: bool = "--assist" in OS.get_cmdline_user_args()
-	var world = load("res://scenes/main.tscn").instantiate()
+	var world: District = load("res://levels/main.tscn").instantiate() as District
 	root.add_child(world)
-	world.set_process(false)
+	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	world.player.position.x = 0 if assist else 700
 	world.player.health = 100 if assist else 0
-	for site in world.sites:
+	for site: ConstructionSite in world.construction.sites:
 		site.hp = site.max_hp
-	for step in range(7000):
+	for step: int in range(7000):
 		if assist:
-			var player = world.player
+			var player: Player = world.player
 			player.invulnerable = maxf(0.0, player.invulnerable - 0.1)
 			player.cooldown_remaining = maxf(0.0, player.cooldown_remaining - 0.1)
 			if player.health <= 0:
@@ -26,7 +26,7 @@ func simulate() -> void:
 					player.invulnerable = 2
 			else:
 				var target: Node2D = null
-				for enemy in get_nodes_in_group("enemies"):
+				for enemy: Node2D in get_nodes_in_group("enemies"):
 					if target == null or absf(enemy.position.x) < absf(target.position.x):
 						target = enemy
 				if target != null:
@@ -34,18 +34,21 @@ func simulate() -> void:
 					if absf(target.position.x - player.position.x) > 32:
 						player.position.x = move_toward(player.position.x, target.position.x, player.speed * 0.1)
 					player.attack()
-					if (world.cooldown_left if player.position.x < 0 else world.cooldown_right) == 0:
-						world.activate_overload()
-			if world.phase == "DÍA":
-				for index in range(world.sites.size()):
-					world.perform_interaction(index)
-		world._process(0.1)
-		for enemy in get_nodes_in_group("enemies"):
+					if (world.overload.cooldown_left if player.position.x < 0 else world.overload.cooldown_right) == 0:
+						world.overload.activate_overload()
+			if world.cycle.phase == "DÍA":
+				for index: int in range(world.construction.sites.size()):
+					world.interaction.perform_interaction(index)
+		world.session._process(0.1)
+		for enemy: Node2D in get_nodes_in_group("enemies"):
 			enemy.set_physics_process(false)
 			enemy._physics_process(0.1)
-		if world.finished:
-			print("Simulación apoyo=%s: victoria=%s día=%d núcleo=%d tiempo=%.1fs" % [assist, world.won, world.day, world.core_health, step * 0.1])
-			quit(0 if world.won == assist else 1)
+		if world.session.finished:
+			print("Simulación apoyo=%s: victoria=%s día=%d núcleo=%d tiempo=%.1fs" % [assist, world.session.won, world.cycle.day, world.core.health, step * 0.1])
+			var matches_reference: bool = world.session.won == assist and world.cycle.day == (3 if assist else 2) and world.core.health == (300 if assist else 0) and step == (2405 if assist else 1286)
+			if not matches_reference:
+				push_error("La simulación cambió respecto a la referencia anterior al refactor")
+			quit(0 if matches_reference else 1)
 			return
 	push_error("La partida no terminó en el presupuesto de simulación")
 	quit(1)

@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://dki3q4vtfhx55"]
+
+[ext_resource type="Script" path="res://levels/district.gd" id="root"]
+[ext_resource type="PackedScene" path="res://entities/player/player.tscn" id="player"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="hud"]
+[ext_resource type="Script" path="res://systems/cycle_system.gd" id="Cycle"]
+[ext_resource type="Script" path="res://systems/resource_bank.gd" id="Bank"]
+[ext_resource type="Script" path="res://entities/structures/colony_core.gd" id="Core"]
+[ext_resource type="Script" path="res://systems/colony_system.gd" id="Colony"]
+[ext_resource type="Script" path="res://systems/construction_system.gd" id="Construction"]
+[ext_resource type="Script" path="res://systems/overload_system.gd" id="Overload"]
+[ext_resource type="Script" path="res://systems/defense_system.gd" id="Defenses"]
+[ext_resource type="Script" path="res://systems/siege_director.gd" id="Director"]
+[ext_resource type="Script" path="res://systems/interaction_system.gd" id="Interaction"]
+[ext_resource type="Script" path="res://systems/session_controller.gd" id="Session"]
+[ext_resource type="Script" path="res://ui/hud_presenter.gd" id="Presenter"]
+[ext_resource type="Script" path="res://levels/district_view.gd" id="View"]
+[ext_resource type="Resource" path="res://data/cycles/district.tres" id="config"]
+[ext_resource type="Resource" path="res://data/workers/builder.tres" id="builder"]
+[ext_resource type="Resource" path="res://data/workers/collector.tres" id="collector"]
+[ext_resource type="Resource" path="res://data/structures/wall.tres" id="wall"]
+[ext_resource type="Resource" path="res://data/structures/turret.tres" id="turret"]
+[ext_resource type="Resource" path="res://data/waves/night_1.tres" id="wave1"]
+[ext_resource type="Resource" path="res://data/waves/night_2.tres" id="wave2"]
+[ext_resource type="Resource" path="res://data/waves/night_3.tres" id="wave3"]
+[ext_resource type="Script" path="res://data/structure_data.gd" id="structure_data"]
+[ext_resource type="Script" path="res://data/wave_data.gd" id="wave_data"]
+
+[sub_resource type="RectangleShape2D" id="floor"]
+size = Vector2(1920, 40)
+[sub_resource type="RectangleShape2D" id="edge"]
+size = Vector2(16, 400)
+[node name="PrimerDistrito" type="Node2D"]
+script = ExtResource("root")
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(0, 280)
+[node name="Shape" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("floor")
+[node name="LeftEdge" type="StaticBody2D" parent="."]
+position = Vector2(-968, 100)
+[node name="Shape" type="CollisionShape2D" parent="LeftEdge"]
+shape = SubResource("edge")
+[node name="RightEdge" type="StaticBody2D" parent="."]
+position = Vector2(968, 100)
+[node name="Shape" type="CollisionShape2D" parent="RightEdge"]
+shape = SubResource("edge")
+[node name="Player" parent="." instance=ExtResource("player")]
+position = Vector2(0, 260)
+[node name="Cycle" type="Node" parent="."]
+script = ExtResource("Cycle")
+config = ExtResource("config")
+[node name="Bank" type="Node" parent="."]
+script = ExtResource("Bank")
+[node name="Core" type="Node2D" parent="."]
+position = Vector2(0, 260)
+z_index = -1
+script = ExtResource("Core")
+[node name="Colony" type="Node" parent="."]
+script = ExtResource("Colony")
+builder_data = ExtResource("builder")
+collector_data = ExtResource("collector")
+[node name="Construction" type="Node" parent="."]
+script = ExtResource("Construction")
+blueprints = Array[ExtResource("structure_data")]([ExtResource("wall"), ExtResource("turret")])
+[node name="Overload" type="Node" parent="."]
+script = ExtResource("Overload")
+[node name="Defenses" type="Node" parent="."]
+script = ExtResource("Defenses")
+[node name="Director" type="Node" parent="."]
+script = ExtResource("Director")
+waves = Array[ExtResource("wave_data")]([ExtResource("wave1"), ExtResource("wave2"), ExtResource("wave3")])
+[node name="Interaction" type="Node" parent="."]
+script = ExtResource("Interaction")
+[node name="Session" type="Node" parent="."]
+process_mode = 3
+script = ExtResource("Session")
+[node name="Presenter" type="Node" parent="."]
+script = ExtResource("Presenter")
+[node name="View" type="Node2D" parent="."]
+z_index = -2
+script = ExtResource("View")
+[node name="HUD" parent="." instance=ExtResource("hud")]

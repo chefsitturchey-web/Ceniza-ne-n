@@ -6,7 +6,7 @@ Prototipo de supervivencia y defensa lateral en 2D, desarrollado con **Godot y G
 
 La colonia es tu defensa principal. Tu personaje combate, repara la situación en el frente más presionado y activa sobrecargas eléctricas para cambiar el rumbo del asedio.
 
-> **Estado: prototipo jugable en desarrollo.** Actualmente puedes completar una partida de tres noches, de aproximadamente ocho minutos. Los gráficos son provisionales y todavía no hay sonido ni guardado de partida.
+> **Estado: prototipo jugable en desarrollo.** Partida de tres noches; configuración base de aproximadamente ocho minutos. Este worktree conserva el ajuste de pruebas con días de 10 segundos (unos cuatro minutos). Errante, corredor y constructor tienen animaciones; el resto del arte es provisional. Todavía no hay sonido ni guardado de partida.
 
 [Cómo jugar](#cómo-probarlo) · [Controles](#controles) · [Estado del proyecto](#estado-del-proyecto) · [Reportar un problema](https://github.com/chefsitturchey-web/Ceniza-ne-n/issues)
 
@@ -62,7 +62,7 @@ El proyecto se prueba desde el editor; este repositorio no incluye un ejecutable
 4. **Responde al asedio.** Al anochecer, revisa los indicadores de amenazas de ambos lados. Ataca con **J**, esquiva con **Espacio** y utiliza **Q** para sobrecargar el frente donde te encuentras.
 5. **Recupera las defensas.** Encarga reparaciones en las estructuras dañadas por ocho de chatarra. Los constructores esperan si hay enemigos cerca: despejar la zona también es parte de tu trabajo.
 
-Cada ciclo tiene **90 segundos de día, 10 de aviso y 60 de noche**. La noche se prolonga si quedan enemigos. Sobrevive a las tres noches para ganar; si destruyen el núcleo, pierdes. Al morir, el personaje reaparece después de cuatro segundos mientras la colonia sigue defendiéndose.
+La configuración base tiene **90 segundos de día, 10 de aviso y 60 de noche**. El distrito actual conserva tu ajuste de **10 segundos de día**: en `levels/main.tscn`, selecciona `Cycle` y asigna `data/cycles/standard.tres` a `config` si quieres el tiempo completo de preparación. La noche se prolonga si quedan enemigos. Sobrevive a las tres noches para ganar; si destruyen el núcleo, pierdes. Al morir, el personaje reaparece después de cuatro segundos mientras la colonia sigue defendiéndose.
 
 **Consejo:** la sobrecarga dura seis segundos y después necesita dieciocho de enfriamiento. Cada frente tiene su propio temporizador: úsala cuando la defensa esté bajo presión.
 
@@ -103,10 +103,17 @@ Esta versión valida el ciclo de construcción y defensa. El alcance completo de
 - [Dirección de arte y prompts](docs/GUIA_ARTE.md): paleta, dimensiones y referencias para producir recursos consistentes.
 - [Documento de diseño — GDD](CENIZA_NEON_GDD.docx): visión y alcance previsto del juego; no es una lista de funciones ya implementadas.
 - [Registro de recursos](docs/ASSET_SOURCES.csv): procedencia y condiciones de uso de los futuros assets.
+- [Arquitectura y señales](docs/ARQUITECTURA.md): responsabilidades, configuración y pruebas.
 
 ```text
-scenes/         Escenas del escenario y del personaje
-scripts/        Movimiento, combate, colonia y enemigos
+core/           Controles y constantes de capas, grupos y reglas compartidas
+components/     Vida, hitbox, hurtbox e interfaz visual reutilizables
+entities/       Jugador, enemigos, trabajadores, estructuras y núcleo
+systems/        Ciclo, economía, obras, colonia, asedio, defensas y sesión
+ui/             HUD como escena receptora de señales y su presentador
+data/           Definiciones Resource y configuraciones .tres
+levels/         Distrito principal: composición de nodos y conexiones
+assets/         PNG originales y sus ajustes de importación
 tests/          Pruebas de reglas y simulaciones de sesión
 docs/           Dirección de arte y registro de recursos
 project.godot   Configuración y punto de entrada del proyecto
@@ -117,8 +124,16 @@ project.godot   Configuración y punto de entrada del proyecto
 Desde la carpeta del proyecto, con el ejecutable de Godot disponible como `godot`:
 
 ```bash
+godot --headless --path . --import
+godot --headless --path . --script res://tests/run_all.gd
+```
+
+`run_all.gd` ejecuta combate, asedio, animaciones, vida, carga de los 11 Resources, oleadas, integración visual, compilación y ambas simulaciones. Sale con código distinto de cero ante un fallo. Para ejecutar pruebas individuales:
+
+```bash
 godot --headless --path . --script res://tests/combat_smoke.gd
 godot --headless --path . --script res://tests/siege_smoke.gd
+godot --headless --path . --script res://tests/errante_animation_smoke.gd
 godot --headless --path . --script res://tests/session_simulation.gd
 godot --headless --path . --script res://tests/session_simulation.gd -- --assist
 ```
@@ -126,6 +141,14 @@ godot --headless --path . --script res://tests/session_simulation.gd -- --assist
 En Windows puedes sustituir `godot` por la ruta de tu ejecutable de consola. En PowerShell, una ruta entre comillas se ejecuta anteponiendo `&`.
 
 Las pruebas cubren alcance, daño, economía, obras, energía, esquiva y condiciones de finalización. Las simulaciones parten de defensas construidas: sin apoyo se espera una derrota; con apoyo automatizado, una victoria. No sustituyen la prueba visual, la comprobación del mando ni el ajuste de dificultad con jugadores.
+
+## Añadir contenido con Resources
+
+**Enemigo:** duplica una escena de `entities/enemies/`, conserva su raíz con `SiegeEnemy` (o un script que lo extienda) y configura `AnimatedSprite2D`. Usa `reposo`, `ataque`, `daño`, `destruccion` y la animación de avance indicada por `move_animation`. Crea un `EnemyData` en `data/enemies/`, asigna la escena, identidad, estadísticas y recompensa. Añádelo al array `enemies` de una oleada en `data/waves/`, con una entrada correspondiente en `sides` (-1 izquierda, +1 derecha). El director no necesita cambios de código. El número de elementos determina la cantidad; puedes repetir referencias.
+
+**Estructura:** duplica un `StructureData` de `data/structures/`. Ajusta nombre, costo, vida, reparación, energía, posición y ataque. Asigna una escena con raíz `ConstructionSite` (puedes reutilizar `entities/structures/site.tscn` o extenderla para otro aspecto). Añade el Resource a `Construction.blueprints` en `levels/main.tscn`: aparecerá en ambos lados, a la distancia `offset`. `blocks_enemies` define si bloquea; `damage` mayor que cero habilita disparos. Las reglas de obra, vida, reparación y energía son compartidas.
+
+Para modificar trabajadores, edita sus `WorkerData`; para tiempos y premios, el `CycleConfig` asignado a `Cycle`. No cambies los Resources durante una partida: cada entidad mantiene su estado por separado. Al mover scripts, mueve también sus `.gd.uid` y reimporta.
 
 ## Comentarios y problemas
 

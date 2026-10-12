@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WorkerData" format=3]
+
+[ext_resource type="Script" path="res://data/worker_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://entities/colony/collector.tscn" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"collector"
+scene = ExtResource("2")
+speed = 65.0
+cargo = 8
+home_distance = 35.0

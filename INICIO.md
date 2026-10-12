@@ -1,6 +1,6 @@
 # CENIZA NEÓN — prototipo de colonia y asedio
 
-Abre `project.godot` con Godot 4 y pulsa F5. Partida nueva de aproximadamente ocho minutos: tres ciclos de 90 segundos de día, 10 de aviso y 60 de noche. La noche se prolonga si quedan enemigos vivos. Sin guardado todavía.
+Abre `project.godot` con Godot 4 y pulsa F5. La configuración base tiene tres ciclos de 90 segundos de día, 10 de aviso y 60 de noche (unos ocho minutos). Este worktree conserva tu ajuste de pruebas: días de 10 segundos, unos cuatro minutos por partida. La noche se prolonga si quedan enemigos vivos. Sin guardado todavía.
 
 ## Controles
 
@@ -38,7 +38,9 @@ En el centro puedes curarte de día con E. Al amanecer se restauran 40 puntos de
 
 Simplificaciones del prototipo: trabajadores sin daño ni selección de herramientas; chatarra en una bolsa común; generación eléctrica fija; torretas no son objetivo de enemigos; no hay progresión, guardado, jefes, sonido ni arte final. Al perder se reinicia toda la sesión, todavía no se restaura el inicio del día como propone el GDD. La dificultad necesita pruebas con jugadores.
 
-Tus ajustes del personaje siguen en `scenes/player.tscn`: velocidad 220 y daño 50. Los tiempos del ciclo se pueden editar seleccionando PrimerDistrito en `scenes/main.tscn`.
+Tus ajustes del personaje siguen en `entities/player/player.tscn`: velocidad 220 y daño 50. Los tiempos se editan en el Resource `config` del nodo `Cycle` en `levels/main.tscn`. Está asignado `data/cycles/district.tres` (10/10/60). Para disponer de 90 segundos de construcción, asigna `data/cycles/standard.tres` (90/10/60). Los controles y costos no han cambiado.
+
+El corredor del asedio y los constructores ya utilizan sus escenas animadas. Para comprobarlo, encarga una obra con E y observa cómo el constructor camina y trabaja; durante la noche, cada tercer enemigo será un corredor animado. Jugador y recuperador conservan su dibujo provisional.
 
 ## Arte
 
@@ -49,6 +51,8 @@ La dirección visual y los prompts están en `docs/GUIA_ARTE.md`. Primero prepar
 Con el ejecutable de Godot desde esta carpeta:
 
 ```text
+godot --headless --path . --import
+godot --headless --path . --script res://tests/run_all.gd
 godot --headless --path . --script res://tests/combat_smoke.gd
 godot --headless --path . --script res://tests/siege_smoke.gd
 godot --headless --path . --script res://tests/session_simulation.gd

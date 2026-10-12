@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="StructureData" format=3]
+
+[ext_resource type="Script" path="res://data/structure_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://entities/structures/site.tscn" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"wall"
+scene = ExtResource("2")

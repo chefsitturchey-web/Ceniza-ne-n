@@ -12,11 +12,11 @@ func verify(condition: bool, description: String) -> void:
 		push_error(description)
 
 func run_checks() -> void:
-	var world = load("res://scenes/main.tscn").instantiate()
+	var world: District = load("res://levels/main.tscn").instantiate() as District
 	root.add_child(world)
-	world.set_process(false)
+	world.session.set_process(false)
 	world.player.set_physics_process(false)
-	var enemy = world.spawn_enemy(1, false)
+	var enemy: SiegeEnemy = world.director.spawn_enemy(1, load("res://data/enemies/errante.tres") as EnemyData)
 	enemy.set_physics_process(false)
 	var sprite: AnimatedSprite2D = enemy.get_node("AnimatedSprite2D")
 	verify(sprite.sprite_frames.get_animation_names().size() == 5, "Cinco animaciones cargadas")
@@ -38,20 +38,20 @@ func run_checks() -> void:
 	verify(sprite.animation == &"daño", "Animación de daño")
 	enemy._physics_process(0.4)
 	verify(sprite.animation == &"reposo", "Reposo durante recuperación")
-	var original_scrap: int = world.scrap
+	var original_scrap: int = world.bank.scrap
 	enemy.take_damage(1000)
 	verify(sprite.animation == &"destruccion" and not enemy.is_queued_for_deletion(), "Mostrar muerte antes de borrar")
 	verify(not enemy.is_in_group("enemies"), "La muerte deja de contar como amenaza")
 	enemy.take_damage(1000)
-	verify(world.scrap == original_scrap + 3, "Una sola recompensa por enemigo")
+	verify(world.bank.scrap == original_scrap + 3, "Una sola recompensa por enemigo")
 	verify(not sprite.sprite_frames.get_animation_loop(&"destruccion"), "Destrucción sin bucle")
 	await create_timer(2.3).timeout
 	verify(not is_instance_valid(enemy), "Desaparición al terminar la animación")
-	var runner = world.spawn_enemy(-1, true)
+	var runner: SiegeEnemy = world.director.spawn_enemy(-1, load("res://data/enemies/corredor.tres") as EnemyData)
 	runner.set_physics_process(false)
-	verify(runner.get_node_or_null("AnimatedSprite2D") == null, "Conservar corredor provisional")
+	verify(runner.get_node_or_null("AnimatedSprite2D") != null, "Corredor utiliza su escena animada")
 	runner.take_damage(1000)
-	verify(runner.is_queued_for_deletion(), "Corredor conserva muerte inmediata")
+	verify(not runner.is_in_group(GameRules.ENEMIES) and runner.sprite.animation == &"destruccion", "Corredor muerto deja de ser amenaza y muestra destrucción")
 	world.queue_free()
 	await process_frame
 	print("Animaciones: %d comprobaciones; %d fallos" % [checks, failures])

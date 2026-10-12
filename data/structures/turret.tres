@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StructureData" format=3]
+
+[ext_resource type="Script" path="res://data/structure_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://entities/structures/site.tscn" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"turret"
+display_name = "Torreta"
+cost = 25
+health = 100
+energy = 2
+offset = 180.0
+blocks_enemies = false
+attack_range = 260.0
+damage = 18
+scene = ExtResource("2")

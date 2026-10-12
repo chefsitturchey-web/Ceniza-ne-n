@@ -12,38 +12,38 @@ func verify(condition: bool, description: String) -> void:
 	checks += 1
 
 func run_checks() -> void:
-	var world = load("res://scenes/main.tscn").instantiate()
+	var world: District = load("res://levels/main.tscn").instantiate() as District
 	root.add_child(world)
-	world.set_process(false)
+	world.session.set_process(false)
 	world.player.set_physics_process(false)
-	verify(world.scrap == 90 and world.workers.size() == 2, "economía inicial")
-	verify(world.perform_interaction(0), "encargar muralla")
-	verify(world.scrap == 70, "pago único")
-	verify(not world.perform_interaction(0) and world.scrap == 70, "evitar obra duplicada")
-	for index in range(100):
-		world.update_workers(0.1)
-	verify(world.sites[0].hp == 240, "constructor completa obra")
-	world.damage_site(0, 40)
-	verify(world.perform_interaction(0), "reparación encargada")
-	for index in range(100):
-		world.update_workers(0.1)
-	verify(world.sites[0].hp == 240, "reparación completada")
-	world.scrap = 0
-	verify(not world.perform_interaction(2), "no construir sin fondos")
-	world.scrap = 100
-	world.energy_capacity = 0
-	verify(not world.perform_interaction(1), "límite de energía")
-	world.energy_capacity = 4
-	verify(world.perform_interaction(1), "encargar torreta")
-	verify(world.energy_used() == 2, "reservar energía en obra")
-	verify(world.perform_interaction(-1) and world.perform_interaction(-1), "reclutar hasta cuatro")
-	verify(not world.perform_interaction(-1), "respetar capacidad de población")
+	verify(world.bank.scrap == 90 and world.colony.workers.size() == 2, "economía inicial")
+	verify(world.interaction.perform_interaction(0), "encargar muralla")
+	verify(world.bank.scrap == 70, "pago único")
+	verify(not world.interaction.perform_interaction(0) and world.bank.scrap == 70, "evitar obra duplicada")
+	for index: int in range(100):
+		world.colony.update_workers(0.1)
+	verify(world.construction.sites[0].hp == 240, "constructor completa obra")
+	world.construction.damage_site(0, 40)
+	verify(world.interaction.perform_interaction(0), "reparación encargada")
+	for index: int in range(100):
+		world.colony.update_workers(0.1)
+	verify(world.construction.sites[0].hp == 240, "reparación completada")
+	world.bank.scrap = 0
+	verify(not world.interaction.perform_interaction(2), "no construir sin fondos")
+	world.bank.scrap = 100
+	world.bank.energy_capacity = 0
+	verify(not world.interaction.perform_interaction(1), "límite de energía")
+	world.bank.energy_capacity = 4
+	verify(world.interaction.perform_interaction(1), "encargar torreta")
+	verify(world.bank.energy_used() == 2, "reservar energía en obra")
+	verify(world.interaction.perform_interaction(-1) and world.interaction.perform_interaction(-1), "reclutar hasta cuatro")
+	verify(not world.interaction.perform_interaction(-1), "respetar capacidad de población")
 	world.player.position.x = -100
-	world.activate_overload()
-	verify(world.overload_left == 6.0 and world.overload_right == 0.0, "sobrecarga por frente")
-	world.overload_left = 2.0
-	world.activate_overload()
-	verify(world.overload_left == 2.0, "sobrecarga respeta enfriamiento")
+	world.overload.activate_overload()
+	verify(world.overload.overload_left == 6.0 and world.overload.overload_right == 0.0, "sobrecarga por frente")
+	world.overload.overload_left = 2.0
+	world.overload.activate_overload()
+	verify(world.overload.overload_left == 2.0, "sobrecarga respeta enfriamiento")
 	world.player.dodge()
 	verify(world.player.stamina == 70.0, "coste de esquiva")
 	world.player.take_damage(25)
@@ -53,14 +53,14 @@ func run_checks() -> void:
 	verify(world.player.health == 0 and world.player.respawn_remaining == 4.0, "muerte y reenlace")
 	world.player._physics_process(4.1)
 	verify(world.player.health == 100 and world.player.position.x == 0.0, "reaparición en núcleo")
-	var enemy = world.spawn_enemy(-1, false)
+	var enemy: SiegeEnemy = world.director.spawn_enemy(-1, load("res://data/enemies/errante.tres") as EnemyData)
 	enemy.set_physics_process(false)
 	enemy.position.x = -263
 	enemy._physics_process(0.1)
 	verify(enemy.target_kind == "wall" and enemy.windup > 0, "enemigo avisa antes de golpear muralla")
-	var hp: int = world.sites[0].hp
+	var hp: int = world.construction.sites[0].hp
 	enemy._physics_process(0.6)
-	verify(world.sites[0].hp < hp, "enemigo daña muralla")
+	verify(world.construction.sites[0].hp < hp, "enemigo daña muralla")
 	enemy.position.x = -120
 	world.player.position.x = -130
 	enemy.cooldown = 0.0
@@ -71,29 +71,30 @@ func run_checks() -> void:
 	verify(world.player.health == 100, "salir del alcance evita golpe")
 	enemy.take_damage(1000)
 	verify(world.get_tree().get_nodes_in_group("enemies").is_empty(), "muerte elimina amenaza")
-	world.phase = "DÍA"
-	world.phase_remaining = 0
-	world.update_phase(0)
-	verify(world.phase == "AVISO", "día pasa a aviso")
-	world.phase_remaining = 0
-	world.update_phase(0)
-	verify(world.phase == "NOCHE", "aviso pasa a noche")
-	world.spawn_count = 12
-	world.phase_remaining = 0
-	world.update_phase(0)
-	verify(world.day == 2 and world.phase == "DÍA", "amanecer tras limpiar asedio")
-	world.phase = "NOCHE"
-	world.day = 3
-	world.spawn_count = 20
-	world.phase_remaining = 0
-	world.update_phase(0)
-	verify(world.finished and world.won, "victoria tercera noche")
+	world.cycle.phase = "DÍA"
+	world.cycle.phase_remaining = 0
+	world.cycle.update_phase(0)
+	verify(world.cycle.phase == "AVISO", "día pasa a aviso")
+	world.cycle.phase_remaining = 0
+	world.cycle.update_phase(0)
+	verify(world.cycle.phase == "NOCHE", "aviso pasa a noche")
+	world.director.spawn_count = 12
+	world.cycle.phase_remaining = 0
+	world.cycle.update_phase(0)
+	verify(world.cycle.day == 2 and world.cycle.phase == "DÍA", "amanecer tras limpiar asedio")
+	world.cycle.phase = "NOCHE"
+	world.cycle.day = 3
+	world.director.start(3)
+	world.director.spawn_count = 20
+	world.cycle.phase_remaining = 0
+	world.cycle.update_phase(0)
+	verify(world.session.finished and world.session.won, "victoria tercera noche")
 	world.queue_free()
 	await process_frame
-	var defeat = load("res://scenes/main.tscn").instantiate()
+	var defeat: District = load("res://levels/main.tscn").instantiate() as District
 	root.add_child(defeat)
-	defeat.core_health = 0
-	defeat._process(0.1)
-	verify(defeat.finished and not defeat.won, "derrota por núcleo destruido")
+	defeat.core.health = 0
+	defeat.session._process(0.1)
+	verify(defeat.session.finished and not defeat.session.won, "derrota por núcleo destruido")
 	print("Comprobaciones: %d; fallos: %d" % [checks, failures])
 	quit(1 if failures > 0 else 0)

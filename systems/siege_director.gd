@@ -1,0 +1,45 @@
+class_name SiegeDirector
+extends Node
+
+signal spawned(enemy: SiegeEnemy, side: float)
+@export var waves: Array[WaveData] = []
+var player: Player
+var construction: ConstructionSystem
+var core: ColonyCore
+var bank: ResourceBank
+var session: SessionController
+var spawn_remaining: float = 0.0
+var spawn_count: int = 0
+var night: int = 1
+var wave: WaveData
+
+func start(number: int) -> void:
+	night = number
+	wave = waves[number - 1]
+	spawn_count = 0
+	spawn_remaining = 0.0
+
+func tick(delta: float) -> void:
+	spawn_remaining -= delta
+	if spawn_remaining <= 0.0 and spawn_count < wave.enemies.size():
+		spawn_enemy(wave.sides[spawn_count], wave.enemies[spawn_count], night)
+		spawn_count += 1
+		spawn_remaining = wave.cadence
+
+func is_cleared() -> bool:
+	return spawn_count >= wave.enemies.size() and get_tree().get_nodes_in_group(GameRules.ENEMIES).is_empty()
+
+func spawn_enemy(side: float, data: EnemyData, number: int = 1) -> SiegeEnemy:
+	var enemy: SiegeEnemy = data.scene.instantiate() as SiegeEnemy
+	enemy.data = data
+	enemy.player = player
+	enemy.construction = construction
+	enemy.core = core
+	enemy.session = session
+	enemy.night = number
+	enemy.reward_requested.connect(bank.deposit)
+	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+	enemy.position = Vector2(side * data.spawn_distance, GameRules.FLOOR_Y)
+	add_child(enemy)
+	spawned.emit(enemy, side)
+	return enemy
