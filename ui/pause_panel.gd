@@ -10,13 +10,13 @@ var phase: String = "DÍA"
 
 func _ready() -> void:
 	rows = VBoxContainer.new()
-	rows.add_theme_font_size_override("font_size", 11)
-	rows.add_theme_constant_override("separation", 10)
+	rows.add_theme_font_size_override("font_size", 10)
+	rows.add_theme_constant_override("separation", 6)
 	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	get_node("Margin").add_child(rows)
 	var heading: Label = Label.new()
-	heading.text = "PAUSA · Esc / Start para continuar"
-	heading.add_theme_font_size_override("font_size", 11)
+	heading.text = "PAUSA"
+	heading.theme_type_variation = &"Title"
 	heading.add_theme_color_override("font_color", Color("ffce75"))
 	rows.add_child(heading)
 	var first: HBoxContainer = _row()
@@ -50,11 +50,17 @@ func _ready() -> void:
 	var third: HBoxContainer = _row()
 	_item(third, "amenaza")
 	_item(third, "sobrecarga")
-	var controls: Label = Label.new()
-	controls.text = "TECLADO\nA/D o ←/→ mover · J atacar · Espacio esquivar\nMantén E construir / reparar / curarte / reclutar\nQ sobrecarga · Esc pausa · R nueva partida tras el final\n\nMANDO\nStick / cruceta mover · X atacar · A esquivar · Mantén Y interactuar\nLB sobrecarga · Start pausa · Select nueva partida tras el final"
-	controls.add_theme_font_size_override("font_size", 10)
-	controls.add_theme_color_override("font_color", Color("8299a8"))
+	var controls: GridContainer = GridContainer.new()
+	controls.columns = 2
+	controls.add_theme_constant_override("h_separation", 24)
+	controls.add_theme_constant_override("v_separation", 2)
 	rows.add_child(controls)
+	for text: String in ["Mover", "A/D / Stick", "Atacar", "J / X", "Esquivar", "Espacio / A",
+		"Interactuar", "Mantener E / Y", "Sobrecarga", "Q / LB", "Continuar", "Esc / Start",
+		"Reintentar al final", "R / Select"]:
+		var label: Label = Label.new()
+		label.text = text
+		controls.add_child(label)
 
 
 func _row() -> HBoxContainer:
@@ -76,7 +82,7 @@ func _icon(parent: Control, key: String) -> void:
 
 func _label(parent: Control, key: String) -> void:
 	var label: Label = Label.new()
-	label.add_theme_font_size_override("font_size", 11)
+	label.add_theme_font_size_override("font_size", 10)
 	parent.add_child(label)
 	values[key] = label
 
@@ -91,7 +97,7 @@ func display_dashboard(data: Dictionary) -> void:
 	icons.dia.visible = phase == "DÍA"
 	icons.aviso.visible = phase == "AVISO"
 	icons.noche.visible = phase == "NOCHE"
-	values.phase.text = "%s %d/%d · %ds" % [phase, data.day, data.nights, data.seconds]
+	values.phase.text = "%s %d/%d   %ds" % [phase, data.day, data.nights, data.seconds]
 	values.chatarra.text = str(data.scrap)
 	values.energia.text = "%d/%d" % [data.energy, data.capacity]
 	values.habitantes.text = "%d/%d" % [data.population, data.population_max]
@@ -100,6 +106,6 @@ func display_dashboard(data: Dictionary) -> void:
 	for index: int in range(keys.size()):
 		bars[keys[index]].value = amounts[index]
 		values[keys[index]].text = str(amounts[index])
-	values.amenaza.text = "◀ %d / %d ▶" % [data.left, data.right]
+	values.amenaza.text = "IZQ %d / DER %d" % [data.left, data.right]
 	values.sobrecarga.text = "IZQ %s / DER %s" % [data.overload_left, data.overload_right]
 

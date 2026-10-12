@@ -9,11 +9,13 @@ script = ExtResource("1")
 mouse_filter = 2
 script = ExtResource("3")
 [node name="Gameplay" type="Control" parent="."]
+texture_filter = 1
 mouse_filter = 2
 [node name="Status" type="Label" parent="."]
 visible = false
 [node name="PausePanel" parent="." instance=ExtResource("2")]
 [node name="Result" type="Label" parent="."]
+texture_filter = 1
 offset_left = 64.0
 offset_top = 130.0
 offset_right = 576.0
@@ -24,4 +26,4 @@ theme_override_colors/font_color = Color(1, 0.808, 0.459, 1)
 theme_override_colors/font_shadow_color = Color(0.043, 0.075, 0.133, 1)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 16
+theme_type_variation = &"Title"
