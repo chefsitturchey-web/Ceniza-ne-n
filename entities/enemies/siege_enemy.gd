@@ -41,6 +41,7 @@ func _ready() -> void:
 	hurtbox.hit.connect(take_damage)
 	add_child(hurtbox)
 	visual.actor = self
+	add_child(visual.effects)
 	add_child(visual)
 	visual.bind(sprite)
 	if sprite != null:
@@ -75,6 +76,7 @@ func take_damage(amount: int) -> void:
 	if health <= 0 or amount <= 0:
 		return
 	health_component.take_damage(amount)
+	visual.hit_effects(health == 0)
 	flash = data.flash_duration
 	hurt_remaining = data.hurt_duration
 	if health == 0:

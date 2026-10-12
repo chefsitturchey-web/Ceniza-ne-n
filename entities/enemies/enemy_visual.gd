@@ -2,6 +2,25 @@ class_name EnemyVisual
 extends EntityVisual
 
 var actor: SiegeEnemy
+var effects: DebrisEmitter = DebrisEmitter.new()
+var smoke_timer: float = 0.0
+
+func hit_effects(dead: bool) -> void:
+	if not effects.is_inside_tree():
+		return
+	var origin: Vector2 = actor.global_position + Vector2(0, -actor.data.provisional_height * 0.6)
+	effects.emit_pixels(origin, 4, Color("ffce75"))
+	effects.emit_pixels(origin, 2, Color("e89e54"))
+	effects.emit_fragments(actor.global_position, null, effects.rng.randi_range(4, 6) if dead else effects.rng.randi_range(1, 3))
+
+func _process(delta: float) -> void:
+	smoke_timer -= delta
+	if actor.health > 0 and actor.health <= actor.max_health * 0.35 and smoke_timer <= 0 and effects.is_inside_tree():
+		smoke_timer = 0.45
+		var origin: Vector2 = actor.global_position + Vector2(0, -actor.data.provisional_height * 0.7)
+		effects.emit_pixels(origin, 1, Color("89939e"), true)
+		if effects.rng.randf() < 0.35:
+			effects.emit_pixels(origin, 2, Color("ffce75"))
 
 func update_state(moving: bool = false) -> void:
 	if sprite != null:

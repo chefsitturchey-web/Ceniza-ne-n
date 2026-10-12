@@ -4,6 +4,8 @@ extends Node2D
 signal destroyed
 @export var data: StructureData
 var health_component: HealthComponent = HealthComponent.new()
+var effects: StructureEffects = StructureEffects.new()
+var weld_timer: float = 0.0
 var boosted: bool = false
 var ordered: bool = false
 var progress: float = 0.0
@@ -26,16 +28,20 @@ func _ready() -> void:
 	health_component.maximum = data.health
 	health_component.reset(0)
 	health_component.died.connect(_on_destroyed)
+	add_child(effects)
+	effects.setup(health_component, data.texture, x < 0.0)
 
 func take_damage(amount: int) -> void:
 	health_component.take_damage(amount)
 
 func complete_work() -> void:
+	effects.repair_sparks()
 	health_component.reset()
 	ordered = false
 	progress = 0.0
 
 func _on_destroyed() -> void:
+	effects.shatter()
 	ordered = false
 	progress = 0.0
 	destroyed.emit()
@@ -44,9 +50,32 @@ func update_overload(left_active: bool, right_active: bool) -> void:
 	boosted = left_active if x < 0.0 else right_active
 	queue_redraw()
 
+func _process(delta: float) -> void:
+	weld_timer -= delta
+	if ordered and weld_timer <= 0.0:
+		weld_timer = 0.18
+		var height: float = data.texture.get_height() if data.texture != null else 40.0
+		var origin: Vector2 = global_position + Vector2(effects.rng.randf_range(-8, 8), -height * clampf(progress / GameRules.BUILD_TIME, 0, 1))
+		effects.emit_pixels(origin, 2, Color("75fff0") if hp > 0 else Color("ffce75"))
+	queue_redraw()
+
+func _draw_construction() -> void:
+	var size: Vector2 = data.texture.get_size()
+	var built: float = floorf(size.y * clampf(progress / GameRules.BUILD_TIME, 0, 1))
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(-1.0 if x < 0.0 else 1.0, 1.0))
+	draw_rect(Rect2(-size.x / 2.0, -size.y, size.x, size.y - built), Color("b075ae", 0.4), false, 1.0)
+	if built > 0:
+		draw_texture_rect_region(data.texture, Rect2(-size.x / 2.0, -built, size.x, built), Rect2(0, size.y - built, size.x, built))
+	var amber: Color = Color("ffce75")
+	amber.a = 1.0 if int(effects.elapsed * 12) % 2 == 0 else 0.45
+	draw_line(Vector2(-size.x / 2.0, -built), Vector2(size.x / 2.0, -built), amber)
+	draw_set_transform(Vector2.ZERO)
+
 func _draw() -> void:
 	var color: Color = Color("47dacb") if boosted else Color("8299a8")
-	if hp > 0 and data.texture != null:
+	if ordered and hp == 0 and progress < GameRules.BUILD_TIME and data.texture != null:
+		_draw_construction()
+	elif hp > 0 and data.texture != null:
 		var size: Vector2 = data.texture.get_size()
 		# Los sprites miran a la derecha; en el frente izquierdo deben mirar hacia afuera.
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2(-1.0 if x < 0.0 else 1.0, 1.0))

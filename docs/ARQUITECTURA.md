@@ -45,8 +45,17 @@ Estados del jugador: `IDLE`, `MOVE`, `ATTACK`, `DODGE`, `DEAD`; los temporizador
 
 `save_system_test.gd` comprueba ida y vuelta, reapertura, documentos inválidos, amanecer y finales con `user://partida_test.json`. Las demás suites desactivan la persistencia antes de añadir el distrito al árbol para no leer ni modificar la partida real.
 
-`tests/run_all.gd` ejecuta diez suites en procesos separados, comprueba códigos de salida, errores y marcadores de finalización. Devuelve 1 si alguna falla. Solo reconoce como externo el mensaje exacto de acceso denegado al almacén de certificados de Windows; lo muestra en la salida. No ignora errores de scripts ni avisos del proyecto. Los registros `validation*.log` están excluidos de Git.
+`tests/run_all.gd` ejecuta doce suites en procesos separados, comprueba códigos de salida, errores y marcadores de finalización. Devuelve 1 si alguna falla. Solo reconoce como externo el mensaje exacto de acceso denegado al almacén de certificados de Windows; lo muestra en la salida. No ignora errores de scripts ni avisos del proyecto. Los registros `validation*.log` están excluidos de Git.
 
-`static_check.gd` carga y recompila todos los demás scripts (42); los avisos del proyecto están configurados como warning. Para la revisión final se compilaron también con todos los avisos habilitados elevados temporalmente a error, restaurando después la configuración normal. Referencia: [sistema de avisos y niveles de GDScript](https://docs.godotengine.org/en/stable/classes/class_projectsettings.html#class-projectsettings-property-debug-gdscript-warnings-inferred-declaration).
+`static_check.gd` carga y recompila todos los demás scripts (47); los avisos del proyecto están configurados como warning. Para la revisión final se compilaron también con todos los avisos habilitados elevados temporalmente a error, restaurando después la configuración normal. Referencia: [sistema de avisos y niveles de GDScript](https://docs.godotengine.org/en/stable/classes/class_projectsettings.html#class-projectsettings-property-debug-gdscript-warnings-inferred-declaration).
 
 Las pruebas de animación del errante conservan 17 comprobaciones; las dos que exigían un corredor provisional ahora exigen su sprite y muerte animada. `visual_integration_test.gd` amplía la cobertura del corredor, constructor e interfaz provisional.
+
+
+## Efectos por código
+
+`DebrisEmitter` crea nodos pixelados con gravedad, rebote contra `GameRules.FLOOR_Y`, desvanecido y recortes reales de textura. Comparte un máximo de 120 partículas; el contador se libera en `_exit_tree`, también al cerrar la sesión. Las partículas son hermanas del actor y sobreviven a su muerte. Cada emisor utiliza un `RandomNumberGenerator` propio: no consume la aleatoriedad de las reglas.
+
+`StructureEffects` escucha las señales de vida y dibuja grietas deterministas por sitio (66% y 33%), humo, desprendimientos y chispas de reparación. Las obras revelan el sprite desde abajo, con andamio y soldadura; al destruirse generan ocho recortes. Núcleo y jugador solo sacuden su presentación, sin mover colisiones. `EnemyVisual` añade chispas, metal y humo; `PlayerVisual` ralentiza la animación de carrera a 0,8 con poca energía y añade respiración y sudor.
+
+`effects_test.gd` comprueba creación, liberación, persistencia tras muerte del actor, rebote, posiciones enteras, límite global, fragmentación de muralla, etapas de daño, humo, reparación y cansancio sin cambios físicos. Las simulaciones conservan 128.6 s y 240.5 s. Si el sandbox bloquea AppData, ejecutar las validaciones con `$env:APPDATA = Join-Path (Get-Location) '.godot\validation-user'`; los datos temporales quedan fuera de Git.
