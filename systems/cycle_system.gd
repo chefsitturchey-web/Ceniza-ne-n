@@ -6,6 +6,7 @@ signal phase_changed(phase: String, day: int)
 signal victory_requested
 signal notice_requested(message: String)
 @export var config: CycleConfig
+var boss_required: bool = false
 var director: SiegeDirector
 var day: int = 1
 var phase: String = "DÍA"
@@ -30,10 +31,10 @@ func update_phase(delta: float) -> void:
 		phase_remaining = config.night_duration
 		director.start(day)
 	elif director.is_cleared():
-		if day == config.nights:
+		if day == config.nights and not boss_required:
 			victory_requested.emit()
 		else:
-			day += 1
+			day = mini(day + 1, config.nights)
 			phase = "DÍA"
 			phase_remaining = config.day_duration
 			dawn.emit(config)

@@ -89,7 +89,7 @@ func run_checks() -> void:
 	world.director.spawn_count = 20
 	world.cycle.phase_remaining = 0
 	world.cycle.update_phase(0)
-	verify(world.session.finished and world.session.won, "victoria tercera noche")
+	verify(not world.session.finished and world.cycle.phase == "DÍA" and world.cycle.day == 3, "La tercera noche permite continuar hasta derrotar al jefe")
 	world.queue_free()
 	await process_frame
 	var defeat: District = load("res://levels/main.tscn").instantiate() as District

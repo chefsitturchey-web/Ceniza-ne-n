@@ -12,6 +12,7 @@ var defenses: DefenseSystem
 var interaction: InteractionSystem
 var overload: OverloadSystem
 var presenter: HudPresenter
+var expedition: ExpeditionManager
 var finished: bool = false
 var won: bool = false
 var persistence_enabled: bool = true
@@ -41,6 +42,8 @@ func restart() -> void:
 	get_tree().reload_current_scene()
 
 func _process(delta: float) -> void:
+	if expedition != null and expedition.active:
+		return
 	if Input.is_action_just_pressed("restart") and finished:
 		restart()
 		return
@@ -60,6 +63,8 @@ func _process(delta: float) -> void:
 	colony.update_workers(delta)
 	defenses.update_defenses(delta)
 	interaction.update_interaction(delta)
+	if expedition != null and expedition.active:
+		return
 	if Input.is_action_just_pressed("overload") and player.health > 0:
 		overload.activate_overload()
 	defenses.update_beams(delta)

@@ -67,3 +67,15 @@ Las pruebas de animación del errante conservan 17 comprobaciones; las dos que e
 `ui/hud.tscn` presenta recursos mínimos, chevrons, cartel de fase de 2,5 s, interacción sobre el objeto y toasts. `ui/damage_edges.gd` dibuja la viñeta pixelada y el aviso ámbar inferior sin shaders. La vida baja mantiene un latido hasta curarse; los temporizadores visuales se congelan al pausar. `ui/pause_panel.tscn` es una escena independiente: `Margin` aloja las filas de detalle creadas por `pause_panel.gd` y permite incorporar el futuro menú. El panel no procesa entradas ni modifica la sesión; `SessionController` sigue controlando Esc/Start.
 
 Las estructuras y enemigos exponen `WORLD_BARS_ENABLED = false`; sus dibujos ya no incluyen barras de vida ni de obra. Permanecen contornos, revelado, grietas y partículas. `hud_clean_test.gd`, incluido en `run_all.gd`, comprueba presentación, pausa mediante la entrada existente, cámara/zoom, notificaciones y finales. Opcionalmente `-- --capture` en una ejecución gráfica guarda capturas en `.godot/`, fuera de Git.
+
+## Repetidores y expediciones
+
+`EnemyRepeater` usa vida de 300, `HurtboxComponent` y `StructureEffects`. Pertenece al grupo `repeaters`, separado de `enemies`: solo la hitbox del jugador consulta ambos; defensas, amenazas y oleadas siguen consultando enemigos. No tiene colision fisica ni barra de vida.
+
+`RailwayStation` presenta el anden y la llegada del tren, con cinco ruedas rotadas por desplazamiento y particulas de `DebrisEmitter`. `ExpeditionManager` conecta los dos objetivos, habilita la estacion y valida el viaje de dia. `InteractionSystem` conserva la pulsacion mantenida y `HudPresenter` ancla el contexto sobre la estacion.
+
+La expedicion es una escena hermana del distrito. El gestor conserva y deshabilita el modo de procesamiento de cada nodo de la colonia, incluidos Session/HUD (ALWAYS) y enemigos (PAUSABLE), y oculta mundo y HUD. Derrota libera la expedicion y restaura esos modos sin reconstruir la colonia ni tocar sus temporizadores. Victoria mantiene la suspension y muestra Continuar; R borra el guardado y reinicia como sustituto temporal del distrito 2.
+
+El guardado sigue en version 1: `expedition.destroyed` contiene dos booleanos y `expedition.train_arrived` indica si aparco. La ausencia de estos campos equivale a torres intactas y tren ausente. Se valida antes de aplicar; un tren llegado con torres intactas se rechaza. Una llegada pendiente vuelve a iniciarse al cargar. Se conserva el autoguardado de inicio del dia.
+
+La campana repite la ultima oleada configurada despues de la tercera noche hasta completar la expedicion; no cambia recursos de balance ni escala enemigos. La simulacion historica desactiva explicitamente `boss_required` para medir el mismo final de asedio (128.6 s / 240.5 s). `siege_smoke` comprueba el nuevo amanecer tras la tercera noche. `expedition_test`, registrada en la suite completa, verifica objetivos, llegada, restricciones, suspension, derrota, victoria y compatibilidad de guardado.
