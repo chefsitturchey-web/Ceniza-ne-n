@@ -1,7 +1,7 @@
 class_name ExpeditionManager
 extends Node
 
-const ARENA: PackedScene = preload("res://levels/expedition/boss_stub.tscn")
+const ARENA: PackedScene = preload("res://levels/expedition/recaudador_arena.tscn")
 var district: District
 var station: RailwayStation
 var repeaters: Array[EnemyRepeater] = []
@@ -42,6 +42,7 @@ func start() -> bool:
 		return false
 	active = true
 	arena = ARENA.instantiate() as CanvasLayer
+	arena.configure(district.player)
 	arena.resolved.connect(resolve)
 	arena.continued.connect(continue_district)
 	# Hermana del distrito: no hereda la suspension ni la camara del mundo.
