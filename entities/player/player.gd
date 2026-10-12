@@ -12,6 +12,8 @@ const HIT_INVULNERABILITY: float = 0.6
 const RESPAWN_INVULNERABILITY: float = 2.0
 const RESPAWN_DURATION: float = 4.0
 const SLASH_DURATION: float = 0.12
+## El golpe dura 0.12 s, pero la animación necesita más tiempo para leerse.
+const ATTACK_ANIM_DURATION: float = 0.3
 const MOVE_THRESHOLD: float = 0.1
 const ATTACK_OFFSET: float = 8.0
 const ATTACK_HEIGHT: float = 30.0
@@ -32,6 +34,7 @@ var facing: float = 1.0
 var attack_facing: float = 1.0
 var cooldown_remaining: float = 0.0
 var slash_remaining: float = 0.0
+var attack_anim_remaining: float = 0.0
 var health: int:
 	get: return health_component.current
 	set(value): health_component.reset(value)
@@ -65,7 +68,14 @@ func refresh_state() -> void:
 	else:
 		set_state(State.MOVE if absf(velocity.x) > 0.0 else State.IDLE)
 	visual.face(facing < 0.0)
-	visual.play_visual([&"reposo", &"correr", &"ataque", &"esquiva", &"muerte"][state])
+	if state == State.DODGE:
+		visual.play_visual(&"esquiva", DODGE_DURATION)
+	elif state == State.DEAD:
+		visual.play_visual(&"muerte")
+	elif attack_anim_remaining > 0.0:
+		visual.play_visual(&"ataque", ATTACK_ANIM_DURATION)
+	else:
+		visual.play_visual(&"correr" if state == State.MOVE else &"reposo")
 	visual.queue_redraw()
 
 func _physics_process(delta: float) -> void:
@@ -73,6 +83,7 @@ func _physics_process(delta: float) -> void:
 		return
 	cooldown_remaining = maxf(0.0, cooldown_remaining - delta)
 	slash_remaining = maxf(0.0, slash_remaining - delta)
+	attack_anim_remaining = maxf(0.0, attack_anim_remaining - delta)
 	invulnerable = maxf(0.0, invulnerable - delta)
 	stamina = minf(MAX_STAMINA, stamina + STAMINA_REGEN * delta)
 	if respawn_remaining > 0.0:
@@ -125,6 +136,7 @@ func attack() -> void:
 		return
 	cooldown_remaining = attack_cooldown
 	slash_remaining = SLASH_DURATION
+	attack_anim_remaining = ATTACK_ANIM_DURATION
 	attack_facing = facing
 	var hit_rect: Rect2 = get_attack_rect()
 	hitbox.strike(hit_rect, attack_damage)

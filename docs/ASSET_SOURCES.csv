@@ -1,1 +1,2 @@
 ﻿asset_id,file,tool_or_author,date,reference,license_or_terms,notes
+player_portador,assets/player/*/*.png,PixelLab (MCP; personaje db8da4e8-279c-4f89-9fbc-29b081108d01),2026-10-12,docs/GUIA_ARTE.md#1-portador,Términos de servicio de PixelLab (https://pixellab.ai/termsofservice),"Vista lateral 48x48; reposo, correr (skeleton-v3), ataque (v3), esquiva y muerte"

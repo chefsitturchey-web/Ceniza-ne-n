@@ -5,6 +5,7 @@ var actor: Player
 
 func _draw() -> void:
 	if sprite != null:
+		sprite.modulate.a = 0.5 if actor.invulnerable > 0.0 and actor.health > 0 else 1.0
 		return
 	if actor.health <= 0:
 		draw_circle(Vector2(0, -8), 7, Color("47dacb"))
