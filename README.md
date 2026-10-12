@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-prototipo%20jugable-e89e54">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-15%20suites-47dacb">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-16%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -125,8 +125,8 @@ La guía detallada de esta versión está en [INICIO.md](INICIO.md).
 | Hecho | En curso | Próximo |
 |---|---|---|
 | Distrito 1 completo con dos frentes, repetidores y estación | Música y efectos de sonido | Datos neuronales, niveles y Clínica de enlace |
-| Primer jefe: El Recaudador | Animaciones norte/sur del Portador en la arena | Módulos automáticos, pasivas y evoluciones |
-| Errante, Corredor, constructores y recuperadores | Nuevo Corredor y Constructor con el estilo actual | Blindado, Saltador, Ariete y más arquetipos |
+| Primer jefe: El Recaudador, con arena ambientada | Animaciones norte/sur del Portador en la arena; arte definitivo de los enemigos nuevos | Módulos automáticos, pasivas y evoluciones |
+| Errante, Corredor, Blindado, Saltador y Ariete | Nuevo Corredor y Constructor con el estilo actual | Saboteador, Dron cazador, Artillero, Portador y Reparador |
 | Efectos, ciclo de luz, HUD mínimo y fuentes pixel | Menús principal, de opciones y de pausa | Distritos 2 a 4 y los demás jefes |
 
 El alcance completo está en el [documento de diseño (GDD)](CENIZA_NEON_GDD.docx).
@@ -156,7 +156,7 @@ godot --headless --path . --import
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta 15 suites (combate, asedio, animaciones, guardado, efectos, HUD, expedición, jefe, Resources y dos simulaciones completas de partida) y termina con error ante cualquier fallo. En Windows sustituye `godot` por la ruta del ejecutable de consola.
+`run_all.gd` ejecuta 16 suites (combate, asedio, animaciones, guardado, efectos, HUD, expedición, jefe, enemigos, Resources y dos simulaciones completas de partida) y termina con error ante cualquier fallo. En Windows sustituye `godot` por la ruta del ejecutable de consola.
 
 ### Flujo de trabajo
 
