@@ -13,13 +13,13 @@ const FAR_FOLLOW: float = 0.8
 const MID_FOLLOW: float = 0.55
 ## Decoración fija del distrito: [textura, x]. Lejos de las obras (±180, ±240) y del núcleo.
 const PROPS: Array = [
-	[preload("res://assets/props/sign.png"), -880.0], [preload("res://assets/props/car.png"), -720.0],
+	[preload("res://assets/props/sign.png"), -810.0], [preload("res://assets/props/car.png"), -720.0],
 	[preload("res://assets/props/crate.png"), -630.0], [preload("res://assets/props/lamp.png"), -560.0],
 	[preload("res://assets/props/scrap.png"), -470.0], [preload("res://assets/props/barrel.png"), -395.0],
 	[preload("res://assets/props/barrel.png"), -380.0], [preload("res://assets/props/lamp.png"), -330.0],
 	[preload("res://assets/props/lamp.png"), 330.0], [preload("res://assets/props/scrap.png"), 420.0],
-	[preload("res://assets/props/crate.png"), 520.0], [preload("res://assets/props/lamp.png"), 610.0],
-	[preload("res://assets/props/spool.png"), 700.0], [preload("res://assets/props/sign.png"), 860.0],
+	[preload("res://assets/props/crate.png"), 455.0], [preload("res://assets/props/lamp.png"), 775.0],
+	[preload("res://assets/props/spool.png"), 700.0], [preload("res://assets/props/sign.png"), 825.0],
 ]
 const LAMP: Texture2D = preload("res://assets/props/lamp.png")
 

@@ -15,6 +15,8 @@ extends Node2D
 @onready var presenter: HudPresenter = $Presenter
 @onready var view: DistrictView = $View
 
+@onready var expedition: ExpeditionManager = $Expedition
+
 func _ready() -> void:
 	InputSetup.configure_input()
 	construction.bank = bank
@@ -75,5 +77,9 @@ func _ready() -> void:
 	session.frame_finished.connect(view.queue_redraw)
 	presenter.updated.connect($HUD.display)
 	presenter.dashboard_updated.connect($HUD.display_dashboard)
+	expedition.setup(self)
+	session.expedition = expedition
+	interaction.expedition = expedition
+	cycle.boss_required = true
 	session.initialize()
 	presenter.publish()

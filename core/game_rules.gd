@@ -1,6 +1,7 @@
 class_name GameRules
 extends RefCounted
 
+const REPEATERS: StringName = &"repeaters"
 const ENEMIES: StringName = &"enemies"
 const WORLD_LAYER: int = 1
 const FLOOR_Y: float = 260.0

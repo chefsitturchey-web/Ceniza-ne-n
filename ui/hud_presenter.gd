@@ -70,7 +70,16 @@ func publish() -> void:
 	var context_key: bool = true
 	var context_screen: Vector2 = Vector2.ZERO
 	var target: int = interaction.interaction_target()
-	if target == -1:
+	if target == InteractionSystem.STATION_TARGET:
+		var expedition: ExpeditionManager = interaction.expedition
+		context = "Destruye los repetidores"
+		if expedition.all_destroyed():
+			context = "Tren en camino" if not expedition.station.train_arrived else ("Viajar" if cycle.phase == "DÍA" else "Solo de dia")
+		context_key = expedition.can_travel()
+		if not context_key:
+			context_progress = 0
+		context_screen = expedition.station.get_global_transform_with_canvas() * Vector2(0, -56)
+	elif target == -1:
 		context = "Curarte" if player.health < Player.MAX_HEALTH else "Reclutar"
 		context_cost = -1 if player.health < Player.MAX_HEALTH else (colony.builder_data.cost if colony.workers.size() == GameRules.INITIAL_POPULATION else colony.collector_data.cost)
 		context_screen = core.get_global_transform_with_canvas() * Vector2(0, -ColonyCore.TEXTURE.get_height())

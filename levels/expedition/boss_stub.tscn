@@ -1,0 +1,22 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://levels/expedition/boss_stub.gd" id="script"]
+[ext_resource type="Theme" path="res://ui/theme.tres" id="theme"]
+[node name="BossStub" type="CanvasLayer"]
+layer = 20
+script = ExtResource("script")
+[node name="Screen" type="ColorRect" parent="."]
+offset_right = 640.0
+offset_bottom = 360.0
+color = Color(0.043, 0.075, 0.133, 1)
+theme = ExtResource("theme")
+[node name="Title" type="Label" parent="Screen"]
+offset_top = 135.0
+offset_right = 640.0
+theme_type_variation = &"Title"
+text = "EL RECAUDADOR"
+horizontal_alignment = 1
+[node name="Choices" type="Label" parent="Screen"]
+offset_top = 190.0
+offset_right = 640.0
+text = "[1] Victoria     [2] Derrota"
+horizontal_alignment = 1

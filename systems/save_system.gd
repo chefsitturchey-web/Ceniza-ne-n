@@ -42,7 +42,8 @@ func _snapshot() -> Dictionary:
 		"scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
 		"core_health": session.core.health, "player": player, "structures": structures,
 		"workers": workers, "overload": _fields(session.overload, OVERLOAD_FIELDS),
-		"drone_timer": session.defenses.drone_timer}
+		"drone_timer": session.defenses.drone_timer,
+		"expedition": session.expedition.snapshot() if session.expedition != null else {}}
 
 func save_game() -> bool:
 	var data: Dictionary = _snapshot()
@@ -70,6 +71,8 @@ func load_game() -> bool:
 		return false
 	# Validar todo antes de modificar la sesión evita cargas parciales.
 	var data: Dictionary = parser.data
+	if session.expedition != null:
+		session.expedition.restore(data.get("expedition", {}))
 	session.cycle.day = int(data.day)
 	session.cycle.phase = data.phase
 	session.cycle.phase_remaining = session.cycle.config.day_duration
@@ -110,6 +113,8 @@ func _valid(value: Variant) -> bool:
 	if not value is Dictionary:
 		return false
 	var data: Dictionary = value
+	if not ExpeditionManager.valid(data.get("expedition", {})):
+		return false
 	if not _number(data, "version", 1, 1, true) or data.get("phase") != "DÍA":
 		return false
 	if not _number(data, "day", 1, session.cycle.config.nights, true) or not _number(data, "core_health", 1, session.core.health_component.maximum, true):
