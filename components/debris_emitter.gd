@@ -4,6 +4,8 @@ extends Node2D
 const LIMIT: int = 120
 static var live_count: int = 0
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+## Arena cenital: evita el suelo lateral sin cambiar el presupuesto compartido.
+var planar: bool = false
 
 class Pixel extends Node2D:
 	var velocity: Vector2
@@ -126,6 +128,8 @@ func _create(origin: Vector2) -> Pixel:
 	piece.top_level = true
 	piece.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	piece.velocity = Vector2(rng.randf_range(-55, 55), rng.randf_range(-100, -45))
+	if planar:
+		piece.gravity = 0.0
 	# Hermano del actor: persiste tras su muerte y se limpia al cerrar el mundo.
 	get_parent().get_parent().add_child(piece)
 	piece.precise_position = origin

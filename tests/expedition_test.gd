@@ -42,10 +42,14 @@ func run_checks() -> void:
 	world.cycle.phase = "DÍA"
 	world.cycle.phase_remaining = 7.25
 	world.player.position.x = 560
+	world.player.health = 73
+	world.player.stamina = 41
 	var timer: float = world.cycle.phase_remaining
 	var cargo: float = world.colony.workers[1].gather
 	var hud_time: float = world.get_node("HUD").elapsed
 	verify(manager.start(), "Iniciar expedicion de dia")
+	verify(manager.arena.player.health == 73 and manager.arena.player.stamina == 41, "Arena hereda vida y resistencia")
+	verify(manager.arena.player.attack_damage == world.player.attack_damage, "Arena hereda dano de la hoja")
 	verify(not manager.start(), "Evitar expediciones duplicadas")
 	verify(not world.get_node("HUD").visible and not world.session.can_process(), "Ocultar HUD y suspender sesion ALWAYS")
 	verify(not world.player.can_process() and not station.can_process(), "Suspender actores y tren")
