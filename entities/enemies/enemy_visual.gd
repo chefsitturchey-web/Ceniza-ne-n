@@ -4,6 +4,8 @@ extends EntityVisual
 var actor: SiegeEnemy
 var effects: DebrisEmitter = DebrisEmitter.new()
 var smoke_timer: float = 0.0
+var dust_timer: float = 0.0
+var walking: bool = false
 
 func hit_effects(dead: bool) -> void:
 	if not effects.is_inside_tree():
@@ -14,6 +16,10 @@ func hit_effects(dead: bool) -> void:
 	effects.emit_fragments(actor.global_position, null, effects.rng.randi_range(4, 6) if dead else effects.rng.randi_range(1, 3))
 
 func _process(delta: float) -> void:
+	dust_timer -= delta
+	if sprite != null and walking and actor.health > 0 and sprite.is_playing() and dust_timer <= 0:
+		dust_timer = 0.3
+		effects.emit_dust(actor.global_position, 1)
 	smoke_timer -= delta
 	if actor.health > 0 and actor.health <= actor.max_health * 0.35 and smoke_timer <= 0 and effects.is_inside_tree():
 		smoke_timer = 0.45
@@ -23,6 +29,7 @@ func _process(delta: float) -> void:
 			effects.emit_pixels(origin, 2, Color("ffce75"))
 
 func update_state(moving: bool = false) -> void:
+	walking = moving
 	if sprite != null:
 		sprite.modulate = Color(1.6, 1.3, 1.3) if actor.flash > 0.0 else Color.WHITE
 	if actor.windup > 0.0:

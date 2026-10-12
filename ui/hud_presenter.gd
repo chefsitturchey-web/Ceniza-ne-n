@@ -4,6 +4,7 @@ extends Node
 const INITIAL_NOTICE_DURATION: float = 7.0
 const NOTICE_DURATION: float = 4.0
 signal updated(text: String, hint: String, result: String)
+signal dashboard_updated(values: Dictionary)
 var player: Player
 var cycle: CycleSystem
 var bank: ResourceBank
@@ -61,3 +62,12 @@ func publish() -> void:
 	if session.finished:
 		result_text = ("DISTRITO ESTABILIZADO" if session.won else "NÚCLEO DESTRUIDO") + "\n\nR / Select: nueva partida"
 	updated.emit(text, hint_text, result_text)
+	dashboard_updated.emit({
+		"phase": cycle.phase, "day": cycle.day, "nights": cycle.config.nights,
+		"seconds": ceili(cycle.phase_remaining), "scrap": bank.scrap,
+		"energy": bank.energy_used(), "capacity": bank.energy_capacity,
+		"population": colony.workers.size(), "population_max": GameRules.POPULATION,
+		"health": player.health, "stamina": int(player.stamina), "core": core.health,
+		"left": left_count, "right": right_count,
+		"overload_left": overload.overload_status(true), "overload_right": overload.overload_status(false)
+	})

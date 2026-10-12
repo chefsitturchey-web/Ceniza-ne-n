@@ -85,5 +85,39 @@ func run_checks() -> void:
 	verify(DebrisEmitter.live_count == DebrisEmitter.LIMIT, "Límite compartido entre emisores")
 	world.free()
 	verify(DebrisEmitter.live_count == 0, "Cerrar mundo libera todas las partículas")
+	var range_world: Node2D = Node2D.new()
+	root.add_child(range_world)
+	var turret: ConstructionSite = ConstructionSite.new()
+	turret.data = load("res://data/structures/turret.tres")
+	turret.position = Vector2(-180, GameRules.FLOOR_Y)
+	range_world.add_child(turret)
+	turret.hp = turret.max_hp
+	turret.fire_effects()
+	var kinds: Array[StringName] = []
+	for child: Node in range_world.get_children():
+		if child is DebrisEmitter.Pixel:
+			kinds.append(child.effect_kind)
+	verify(kinds.has(&"muzzle_flash") and kinds.has(&"casing"), "Disparo crea fogonazo y casquillo")
+	verify(turret.recoil > 0.0, "Disparo aplica retroceso")
+	verify(turret.muzzle_position().x < turret.global_position.x, "Cañón del frente izquierdo apunta hacia afuera")
+	var dust_emitter: DebrisEmitter = DebrisEmitter.new()
+	range_world.add_child(dust_emitter)
+	var before_dust: int = DebrisEmitter.live_count
+	dust_emitter.emit_dust(Vector2(0, GameRules.FLOOR_Y), 3)
+	verify(DebrisEmitter.live_count == before_dust + 3, "Polvo crea partículas")
+	range_world.free()
+	var hud: GameHud = load("res://ui/hud.tscn").instantiate() as GameHud
+	root.add_child(hud)
+	verify(hud.icons.size() == 11, "HUD instancia los once íconos")
+	var all_loaded: bool = true
+	for key: String in hud.icons:
+		all_loaded = all_loaded and (hud.icons[key] as TextureRect).texture != null
+	verify(all_loaded, "Todos los íconos del HUD tienen textura")
+	hud.display_dashboard({"phase": "NOCHE", "day": 2, "nights": 3, "seconds": 9, "scrap": 40, "energy": 1,
+		"capacity": 4, "population": 2, "population_max": 4, "health": 70, "stamina": 50, "core": 200,
+		"left": 1, "right": 2, "overload_left": "LISTA", "overload_right": "LISTA"})
+	verify(hud.icons.noche.visible and not hud.icons.dia.visible, "Ícono de fase cambia con la noche")
+	verify(hud.bars.nucleo.value == 200 and hud.values.chatarra.text == "40", "Panel muestra barras y valores")
+	hud.free()
 	print("Efectos: %d comprobaciones; %d fallos" % [checks, failures])
 	quit(1 if failures > 0 else 0)

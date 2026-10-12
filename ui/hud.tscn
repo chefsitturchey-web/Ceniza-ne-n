@@ -5,9 +5,9 @@ process_mode = 3
 script = ExtResource("1")
 [node name="Panel" type="ColorRect" parent="."]
 offset_right = 640.0
-offset_bottom = 82.0
+offset_bottom = 76.0
 mouse_filter = 2
-color = Color(0.02, 0.03, 0.06, 0.92)
+color = Color(0.02, 0.03, 0.06, 0.80)
 [node name="Status" type="Label" parent="."]
 offset_left = 12.0
 offset_top = 6.0

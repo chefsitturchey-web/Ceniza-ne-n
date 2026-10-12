@@ -17,6 +17,7 @@ class Pixel extends Node2D:
 	var texture: Texture2D
 	var region: Rect2
 	var mirrored: bool = false
+	var effect_kind: StringName = &"debris"
 
 	func _enter_tree() -> void:
 		DebrisEmitter.live_count += 1
@@ -36,7 +37,7 @@ class Pixel extends Node2D:
 			velocity = Vector2(velocity.x * 0.7, -absf(velocity.y) * 0.32)
 		global_position = precise_position.round()
 		rotation += spin * delta
-		modulate.a = clampf((lifetime - age) / 0.45, 0.0, 1.0)
+		modulate.a = clampf((lifetime - age) / minf(lifetime, 0.45), 0.0, 1.0)
 
 	func _draw() -> void:
 		if texture != null:
@@ -91,6 +92,34 @@ func emit_sweat(origin: Vector2) -> void:
 	piece.tint = Color("a5f8ff")
 	piece.velocity = Vector2(0, 8)
 	piece.lifetime = 0.5
+
+func emit_dust(origin: Vector2, count: int = 2) -> void:
+	for index: int in range(mini(count, LIMIT - live_count)):
+		var piece: Pixel = _create(origin + Vector2(rng.randf_range(-4, 4), -2))
+		piece.effect_kind = &"dust"
+		piece.tint = Color("89939e", 0.55)
+		piece.size = Vector2(rng.randi_range(2, 4), 2)
+		piece.gravity = -3.0
+		piece.velocity = Vector2(rng.randf_range(-16, 16), rng.randf_range(-12, -5))
+		piece.lifetime = 0.4
+
+func emit_shot(muzzle: Vector2, direction: float) -> void:
+	if live_count < LIMIT:
+		var flash: Pixel = _create(muzzle)
+		flash.effect_kind = &"muzzle_flash"
+		flash.tint = Color("ffce75")
+		flash.size = Vector2(7, 3)
+		flash.velocity = Vector2.ZERO
+		flash.gravity = 0.0
+		flash.lifetime = 0.09
+	if live_count < LIMIT:
+		var casing: Pixel = _create(muzzle - Vector2(direction * 10, 0))
+		casing.effect_kind = &"casing"
+		casing.tint = Color("e6b65c")
+		casing.size = Vector2(2, 1)
+		casing.velocity = Vector2(-direction * rng.randf_range(22, 38), -65)
+		casing.spin = direction * 8
+		casing.lifetime = 1.2
 
 func _create(origin: Vector2) -> Pixel:
 	var piece: Pixel = Pixel.new()
