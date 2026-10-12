@@ -1,4 +1,4 @@
-﻿# CENIZA NEÓN
+# CENIZA NEÓN
 
 **Construye de día. Resiste de noche. Recupera la ciudad.**
 
@@ -6,19 +6,21 @@ Prototipo de supervivencia y defensa lateral en 2D, desarrollado con **Godot y G
 
 La colonia es tu defensa principal. Tu personaje combate, repara la situación en el frente más presionado y activa sobrecargas eléctricas para cambiar el rumbo del asedio.
 
-> **Estado: prototipo jugable en desarrollo.** Partida de tres noches; configuración base de aproximadamente ocho minutos. Este worktree conserva el ajuste de pruebas con días de 10 segundos (unos cuatro minutos). Errante, corredor y constructor tienen animaciones; el resto del arte es provisional. Guardado automático al comenzar cada día. Todavía no hay sonido.
+> **Estado: prototipo jugable en desarrollo (Distrito 1).** Defensa lateral de tres noches con ciclo de luz día/atardecer/noche, dos repetidores enemigos, estación ferroviaria y una expedición en vista cenital contra el primer jefe, **El Recaudador**. Arte pixel de perfil plano para personajes, estructuras, decoración y fondo con parallax; efectos de construcción, daño y escombros; HUD mínimo con panel de pausa y fuente pixel. Guardado automático al comenzar cada día. Todavía no hay sonido (en curso). El ajuste de pruebas usa días de 10 segundos.
 
 [Cómo jugar](#cómo-probarlo) · [Controles](#controles) · [Estado del proyecto](#estado-del-proyecto) · [Reportar un problema](https://github.com/chefsitturchey-web/Ceniza-ne-n/issues)
 
 ## Qué puedes probar
 
-- Movimiento lateral, combate cuerpo a cuerpo y esquiva con resistencia.
-- Construcción y reparación de murallas y torretas en posiciones predeterminadas.
+- Movimiento lateral, combate cuerpo a cuerpo y esquiva con resistencia; el cansancio se ve en la animación.
+- Construcción y reparación de murallas y torretas: la obra se levanta por etapas, se agrieta, echa humo y se rompe en pedazos.
 - Reclutamiento de hasta cuatro habitantes: constructores y recuperadores con tareas automáticas.
 - Producción de chatarra, capacidad energética y sobrecarga independiente por frente.
-- Un dron de apoyo y dos enemigos con comportamientos y velocidades diferentes.
-- Ciclo de preparación, aviso y asedio, con ataques desde ambos lados.
-- Reaparición del personaje, pausa, victoria, derrota y reinicio.
+- Un dron de apoyo y dos enemigos (Errante y Corredor) con chispas, esquirlas y humo al recibir daño.
+- Ciclo de luz día, atardecer y noche, con ataques desde ambos lados.
+- **Repetidores enemigos** en ambos extremos: al destruir los dos llega el **tren blindado** a la estación.
+- **Expedición al jefe** en vista cenital (estilo Enter the Gungeon): El Recaudador con escudo, abanicos de fichas, garrazo y embestida que expone su núcleo; segunda fase al 50 %. Si pierdes vuelves a la colonia en el mismo momento; si ganas, completas el Distrito 1.
+- HUD mínimo: recursos en una esquina, viñeta roja de daño, flechas de amenaza en los bordes, carteles de fase y panel completo al pausar.
 
 ## Cómo probarlo
 
@@ -77,6 +79,9 @@ La configuración base tiene **90 segundos de día, 10 de aviso y 60 de noche**.
 | Sobrecarga del frente actual | Q | LB |
 | Pausar / continuar | Esc | Start |
 | Nueva partida después de ganar o perder | R | Select / Back |
+| Viajar en el tren (de día, con el tren en la estación) | Mantener E | Mantener Y |
+
+En la **arena del jefe** el movimiento es en ocho direcciones (W/A/S/D o flechas, stick izquierdo); ataque, esquiva y pausa usan los mismos botones.
 
 En PlayStation, las equivalencias principales son **Cuadrado** para atacar, **Cruz** para esquivar, **Triángulo** para interactuar y **L1** para sobrecargar. El HUD utiliza las etiquetas de Xbox.
 
@@ -90,12 +95,13 @@ Esta versión valida el ciclo de construcción y defensa. El alcance completo de
 
 | Disponible | Pendiente |
 |---|---|
-| Un escenario provisional con dos frentes | Distritos, expediciones y campaña |
-| Tres asedios y dos tipos de enemigo | Jefes y más variedad de amenazas |
-| Combate manual, esquiva y dron | Equipo, evoluciones y progresión |
-| Economía y trabajadores simplificados | Infraestructura y profesiones ampliadas |
-| Formas y efectos provisionales | Sprites, animaciones, música y sonido |
-| Reinicio de sesión y guardado al amanecer | Guardado durante el asedio |
+| Distrito 1 con dos frentes, repetidores y estación | Distritos 2-4 y campaña |
+| Primer jefe (El Recaudador) en arena cenital | Otros cuatro jefes; pulido y ambientación de la arena |
+| Errante y Corredor | Blindado, Saltador, Ariete y el resto de arquetipos del GDD |
+| Combate manual, esquiva y dron | Datos neuronales, niveles, Clínica de enlace, módulos y pasivas |
+| Constructores y recuperadores | Tirador, guardián, técnico, médico y más edificios |
+| Arte pixel, efectos y ciclo de luz | Animaciones norte/sur en la arena, nuevo Corredor y Constructor |
+| Guardado al amanecer (incluye repetidores y tren) | Música y sonido (en curso) |
 
 **Limitaciones actuales:** la chatarra se almacena en una bolsa común, la capacidad energética es fija, los trabajadores no reciben daño y las torretas no son objetivos de los enemigos. Al cerrar se pierde lo realizado después del último amanecer; perder elimina la partida. La dificultad y la legibilidad visual requieren pruebas con jugadores.
 
@@ -107,17 +113,22 @@ Esta versión valida el ciclo de construcción y defensa. El alcance completo de
 - [Registro de recursos](docs/ASSET_SOURCES.csv): procedencia y condiciones de uso de los futuros assets.
 - [Arquitectura y señales](docs/ARQUITECTURA.md): responsabilidades, configuración y pruebas.
 
+**Herramientas de arte** (carpeta `tools/`): `generar_fondo.py` (capas del fondo), `bocetos_arena.py` y `bocetos_recaudador.py` (bocetos planos que se detallan con IA local), `integrar_pixellab.py` (convierte las animaciones exportadas de PixelLab en `SpriteFrames`). Los personajes animados se generan con PixelLab; estructuras, decoración y piezas del jefe con Stable Diffusion local (ComfyUI) a partir de bocetos planos, siempre en vista lateral plana salvo la arena cenital. Fuentes: Micro 5 y Silkscreen (SIL OFL, licencias en `assets/fonts/`).
+
+**Trabajo en equipo:** cada tarea va en su propia rama (`audio/...`, `ui/...`, `feature/...`) y se integra en `main` con Pull Request cuando `tests/run_all.gd` termina sin fallos. El tablero de sprints está en Notion (acceso por invitación).
+
 ```text
 core/           Controles y constantes de capas, grupos y reglas compartidas
 components/     Vida, hitbox, hurtbox e interfaz visual reutilizables
 entities/       Jugador, enemigos, trabajadores, estructuras y núcleo
 systems/        Ciclo, economía, obras, colonia, asedio, defensas y sesión
-ui/             HUD como escena receptora de señales y su presentador
+ui/             HUD mínimo, panel de pausa, tema y fuentes
 data/           Definiciones Resource y configuraciones .tres
-levels/         Distrito principal: composición de nodos y conexiones
+levels/         Distrito principal y expedición (arena del Recaudador)
 assets/         PNG originales y sus ajustes de importación
 tests/          Pruebas de reglas y simulaciones de sesión
 docs/           Dirección de arte y registro de recursos
+tools/          Scripts para generar e integrar arte
 project.godot   Configuración y punto de entrada del proyecto
 ```
 
@@ -130,7 +141,7 @@ godot --headless --path . --import
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta combate, asedio, animaciones, vida, carga de los 11 Resources, oleadas, integración visual, compilación y ambas simulaciones. Sale con código distinto de cero ante un fallo. Para ejecutar pruebas individuales:
+`run_all.gd` ejecuta 15 suites: combate, asedio, animaciones, vida, Resources, oleadas, integración visual, compilación, guardado, efectos, HUD, expedición, el jefe y ambas simulaciones. Sale con código distinto de cero ante un fallo. Para ejecutar pruebas individuales:
 
 ```bash
 godot --headless --path . --script res://tests/combat_smoke.gd

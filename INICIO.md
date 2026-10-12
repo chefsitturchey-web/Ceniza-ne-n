@@ -60,3 +60,11 @@ godot --headless --path . --script res://tests/session_simulation.gd -- --assist
 ```
 
 Las simulaciones parten de defensas ya construidas. Sin apoyo, la colonia debe caer; con --assist, un jugador automatizado se desplaza, ataca, sobrecarga y encarga reparaciones durante el día. Esta segunda prueba no valida la construcción inicial ni sustituye la prueba de dificultad humana.
+
+## Expedición al jefe (Distrito 1)
+
+1. De día, ve a los extremos del mapa y destruye los dos **repetidores** enemigos (torres con luces rosas).
+2. Al caer ambos llega el **tren blindado** a la estación, a la derecha del núcleo.
+3. De día, mantén **E** en la estación para viajar a la arena de **El Recaudador** (vista cenital, movimiento en ocho direcciones).
+4. Su escudo bloquea los golpes de frente. Esquiva su embestida: si choca contra una pared queda aturdido y su núcleo expuesto recibe doble daño.
+5. Si pierdes, vuelves a la colonia en el mismo momento; si ganas, el Distrito 1 queda completado.
