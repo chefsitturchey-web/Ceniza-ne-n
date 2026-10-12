@@ -50,7 +50,9 @@ func _ready() -> void:
 	add_child(health_component)
 	add_child(hitbox)
 	visual.actor = self
+	add_child(visual.effects)
 	add_child(visual)
+	health_component.damaged.connect(visual.on_damage)
 	visual.bind(get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D)
 
 func set_state(value: State) -> void:
