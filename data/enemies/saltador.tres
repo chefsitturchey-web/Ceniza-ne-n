@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://entities/enemies/saltador.tscn" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"saltador"
+health = 75
+speed = 50.0
+damage = 8
+reward = 4
+scene = ExtResource("2")
+move_animation = &"correr"

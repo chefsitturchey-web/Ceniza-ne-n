@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://entities/enemies/errante.tscn" id="1"]
+[ext_resource type="Script" path="res://entities/enemies/ariete.gd" id="2"]
+[ext_resource type="SpriteFrames" path="res://entities/enemies/ariete_frames.tres" id="3"]
+
+[node name="Ariete" instance=ExtResource("1")]
+script = ExtResource("2")
+
+[node name="AnimatedSprite2D" parent="." index="0"]
+sprite_frames = ExtResource("3")
+modulate = Color(1, 0.7, 0.62, 1)
+scale = Vector2(1.2, 1.2)
+position = Vector2(0, -25)

@@ -86,7 +86,7 @@ func run_checks() -> void:
 	world.cycle.phase = "NOCHE"
 	world.cycle.day = 3
 	world.director.start(3)
-	world.director.spawn_count = 20
+	world.director.spawn_count = (load("res://data/waves/night_3.tres") as WaveData).enemies.size()
 	world.cycle.phase_remaining = 0
 	world.cycle.update_phase(0)
 	verify(not world.session.finished and world.cycle.phase == "DÍA" and world.cycle.day == 3, "La tercera noche permite continuar hasta derrotar al jefe")

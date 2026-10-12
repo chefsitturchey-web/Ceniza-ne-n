@@ -22,10 +22,13 @@ func nearest_enemy(x: float, distance_limit: float) -> Node2D:
 			best = enemy
 	return best
 
-func fire_from(origin: Vector2, target: Node2D, damage: int) -> void:
+func fire_from(origin: Vector2, target: Node2D, damage: int, electric: bool = false) -> void:
 	beams.append({"from": origin, "to": target.position + Vector2(0, -16), "time": GameRules.BEAM_DURATION})
 	var hurtbox: HurtboxComponent = target.get_node("Hurtbox") as HurtboxComponent
-	hurtbox.receive(damage)
+	if target is SiegeEnemy:
+		(target as SiegeEnemy).receive_shot(damage, origin, electric)
+	else:
+		hurtbox.receive(damage)
 
 func update_defenses(delta: float) -> void:
 	for site: ConstructionSite in sites:
@@ -36,7 +39,7 @@ func update_defenses(delta: float) -> void:
 			var target: Node2D = nearest_enemy(site.x, site.data.attack_range)
 			if target != null:
 				site.fire_effects()
-				fire_from(Vector2(site.x, GameRules.FLOOR_Y - 42), target, site.data.damage)
+				fire_from(Vector2(site.x, GameRules.FLOOR_Y - 42), target, site.data.damage, overload.overloaded(site.x))
 				site.shot = site.data.overloaded_interval if overload.overloaded(site.x) else site.data.interval
 	drone_timer = maxf(0.0, drone_timer - delta)
 	if drone_timer == 0.0 and player.health > 0:

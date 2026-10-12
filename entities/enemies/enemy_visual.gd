@@ -4,6 +4,13 @@ extends EntityVisual
 ## El estado del mundo se comunica con efectos, nunca con barras.
 const WORLD_BARS_ENABLED: bool = false
 
+var base_tint: Color = Color.WHITE
+
+func bind(value: AnimatedSprite2D) -> void:
+	super.bind(value)
+	if sprite != null:
+		base_tint = sprite.modulate
+
 var actor: SiegeEnemy
 var effects: DebrisEmitter = DebrisEmitter.new()
 var smoke_timer: float = 0.0
@@ -34,7 +41,7 @@ func _process(delta: float) -> void:
 func update_state(moving: bool = false) -> void:
 	walking = moving
 	if sprite != null:
-		sprite.modulate = Color(1.6, 1.3, 1.3) if actor.flash > 0.0 else Color.WHITE
+		sprite.modulate = Color(1.6, 1.3, 1.3) if actor.flash > 0.0 else base_tint
 	if actor.windup > 0.0:
 		play_visual(&"ataque", actor.data.attack_visual_duration)
 	elif actor.hurt_remaining > 0.0:

@@ -54,9 +54,9 @@ func run_checks() -> void:
 		verify(data.dawn_scrap == 25 and data.dawn_core_heal == 40 and data.dawn_player_health == 100, id + ": amanecer")
 	for night: int in range(1, 4):
 		var data: WaveData = load("res://data/waves/night_%d.tres" % night)
-		verify(data.enemies.size() == 8 + night * 4 and data.sides.size() == data.enemies.size(), "Tamaño de oleada %d" % night)
+		verify(data.enemies.size() == [12, 18, 23][night - 1] and data.sides.size() == data.enemies.size(), "Tamaño de oleada %d" % night)
 		verify(data.cadence == 2.2 - night * 0.4, "Cadencia exacta de oleada %d" % night)
 		for index: int in range(data.enemies.size()):
-			verify(data.enemies[index].id == (&"corredor" if index % 3 == 2 else &"errante") and data.sides[index] == (-1.0 if index % 2 == 0 else 1.0), "Secuencia de oleada %d/%d" % [night, index])
+			verify((index >= 8 + night * 4 or data.enemies[index].id == (&"corredor" if index % 3 == 2 else &"errante")) and data.sides[index] == (-1.0 if index % 2 == 0 else 1.0), "Secuencia de oleada %d/%d" % [night, index])
 	print("Resources: %d cargados; %d comprobaciones; %d fallos" % [loaded, checks, failures])
 	quit(1 if failures > 0 else 0)
