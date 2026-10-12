@@ -68,6 +68,7 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 </table>
 
 - **Combate exigente:** ataque cuerpo a cuerpo, esquiva con invulnerabilidad y resistencia; el cansancio se nota en la animación.
+- **Cinco tipos de enemigo:** Errante, Corredor, Blindado (escudo frontal), Saltador (pasa la primera muralla) y Ariete (rompe murallas).
 - **Colonia automática:** constructores y recuperadores con tareas propias; recluta hasta cuatro habitantes.
 - **Economía y energía:** chatarra para construir, capacidad energética para mantener torretas y sobrecarga independiente por frente.
 - **Expediciones:** la colonia se pausa mientras luchas contra el jefe; si caes, vuelves al mismo momento para prepararte mejor.
