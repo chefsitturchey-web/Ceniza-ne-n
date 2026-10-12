@@ -115,7 +115,7 @@ func build_geometry() -> void:
 
 func build_lighting() -> void:
 	var ambient: CanvasModulate = CanvasModulate.new()
-	ambient.color = Color("9aa4bc")
+	ambient.color = Color("b2bacb")
 	world.add_child(ambient)
 	var gradient: Gradient = Gradient.new()
 	gradient.colors = PackedColorArray([Color(1, 0.75, 0.4, 0.7), Color(1, 0.6, 0.2, 0)])
@@ -133,7 +133,17 @@ func build_lighting() -> void:
 			light.position = Vector2(x, y)
 			light.energy = 1.1
 			light.texture_scale = 1.3
+			light.add_to_group(&"arena_light")
 			world.add_child(light)
+	# Luz roja de alarma tenue sobre la zona del jefe; arena_floor.gd la hace respirar.
+	var alarm: PointLight2D = PointLight2D.new()
+	alarm.texture = texture
+	alarm.color = Color("dd6482")
+	alarm.position = Vector2(320, 230)
+	alarm.energy = 0.35
+	alarm.texture_scale = 2.2
+	alarm.add_to_group(&"arena_alarm")
+	world.add_child(alarm)
 
 func label(text: String, rect: Rect2, title: bool = false) -> Label:
 	var node: Label = Label.new()
