@@ -1,6 +1,9 @@
 class_name ColonyCore
 extends Node2D
 
+## El estado del mundo se comunica con efectos, nunca con barras.
+const WORLD_BARS_ENABLED: bool = false
+
 const TEXTURE: Texture2D = preload("res://assets/structures/core_01.png")
 
 var effects: StructureEffects = StructureEffects.new()
@@ -38,4 +41,3 @@ func _draw() -> void:
 	draw_set_transform(offset)
 	draw_texture(TEXTURE, Vector2(-size.x / 2.0, -size.y))
 	draw_set_transform(Vector2.ZERO)
-	draw_rect(Rect2(-30, -size.y - 8, 60.0 * health / GameRules.CORE_HEALTH, 4), Color("47dacb"))

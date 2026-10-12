@@ -108,16 +108,16 @@ func run_checks() -> void:
 	range_world.free()
 	var hud: GameHud = load("res://ui/hud.tscn").instantiate() as GameHud
 	root.add_child(hud)
-	verify(hud.icons.size() == 11, "HUD instancia los once íconos")
+	verify(hud.pause_panel.icons.size() == 11, "HUD instancia los once íconos")
 	var all_loaded: bool = true
-	for key: String in hud.icons:
-		all_loaded = all_loaded and (hud.icons[key] as TextureRect).texture != null
+	for key: String in hud.pause_panel.icons:
+		all_loaded = all_loaded and (hud.pause_panel.icons[key] as TextureRect).texture != null
 	verify(all_loaded, "Todos los íconos del HUD tienen textura")
 	hud.display_dashboard({"phase": "NOCHE", "day": 2, "nights": 3, "seconds": 9, "scrap": 40, "energy": 1,
 		"capacity": 4, "population": 2, "population_max": 4, "health": 70, "stamina": 50, "core": 200,
 		"left": 1, "right": 2, "overload_left": "LISTA", "overload_right": "LISTA"})
 	verify(hud.icons.noche.visible and not hud.icons.dia.visible, "Ícono de fase cambia con la noche")
-	verify(hud.bars.nucleo.value == 200 and hud.values.chatarra.text == "40", "Panel muestra barras y valores")
+	verify(hud.pause_panel.bars.nucleo.value == 200 and hud.values.chatarra.text == "40", "Pausa conserva integridad y HUD muestra chatarra")
 	hud.free()
 	print("Efectos: %d comprobaciones; %d fallos" % [checks, failures])
 	quit(1 if failures > 0 else 0)
