@@ -53,6 +53,8 @@ func start() -> bool:
 	return true
 
 func _suspend(node: Node) -> void:
+	if node is GameSound:
+		return
 	suspended[node] = node.process_mode
 	node.process_mode = Node.PROCESS_MODE_DISABLED
 	for child: Node in node.get_children():

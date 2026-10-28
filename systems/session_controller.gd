@@ -17,6 +17,8 @@ var finished: bool = false
 var won: bool = false
 var persistence_enabled: bool = true
 var save_system: SaveSystem
+var neural: NeuralSystem
+var clinic_panel: ClinicPanel
 
 func initialize() -> void:
 	if not persistence_enabled:
@@ -42,6 +44,10 @@ func restart() -> void:
 	get_tree().reload_current_scene()
 
 func _process(delta: float) -> void:
+	if clinic_panel != null and clinic_panel.opened:
+		return
+	if clinic_panel != null and clinic_panel.closed_frame == Engine.get_process_frames():
+		return
 	if expedition != null and expedition.active:
 		return
 	if Input.is_action_just_pressed("restart") and finished:

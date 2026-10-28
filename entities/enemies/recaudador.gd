@@ -3,6 +3,7 @@ extends CharacterBody2D
 
 signal died
 signal fired(origin: Vector2, direction: Vector2)
+signal cue_requested(id: String)
 enum State { APPROACH, CLAW_WINDUP, CLAW, VOLLEY_WINDUP, VOLLEY, CHARGE_WINDUP, CHARGE, STUNNED, RECOVER, DEAD }
 ## Around 20 exposed windows at base damage; target 3-5 minutes with flank hits.
 @export var max_health: int = 10000
@@ -65,6 +66,10 @@ func piece(asset: String, offset: Vector2) -> Sprite2D:
 	return sprite
 
 func change_state(value: State, duration: float) -> void:
+	if value in [State.CLAW_WINDUP, State.CHARGE_WINDUP, State.VOLLEY_WINDUP]:
+		cue_requested.emit("alarm")
+	elif value == State.STUNNED:
+		cue_requested.emit("hit")
 	state = value
 	timer = duration
 	velocity = Vector2.ZERO

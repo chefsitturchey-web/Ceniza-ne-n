@@ -6,6 +6,8 @@ var player: Player
 var overload: OverloadSystem
 var drone_timer: float = 0.0
 var beams: Array[Dictionary] = []
+var drone_rank: int = 0
+signal shot_fired(origin: Vector2)
 
 func update_beams(delta: float) -> void:
 	for index: int in range(beams.size() - 1, -1, -1):
@@ -23,6 +25,7 @@ func nearest_enemy(x: float, distance_limit: float) -> Node2D:
 	return best
 
 func fire_from(origin: Vector2, target: Node2D, damage: int, electric: bool = false) -> void:
+	shot_fired.emit(origin)
 	beams.append({"from": origin, "to": target.position + Vector2(0, -16), "time": GameRules.BEAM_DURATION})
 	var hurtbox: HurtboxComponent = target.get_node("Hurtbox") as HurtboxComponent
 	if target is SiegeEnemy:
@@ -45,5 +48,5 @@ func update_defenses(delta: float) -> void:
 	if drone_timer == 0.0 and player.health > 0:
 		var target: Node2D = nearest_enemy(player.position.x, GameRules.DRONE_RANGE)
 		if target != null:
-			fire_from(player.position + Vector2(-18, -48), target, GameRules.DRONE_DAMAGE)
-			drone_timer = GameRules.DRONE_INTERVAL
+			fire_from(player.position + Vector2(-18, -48), target, GameRules.DRONE_DAMAGE + drone_rank * 4)
+			drone_timer = GameRules.DRONE_INTERVAL * (1.0 - drone_rank * 0.1)

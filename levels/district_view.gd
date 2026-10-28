@@ -71,10 +71,72 @@ func _draw() -> void:
 		draw_texture(texture, top_left)
 	draw_rect(Rect2(-960, FLOOR_Y, 1920, 80), Color("0b1322"))
 	draw_texture_rect(GROUND, Rect2(-960, FLOOR_Y, 1920, GROUND.get_height()), true)
+	_draw_wet_ground(camera_x)
+	_draw_ash(camera_x)
 	if is_instance_valid(player) and player.health > 0:
-		draw_circle(player.position + Vector2(-18, -48), 5, Color("47dacb"))
+		_draw_drone(player.position + Vector2(-18, -48))
 	for beam: Dictionary in defenses.beams:
+		draw_line(beam.from, beam.to, Color(1.0, 0.66, 0.3, 0.12), 7.0)
 		draw_line(beam.from, beam.to, Color("ffce75"), 2.0)
+		draw_line(beam.from, beam.to, Color("fff2cd"), 1.0)
+
+func _draw_drone(origin: Vector2) -> void:
+	origin.y += roundf(sin(time * 3.0) * 2.0)
+	draw_circle(origin, 12, Color(0.28, 0.85, 0.8, 0.06))
+	draw_rect(Rect2(origin + Vector2(-7, -3), Vector2(14, 6)), Color("0b1322"))
+	draw_rect(Rect2(origin + Vector2(-5, -2), Vector2(10, 4)), Color("8299a8"))
+	draw_rect(Rect2(origin + Vector2(-2, -1), Vector2(4, 2)), Color("47dacb"))
+	for side: int in [-1, 1]:
+		draw_line(origin + Vector2(side * 7, -4), origin + Vector2(side * 3, -4), Color("304356"), 2)
+		draw_rect(Rect2(origin + Vector2(side * 4 - 1, 4), Vector2(2, 2 + int(time * 12) % 2)), Color("47dacb"))
+	for rank: int in range(defenses.drone_rank):
+		draw_rect(Rect2(origin + Vector2(-3 + rank * 3, -3), Vector2(2, 1)), Color("ffce75"))
+
+func _draw_ash(camera_x: float) -> void:
+	# Campo determinista acotado; no usa el RNG de combate ni crea nodos.
+	for index: int in range(54):
+		var x: float = fposmod(index * 73.0 + time * (5.0 + index % 4) - camera_x * 0.25, 800.0) + camera_x - 400
+		var y: float = fposmod(index * 47.0 + time * (9.0 + index % 7), 370.0) - 100
+		var ember: bool = index % 11 == 0
+		draw_rect(Rect2(roundf(x), roundf(y), 1, 2 if ember else 1), Color(0.9, 0.57, 0.3, 0.45) if ember else Color(0.73, 0.8, 0.85, 0.22))
+
+func _draw_wet_ground(camera_x: float) -> void:
+	for index: int in range(18):
+		var x: float = -900.0 + index * 106.0
+		if absf(x - camera_x) > 430:
+			continue
+		var width: float = 32.0 + index % 3 * 13.0
+		draw_rect(Rect2(x, FLOOR_Y + 2, width, 7), Color("111e30"))
+		draw_line(Vector2(x + 3, FLOOR_Y + 3), Vector2(x + width - 4, FLOOR_Y + 3), Color(0.51, 0.65, 0.73, 0.16), 1)
+	for entry: Array in PROPS:
+		if entry[0] != LAMP or light["lamps"] <= 0.05:
+			continue
+		var x: float = entry[1] + LAMP.get_width() * 0.5 - 4
+		for line: int in range(7):
+			var half: float = 11 - line + sin(time * 2.0 + line) * 2
+			draw_line(Vector2(x - half, FLOOR_Y + 2 + line * 2), Vector2(x + half, FLOOR_Y + 2 + line * 2), Color(1.0, 0.7, 0.3, light["lamps"] * (0.17 - line * 0.02)), 1)
+	_reflect_actor(player)
+	var count: int = 0
+	for enemy: Node2D in get_tree().get_nodes_in_group(GameRules.ENEMIES):
+		if count >= 24:
+			break
+		if absf(enemy.position.x - camera_x) < 370:
+			_reflect_actor(enemy)
+			count += 1
+
+func _reflect_actor(actor: Node2D) -> void:
+	if not is_instance_valid(actor) or absf(actor.position.y - FLOOR_Y) > 5:
+		return
+	var sprite: AnimatedSprite2D = actor.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+	if sprite == null or sprite.sprite_frames == null:
+		return
+	var texture: Texture2D = sprite.sprite_frames.get_frame_texture(sprite.animation, sprite.frame)
+	if texture == null:
+		return
+	var size: Vector2 = texture.get_size() * sprite.scale
+	draw_set_transform(Vector2(actor.position.x, FLOOR_Y + 2), 0, Vector2(-1 if sprite.flip_h else 1, -0.23))
+	draw_texture_rect(texture, Rect2(-size.x / 2, -size.y, size.x, size.y), false, Color(0.5, 0.67, 0.78, 0.17))
+	draw_set_transform(Vector2.ZERO)
 
 func _draw_sky(camera_x: float) -> void:
 	var left: float = camera_x - 400.0

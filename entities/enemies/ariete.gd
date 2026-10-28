@@ -15,6 +15,10 @@ class RamHead extends Node2D:
 		draw_rect(Rect2(-4, -21, 8, 10), Color("304356"))
 		draw_rect(Rect2(-4, -21, 8, 2), Color("8299a8"))
 		draw_rect(Rect2(2, -19, 2, 6), Color("e89e54"))
+		for y: int in [-20, -16]:
+			draw_line(Vector2(4, y), Vector2(8, y + 1), Color("8299a8"), 2)
+		draw_line(Vector2(-8, -19), Vector2(-4, -19), Color("8299a8"), 2)
+		draw_rect(Rect2(-9, -20, 2, 6), Color("e89e54"))
 
 func _ready() -> void:
 	head = RamHead.new()

@@ -3,6 +3,9 @@ extends Node
 
 signal notice_requested(message: String)
 const STATION_TARGET: int = -2
+const CLINIC_TARGET: int = -3
+var clinic: NeuralClinic
+var clinic_panel: ClinicPanel
 var expedition: ExpeditionManager
 var construction: ConstructionSystem
 var colony: ColonySystem
@@ -13,6 +16,8 @@ var hold_time: float = 0.0
 var hold_target: int = GameRules.NO_TARGET
 
 func interaction_target() -> int:
+	if clinic != null and absf(player.position.x - clinic.position.x) < 30:
+		return CLINIC_TARGET
 	if expedition != null and absf(player.position.x - expedition.station.position.x) < 55:
 		return STATION_TARGET
 	if absf(player.position.x) < GameRules.CORE_INTERACT_RANGE:
@@ -40,6 +45,11 @@ func update_interaction(delta: float) -> void:
 		hold_time = 0.0
 
 func perform_interaction(target: int) -> bool:
+	if target == CLINIC_TARGET:
+		if cycle.phase != "DÍA":
+			notice_requested.emit("Clínica disponible de día")
+			return false
+		return clinic_panel != null and clinic_panel.open_panel()
 	if target == STATION_TARGET:
 		return expedition != null and expedition.start()
 	if target == -1:

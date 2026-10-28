@@ -64,6 +64,15 @@ func _draw() -> void:
 	if actor.flash > 0.0:
 		color = Color.WHITE
 	var height: float = actor.data.provisional_height
+	if actor.data.id == &"saltador":
+		# Resortes y toberas hacen reconocible su función incluso en silueta.
+		var side: float = -actor.facing
+		draw_rect(Rect2(side * 13 - 3, -21, 6, 10), Color("0b1322"))
+		draw_rect(Rect2(side * 13 - 2, -20, 4, 6), Color("8299a8"))
+		for y: int in [-13, -10, -7]:
+			draw_line(Vector2(side * 9, y), Vector2(side * 14, y + 2), Color("e89e54"), 1)
+		if float(actor.get("airborne")) > 0:
+			draw_line(Vector2(side * 13, -13), Vector2(side * 15, -5), Color("ffce75"), 2)
 	if sprite == null:
 		draw_rect(Rect2(-10, -height, 20, height), color)
 		draw_rect(Rect2(-7, -height + 5, 14, 6), Color("271d33"))

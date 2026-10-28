@@ -43,6 +43,7 @@ func _snapshot() -> Dictionary:
 		"core_health": session.core.health, "player": player, "structures": structures,
 		"workers": workers, "overload": _fields(session.overload, OVERLOAD_FIELDS),
 		"drone_timer": session.defenses.drone_timer,
+		"neural": session.neural.snapshot() if session.neural != null else {},
 		"expedition": session.expedition.snapshot() if session.expedition != null else {}}
 
 func save_game() -> bool:
@@ -71,6 +72,8 @@ func load_game() -> bool:
 		return false
 	# Validar todo antes de modificar la sesión evita cargas parciales.
 	var data: Dictionary = parser.data
+	if session.neural != null:
+		session.neural.restore(data.get("neural", {}))
 	if session.expedition != null:
 		session.expedition.restore(data.get("expedition", {}))
 	session.cycle.day = int(data.day)
@@ -113,6 +116,8 @@ func _valid(value: Variant) -> bool:
 	if not value is Dictionary:
 		return false
 	var data: Dictionary = value
+	if not NeuralSystem.valid(data.get("neural", {})):
+		return false
 	if not ExpeditionManager.valid(data.get("expedition", {})):
 		return false
 	if not _number(data, "version", 1, 1, true) or data.get("phase") != "DÍA":

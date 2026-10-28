@@ -11,6 +11,10 @@ class ShieldPlate extends Node2D:
 		draw_rect(Rect2(-3, -30, 6, 26), Color("0b1322"))
 		draw_rect(Rect2(-2, -29, 4, 24), Color("8299a8"))
 		draw_line(Vector2(-1, -28), Vector2(-1, -7), Color("b8c4cc"))
+		for y: int in [-27, -9]:
+			draw_rect(Rect2(1, y, 1, 1), Color("ffce75"))
+		draw_rect(Rect2(-2, -21, 2, 7), Color("182639"))
+		draw_line(Vector2(-2, -22), Vector2(1, -19), Color("dd6482"), 1)
 
 func _ready() -> void:
 	shield = ShieldPlate.new()

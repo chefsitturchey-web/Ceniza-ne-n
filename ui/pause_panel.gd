@@ -57,7 +57,7 @@ func _ready() -> void:
 	rows.add_child(controls)
 	for text: String in ["Mover", "A/D / Stick", "Atacar", "J / X", "Esquivar", "Espacio / A",
 		"Interactuar", "Mantener E / Y", "Sobrecarga", "Q / LB", "Continuar", "Esc / Start",
-		"Reintentar al final", "R / Select"]:
+		"Reintentar al final", "R / Select", "Silenciar audio", "M"]:
 		var label: Label = Label.new()
 		label.text = text
 		controls.add_child(label)

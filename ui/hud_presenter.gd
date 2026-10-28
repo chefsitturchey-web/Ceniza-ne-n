@@ -14,6 +14,7 @@ var construction: ConstructionSystem
 var overload: OverloadSystem
 var interaction: InteractionSystem
 var session: SessionController
+var neural: NeuralSystem
 var notice: String = "DEFIENDE EL NÚCLEO"
 var notice_time: float = INITIAL_NOTICE_DURATION
 
@@ -70,7 +71,11 @@ func publish() -> void:
 	var context_key: bool = true
 	var context_screen: Vector2 = Vector2.ZERO
 	var target: int = interaction.interaction_target()
-	if target == InteractionSystem.STATION_TARGET:
+	if target == InteractionSystem.CLINIC_TARGET:
+		context = "Clínica: %d puntos" % neural.points() if cycle.phase == "DÍA" else "Clínica: solo de día"
+		context_key = cycle.phase == "DÍA"
+		context_screen = interaction.clinic.get_global_transform_with_canvas() * Vector2(0, -45)
+	elif target == InteractionSystem.STATION_TARGET:
 		var expedition: ExpeditionManager = interaction.expedition
 		context = "Destruye los repetidores"
 		if expedition.all_destroyed():

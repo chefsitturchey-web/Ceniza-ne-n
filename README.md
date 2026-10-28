@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-prototipo%20jugable-e89e54">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-16%20suites-47dacb">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-17%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -73,6 +73,8 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 - **Economía y energía:** chatarra para construir, capacidad energética para mantener torretas y sobrecarga independiente por frente.
 - **Expediciones:** la colonia se pausa mientras luchas contra el jefe; si caes, vuelves al mismo momento para prepararte mejor.
 - **Guardado automático** al comenzar cada día (incluye repetidores destruidos y el tren).
+- **Clínica de enlace:** cada seis máquinas derrotadas dan un punto para mejorar filo, dron o recuperación de resistencia; tres rangos por módulo. Terminal a la izquierda del núcleo, mantener E de día.
+- **Audio por fases:** música original de trabajo por capas y efectos CC0 de combate. M silencia el audio; mezcla separada de música y efectos.
 - **Arte pixel coherente:** todo en vista lateral plana (la arena es cenital), paleta propia, fuentes pixel y fondo con parallax.
 
 ## Cómo jugar
@@ -119,12 +121,13 @@ La guía detallada de esta versión está en [INICIO.md](INICIO.md).
 | Sobrecarga del frente | Q | LB / L1 |
 | Pausa y estadísticas | Esc | Start |
 | Nueva partida tras el final | R | Select |
+| Silenciar audio | M | — |
 
 ## Hoja de ruta
 
 | Hecho | En curso | Próximo |
 |---|---|---|
-| Distrito 1 completo con dos frentes, repetidores y estación | Música y efectos de sonido | Datos neuronales, niveles y Clínica de enlace |
+| Distrito 1, datos neuronales y Clínica de enlace con tres mejoras | Producción musical final; audio de trabajo integrado | Más módulos automáticos y progresión entre distritos |
 | Primer jefe: El Recaudador, con arena ambientada | Animaciones norte/sur del Portador en la arena; arte definitivo de los enemigos nuevos | Módulos automáticos, pasivas y evoluciones |
 | Errante, Corredor, Blindado, Saltador y Ariete | Nuevo Corredor y Constructor con el estilo actual | Saboteador, Dron cazador, Artillero, Portador y Reparador |
 | Efectos, ciclo de luz, HUD mínimo y fuentes pixel | Menús principal, de opciones y de pausa | Distritos 2 a 4 y los demás jefes |
@@ -156,7 +159,7 @@ godot --headless --path . --import
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta 16 suites (combate, asedio, animaciones, guardado, efectos, HUD, expedición, jefe, enemigos, Resources y dos simulaciones completas de partida) y termina con error ante cualquier fallo. En Windows sustituye `godot` por la ruta del ejecutable de consola.
+`run_all.gd` ejecuta 17 suites (combate, asedio, animaciones, guardado, efectos, HUD, expedición, jefe, enemigos, Resources, clínica/audio y dos simulaciones completas de partida) y termina con error ante cualquier fallo detectado. El aviso previo de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [revisión y audio](docs/REVISION_Y_AUDIO.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
 
 ### Flujo de trabajo
 
@@ -169,6 +172,7 @@ godot --headless --path . --script res://tests/run_all.gd
 - [Arquitectura y señales](docs/ARQUITECTURA.md)
 - [Guía de arte y paleta](docs/GUIA_ARTE.md)
 - [Guía de la versión actual](INICIO.md)
+- [Revisión, mejoras neuronales, audio y recursos pendientes](docs/REVISION_Y_AUDIO.md)
 - [Documento de diseño (GDD)](CENIZA_NEON_GDD.docx)
 
 ### Añadir contenido
@@ -188,6 +192,7 @@ Con apoyo de asistentes de IA (Claude y Codex) para programación, herramientas 
 ## Créditos y licencias
 
 - **Motor:** [Godot Engine](https://godotengine.org) (licencia MIT).
+- **Sonidos:** Kenney, Sci-fi Sounds 1.0, CC0; licencia incluida en `assets/audio/sfx/`. Música sintética original de trabajo, reproducible con `tools/generar_musica.py`.
 - **Fuentes:** Micro 5 y Silkscreen, bajo [SIL Open Font License](assets/fonts/) (licencias incluidas).
 - **Arte generado:** PixelLab (según sus [términos de servicio](https://pixellab.ai/termsofservice)) y Stable Diffusion 1.5 (CreativeML OpenRAIL-M) con un LoRA de pixel art. Detalle por recurso en [docs/ASSET_SOURCES.csv](docs/ASSET_SOURCES.csv).
 

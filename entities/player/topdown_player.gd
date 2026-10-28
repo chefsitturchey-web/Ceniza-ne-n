@@ -3,6 +3,7 @@ extends CharacterBody2D
 
 signal died
 signal damaged
+signal dodged
 signal slash(origin: Vector2, direction: Vector2, amount: int, reach: float)
 
 const FRAMES: SpriteFrames = preload("res://entities/player/player_frames.tres")
@@ -13,6 +14,7 @@ var speed: float = 220.0
 var attack_damage: int = 50
 var attack_range: float = 42.0
 var attack_cooldown: float = 0.4
+var neural_regen: float = 0.0
 var facing: Vector2 = Vector2.DOWN
 var dodge_direction: Vector2 = Vector2.DOWN
 var invulnerable: float = 0.0
@@ -33,7 +35,8 @@ func copy_from(source: Player) -> void:
 	health = source.health
 	stamina = source.stamina
 	speed = source.speed
-	attack_damage = source.attack_damage
+	attack_damage = source.attack_damage + source.neural_damage
+	neural_regen = source.neural_regen
 	attack_range = source.attack_range
 	attack_cooldown = source.attack_cooldown
 
@@ -62,7 +65,7 @@ func _physics_process(delta: float) -> void:
 	invulnerable = maxf(0, invulnerable - delta)
 	cooldown = maxf(0, cooldown - delta)
 	slash_remaining = maxf(0, slash_remaining - delta)
-	stamina = minf(Player.MAX_STAMINA, stamina + Player.STAMINA_REGEN * delta)
+	stamina = minf(Player.MAX_STAMINA, stamina + (Player.STAMINA_REGEN + neural_regen) * delta)
 	var direction: Vector2 = Input.get_vector("move_left", "move_right", "arena_up", "arena_down")
 	if dodge_remaining <= 0 and direction.length() > Player.MOVE_THRESHOLD:
 		facing = direction.normalized()
@@ -90,6 +93,7 @@ func dodge() -> void:
 	dodge_direction = facing
 	dodge_remaining = Player.DODGE_DURATION
 	invulnerable = maxf(invulnerable, Player.DODGE_DURATION)
+	dodged.emit()
 
 func attack() -> void:
 	if health <= 0 or cooldown > 0 or dodge_remaining > 0:

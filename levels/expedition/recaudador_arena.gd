@@ -22,8 +22,11 @@ var pause_panel: PanelContainer = PanelContainer.new()
 var damage_edges: Control = Control.new()
 var hit_count: int = 0
 var camera: Camera2D = Camera2D.new()
+var sound: GameSound = GameSound.new()
+var configured: bool = false
 
 func configure(source: Player) -> void:
+	configured = true
 	player.copy_from(source)
 
 func _ready() -> void:
@@ -68,6 +71,11 @@ func _ready() -> void:
 	camera.reset_smoothing()
 	build_lighting()
 	build_hud()
+	sound.music_enabled = not configured
+	add_child(sound)
+	player.dodged.connect(func() -> void: sound.play_cue("dodge"))
+	boss.cue_requested.connect(func(id: String) -> void: sound.play_cue(id, -4))
+	player.slash.connect(func(_o: Vector2, _d: Vector2, _a: int, _r: float) -> void: sound.play_cue("slash"))
 
 func configure_controls() -> void:
 	if not InputMap.has_action("attack"):
@@ -213,12 +221,14 @@ func strike(origin: Vector2, direction: Vector2, amount: int, reach: float) -> v
 		boss.receive_hit(origin, amount)
 
 func spawn_bullet(origin: Vector2, direction: Vector2) -> void:
+	sound.play_cue("shot", -6)
 	var bullet: RecaudadorBullet = RecaudadorBullet.new()
 	bullet.position = origin
 	bullet.velocity = direction * (190 if boss.phase == 2 else 155)
 	world.add_child(bullet)
 
 func on_damage() -> void:
+	sound.play_cue("hit")
 	hit_count += 1
 	damage_edges.set_state({"health": player.health, "player_hit": hit_count})
 
@@ -226,6 +236,7 @@ func finish(victory: bool) -> void:
 	if ending or completed:
 		return
 	ending = true
+	sound.play_cue("destroy" if victory else "alarm")
 	ending_victory = victory
 	ending_timer = 2.2 if victory else 1.2
 	player.set_physics_process(false)

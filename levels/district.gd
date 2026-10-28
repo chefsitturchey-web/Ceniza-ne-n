@@ -16,6 +16,10 @@ extends Node2D
 @onready var view: DistrictView = $View
 
 @onready var expedition: ExpeditionManager = $Expedition
+var neural: NeuralSystem = NeuralSystem.new()
+var clinic: NeuralClinic = NeuralClinic.new()
+var clinic_panel: ClinicPanel = ClinicPanel.new()
+var sound: GameSound = GameSound.new()
 
 func _ready() -> void:
 	InputSetup.configure_input()
@@ -81,5 +85,25 @@ func _ready() -> void:
 	session.expedition = expedition
 	interaction.expedition = expedition
 	cycle.boss_required = true
+	neural.player = player
+	neural.defenses = defenses
+	add_child(neural)
+	session.neural = neural
+	clinic.position = Vector2(-110, GameRules.FLOOR_Y)
+	add_child(clinic)
+	clinic_panel.district = self
+	add_child(clinic_panel)
+	session.clinic_panel = clinic_panel
+	interaction.clinic_panel = clinic_panel
+	interaction.clinic = clinic
+	presenter.neural = neural
+	neural.changed.connect(func() -> void: clinic.available = neural.points() > 0)
+	neural.point_earned.connect(func() -> void: presenter.show_notice("Punto neuronal: visita la clínica a la izquierda del núcleo"))
+	director.spawned.connect(_connect_neural)
 	session.initialize()
+	sound.district = self
+	add_child(sound)
 	presenter.publish()
+
+func _connect_neural(enemy: SiegeEnemy, _side: float) -> void:
+	enemy.reward_requested.connect(neural.recover_data)

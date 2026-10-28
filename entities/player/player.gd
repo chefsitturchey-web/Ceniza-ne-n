@@ -44,6 +44,8 @@ var dodge_remaining: float = 0.0
 var dodge_direction: float = 1.0
 var respawn_remaining: float = 0.0
 var enabled: bool = true
+var neural_damage: int = 0
+var neural_regen: float = 0.0
 
 func _ready() -> void:
 	health_component.maximum = MAX_HEALTH
@@ -87,7 +89,7 @@ func _physics_process(delta: float) -> void:
 	slash_remaining = maxf(0.0, slash_remaining - delta)
 	attack_anim_remaining = maxf(0.0, attack_anim_remaining - delta)
 	invulnerable = maxf(0.0, invulnerable - delta)
-	stamina = minf(MAX_STAMINA, stamina + STAMINA_REGEN * delta)
+	stamina = minf(MAX_STAMINA, stamina + (STAMINA_REGEN + neural_regen) * delta)
 	if respawn_remaining > 0.0:
 		respawn_remaining = maxf(0.0, respawn_remaining - delta)
 		if respawn_remaining == 0.0:
@@ -144,7 +146,7 @@ func attack() -> void:
 	attack_anim_remaining = ATTACK_ANIM_DURATION
 	attack_facing = facing
 	var hit_rect: Rect2 = get_attack_rect()
-	hitbox.strike(hit_rect, attack_damage)
+	hitbox.strike(hit_rect, attack_damage + neural_damage)
 	refresh_state()
 
 func get_attack_rect() -> Rect2:
