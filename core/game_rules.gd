@@ -3,6 +3,8 @@ extends RefCounted
 
 const REPEATERS: StringName = &"repeaters"
 const ENEMIES: StringName = &"enemies"
+const ALLIES: StringName = &"allies"
+const MAP_HALF_WIDTH: float = 1600.0
 const WORLD_LAYER: int = 1
 const FLOOR_Y: float = 260.0
 const CORE_HEALTH: int = 300

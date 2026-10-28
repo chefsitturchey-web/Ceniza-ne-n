@@ -24,6 +24,7 @@ var briefing: BriefingPanel
 var zone_index: int = 0
 var campaign: Dictionary = CampaignRoute.initial_state()
 var terrain: ZoneHazards
+var expansion: ExpansionSystem
 
 func initialize() -> void:
 	var transfer: Dictionary = CampaignRoute.take(zone_index)
@@ -122,6 +123,8 @@ func _process(delta: float) -> void:
 	if finished:
 		return
 	colony.update_workers(delta)
+	if expansion != null:
+		expansion.tick(delta)
 	if terrain != null:
 		terrain.tick(delta)
 	defenses.update_defenses(delta)

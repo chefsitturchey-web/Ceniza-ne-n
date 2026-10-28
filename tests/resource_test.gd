@@ -57,6 +57,8 @@ func run_checks() -> void:
 		verify(data.enemies.size() == [12, 18, 23][night - 1] and data.sides.size() == data.enemies.size(), "Tamaño de oleada %d" % night)
 		verify(data.cadence == 2.2 - night * 0.4, "Cadencia exacta de oleada %d" % night)
 		for index: int in range(data.enemies.size()):
-			verify((index >= 8 + night * 4 or data.enemies[index].id == (&"corredor" if index % 3 == 2 else &"errante")) and data.sides[index] == (-1.0 if index % 2 == 0 else 1.0), "Secuencia de oleada %d/%d" % [night, index])
+			var substitutions: Dictionary = {6: &"artillero", 10: &"saboteador"} if night == 2 else ({4: &"artillero", 8: &"saboteador", 14: &"artillero", 18: &"saboteador"} if night == 3 else {})
+			var expected: StringName = substitutions.get(index, &"corredor" if index % 3 == 2 else &"errante")
+			verify((index >= 8 + night * 4 or data.enemies[index].id == expected) and data.sides[index] == (-1.0 if index % 2 == 0 else 1.0), "Secuencia de oleada %d/%d" % [night, index])
 	print("Resources: %d cargados; %d comprobaciones; %d fallos" % [loaded, checks, failures])
 	quit(1 if failures > 0 else 0)

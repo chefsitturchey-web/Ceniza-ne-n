@@ -11,6 +11,13 @@ func bind(value: AnimatedSprite2D) -> void:
 	super.bind(value)
 	if sprite != null:
 		base_tint = sprite.modulate
+	if actor.data.id in [&"artillero", &"saboteador"]:
+		var field_rig: FieldUnitVisual = FieldUnitVisual.new()
+		field_rig.actor = actor
+		field_rig.role = String(actor.data.id)
+		actor.add_child(field_rig)
+		hide()
+		if sprite != null: sprite.hide()
 	if actor.detailed_silhouette and actor.data.id in [&"blindado", &"saltador", &"ariete"]:
 		rig = MachineRig.new()
 		rig.actor = actor

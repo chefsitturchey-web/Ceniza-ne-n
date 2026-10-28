@@ -70,6 +70,7 @@ func _snapshot() -> Dictionary:
 	player["velocity_y"] = session.player.velocity.y
 	return {"version": 1, "day": session.cycle.day, "phase": session.cycle.phase, "campaign": session.campaign.duplicate(true),
 		"scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
+		"expansion": session.expansion.snapshot() if session.expansion != null else {},
 		"core_health": session.core.health, "player": player, "structures": structures,
 		"workers": workers, "overload": _fields(session.overload, OVERLOAD_FIELDS),
 		"drone_timer": session.defenses.drone_timer,
@@ -118,6 +119,8 @@ func load_game() -> bool:
 		apply_handoff(data)
 		return true
 	session.campaign = CampaignRoute.initial_state(int(data.get("campaign", CampaignRoute.initial_state()).zone))
+	if session.expansion != null:
+		session.expansion.restore(data.get("expansion", {}))
 	if session.neural != null:
 		session.neural.restore(data.get("neural", {}))
 	if session.expedition != null:
@@ -149,7 +152,7 @@ func load_game() -> bool:
 	_apply(session.overload, data.overload)
 	session.overload.tick(0.0)
 	session.defenses.drone_timer = data.drone_timer
-	session.bank.changed.emit(session.bank.scrap, session.bank.energy_used(), session.bank.energy_capacity)
+	session.bank.changed.emit(session.bank.scrap, session.bank.energy_used(), session.bank.available_capacity())
 	return true
 
 func apply_handoff(data: Dictionary) -> void:
@@ -165,7 +168,7 @@ func apply_handoff(data: Dictionary) -> void:
 	session.player.stamina = Player.MAX_STAMINA
 	session.player.position = Vector2(0, GameRules.FLOOR_Y)
 	session.player.refresh_state()
-	session.bank.changed.emit(session.bank.scrap, session.bank.energy_used(), session.bank.energy_capacity)
+	session.bank.changed.emit(session.bank.scrap, session.bank.energy_used(), session.bank.available_capacity())
 
 func _number(data: Dictionary, key: String, minimum: float, maximum: float, integer: bool = false) -> bool:
 	var value: Variant = data.get(key)
@@ -177,6 +180,8 @@ func _valid(value: Variant) -> bool:
 	if not value is Dictionary:
 		return false
 	var data: Dictionary = value
+	if not ExpansionSystem.valid(data.get("expansion", {})):
+		return false
 	if data.get("handoff", false) == true:
 		return CampaignRoute.valid_handoff(data) and int(data.campaign.zone) == session.zone_index
 	var route: Variant = data.get("campaign", CampaignRoute.initial_state())

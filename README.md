@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-25%20casos-47dacb">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-26%20casos-47dacb">
 </p>
 
 <p align="center">
@@ -70,7 +70,8 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 </table>
 
 - **Combate exigente:** ataque cuerpo a cuerpo, esquiva con invulnerabilidad y resistencia; el cansancio se nota en la animación.
-- **Cinco tipos de enemigo:** Errante, Corredor, Blindado (escudo frontal), Saltador (pasa la primera muralla) y Ariete (rompe murallas).
+- **Siete tipos de enemigo:** Errante, Corredor, Blindado, Saltador, Ariete, Artillero con proyectiles interceptables y Saboteador que busca instalaciones.
+- **Colonias ampliadas:** mapas de 3200 unidades, suministros, generadores, recicladoras, cuarteles y puestos médicos. Fusileros y drones sanitarios aliados, con animaciones propias. [Cómo desplegarlos y escena de práctica](docs/EXPANSION_Y_UNIDADES.md).
 - **Siluetas propias:** Blindado, Saltador y Ariete usan piezas mecánicas animadas con armadura, muelles y pistón; conservan los sprites anteriores como alternativa del Inspector.
 - **Defensas articuladas:** las torretas siguen blancos y disparan con retroceso desde el cañón. Introducción sin consumir tiempo, objetivos visibles y viajes entre colonias con guardado.
 - **Colonia automática:** constructores y recuperadores con tareas propias; recluta hasta cuatro habitantes.
@@ -164,7 +165,7 @@ godot --headless --path . --import
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta 25 casos, incluyendo campaña y jefes, menú/opciones, animación/pulido, módulos/evoluciones, siluetas, combate, guardado, expedición y simulaciones desde una colonia nueva en los tres distritos. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
+`run_all.gd` ejecuta 26 casos, incluyendo expansión/unidades, campaña y jefes, menú/opciones, animación/pulido, módulos/evoluciones, siluetas, combate, guardado, expedición y simulaciones desde una colonia nueva en los tres distritos. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
 
 ### Flujo de trabajo
 

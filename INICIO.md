@@ -80,3 +80,9 @@ Las simulaciones parten de defensas ya construidas. Sin apoyo, la colonia debe c
 La ruta disponible tiene tres distritos. Fundición añade rejillas nocturnas y Santa Caldera; Barrio inundado añade charcos y el Coro Sumergido. Cada zona tiene repetidores y estación propios. La victoria guarda la llegada al siguiente distrito antes de viajar, y **Continuar** en el menú recupera esa ruta.
 
 Para probar sin recorrer la campaña, abre `levels/zones/foundry.tscn` o `flooded.tscn` y pulsa F6. Para practicar sus jefes, abre `levels/expedition/caldera_arena.tscn` o `choir_arena.tscn`. El Recaudador conserva su escena original. [Mecánicas y validación del bloque](docs/CAMPANA_Y_JEFES.md).
+
+## Más estructuras y unidades
+
+Los tres mapas tienen ahora 3200 unidades de ancho. Explora cajas de suministros y despliega de día, con E, cuarteles, puestos médicos, generadores y recicladoras. Los generadores dan energía a los fusileros y sanitarios; artilleros y saboteadores enemigos aparecen en las oleadas avanzadas.
+
+Para ver las novedades rápidamente, abre **`levels/zones/expansion_playground.tscn` y pulsa F6**: defensas listas, presupuesto de práctica y tiempo para desplegar. Esa escena no guarda sobre tu partida. [Costes, funciones y controles](docs/EXPANSION_Y_UNIDADES.md).

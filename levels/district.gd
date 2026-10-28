@@ -26,6 +26,7 @@ var sound: GameSound = GameSound.new()
 var options: SettingsPanel = SettingsPanel.new()
 var modules: ModuleSystem = ModuleSystem.new()
 var briefing: BriefingPanel
+var expansion: ExpansionSystem
 
 func _ready() -> void:
 	InputSetup.configure_input()
@@ -78,6 +79,13 @@ func _ready() -> void:
 	session.defenses = defenses
 	session.interaction = interaction
 	session.overload = overload
+	expansion = ExpansionSystem.new()
+	expansion.setup(self)
+	add_child(expansion)
+	session.expansion = expansion
+	bank.expansion = expansion
+	interaction.expansion = expansion
+	director.expansion = expansion
 	session.presenter = presenter
 	presenter.player = player
 	presenter.core = core

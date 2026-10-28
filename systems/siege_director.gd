@@ -12,6 +12,7 @@ var spawn_remaining: float = 0.0
 var spawn_count: int = 0
 var night: int = 1
 var wave: WaveData
+var expansion: ExpansionSystem
 
 func start(number: int) -> void:
 	night = number
@@ -40,7 +41,8 @@ func spawn_enemy(side: float, data: EnemyData, number: int = 1, elite: bool = fa
 	enemy.elite = elite
 	enemy.reward_requested.connect(bank.deposit)
 	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
-	enemy.position = Vector2(side * data.spawn_distance, GameRules.FLOOR_Y)
+	var distance: float = maxf(data.spawn_distance, expansion.frontier(side) + 180) if expansion != null else data.spawn_distance
+	enemy.position = Vector2(side * minf(GameRules.MAP_HALF_WIDTH - 25, distance), GameRules.FLOOR_Y)
 	add_child(enemy)
 	spawned.emit(enemy, side)
 	return enemy

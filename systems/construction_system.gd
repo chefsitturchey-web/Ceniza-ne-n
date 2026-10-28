@@ -25,7 +25,7 @@ func order(target: int) -> bool:
 	if bank.scrap < cost:
 		notice_requested.emit("Falta chatarra")
 		return false
-	if site.hp == 0 and bank.energy_used() + site.data.energy > bank.energy_capacity:
+	if site.hp == 0 and site.data.energy > 0 and bank.energy_used() + site.data.energy > bank.available_capacity():
 		notice_requested.emit("Falta energía")
 		return false
 	bank.spend(cost)

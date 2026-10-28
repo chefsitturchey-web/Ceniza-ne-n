@@ -29,6 +29,7 @@ var cooldown: float = 0.0
 var windup: float = 0.0
 var target_kind: String = ""
 var target_index: int = -1
+var ally_target: Node2D
 var flash: float = 0.0
 var hurt_remaining: float = 0.0
 var death_remaining: float = 0.0
@@ -103,6 +104,8 @@ func take_damage(amount: int) -> void:
 			sprite.modulate = visual.base_tint
 			visual.play_visual(&"destruccion")
 			death_remaining = visual.animation_duration(&"destruccion") + DEATH_VISUAL_GRACE
+		elif data.id in [&"artillero", &"saboteador"]:
+			death_remaining = 0.7
 		else:
 			queue_free()
 		visual.queue_redraw()
@@ -138,9 +141,18 @@ func _physics_process(delta: float) -> void:
 		update_visual()
 		return
 	var moving: bool = false
+	if choose_special_target(delta): return
+	ally_target = null
+	for ally: Node in get_tree().get_nodes_in_group(GameRules.ALLIES):
+		if absf(ally.position.x - position.x) < 30:
+			ally_target = ally as Node2D
+			break
 	if player.health > 0 and absf(player.position.x - position.x) < data.player_notice_range:
 		target_kind = "player"
 		face_toward(player.position.x)
+	elif is_instance_valid(ally_target):
+		target_kind = "ally"
+		face_toward(ally_target.position.x)
 	elif find_wall() >= 0:
 		target_kind = "wall"
 		target_index = find_wall()
@@ -170,6 +182,9 @@ func find_wall() -> int:
 			return index
 	return -1
 
+func choose_special_target(_delta: float) -> bool:
+	return false
+
 func land_hit() -> void:
 	if target_kind == "player":
 		if absf(player.position.x - position.x) < data.player_hit_range:
@@ -178,3 +193,5 @@ func land_hit() -> void:
 		construction.damage_site(target_index, damage)
 	elif target_kind == "core":
 		core.take_damage(damage)
+	elif target_kind == "ally" and is_instance_valid(ally_target) and absf(ally_target.position.x - position.x) < 38:
+		ally_target.take_damage(damage)

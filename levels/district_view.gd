@@ -87,8 +87,8 @@ func _draw() -> void:
 		if texture == LAMP and light["lamps"] > 0.05:
 			_draw_lamp_glow(top_left + Vector2(size.x - 4.0, 4.0), index)
 		draw_texture(texture, top_left)
-	draw_rect(Rect2(-960, FLOOR_Y, 1920, 80), Color("0b1322"))
-	draw_texture_rect(GROUND, Rect2(-960, FLOOR_Y, 1920, GROUND.get_height()), true)
+	draw_rect(Rect2(-GameRules.MAP_HALF_WIDTH, FLOOR_Y, GameRules.MAP_HALF_WIDTH * 2, 80), Color("0b1322"))
+	draw_texture_rect(GROUND, Rect2(-GameRules.MAP_HALF_WIDTH, FLOOR_Y, GameRules.MAP_HALF_WIDTH * 2, GROUND.get_height()), true)
 	_draw_wet_ground(camera_x)
 	_draw_ash(camera_x)
 	if is_instance_valid(player) and player.health > 0 and (defenses.modules == null or "drone" in defenses.modules.equipped):
@@ -124,8 +124,8 @@ func _draw_ash(camera_x: float) -> void:
 		draw_rect(Rect2(roundf(x), roundf(y), 1, 2 if ember else 1), Color(0.9, 0.57, 0.3, 0.45) if ember else Color(0.73, 0.8, 0.85, 0.22))
 
 func _draw_wet_ground(camera_x: float) -> void:
-	for index: int in range(18):
-		var x: float = -900.0 + index * 106.0
+	for index: int in range(30):
+		var x: float = -1500.0 + index * 106.0
 		if absf(x - camera_x) > 430:
 			continue
 		var width: float = 32.0 + index % 3 * 13.0
@@ -161,24 +161,24 @@ func _reflect_actor(actor: Node2D) -> void:
 	draw_texture_rect(texture, Rect2(-size.x / 2, -size.y, size.x, size.y), false, Color(0.5, 0.67, 0.78, 0.17))
 	draw_set_transform(Vector2.ZERO)
 
-func _draw_sky(camera_x: float) -> void:
-	var left: float = camera_x - 400.0
-	var right: float = camera_x + 400.0
+func _draw_sky(_camera_x: float) -> void:
+	var left: float = -GameRules.MAP_HALF_WIDTH - 400.0
+	var right: float = GameRules.MAP_HALF_WIDTH + 400.0
 	var top: float = -420.0
 	var horizon: float = FLOOR_Y
 	var points: PackedVector2Array = [Vector2(left, top), Vector2(right, top), Vector2(right, horizon), Vector2(left, horizon)]
 	var colors: PackedColorArray = [light["sky_top"], light["sky_top"], light["sky_bottom"], light["sky_bottom"]]
 	draw_polygon(points, colors)
 
-func _draw_haze(camera_x: float, amount: float) -> void:
+func _draw_haze(_camera_x: float, amount: float) -> void:
 	# Perspectiva atmosférica: de día lo lejano se aclara hacia el color del horizonte.
 	if amount <= 0.01:
 		return
 	var haze: Color = light["sky_bottom"]
 	var top: Color = Color(haze, 0.0)
 	var bottom: Color = Color(haze, amount)
-	var points: PackedVector2Array = [Vector2(camera_x - 400.0, -100.0), Vector2(camera_x + 400.0, -100.0),
-		Vector2(camera_x + 400.0, FLOOR_Y), Vector2(camera_x - 400.0, FLOOR_Y)]
+	var points: PackedVector2Array = [Vector2(-GameRules.MAP_HALF_WIDTH - 400, -100.0), Vector2(GameRules.MAP_HALF_WIDTH + 400, -100.0),
+		Vector2(GameRules.MAP_HALF_WIDTH + 400, FLOOR_Y), Vector2(-GameRules.MAP_HALF_WIDTH - 400, FLOOR_Y)]
 	draw_polygon(points, [top, top, bottom, bottom])
 
 func _draw_lamp_glow(bulb: Vector2, index: int) -> void:

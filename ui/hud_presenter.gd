@@ -96,7 +96,20 @@ func publish() -> void:
 	var context_key: bool = true
 	var context_screen: Vector2 = Vector2.ZERO
 	var target: int = interaction.interaction_target()
-	if target == InteractionSystem.CLINIC_TARGET:
+	if target <= -200 and interaction.expansion != null:
+		context = "Recuperar suministros: +20"
+		context_screen = interaction.expansion.get_global_transform_with_canvas() * Vector2(ExpansionSystem.CACHE_X[-200 - target], GameRules.FLOOR_Y - 25)
+	elif target <= -100 and interaction.expansion != null:
+		var outpost: ExpansionOutpost = interaction.expansion.sites[-100 - target]
+		context = outpost.spec.title + (": operativo" if outpost.hp >= outpost.MAX_HEALTH else (": desplegando" if outpost.ordered else (": reparar" if outpost.hp > 0 else ": desplegar")))
+		if outpost.hp >= outpost.MAX_HEALTH:
+			var purpose: Dictionary = {"generator": "+2 energía", "recycler": "+5 chatarra / 12 s de día", "barracks": "fusilero de guardia", "medical": "dron sanitario"}
+			context = outpost.spec.title + ": " + (String(purpose[outpost.spec.id]) if interaction.expansion.powered(outpost) else "sin energía")
+		context_cost = -1 if outpost.hp >= outpost.MAX_HEALTH or outpost.ordered else (12 if outpost.hp > 0 else int(outpost.spec.cost))
+		context_key = cycle.phase == "DÍA" and not outpost.ordered and outpost.hp < outpost.MAX_HEALTH
+		context_progress = outpost.progress / 6 if outpost.ordered else context_progress
+		context_screen = outpost.get_global_transform_with_canvas() * Vector2(0, -48)
+	elif target == InteractionSystem.CLINIC_TARGET:
 		context = "Clínica: %d puntos" % neural.points() if cycle.phase == "DÍA" else "Clínica: solo de día"
 		context_key = cycle.phase == "DÍA"
 		context_screen = interaction.clinic.get_global_transform_with_canvas() * Vector2(0, -45)
@@ -142,7 +155,7 @@ func publish() -> void:
 		"offscreen_left": offscreen_left, "offscreen_right": offscreen_right,
 		"phase": cycle.phase, "day": cycle.day, "nights": cycle.config.nights,
 		"seconds": ceili(cycle.phase_remaining), "scrap": bank.scrap,
-		"energy": bank.energy_used(), "capacity": bank.energy_capacity,
+		"energy": bank.energy_used(), "capacity": bank.available_capacity(),
 		"population": colony.workers.size(), "population_max": GameRules.POPULATION,
 		"health": player.health, "stamina": int(player.stamina), "core": core.health,
 		"left": left_count, "right": right_count,

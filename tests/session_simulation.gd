@@ -46,11 +46,16 @@ func simulate() -> void:
 		for enemy: Node2D in get_nodes_in_group("enemies"):
 			enemy.set_physics_process(false)
 			enemy._physics_process(0.1)
+		for child: Node in world.director.get_children():
+			if child is RaidBolt:
+				child.set_physics_process(false)
+				child._physics_process(0.1)
 		if world.session.finished:
 			print("Simulación apoyo=%s: victoria=%s día=%d núcleo=%d tiempo=%.1fs" % [assist, world.session.won, world.cycle.day, world.core.health, step * 0.1])
-			var matches_reference: bool = world.session.won == assist and world.cycle.day == (3 if assist else 2) and world.core.health == (300 if assist else 0) and step == (2405 if assist else 1286)
+			# Referencia ampliada con artilleros y proyectiles simulados: 128.2 s sin apoyo.
+			var matches_reference: bool = world.session.won == assist and world.cycle.day == (3 if assist else 2) and world.core.health == (300 if assist else 0) and step == (2405 if assist else 1282)
 			if not matches_reference:
-				push_error("La simulación cambió respecto a la referencia anterior al refactor")
+				push_error("La simulación cambió respecto a la referencia de las oleadas ampliadas")
 			quit(0 if matches_reference else 1)
 			return
 	push_error("La partida no terminó en el presupuesto de simulación")

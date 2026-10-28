@@ -41,9 +41,9 @@ Para probar directamente una zona con F6: `levels/zones/foundry.tscn` o `flooded
 
 `tests/campaign_bosses_test.gd`: 69 comprobaciones de ataques, avisos sin daño, invulnerabilidad, aperturas, fases, límites de peligros, muerte, botones, esquema de campaña, guardados anteriores, protección entre zonas, viajes reales, persistencia de equipo y habitantes, reintento y Continuar desde el menú.
 
-`tests/fresh_colony_simulation.gd -- --foundry` y `-- --flooded` prueban preparar las cuatro obras y resistir tres noches con apoyo automatizado, sin mejoras ni recursos gratuitos. Fundición: obras encargadas en 7.7 s, núcleo 300, final en 345.2 s. Barrio: 8.2 s, núcleo 300, final en 360.2 s. La prueba original mantiene 7.1 s y 240.5 s. Son simulaciones de sistemas; falta equilibrar dificultad con personas jugando.
+`tests/fresh_colony_simulation.gd -- --foundry` y `-- --flooded` prueban preparar las cuatro obras y resistir tres noches con apoyo automatizado, sin mejoras ni recursos gratuitos. Fundición: obras encargadas en 7.7 s, final en 345.2 s. Barrio: 8.2 s, final en 360.2 s. La Periferia mantiene 7.1 s y 240.5 s. Tras incorporar artilleros, el núcleo termina con 286/258/272 respectivamente; los detalles están en [Expansión y unidades](EXPANSION_Y_UNIDADES.md). Son simulaciones de sistemas; falta equilibrar dificultad con personas jugando.
 
-`tests/run_all.gd` ejecuta 25 casos. Las capturas OpenGL de GTX 1070 se generan con:
+`tests/run_all.gd` ejecuta 26 casos. Las capturas OpenGL de GTX 1070 se generan con:
 
 ```text
 godot --path . --script res://tests/campaign_bosses_test.gd -- --capture

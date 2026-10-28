@@ -1,0 +1,7 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://levels/main.tscn" id="1"]
+[ext_resource type="Script" path="res://levels/zones/expansion_playground.gd" id="2"]
+[node name="CampoDePruebas" instance=ExtResource("1")]
+zone_index = 1
+[node name="Practice" type="Node" parent="."]
+script = ExtResource("2")

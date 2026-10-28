@@ -70,6 +70,10 @@ func simulate() -> void:
 		for enemy: SiegeEnemy in get_nodes_in_group(GameRules.ENEMIES):
 			enemy.set_physics_process(false)
 			enemy._physics_process(0.1)
+		for child: Node in world.director.get_children():
+			if child is RaidBolt:
+				child.set_physics_process(false)
+				child._physics_process(0.1)
 		if world.session.finished:
 			Input.action_release("interact")
 			var valid: bool = world.session.won and all_built and order_time > 0 and order_time < world.cycle.config.day_duration and world.core.health > 0

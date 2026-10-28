@@ -12,6 +12,7 @@ var colony: ColonySystem
 var cycle: CycleSystem
 var bank: ResourceBank
 var player: Player
+var expansion: ExpansionSystem
 var hold_time: float = 0.0
 var hold_target: int = GameRules.NO_TARGET
 
@@ -22,6 +23,10 @@ func interaction_target() -> int:
 		return STATION_TARGET
 	if absf(player.position.x) < GameRules.CORE_INTERACT_RANGE:
 		return -1
+	if expansion != null:
+		var expansion_target: int = expansion.target_at(player.position.x)
+		if expansion_target != GameRules.NO_TARGET:
+			return expansion_target
 	var best: int = GameRules.NO_TARGET
 	var distance: float = GameRules.SITE_INTERACT_RANGE
 	for index: int in range(construction.sites.size()):
@@ -45,6 +50,8 @@ func update_interaction(delta: float) -> void:
 		hold_time = 0.0
 
 func perform_interaction(target: int) -> bool:
+	if expansion != null and target <= -100:
+		return expansion.interact(target)
 	if target == CLINIC_TARGET:
 		if cycle.phase != "DÍA":
 			notice_requested.emit("Clínica disponible de día")
