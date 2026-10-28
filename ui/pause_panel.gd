@@ -3,6 +3,7 @@ extends PanelContainer
 
 signal options_requested
 signal menu_requested
+signal resume_requested
 
 const ICON_NAMES: Array[String] = ["dia", "aviso", "noche", "chatarra", "energia", "habitantes", "vida", "resistencia", "nucleo", "amenaza", "sobrecarga"]
 var icons: Dictionary = {}
@@ -10,6 +11,7 @@ var values: Dictionary = {}
 var bars: Dictionary = {}
 var rows: VBoxContainer
 var phase: String = "DÍA"
+var resume_button: Button
 
 func _ready() -> void:
 	rows = VBoxContainer.new()
@@ -65,6 +67,10 @@ func _ready() -> void:
 		label.text = text
 		controls.add_child(label)
 	var actions: HBoxContainer = _row()
+	resume_button = Button.new()
+	resume_button.text = "Continuar"
+	resume_button.pressed.connect(func() -> void: resume_requested.emit())
+	actions.add_child(resume_button)
 	for pair: Array in [["Opciones", func() -> void: options_requested.emit()], ["Menú principal", func() -> void: menu_requested.emit()]]:
 		var button: Button = Button.new()
 		button.text = pair[0]

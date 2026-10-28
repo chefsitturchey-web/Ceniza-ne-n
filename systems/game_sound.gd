@@ -5,6 +5,7 @@ const CUES: Dictionary = {
 	"slash": preload("res://assets/audio/sfx/slash.ogg"),
 	"shot": preload("res://assets/audio/sfx/shot.ogg"),
 	"hit": preload("res://assets/audio/sfx/hit.ogg"),
+	"step": preload("res://assets/audio/sfx/hit.ogg"),
 	"dodge": preload("res://assets/audio/sfx/dodge.ogg"),
 	"alarm": preload("res://assets/audio/sfx/alarm.ogg"),
 	"upgrade": preload("res://assets/audio/sfx/upgrade.ogg"),
@@ -48,6 +49,8 @@ func _ready() -> void:
 	if district == null:
 		return
 	district.player.state_changed.connect(_player_state)
+	district.player.stepped.connect(func(origin: Vector2) -> void: play_world("step", origin, -18))
+	district.player.hitbox.hit.connect(func(target: HurtboxComponent, _amount: int) -> void: play_world("hit", target.actor.global_position, -6))
 	district.player.health_component.damaged.connect(func(_a: int, _b: int) -> void: play_cue("hit"))
 	district.core.health_component.damaged.connect(func(_a: int, _b: int) -> void: play_cue("alarm"))
 	district.defenses.shot_fired.connect(func(origin: Vector2) -> void: play_world("shot", origin))
@@ -67,12 +70,12 @@ func _player_state(state: Player.State) -> void:
 func _enemy_spawned(enemy: Node2D, _side: float) -> void:
 	enemy.reward_requested.connect(func(_reward: int) -> void: play_world("destroy", enemy.position))
 
-func play_world(id: String, origin: Vector2) -> void:
+func play_world(id: String, origin: Vector2, gain_db: float = 0.0) -> void:
 	if district == null:
 		return
 	var distance: float = absf(origin.x - district.player.position.x)
 	if distance < 480:
-		play_cue(id, -distance / 35.0)
+		play_cue(id, -distance / 35.0 + gain_db)
 
 func play_cue(id: String, gain_db: float = 0.0) -> void:
 	if not playback_enabled or muted or not CUES.has(id) or elapsed < float(cooldowns.get(id, -1.0)):

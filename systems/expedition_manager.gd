@@ -40,11 +40,14 @@ func can_travel() -> bool:
 func start() -> bool:
 	if not can_travel():
 		return false
+	if district.session.save_system != null:
+		district.session.save_system.save_game()
 	active = true
 	arena = ARENA.instantiate() as CanvasLayer
 	arena.configure(district.player)
 	arena.resolved.connect(resolve)
 	arena.continued.connect(continue_district)
+	arena.menu_requested.connect(leave_to_menu)
 	# Hermana del distrito: no hereda la suspension ni la camara del mundo.
 	district.get_parent().add_child(arena)
 	_suspend(district)
@@ -78,8 +81,15 @@ func resolve(victory: bool) -> void:
 	district.get_node("HUD").show()
 
 func continue_district() -> void:
-	arena.queue_free()
-	district.session.restart()
+	leave_to_menu()
+
+func leave_to_menu() -> void:
+	if arena != null:
+		arena.queue_free()
+		arena = null
+	active = false
+	get_tree().paused = false
+	district.session.return_to_menu()
 
 func snapshot() -> Dictionary:
 	return {"destroyed": [repeaters[0].health.current == 0, repeaters[1].health.current == 0], "train_arrived": station.train_arrived}

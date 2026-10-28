@@ -18,6 +18,7 @@ const MOVE_THRESHOLD: float = 0.1
 const ATTACK_OFFSET: float = 8.0
 const ATTACK_HEIGHT: float = 30.0
 signal state_changed(state: State)
+signal stepped(origin: Vector2)
 var state: State = State.IDLE
 var health_component: HealthComponent = HealthComponent.new()
 var hitbox: HitboxComponent = HitboxComponent.new()
@@ -47,6 +48,7 @@ var enabled: bool = true
 var neural_damage: int = 0
 var neural_regen: float = 0.0
 var modules: ModuleSystem
+var step_timer: float = 0.0
 
 func _ready() -> void:
 	health_component.maximum = MAX_HEALTH
@@ -84,6 +86,8 @@ func refresh_state() -> void:
 	visual.queue_redraw()
 
 func _physics_process(delta: float) -> void:
+	if Engine.get_process_frames() <= GamePreferences.current().input_block_frame:
+		return
 	if not enabled:
 		return
 	cooldown_remaining = maxf(0.0, cooldown_remaining - delta)
@@ -114,6 +118,10 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	move_and_slide()
+	step_timer = maxf(0, step_timer - delta)
+	if is_on_floor() and absf(velocity.x) > 20 and dodge_remaining <= 0 and step_timer == 0:
+		stepped.emit(global_position)
+		step_timer = 0.3
 	visual.movement_dust(delta, was_grounded, previous_speed)
 	if Input.is_action_pressed("attack"):
 		attack()

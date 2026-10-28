@@ -22,6 +22,7 @@ var clinic_panel: ClinicPanel = ClinicPanel.new()
 var sound: GameSound = GameSound.new()
 var options: SettingsPanel = SettingsPanel.new()
 var modules: ModuleSystem = ModuleSystem.new()
+var briefing: BriefingPanel
 
 func _ready() -> void:
 	InputSetup.configure_input()
@@ -105,6 +106,12 @@ func _ready() -> void:
 	session.options = options
 	$HUD/PausePanel.options_requested.connect(options.open_panel)
 	$HUD/PausePanel.menu_requested.connect(session.return_to_menu)
+	$HUD/PausePanel.resume_requested.connect(session.resume_game)
+	options.closed.connect(func() -> void:
+		if get_tree().paused:
+			$HUD/PausePanel.resume_button.grab_focus())
+	$HUD.restart_requested.connect(session.restart)
+	$HUD.menu_requested.connect(session.return_to_menu)
 	session.clinic_panel = clinic_panel
 	interaction.clinic_panel = clinic_panel
 	interaction.clinic = clinic
@@ -116,6 +123,12 @@ func _ready() -> void:
 	sound.district = self
 	add_child(sound)
 	presenter.publish()
+	if GamePreferences.current().briefing_requested:
+		GamePreferences.current().briefing_requested = false
+		briefing = BriefingPanel.new()
+		add_child(briefing)
+		session.briefing = briefing
+		briefing.open_panel()
 
 func _connect_neural(enemy: SiegeEnemy, _side: float) -> void:
 	enemy.reward_requested.connect(neural.recover_data)

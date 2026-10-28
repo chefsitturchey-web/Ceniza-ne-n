@@ -106,6 +106,7 @@ func close_panel() -> void:
 		return
 	opened = false
 	closed_frame = Engine.get_process_frames()
+	GamePreferences.current().block_gameplay_input()
 	get_tree().paused = was_paused
 	hide()
 	closed.emit()

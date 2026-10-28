@@ -14,15 +14,21 @@ var ordered: bool = false
 var progress: float = 0.0
 var shot: float = 0.0
 var recoil: float = 0.0
+var turret_visual: TurretVisual
 
 func muzzle_position() -> Vector2:
+	if turret_visual != null:
+		return turret_visual.muzzle_position()
 	# Sprite 40x50: cañón a 9 px desde arriba, reflejado en el frente izquierdo.
 	var extent: Vector2 = data.texture.get_size() if data.texture != null else Vector2(28, 50)
 	return global_position + Vector2((extent.x / 2.0 - 2) * (-1.0 if x < 0 else 1.0), -extent.y + 9)
 
 func fire_effects() -> void:
 	recoil = 0.09
-	effects.emit_shot(muzzle_position(), -1.0 if x < 0 else 1.0)
+	if turret_visual != null:
+		turret_visual.fire()
+	var direction: float = turret_visual.facing if turret_visual != null else (-1.0 if x < 0 else 1.0)
+	effects.emit_shot(muzzle_position(), direction)
 	queue_redraw()
 var x: float:
 	get: return position.x
@@ -44,6 +50,10 @@ func _ready() -> void:
 	health_component.died.connect(_on_destroyed)
 	add_child(effects)
 	effects.setup(health_component, data.texture, x < 0.0)
+	if data.id == &"turret" and data.texture != null:
+		turret_visual = TurretVisual.new()
+		turret_visual.site = self
+		add_child(turret_visual)
 
 func take_damage(amount: int) -> void:
 	health_component.take_damage(amount)
@@ -55,6 +65,8 @@ func complete_work() -> void:
 	progress = 0.0
 
 func _on_destroyed() -> void:
+	if turret_visual != null:
+		turret_visual.clear_target()
 	effects.shatter()
 	ordered = false
 	progress = 0.0
@@ -91,6 +103,8 @@ func _draw() -> void:
 	if ordered and hp == 0 and progress < GameRules.BUILD_TIME and data.texture != null:
 		_draw_construction()
 	elif hp > 0 and data.texture != null:
+		if turret_visual != null:
+			return
 		var size: Vector2 = data.texture.get_size()
 		# Los sprites miran a la derecha; en el frente izquierdo deben mirar hacia afuera.
 		var kick: float = (1.0 if x < 0 else -1.0) if recoil > 0 else 0.0

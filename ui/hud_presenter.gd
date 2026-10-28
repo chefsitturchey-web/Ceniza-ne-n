@@ -30,6 +30,31 @@ var core_hit: int = 0
 var warned_night: int = -1
 var damage_connected: bool = false
 
+func objective_text() -> String:
+	var fortifications: int = 0
+	var completed: int = 0
+	for site: ConstructionSite in construction.sites:
+		if site.hp > 0 or site.ordered:
+			fortifications += 1
+		if site.hp > 0:
+			completed += 1
+	if fortifications < construction.sites.size():
+		return "Construye las defensas de ambos lados - mantener E"
+	if completed < construction.sites.size():
+		return "Las defensas se están construyendo - protege las obras"
+	if interaction.expedition == null:
+		return "Defiende el núcleo hasta el amanecer"
+	var expedition: ExpeditionManager = interaction.expedition
+	var destroyed: int = 0
+	for repeater: EnemyRepeater in expedition.repeaters:
+		if repeater.health.current <= 0:
+			destroyed += 1
+	if destroyed < 2:
+		return "Antenas enemigas: %d/2 - busca los extremos del distrito" % destroyed
+	if not expedition.station.train_arrived:
+		return "Antenas destruidas - espera el tren en la estación"
+	return "Tren listo - mantén E en la estación" if cycle.phase == "DÍA" else "Resiste hasta el amanecer para viajar en tren"
+
 func _player_damaged(_amount: int, _remaining: int) -> void:
 	player_hit += 1
 
@@ -108,6 +133,7 @@ func publish() -> void:
 		result_text = ("DISTRITO ESTABILIZADO" if session.won else "NÚCLEO DESTRUIDO") + "\n\n[R] Reintentar"
 	updated.emit(text, hint_text, result_text)
 	dashboard_updated.emit({
+		"objective": objective_text(),
 		"paused": get_tree().paused, "finished": session.finished,
 		"context": context, "context_cost": context_cost,
 		"context_progress": context_progress, "context_key": context_key, "context_screen": context_screen,

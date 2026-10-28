@@ -20,6 +20,7 @@ var save_system: SaveSystem
 var neural: NeuralSystem
 var clinic_panel: ClinicPanel
 var options: SettingsPanel
+var briefing: BriefingPanel
 
 func initialize() -> void:
 	if not persistence_enabled:
@@ -54,7 +55,14 @@ func return_to_menu() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://ui/main_menu.tscn")
 
+func resume_game() -> void:
+	get_tree().paused = false
+	GamePreferences.current().block_gameplay_input()
+	presenter.publish()
+
 func _process(delta: float) -> void:
+	if briefing != null and (briefing.opened or briefing.closed_frame == Engine.get_process_frames()):
+		return
 	if options != null and (options.opened or options.closed_frame == Engine.get_process_frames()):
 		return
 	if clinic_panel != null and clinic_panel.opened:
@@ -68,6 +76,8 @@ func _process(delta: float) -> void:
 		return
 	if Input.is_action_just_pressed("pause") and not finished:
 		get_tree().paused = not get_tree().paused
+		if not get_tree().paused:
+			GamePreferences.current().block_gameplay_input()
 	if get_tree().paused or finished:
 		presenter.publish()
 		return

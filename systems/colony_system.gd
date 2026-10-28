@@ -36,7 +36,8 @@ func update_workers(delta: float) -> void:
 				else:
 					bank.deposit(worker.cargo)
 					worker.cargo = 0
-			worker.update_visual(previous_x, false)
+			var gathering: bool = cycle.phase == "DÍA" and worker.cargo == 0 and absf(gather_destination) > GameRules.COLLECTOR_OUTSIDE_THRESHOLD and absf(worker.x - gather_destination) < GameRules.GATHER_ARRIVAL_DISTANCE
+			worker.update_visual(previous_x, gathering)
 			continue
 		# Una reserva por obra impide que los constructores dupliquen tareas.
 		if worker.job >= 0:

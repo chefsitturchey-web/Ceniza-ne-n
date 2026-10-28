@@ -2,6 +2,8 @@
 
 Abre `project.godot` con Godot 4 y pulsa F5. El menú permite Nueva partida, Continuar y Opciones. Se conserva tu ajuste de pruebas: 10 segundos de día, 10 de aviso y 60 de noche. La noche se prolonga si quedan enemigos vivos. Hay guardado automático al amanecer; tras la tercera noche el asedio continúa hasta derrotar al jefe. Consulta también [menú y opciones](docs/MENU_Y_OPCIONES.md), [equipo y evoluciones](docs/MODULOS_Y_EVOLUCIONES.md) y [siluetas](docs/SILUETAS_MECANICAS.md).
 
+La partida nueva comienza con una explicación que detiene el reloj hasta pulsar Comenzar. Las torretas ya apuntan y tienen retroceso; el Portador camina al norte/sur en la arena y el recuperador se anima al trabajar. Los objetivos de pantalla guían hasta el tren. El final del jefe completa esta demo y permite volver al menú. Detalles y comprobaciones en [PULIDO_JUGABLE.md](docs/PULIDO_JUGABLE.md).
+
 ## Controles
 
 | Acción | Teclado | Mando Xbox |

@@ -76,14 +76,18 @@ func save_game() -> bool:
 	var data: Dictionary = _snapshot()
 	if session.finished or not _valid(data):
 		return false
-	var file: FileAccess = FileAccess.open(save_path, FileAccess.WRITE)
+	# Escribir aparte evita truncar la partida anterior si falla la escritura.
+	var pending_path: String = save_path + ".tmp"
+	var file: FileAccess = FileAccess.open(pending_path, FileAccess.WRITE)
 	if file == null:
 		return false
 	file.store_string(JSON.stringify(data))
 	file.flush()
 	var success: bool = file.get_error() == OK
 	file.close()
-	return success
+	if not success:
+		return false
+	return DirAccess.rename_absolute(ProjectSettings.globalize_path(pending_path), ProjectSettings.globalize_path(save_path)) == OK
 
 func load_game() -> bool:
 	if not has_save():

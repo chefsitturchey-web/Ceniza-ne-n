@@ -38,12 +38,17 @@ func update_defenses(delta: float) -> void:
 	for site: ConstructionSite in sites:
 		if site.data.damage == 0 or site.hp <= 0:
 			continue
+		var target: Node2D = nearest_enemy(site.x, site.data.attack_range)
+		if site.turret_visual != null:
+			if target != null:
+				site.turret_visual.track(target.global_position + Vector2(0, -16))
+			else:
+				site.turret_visual.clear_target()
 		site.shot = maxf(0.0, site.shot - delta)
 		if site.shot == 0.0:
-			var target: Node2D = nearest_enemy(site.x, site.data.attack_range)
 			if target != null:
 				site.fire_effects()
-				fire_from(Vector2(site.x, GameRules.FLOOR_Y - 42), target, site.data.damage, overload.overloaded(site.x))
+				fire_from(site.muzzle_position(), target, site.data.damage, overload.overloaded(site.x))
 				site.shot = site.data.overloaded_interval if overload.overloaded(site.x) else site.data.interval
 	drone_timer = maxf(0.0, drone_timer - delta)
 	if drone_timer == 0.0 and player.health > 0 and (modules == null or "drone" in modules.equipped):

@@ -11,8 +11,8 @@
   <img alt="Godot 4.7.2" src="https://img.shields.io/badge/Godot-4.7.2-478cbf?logo=godotengine&logoColor=white">
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
-  <img alt="Estado" src="https://img.shields.io/badge/estado-prototipo%20jugable-e89e54">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-20%20suites-47dacb">
+  <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-22%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -70,6 +70,7 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 - **Combate exigente:** ataque cuerpo a cuerpo, esquiva con invulnerabilidad y resistencia; el cansancio se nota en la animación.
 - **Cinco tipos de enemigo:** Errante, Corredor, Blindado (escudo frontal), Saltador (pasa la primera muralla) y Ariete (rompe murallas).
 - **Siluetas propias:** Blindado, Saltador y Ariete usan piezas mecánicas animadas con armadura, muelles y pistón; conservan los sprites anteriores como alternativa del Inspector.
+- **Defensas articuladas:** las torretas siguen blancos y disparan con retroceso desde el cañón. Introducción sin consumir tiempo, objetivos visibles y final de demo con regreso al menú.
 - **Colonia automática:** constructores y recuperadores con tareas propias; recluta hasta cuatro habitantes.
 - **Economía y energía:** chatarra para construir, capacidad energética para mantener torretas y sobrecarga independiente por frente.
 - **Expediciones:** la colonia se pausa mientras luchas contra el jefe; si caes, vuelves al mismo momento para prepararte mejor.
@@ -98,7 +99,7 @@ git clone https://github.com/chefsitturchey-web/Ceniza-ne-n.git
 
 1. Abre Godot y pulsa **Importar**; elige `project.godot` dentro de la carpeta.
 2. Espera la importación inicial (la primera vez importa fuentes, sprites y audio).
-3. Pulsa **F5**, elige **Nueva partida** o **Continuar**. **Opciones** permite ajustar audio, ventana y efectos; también está en la pausa.
+3. Pulsa **F5**, elige **Nueva partida** o **Continuar**. Una nueva colonia muestra la explicación con el reloj detenido; pulsa **Comenzar**. **Opciones** permite ajustar audio, ventana y efectos; también está en la pausa de colonia y jefe.
 
 También puedes usar **Code → Download ZIP**. Este repositorio no incluye ejecutable: el juego se prueba desde el editor.
 
@@ -161,7 +162,7 @@ godot --headless --path . --import
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta 20 suites, incluyendo menú/opciones, módulos/evoluciones, siluetas, combate, guardado, expedición y dos simulaciones de partida. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
+`run_all.gd` ejecuta 22 suites, incluyendo menú/opciones, animación/pulido, módulos/evoluciones, siluetas, combate, guardado, expedición y simulaciones con defensas preparadas y desde una colonia nueva. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
 
 ### Flujo de trabajo
 
@@ -178,6 +179,7 @@ godot --headless --path . --script res://tests/run_all.gd
 - [Menú ilustrado y opciones persistentes](docs/MENU_Y_OPCIONES.md)
 - [Equipo y evoluciones](docs/MODULOS_Y_EVOLUCIONES.md)
 - [Siluetas mecánicas y presentación de enemigos](docs/SILUETAS_MECANICAS.md)
+- [Pulido jugable, torretas articuladas y animación de arena](docs/PULIDO_JUGABLE.md)
 - [Documento de diseño (GDD)](CENIZA_NEON_GDD.docx)
 
 ### Añadir contenido

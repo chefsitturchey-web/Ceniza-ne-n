@@ -3,6 +3,7 @@ extends CanvasLayer
 
 signal resolved(victory: bool)
 signal continued
+signal menu_requested
 
 const DAMAGE_EDGES: Script = preload("res://ui/damage_edges.gd")
 const THEME: Theme = preload("res://ui/theme.tres")
@@ -25,6 +26,9 @@ var camera: Camera2D = Camera2D.new()
 var sound: GameSound = GameSound.new()
 var configured: bool = false
 var modules: ModuleSystem = ModuleSystem.new()
+var options: SettingsPanel = SettingsPanel.new()
+var exit_button: Button
+var result_shade: ColorRect
 
 func configure(source: Player) -> void:
 	configured = true
@@ -77,10 +81,15 @@ func _ready() -> void:
 	camera.reset_smoothing()
 	build_lighting()
 	build_hud()
+	add_child(options)
+	options.closed.connect(func() -> void:
+		if pause_panel.visible:
+			pause_panel.get_child(0).get_child(1).grab_focus())
 	sound.music_enabled = not configured
 	add_child(sound)
 	modules.fired.connect(func() -> void: sound.play_cue("shot", -5))
 	player.dodged.connect(func() -> void: sound.play_cue("dodge"))
+	player.stepped.connect(func(_origin: Vector2) -> void: sound.play_cue("step", -18))
 	boss.cue_requested.connect(func(id: String) -> void: sound.play_cue(id, -4))
 	player.slash.connect(func(_o: Vector2, _d: Vector2, _a: int, _r: float) -> void: sound.play_cue("slash"))
 
@@ -187,10 +196,16 @@ func build_hud() -> void:
 	bar.position = Vector2(160, 346)
 	bar.size = Vector2(320, 2)
 	add_child(bar)
+	result_shade = ColorRect.new()
+	result_shade.color = Color("0b1322", 0.8)
+	result_shade.size = Vector2(640, 360)
+	result_shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(result_shade)
+	result_shade.hide()
 	banner = label("", Rect2(0, 140, 640, 44), true)
 	pause_panel.theme = THEME
-	pause_panel.position = Vector2(220, 115)
-	pause_panel.size = Vector2(200, 130)
+	pause_panel.position = Vector2(210, 90)
+	pause_panel.size = Vector2(220, 180)
 	add_child(pause_panel)
 	var rows: VBoxContainer = VBoxContainer.new()
 	pause_panel.add_child(rows)
@@ -203,21 +218,46 @@ func build_hud() -> void:
 	resume.text = "Continuar"
 	resume.pressed.connect(toggle_pause)
 	rows.add_child(resume)
+	var settings: Button = Button.new()
+	settings.text = "Opciones"
+	settings.pressed.connect(options.open_panel)
+	rows.add_child(settings)
+	exit_button = Button.new()
+	exit_button.text = "Menú principal"
+	exit_button.pressed.connect(return_to_menu)
+	rows.add_child(exit_button)
 	pause_panel.hide()
 
 func _input(event: InputEvent) -> void:
+	if options.opened or options.closed_frame == Engine.get_process_frames():
+		return
 	if event.is_action_pressed("pause") and not event.is_echo() and not ending and not completed:
 		toggle_pause()
 		get_viewport().set_input_as_handled()
 	elif completed and (event.is_action_pressed("restart") or event.is_action_pressed("ui_accept")):
-		continued.emit()
+		if not configured:
+			if ending_victory:
+				return_to_menu()
+			else:
+				retry_arena()
+		else:
+			continued.emit()
 		get_viewport().set_input_as_handled()
 
 func toggle_pause() -> void:
 	get_tree().paused = not get_tree().paused
+	if not get_tree().paused:
+		GamePreferences.current().block_gameplay_input()
 	pause_panel.visible = get_tree().paused
 	if pause_panel.visible:
 		pause_panel.get_child(0).get_child(1).grab_focus()
+
+func return_to_menu() -> void:
+	get_tree().paused = false
+	if configured:
+		menu_requested.emit()
+	else:
+		get_tree().change_scene_to_file("res://ui/main_menu.tscn")
 
 func strike(origin: Vector2, direction: Vector2, amount: int, reach: float) -> void:
 	var offset: Vector2 = boss.global_position - origin
@@ -265,17 +305,56 @@ func _process(delta: float) -> void:
 		if ending_timer <= 0:
 			emitted = true
 			resolved.emit(ending_victory)
+			if not configured:
+				if ending_victory:
+					show_completed()
+				else:
+					show_standalone_defeat()
+
+func retry_arena() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://levels/expedition/recaudador_arena.tscn")
+
+func show_standalone_defeat() -> void:
+	if completed:
+		return
+	completed = true
+	result_shade.show()
+	var retry: Button = Button.new()
+	retry.theme = THEME
+	retry.text = "Reintentar  [R]"
+	retry.position = Vector2(245, 200)
+	retry.size = Vector2(150, 25)
+	retry.pressed.connect(retry_arena)
+	add_child(retry)
+	var menu: Button = Button.new()
+	menu.theme = THEME
+	menu.text = "Menú principal"
+	menu.position = Vector2(245, 235)
+	menu.size = Vector2(150, 25)
+	menu.pressed.connect(return_to_menu)
+	add_child(menu)
+	retry.grab_focus()
 
 func show_completed() -> void:
+	if completed:
+		return
 	completed = true
+	result_shade.show()
 	player.set_physics_process(false)
 	boss.set_physics_process(false)
+	player.velocity = Vector2.ZERO
+	player.dodge_remaining = 0
+	player.attack_anim_remaining = 0
+	player.slash_remaining = 0
+	player.update_visual()
 	banner.text = "DISTRITO 1 COMPLETADO"
+	label("Has recuperado la Periferia. Demo completada.", Rect2(90, 178, 460, 16))
 	var button: Button = Button.new()
 	button.theme = THEME
-	button.text = "Continuar"
+	button.text = "Volver al menú"
 	button.position = Vector2(265, 200)
-	button.size = Vector2(110, 28)
+	button.size = Vector2(130, 28)
 	button.pressed.connect(func() -> void: continued.emit())
 	add_child(button)
 	button.grab_focus()

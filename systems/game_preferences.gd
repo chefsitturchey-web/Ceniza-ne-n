@@ -9,6 +9,11 @@ var values: Dictionary = DEFAULTS.duplicate()
 var config_path: String = "user://opciones.cfg"
 var base_volumes: Dictionary = {}
 var last_error: Error = OK
+var briefing_requested: bool = false
+var input_block_frame: int = -1
+
+func block_gameplay_input() -> void:
+	input_block_frame = Engine.get_process_frames() + 1
 var particles: bool:
 	get: return values.particles
 var reduced_flashes: bool:

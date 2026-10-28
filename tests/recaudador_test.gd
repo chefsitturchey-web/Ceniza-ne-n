@@ -99,6 +99,8 @@ func run_checks() -> void:
 	verify(paused and arena.pause_panel.visible and not boss.can_process(), "Pausa suspende combate")
 	arena._input(event)
 	verify(not paused and not arena.pause_panel.visible, "Pausa reanuda")
+	await process_frame
+	await process_frame
 	player.invulnerable = 0
 	player.dodge_remaining = 0
 	player.position = Vector2(320, 350)
@@ -146,6 +148,7 @@ func run_checks() -> void:
 	arena._process(2.3)
 	arena._process(2.3)
 	verify(outcomes == [true], "Matar jefe emite resolved true una sola vez")
+	verify(arena.completed and arena.result_shade.visible, "Arena ejecutada sola muestra final navegable")
 	verify(DebrisEmitter.live_count <= DebrisEmitter.LIMIT, "Explosion respeta limite global")
 	arena.free()
 	await process_frame
@@ -157,6 +160,7 @@ func run_checks() -> void:
 	arena._process(1.3)
 	arena._process(1.3)
 	verify(outcomes == [false], "Muerte jugador emite resolved false una sola vez")
+	verify(arena.completed and arena.find_children("*", "Button", true, false).size() >= 5, "Derrota en arena independiente ofrece reintento y menú")
 	arena.free()
 	await process_frame
 	print("Recaudador: %d comprobaciones; %d fallos" % [checks, failures])

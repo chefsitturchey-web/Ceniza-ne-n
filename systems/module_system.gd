@@ -195,13 +195,30 @@ func update_arena(delta: float) -> void:
 		elif id == "tesla" and evolved.tesla:
 			damage = roundi(damage * 1.4)
 		boss.receive_hit(actor.global_position, damage)
-		flashes.append({"from": actor.global_position, "to": boss.global_position, "time": 0.12, "electric": id == "tesla"})
+		var muzzle: Vector2 = drone_origin(0) if id == "drone" else actor.global_position + Vector2(0, -20)
+		flashes.append({"from": muzzle, "to": boss.global_position, "time": 0.12, "electric": id == "tesla"})
 		fired.emit()
 		timers[id] = definition(id).interval * (1.0 - int(actor.get("drone_rank")) * 0.1) if id == "drone" else definition(id).interval
+
+func drone_origin(index: int) -> Vector2:
+	return actor.position + Vector2(-22 if index == 0 else 22, -26 + roundf(sin(elapsed * 3 + index * PI) * 2))
 
 func _draw() -> void:
 	if not is_instance_valid(actor) or actor.health <= 0:
 		return
+	if planar and "drone" in equipped:
+		for index: int in range(2 if evolved.drone else 1):
+			var center: Vector2 = drone_origin(index).round()
+			draw_rect(Rect2(center - Vector2(7, 3), Vector2(14, 6)), Color("0b1322"))
+			draw_rect(Rect2(center - Vector2(5, 2), Vector2(10, 4)), Color("8299a8"))
+			draw_rect(Rect2(center - Vector2(2, 1), Vector2(4, 2)), Color("47dacb"))
+			for side: int in [-1, 1]:
+				draw_rect(Rect2(center + Vector2(side * 4 - 1, 4), Vector2(2, 3)), Color("47dacb"))
+	if "tesla" in equipped:
+		var center: Vector2 = actor.position + Vector2(-10, -27 if planar else -32)
+		draw_rect(Rect2(center - Vector2(2, 5), Vector2(5, 10)), Color("0b1322"))
+		for ring: int in range(3):
+			draw_rect(Rect2(center + Vector2(-3, -3 + ring * 3), Vector2(7, 1)), Color("47dacb"))
 	if "orbital" in equipped:
 		var origin: Vector2 = actor.position if planar else actor.position + Vector2(0, -18)
 		var count: int = 4 if evolved.orbital else 2
