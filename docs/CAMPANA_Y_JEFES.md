@@ -1,5 +1,7 @@
 # Tres distritos conectados
 
+Documento del bloque anterior. La ruta actual contiene cinco capítulos, operaciones y un final: [Historia y campaña](HISTORIA_Y_CAMPANA.md). Las reglas de combate en colonia también cambiaron: [Comandante y portales](COMANDANTE_Y_PORTALES.md).
+
 Bloque jugable del 28 de octubre de 2026: Periferia oxidada → Fundición → Barrio inundado. Cada distrito tiene colonia lateral, dos repetidores, estación y jefe cenital. Los distritos restantes del GDD siguen pendientes; este bloque termina después del Coro.
 
 ## Progresión y guardado

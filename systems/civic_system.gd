@@ -30,7 +30,7 @@ func setup(world: Node2D) -> void:
 			site.position = Vector2(side * distance, GameRules.FLOOR_Y)
 			walls.append(site)
 			add_child(site)
-		for index: int in range(district.zone_index):
+		for index: int in range(mini(3, district.zone_index)):
 			var gate: ConduitGate = ConduitGate.new()
 			gate.position = Vector2(side * (1180 - index * 250), GameRules.FLOOR_Y)
 			gates.append(gate)
@@ -53,7 +53,7 @@ func defend_portal(portal: EnemyRepeater) -> void:
 	# Refuerzos sin botín: no se puede cultivar experiencia provocando una puerta.
 	if get_tree().get_nodes_in_group(GameRules.ENEMIES).size() >= 24: return
 	district.presenter.show_notice("El portal se defiende: protege a tus tiradores")
-	district.sound.play_cue("warning")
+	district.sound.play_cue("alarm")
 	for id: String in ["errante", "corredor"]:
 		var data: EnemyData = load("res://data/enemies/" + id + ".tres").duplicate() as EnemyData
 		data.reward = 0
@@ -238,7 +238,7 @@ static func valid(data: Variant, gate_count: int) -> bool:
 	if not data.get("tools") is Array or data.tools.size() != 6 or not data.get("camps") is Array or data.camps.size() != 2: return false
 	for value: Variant in data.tools + data.camps:
 		if not ExpansionSystem.number(value, 0, 4, true): return false
-	if not ExpansionSystem.number(data.get("capacity"), 8, 20, true) or not ExpansionSystem.number(data.get("day"), 1, 3, true): return false
+	if not ExpansionSystem.number(data.get("capacity"), 8, 20, true) or not ExpansionSystem.number(data.get("day"), 1, 1000000, true): return false
 	if not data.get("villagers") is Array or data.villagers.size() > data.capacity: return false
 	for citizen: Variant in data.villagers:
 		if not citizen is Dictionary or not ExpansionSystem.number(citizen.get("x"), -1600, 1600) or not ExpansionSystem.number(citizen.get("side"), -1, 1, true) or absf(float(citizen.side)) != 1: return false

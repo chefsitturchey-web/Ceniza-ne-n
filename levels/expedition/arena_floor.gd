@@ -58,10 +58,26 @@ func _draw() -> void:
 		draw_rect(Rect2(15, 55, 610, 410), Color("103b4a", 0.26))
 		for y: int in range(90, 450, 45):
 			draw_line(Vector2(30, y), Vector2(610, y + 2), Color("47dacb", 0.08), 1)
+	elif theme_id == "citadel":
+		for x: int in range(60, 620, 80):
+			draw_line(Vector2(x, 25), Vector2(x, 455), Color("ffce75", 0.2), 2)
+		draw_arc(Vector2(320, 240), 130, 0, TAU, 96, Color("ffce75", 0.35), 2)
+	elif theme_id == "network":
+		for x: int in range(45, 600, 55):
+			draw_line(Vector2(x, 25), Vector2(320, 240), Color("47dacb", 0.14), 2)
+			draw_line(Vector2(x, 455), Vector2(320, 240), Color("47dacb", 0.14), 2)
+		for radius: int in [80, 145, 205]: draw_arc(Vector2(320, 240), radius, 0, TAU, 96, Color("47dacb", 0.13), 2)
 	for x: int in [48, 592]:
 		for y: int in [80, 400]:
 			draw_rect(Rect2(x - 5, y - 2, 10, 4), AMBER)
 	if theme_id == "foundry": _draw_foundry_basin()
+	if theme_id == "network":
+		for index: int in range(12):
+			var a: Vector2 = Vector2(320, 240) + Vector2(cos(index * TAU / 12) * 285, sin(index * TAU / 12) * 215)
+			var b: Vector2 = Vector2(320, 240) + Vector2(cos((index + 1) * TAU / 12) * 285, sin((index + 1) * TAU / 12) * 215)
+			draw_colored_polygon(PackedVector2Array([a, b, Vector2(320, 240) + (b - Vector2(320, 240)) * 4, Vector2(320, 240) + (a - Vector2(320, 240)) * 4]), Color("06121d"))
+			draw_line(a, b, Color("304356"), 10)
+			draw_line(a, b, Color("47dacb", 0.7), 2)
 
 func _draw_foundry_basin() -> void:
 	var boundary: PackedVector2Array = PackedVector2Array([Vector2(140, 24), Vector2(500, 24), Vector2(616, 140), Vector2(616, 340), Vector2(500, 456), Vector2(140, 456), Vector2(24, 340), Vector2(24, 140), Vector2(140, 24)])

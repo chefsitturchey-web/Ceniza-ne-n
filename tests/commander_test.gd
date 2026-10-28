@@ -58,6 +58,23 @@ func run_checks() -> void:
 	verify(enemy.health < enemy.max_health, "La escuadra combate al defender su asalto lejos del cuartel")
 	verify(GameArt.icon("optic").region != GameArt.icon("battery").region, "Cada mejora tiene un icono propio")
 	verify(world.modules.command_damage() > 0, "El equipo enlaza bonificaciones con las tropas")
+	for remaining: SiegeEnemy in get_nodes_in_group(GameRules.ENEMIES): remaining.free()
+	portal.restore(false)
+	var arrivals: Array[SiegeEnemy] = []
+	world.director.spawned.connect(func(defender: SiegeEnemy, _side: float) -> void:
+		arrivals.append(defender)
+		defender.set_physics_process(false))
+	home.hire("guardian")
+	home.hire("ranger")
+	for ally: FieldAlly in home.squad: ally.position.x = home.position.x
+	for step: int in range(2200):
+		for ally: FieldAlly in home.squad: ally.tick(0.1)
+		portal._process(0.1)
+		for defender: SiegeEnemy in get_nodes_in_group(GameRules.ENEMIES): defender._physics_process(0.1)
+		if portal.health.current == 0: break
+		if step % 20 == 0: await process_frame
+	verify(portal.health.current == 0, "Una escuadra completa atraviesa la defensa y cierra una entrada sin el Portador")
+	verify(arrivals.size() > 0 and arrivals.size() <= 6, "El asalto completo genera refuerzos acotados")
 	world.free()
 	await process_frame
 	print("Comandante: %d comprobaciones; %d fallos" % [checks, failures])

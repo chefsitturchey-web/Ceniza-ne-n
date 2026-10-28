@@ -1,5 +1,7 @@
 # Revisión del GDD y corrección de las mecánicas
 
+Actualización posterior: [Comandante y portales](COMANDANTE_Y_PORTALES.md) y [cinco capítulos con operaciones y final](HISTORIA_Y_CAMPANA.md). La auditoría al final refleja el estado anterior a esos dos bloques; Ciudadela, Prefecto, MADRE CERO e historia ya tienen implementación jugable. La duración, catálogo completo y pulido de lanzamiento siguen pendientes.
+
 Se leyó completo `CENIZA_NEON_GDD.docx`, versión 1.0 de Carlos Alberto Llano Flores, incluidas sus 31 secciones y el anexo. El DOCX original se conserva. Esta entrega corrige sistemas anteriores; no declara terminado todo el alcance de lanzamiento.
 
 ## Diagnóstico

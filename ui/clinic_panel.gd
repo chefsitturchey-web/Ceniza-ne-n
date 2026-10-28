@@ -11,7 +11,7 @@ var module_rows: Dictionary = {}
 var tabs: TabContainer
 var passive_buttons: Dictionary = {}
 const TITLES: Array[String] = ["FILO DE INDUCCIÓN", "DRON PERFORADOR", "CAPACITOR SINÁPTICO"]
-const DETAILS: Array[String] = ["+10 daño por rango; también contra el jefe", "+4 daño; intervalo de disparo -10% por rango", "+5 resistencia por segundo y por rango"]
+const DETAILS: Array[String] = ["+10 daño de hoja por rango; solo jefes", "+4 daño de dron ante jefes; intervalo -10%", "+5 resistencia por segundo y por rango"]
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS

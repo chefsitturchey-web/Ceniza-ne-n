@@ -37,6 +37,7 @@ func all_destroyed() -> bool:
 	return repeaters.all(func(repeater: EnemyRepeater) -> bool: return repeater.health.current == 0) and (district.civic == null or district.civic.gates.all(func(gate: EnemyRepeater) -> bool: return gate.health.current == 0))
 
 func can_travel() -> bool:
+	if district.story != null and not district.story.ready_to_travel(): return false
 	return not active and all_destroyed() and station.train_arrived and district.cycle.phase == "DÍA" and (district.civic == null or district.civic.stabilized()) and not district.session.finished and district.player.health > 0 and not get_tree().paused
 
 func start() -> bool:

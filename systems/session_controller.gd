@@ -133,6 +133,7 @@ func _process(delta: float) -> void:
 		civic.advance_side = 0 if civic.advance_side != 0 else (-1 if player.position.x < 0 else 1)
 		presenter.show_notice("Escolta: retirada" if civic.advance_side == 0 else "Escolta: atacar entrada del frente")
 	if civic != null: civic.tick(delta)
+	if interaction.story != null: interaction.story.tick(delta)
 	if expansion != null:
 		expansion.tick(delta)
 	if terrain != null:

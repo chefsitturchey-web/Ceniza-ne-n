@@ -15,8 +15,8 @@ var wave: WaveData
 var expansion: ExpansionSystem
 
 func start(number: int) -> void:
-	night = number
-	wave = waves[number - 1]
+	night = mini(number, waves.size())
+	wave = waves[night - 1]
 	spawn_count = 0
 	spawn_remaining = 0.0
 
@@ -39,7 +39,7 @@ func spawn_enemy(side: float, data: EnemyData, number: int = 1, elite: bool = fa
 	enemy.construction = construction
 	enemy.core = core
 	enemy.session = session
-	enemy.night = number
+	enemy.night = mini(number, waves.size())
 	enemy.elite = elite
 	enemy.reward_requested.connect(bank.deposit)
 	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE

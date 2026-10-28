@@ -29,7 +29,8 @@ var modules: ModuleSystem = ModuleSystem.new()
 var options: SettingsPanel = SettingsPanel.new()
 var exit_button: Button
 var result_shade: ColorRect
-@export_range(0, 2) var zone_index: int = 0
+@export_range(0, 4) var zone_index: int = 0
+var support_units: int = 0
 var zone: ZoneData
 var boss_status: Label
 var phase_notice: Label
@@ -39,12 +40,15 @@ func configure(source: Player, index: int = 0) -> void:
 	configured = true
 	zone_index = index
 	player.copy_from(source)
+	var colony: District = source.get_parent() as District
+	if colony != null and colony.story != null: support_units = colony.story.soldiers()
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	zone = CampaignRoute.zone(zone_index)
 	# Creación directa: no hay componentes de un jefe anterior que queden huérfanos.
-	boss = Recaudador.new() if zone_index == 0 else (load("res://entities/enemies/santa_caldera.gd") if zone_index == 1 else load("res://entities/enemies/coro_sumergido.gd")).new() as Recaudador
+	var scripts: Array[String] = ["recaudador", "santa_caldera", "coro_sumergido", "el_prefecto", "madre_cero"]
+	boss = load("res://entities/enemies/" + scripts[zone_index] + ".gd").new() as Recaudador
 	configure_controls()
 	var screen: SubViewportContainer = SubViewportContainer.new()
 	screen.size = Vector2(640, 360)
@@ -75,6 +79,9 @@ func _ready() -> void:
 	actors.add_child(boss)
 	if boss is CoroSumergido:
 		(boss as CoroSumergido).install_relays(actors)
+	if boss is MadreCero:
+		(boss as MadreCero).support_units = support_units
+		(boss as MadreCero).install_relays(actors)
 	modules.actor = player
 	modules.boss = boss
 	modules.planar = true
@@ -149,8 +156,13 @@ func wall(center: Vector2, extent: Vector2) -> StaticBody2D:
 	return body
 
 func build_geometry() -> void:
-	if zone_index == 1:
+	if zone_index in [1, 3, 4]:
 		var boundary: Array[Vector2] = [Vector2(140, 24), Vector2(500, 24), Vector2(616, 140), Vector2(616, 340), Vector2(500, 456), Vector2(140, 456), Vector2(24, 340), Vector2(24, 140)]
+		if zone_index == 3:
+			boundary = [Vector2(96, 24), Vector2(544, 24), Vector2(616, 100), Vector2(616, 380), Vector2(544, 456), Vector2(96, 456), Vector2(24, 380), Vector2(24, 100)]
+		elif zone_index == 4:
+			boundary.clear()
+			for index: int in range(12): boundary.append(Vector2(320, 240) + Vector2(cos(index * TAU / 12) * 285, sin(index * TAU / 12) * 215))
 		for index: int in range(boundary.size()):
 			var a: Vector2 = boundary[index]
 			var b: Vector2 = boundary[(index + 1) % boundary.size()]
@@ -169,6 +181,9 @@ func build_geometry() -> void:
 	elif zone_index == 2:
 		positions = [Vector2(90, 240), Vector2(550, 240), Vector2(320, 65)]
 		assets = ["pillar_top", "pillar_top", "crate_top"]
+	elif zone_index >= 3:
+		positions = [Vector2(90, 240), Vector2(550, 240), Vector2(320, 65), Vector2(145, 360), Vector2(495, 360)]
+		assets = ["pillar_top", "pillar_top", "crate_top", "barrel_top", "barrel_top"]
 	for index: int in range(positions.size()):
 		var texture: Texture2D = load("res://assets/expedition/arena/%s.png" % assets[index]) as Texture2D
 		var body: StaticBody2D = wall(positions[index], texture.get_size())
@@ -214,6 +229,7 @@ func label(text: String, rect: Rect2, title: bool = false) -> Label:
 	var node: Label = Label.new()
 	node.theme = THEME
 	node.theme_type_variation = &"Title" if title else &"SmallTitle"
+	node.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	node.text = text
 	node.position = rect.position
 	node.size = rect.size
@@ -229,6 +245,7 @@ func build_hud() -> void:
 	damage_edges.set_state({"health": player.health})
 	label(zone.boss_title, Rect2(110, 325, 420, 14))
 	boss_status = label(zone.briefing, Rect2(8, 15, 624, 28))
+	boss_status.add_theme_font_size_override("font_size", 10)
 	boss_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	phase_notice = label("", Rect2(80, 60, 480, 22), true)
 	phase_notice.add_theme_color_override("font_color", Color("dd6482"))
@@ -367,7 +384,7 @@ func _process(delta: float) -> void:
 
 func retry_arena() -> void:
 	get_tree().paused = false
-	var scenes: Array[String] = ["res://levels/expedition/recaudador_arena.tscn", "res://levels/expedition/caldera_arena.tscn", "res://levels/expedition/choir_arena.tscn"]
+	var scenes: Array[String] = ["res://levels/expedition/recaudador_arena.tscn", "res://levels/expedition/caldera_arena.tscn", "res://levels/expedition/choir_arena.tscn", "res://levels/expedition/prefect_arena.tscn", "res://levels/expedition/mother_arena.tscn"]
 	get_tree().change_scene_to_file(scenes[zone_index])
 
 func show_standalone_defeat() -> void:
@@ -405,6 +422,13 @@ func show_completed(next_zone: String = "") -> void:
 	player.slash_remaining = 0
 	player.update_visual()
 	banner.text = "DISTRITO %d COMPLETADO" % (zone_index + 1)
+	var ending_text: RichTextLabel = RichTextLabel.new()
+	ending_text.theme = THEME
+	ending_text.position = Vector2(40, 45)
+	ending_text.size = Vector2(560, 85)
+	ending_text.add_theme_font_size_override("normal_font_size", 12)
+	ending_text.text = CampaignStory.chapter(zone_index).ending
+	add_child(ending_text)
 	label("Ruta disponible completada." if next_zone.is_empty() else "Siguiente destino: " + next_zone + ". Equipo y tripulación conservados.", Rect2(40, 178, 560, 16))
 	var button: Button = Button.new()
 	button.theme = THEME

@@ -50,6 +50,9 @@ func tick(delta: float) -> void:
 	if world.civic != null and role in ["ranger", "guardian"]:
 		anchor = signf(home.position.x) * maxf(absf(home.position.x), world.civic.frontier(signf(home.position.x)) - (35 if role == "ranger" else -8))
 		destination = anchor
+	if world.story != null and world.story.convoy_active and world.story.convoy_health > 0 and home.position.x < 0 and world.civic.advance_side == 0 and role in ["ranger", "guardian"]:
+		anchor = world.story.convoy_x + (30 if role == "guardian" else 90)
+		destination = anchor
 	var enemy: SiegeEnemy
 	var nearest: float = 260
 	var assaulting: bool = world.civic != null and world.civic.advance_side == int(signf(home.position.x)) and role in ["ranger", "guardian"]
@@ -86,6 +89,13 @@ func tick(delta: float) -> void:
 				shot = 0.12
 				world.sound.play_cue("shot", -10)
 	elif role == "technician":
+		if world.story != null and world.story.relay_ordered and not world.story.completed[1] and world.cycle.phase == "DÍA":
+			anchor = StoryDirector.RELAY_X
+			destination = anchor
+			if absf(position.x - anchor) < 50:
+				world.story.work_relay(delta)
+				shot = 0.1
+				beam_to = Vector2(anchor, GameRules.FLOOR_Y - 25)
 		if home.hp < home.MAX_HEALTH and cooldown <= 0 and absf(position.x - home.position.x) < 60:
 			home.hp = mini(home.MAX_HEALTH, home.hp + 8)
 			beam_to = home.position + Vector2(0, -24)

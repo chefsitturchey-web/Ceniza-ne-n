@@ -72,6 +72,7 @@ func _snapshot() -> Dictionary:
 		"scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
 		"expansion": session.expansion.snapshot() if session.expansion != null else {},
 		"civic": session.civic.snapshot() if session.civic != null else {},
+		"story": session.interaction.story.snapshot() if session.interaction.story != null else {},
 		"core_health": session.core.health, "player": player, "structures": structures,
 		"workers": workers, "overload": _fields(session.overload, OVERLOAD_FIELDS),
 		"drone_timer": session.defenses.drone_timer,
@@ -123,6 +124,7 @@ func load_game() -> bool:
 	if session.expansion != null:
 		session.expansion.restore(data.get("expansion", {}))
 	if session.civic != null: session.civic.restore(data.get("civic", {}))
+	if session.interaction.story != null: session.interaction.story.restore(data.get("story", {}))
 	if session.neural != null:
 		session.neural.restore(data.get("neural", {}))
 	if session.expedition != null:
@@ -190,7 +192,8 @@ func _valid(value: Variant) -> bool:
 	var data: Dictionary = value
 	if not ExpansionSystem.valid(data.get("expansion", {})):
 		return false
-	if not CivicSystem.valid(data.get("civic", {}), session.zone_index * 2): return false
+	if not StoryDirector.valid(data.get("story", {})): return false
+	if not CivicSystem.valid(data.get("civic", {}), mini(3, session.zone_index) * 2): return false
 	if not data.get("civic", {}).is_empty() and data.get("workers") is Array:
 		var population: int = data.workers.size() + data.civic.villagers.size()
 		for site: Dictionary in data.get("expansion", {}).get("sites", []):
@@ -207,7 +210,7 @@ func _valid(value: Variant) -> bool:
 		return false
 	if not _number(data, "version", 1, 1, true) or data.get("phase") != "DÍA":
 		return false
-	if not _number(data, "day", 1, session.cycle.config.nights, true) or not _number(data, "core_health", 1, session.core.health_component.maximum, true):
+	if not _number(data, "day", 1, 1000000 if session.cycle.boss_required else session.cycle.config.nights, true) or not _number(data, "core_health", 1, session.core.health_component.maximum, true):
 		return false
 	for field: String in ["scrap", "energy_capacity"]:
 		if not _number(data, field, 0, 2147483647, true):

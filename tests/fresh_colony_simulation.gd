@@ -6,7 +6,7 @@ func _initialize() -> void:
 	call_deferred("simulate")
 
 func simulate() -> void:
-	var zone: int = 2 if "--flooded" in OS.get_cmdline_user_args() else (1 if "--foundry" in OS.get_cmdline_user_args() else 0)
+	var zone: int = 4 if "--network" in OS.get_cmdline_user_args() else (3 if "--citadel" in OS.get_cmdline_user_args() else (2 if "--flooded" in OS.get_cmdline_user_args() else (1 if "--foundry" in OS.get_cmdline_user_args() else 0)))
 	var world: District = load(CampaignRoute.SCENES[zone]).instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)

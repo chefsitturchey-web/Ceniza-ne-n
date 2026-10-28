@@ -35,6 +35,11 @@ func _ready() -> void:
 	var instructions: Array[String] = ["Construye murallas y torretas: mantén E en sus cimientos.", "Recluta en campamentos. Compra herramientas en el taller izquierdo.", "Los constructores viajan a las obras y se retiran si hay peligro.", "Resiste una noche, genera energía y cierra entradas para tomar el tren.", "A/D mover · J: solo jefes · E interactuar · Espacio esquivar\nQ sobrecarga · F escolta · Esc o Start pausa"]
 	if zone != null and zone.id != "periphery":
 		instructions = ["Tus mejoras y habitantes han llegado contigo. Levanta las defensas de esta colonia con E antes del asedio.", "Las rejillas avisan en amarillo antes de quemar durante la noche." if zone.id == "foundry" else "Los charcos frenan tus pasos. Puedes cruzarlos con una esquiva.", "Ordena cerrar los repetidores de ambos extremos y toma el tren de día para desafiar a " + zone.boss_title + ".", zone.briefing, "A/D: mover   J: solo jefes   E: interactuar\nEspacio: esquivar   Q: sobrecarga   Esc: pausa"]
+	if zone != null:
+		var index: int = ["periphery", "foundry", "flooded", "citadel", "network"].find(zone.id)
+		var chapter: Dictionary = CampaignStory.chapter(index)
+		instructions[0] = chapter.voice + ": " + String(chapter.opening).get_slice(".", 0) + "."
+		instructions[3] = "Rescata, recupera el relé y escolta el transporte. L abre la historia y el objetivo actual."
 	for text: String in instructions:
 		var label: Label = Label.new()
 		label.text = text

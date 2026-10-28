@@ -277,7 +277,19 @@ func run_checks() -> void:
 	ready_train(world)
 	verify(world.expedition.arena.boss is CoroSumergido, "Tren del Barrio conduce al Coro")
 	world.expedition.resolve(true)
-	verify(not FileAccess.file_exists(PATH) and world.expedition.arena.completed, "Última victoria termina los tres distritos y retira checkpoint")
+	verify(FileAccess.file_exists(PATH) and world.expedition.arena.completed, "El Coro abre la ruta a la Ciudadela sin borrar el avance")
+	for index: int in [3, 4]:
+		world.expedition.continue_district()
+		await process_frame
+		await process_frame
+		await process_frame
+		world = current_scene as District
+		freeze(world)
+		verify(world.zone_index == index and world.civic.gates.size() == 6, "Distrito final con ocho entradas totales")
+		ready_train(world)
+		verify((world.expedition.arena.boss is ElPrefecto) if index == 3 else (world.expedition.arena.boss is MadreCero), "Cada ruta crea su jefe propio")
+		world.expedition.resolve(true)
+	verify(not FileAccess.file_exists(PATH) and world.expedition.arena.completed, "MADRE CERO completa la campaña y retira el checkpoint")
 	world.expedition.leave_to_menu()
 	await process_frame
 	await process_frame

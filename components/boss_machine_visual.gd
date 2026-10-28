@@ -7,6 +7,7 @@ var opening: float = 0.0
 const DARK: Color = Color("0b1322")
 const STEEL: Color = Color("304356")
 const EDGE: Color = Color("8299a8")
+const CHOIR_ART: Texture2D = preload("res://assets/expedition/boss/choir_v2.png")
 const CALDERA_ART: Texture2D = preload("res://assets/expedition/boss/caldera_v2.png")
 
 func _process(delta: float) -> void:
@@ -97,21 +98,14 @@ func draw_legacy_caldera() -> void:
 		draw_line(Vector2(x, 39), Vector2(x + 6, 34), Color("ffce75"), 2)
 
 func draw_choir() -> void:
-	var open: bool = actor.core_exposed
-	var rotation: float = actor.elapsed * 0.3
-	for index: int in range(8):
-		var angle: float = rotation + index * TAU / 8
-		var center: Vector2 = (Vector2.from_angle(angle) * 42).round()
-		draw_line(center * 0.5, center, DARK, 9)
-		draw_line(center * 0.5, center, EDGE, 3)
-		plate(Rect2(center - Vector2(7, 5), Vector2(14, 10)))
-	draw_circle(Vector2.ZERO, 35, DARK)
-	draw_circle(Vector2.ZERO, 31, STEEL)
-	draw_arc(Vector2.ZERO, 26, rotation, rotation + TAU - 0.4, 40, EDGE, 2)
-	draw_circle(Vector2.ZERO, 20, Color("182639"))
-	draw_circle(Vector2.ZERO, 14, Color("ffce75") if open else Color("dd6482"))
-	for side: int in [-1, 1]:
-		var gap: float = roundf(23 * opening)
-		plate(Rect2(side * (8 + gap) - 7, -19, 14, 38))
-	for y: int in [-12, 0, 12]:
-		draw_rect(Rect2(-3, y - 2, 6, 4), Color("ffce75") if open else Color("dd6482"))
+	var turn: float = sin(actor.elapsed * 0.5) * 0.05
+	draw_set_transform(Vector2.ZERO, turn)
+	draw_texture_rect(CHOIR_ART, Rect2(-73, -78, 146, 146), false, Color(1.12, 1.15, 1.2))
+	draw_set_transform(Vector2.ZERO)
+	var color: Color = Color("ffce75") if actor.core_exposed else Color("dd6482")
+	var gap: float = 8 + opening * 7
+	draw_arc(Vector2(0, -5), gap, actor.elapsed * 2, actor.elapsed * 2 + 5, 32, color, 2)
+	if GamePreferences.current().particles:
+		for index: int in range(5):
+			var fall: float = fmod(actor.elapsed * 15 + index * 13, 48)
+			draw_rect(Rect2(sin(index * 3.0) * 38, 25 + fall, 1, 2), Color("47dacb", (1 - fall / 48) * 0.5))

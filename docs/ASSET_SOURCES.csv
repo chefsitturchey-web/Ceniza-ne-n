@@ -20,7 +20,10 @@ expansion_outposts,entities/structures/expansion_outpost.gd,Dibujo y animación 
 caldera_v2,assets/expedition/boss/caldera_v2.png,Generación integrada imagegen,2026-10-28,docs/REVISION_GDD_KINGDOM_SURVIVORS.md,Generado para el proyecto sin referencias de terceros,Horno articulado sobre transparencia; integrado con movimiento pistones y purga
 industrial_atlas_v2,assets/structures/industrial_atlas_v2.png,Generación integrada imagegen,2026-10-28,docs/REVISION_GDD_KINGDOM_SURVIVORS.md,Generado para el proyecto sin referencias de terceros,Atlas transparente 2x2; cuartel clínica generador recicladora; regiones en Godot
 canal_reflection,components/canal_reflection.gdshader,Shader original del proyecto,2026-10-28,docs/REVISION_GDD_KINGDOM_SURVIVORS.md,Original del proyecto,Reflejo del escenario y actores con ondas; no refleja la interfaz
-
-assets/units/field_atlas_v3.png,OpenAI image generation,Original CENIZA NEON field units 4x2 atlas,2026-10-28
-assets/structures/civic_atlas_v3.png,OpenAI image generation,Original CENIZA NEON camp refuge workshop conduit atlas,2026-10-28
-assets/ui/skills/skills_atlas_v1.png,OpenAI image generation,Original CENIZA NEON 16 skill icons atlas,2026-10-28
+field_units_v3,assets/units/field_atlas_v3.png,OpenAI image generation,2026-10-28,docs/HISTORIA_Y_CAMPANA.md,Original generated project artwork,4x2 original units atlas
+civic_v3,assets/structures/civic_atlas_v3.png,OpenAI image generation,2026-10-28,docs/HISTORIA_Y_CAMPANA.md,Original generated project artwork,2x2 original civic buildings atlas
+skill_icons_v1,assets/ui/skills/skills_atlas_v1.png,OpenAI image generation,2026-10-28,docs/HISTORIA_Y_CAMPANA.md,Original generated project artwork,4x4 skill icons
+final_bosses_v1,assets/expedition/boss/final_bosses_v1.png,OpenAI image generation,2026-10-28,docs/HISTORIA_Y_CAMPANA.md,Original generated project artwork,Prefect and Mother Zero original 2x1 atlas
+choir_v2,assets/expedition/boss/choir_v2.png,OpenAI image generation,2026-10-28,docs/HISTORIA_Y_CAMPANA.md,Original generated project artwork,Original detailed floating radio boss
+citadel_background,assets/background/citadel.png,OpenAI image generation,2026-10-28,docs/HISTORIA_Y_CAMPANA.md,Original generated project artwork,Corporate citadel original panorama
+network_background,assets/background/network.png,OpenAI image generation,2026-10-28,docs/HISTORIA_Y_CAMPANA.md,Original generated project artwork,Neural server core original panorama

@@ -1,9 +1,9 @@
 class_name CampaignRoute
 extends RefCounted
 ## Traspaso portátil: datos puros, sin referencias a escenas ni nodos anteriores.
-const COUNT: int = 3
-const ZONE_PATHS: Array[String] = ["res://data/zones/periphery.tres", "res://data/zones/foundry.tres", "res://data/zones/flooded.tres"]
-const SCENES: Array[String] = ["res://levels/main.tscn", "res://levels/zones/foundry.tscn", "res://levels/zones/flooded.tscn"]
+const COUNT: int = 5
+const ZONE_PATHS: Array[String] = ["res://data/zones/periphery.tres", "res://data/zones/foundry.tres", "res://data/zones/flooded.tres", "res://data/zones/citadel.tres", "res://data/zones/network.tres"]
+const SCENES: Array[String] = ["res://levels/main.tscn", "res://levels/zones/foundry.tscn", "res://levels/zones/flooded.tscn", "res://levels/zones/citadel.tscn", "res://levels/zones/network.tscn"]
 static var pending: Dictionary = {}
 static var pending_path: String = "user://partida.json"
 static var pending_persistence: bool = true
@@ -25,7 +25,8 @@ static func valid_state(value: Variant) -> bool:
 	var cleared: Variant = value.get("cleared")
 	if not (zone is int or zone is float) or not is_finite(float(zone)) or zone != floorf(zone) or zone < 0 or zone >= COUNT:
 		return false
-	if not cleared is Array or cleared.size() != COUNT:
+	# Las rutas de la demo de tres distritos migran al cargar, sin perder la colonia.
+	if not cleared is Array or (cleared.size() != COUNT and cleared.size() != 3) or zone >= cleared.size():
 		return false
 	for index: int in range(cleared.size()):
 		if not cleared[index] is bool or cleared[index] != (index < int(zone)):

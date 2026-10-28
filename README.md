@@ -29,11 +29,13 @@
 
 ## El juego
 
+Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y final](docs/HISTORIA_Y_CAMPANA.md). En la colonia el Portador dirige y sus tropas combaten; J funciona en arenas. Las cuatro horas siguen siendo una meta pendiente de ampliar y medir.
+
 Tras un colapso tecnológico, una red autónoma de máquinas intenta borrar los últimos asentamientos humanos. Eres el **Portador**, la persona que lleva una llave neuronal capaz de reactivar la infraestructura antigua. De día recuperas chatarra, reclutas supervivientes y levantas defensas; de noche las máquinas vuelven a conectarse y atacan la colonia por ambos lados.
 
 Para liberar un distrito destruyes sus **repetidores enemigos**, tomas el **tren blindado** y enfrentas al jefe que protege el enlace de transporte en una arena con vista cenital.
 
-La ruta jugable conecta **Periferia oxidada → Fundición → Barrio inundado** y tres jefes distintos. Viajas conservando mejoras y habitantes; cada nueva colonia tiene terreno, preparación y defensas propias. [Ruta, jefes y pruebas directas](docs/CAMPANA_Y_JEFES.md).
+La ruta jugable conecta **Periferia oxidada → Fundición → Barrio inundado → Ciudadela corporativa → Núcleo de la red** y cinco jefes distintos. Viajas conservando mejoras y habitantes; cada colonia tiene tres operaciones de historia y sus propios frentes. [Ruta, jefes y pruebas directas](docs/HISTORIA_Y_CAMPANA.md).
 
 La revisión actual sigue el GDD: **campamentos → herramientas → profesiones**, construcción con trabajadores, murallas por etapas y **experiencia recogible con tres elecciones al subir de nivel**. [Revisión a fondo, referencias y pendientes](docs/REVISION_GDD_KINGDOM_SURVIVORS.md).
 
@@ -123,7 +125,7 @@ La guía detallada de esta versión está en [INICIO.md](INICIO.md).
 | Acción | Teclado | Mando |
 |---|---|---|
 | Moverse | A / D (W / S en la arena) | Stick izquierdo / cruceta |
-| Atacar | J | X / Cuadrado |
+| Atacar en arenas de jefe | J | X / Cuadrado |
 | Esquivar | Espacio | A / Cruz |
 | Construir, reparar, reclutar, viajar | Mantener E | Mantener Y / Triángulo |
 | Sobrecarga del frente | Q | LB / L1 |
@@ -167,7 +169,7 @@ godot --headless --path . --import
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta 26 casos, incluyendo expansión/unidades, campaña y jefes, menú/opciones, animación/pulido, módulos/evoluciones, siluetas, combate, guardado, expedición y simulaciones desde una colonia nueva en los tres distritos. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
+`run_all.gd` ejecuta 30 casos, incluyendo expansión/unidades, campaña y jefes, menú/opciones, animación/pulido, módulos/evoluciones, siluetas, combate, guardado, expedición y simulaciones desde una colonia nueva en las cinco zonas. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
 
 ### Flujo de trabajo
 

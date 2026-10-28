@@ -31,6 +31,7 @@ var warned_night: int = -1
 var damage_connected: bool = false
 
 func objective_text() -> String:
+	if interaction.story != null: return interaction.story.objective()
 	var fortifications: int = 0
 	var completed: int = 0
 	for site: ConstructionSite in construction.sites:
@@ -103,7 +104,12 @@ func publish() -> void:
 	var context_key: bool = true
 	var context_screen: Vector2 = Vector2.ZERO
 	var target: int = interaction.interaction_target()
-	if target <= -300 and interaction.civic != null:
+	if target <= -400 and interaction.story != null:
+		var detail: Dictionary = interaction.story.describe(target)
+		context = detail.text
+		context_cost = detail.cost
+		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -65)
+	elif target <= -300 and interaction.civic != null:
 		var detail: Dictionary = interaction.civic.describe(target)
 		context = detail.text
 		context_cost = detail.cost

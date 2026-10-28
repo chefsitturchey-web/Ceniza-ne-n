@@ -1,7 +1,7 @@
 class_name District
 extends Node2D
 
-@export_range(0, 2) var zone_index: int = 0
+@export_range(0, 4) var zone_index: int = 0
 var zone: ZoneData
 
 @onready var player: Player = $Player
@@ -29,6 +29,7 @@ var briefing: BriefingPanel
 var expansion: ExpansionSystem
 var experience: ExperienceSystem
 var civic: CivicSystem
+var story: StoryDirector
 
 func _ready() -> void:
 	player.combat_enabled = false
@@ -170,6 +171,10 @@ func _ready() -> void:
 	neural.changed.connect(func() -> void: clinic.available = neural.points() > 0 or modules.cores > 0)
 	neural.point_earned.connect(func() -> void: presenter.show_notice("Punto neuronal: visita la clínica a la izquierda del núcleo"))
 	director.spawned.connect(_connect_neural)
+	story = StoryDirector.new()
+	story.setup(self)
+	add_child(story)
+	interaction.story = story
 	for portal: EnemyRepeater in civic.gates + expedition.repeaters:
 		portal.defense_requested.connect(civic.defend_portal)
 	var arriving: bool = not CampaignRoute.pending.is_empty()

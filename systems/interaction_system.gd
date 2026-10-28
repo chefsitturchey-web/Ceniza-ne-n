@@ -14,11 +14,15 @@ var bank: ResourceBank
 var player: Player
 var expansion: ExpansionSystem
 var civic: CivicSystem
+var story: StoryDirector
 var committed_target: int = GameRules.NO_TARGET
 var hold_time: float = 0.0
 var hold_target: int = GameRules.NO_TARGET
 
 func interaction_target() -> int:
+	if story != null:
+		var story_target: int = story.target_at(player.position.x)
+		if story_target != GameRules.NO_TARGET: return story_target
 	if civic != null:
 		var civic_target: int = civic.target_at(player.position.x)
 		if civic_target != GameRules.NO_TARGET: return civic_target
@@ -61,6 +65,7 @@ func update_interaction(delta: float) -> void:
 		hold_time = 0.0
 
 func perform_interaction(target: int) -> bool:
+	if target <= -400 and target >= -402 and story != null: return story.interact(target)
 	if target <= -300 and civic != null: return civic.interact(target)
 	if expansion != null and target <= -100:
 		return expansion.interact(target)

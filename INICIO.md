@@ -1,90 +1,54 @@
-# CENIZA NEÓN — prototipo de colonia y asedio
+# CENIZA NEÓN: cómo jugar
 
-Abre `project.godot` con Godot 4 y pulsa F5. El menú permite Nueva partida, Continuar y Opciones. La revisión del GDD usa 180 segundos de día, 20 de aviso y 90 de noche; los presets anteriores se conservan. Hay guardado al amanecer y recuperación diaria al perder el núcleo. Empieza por [la guía actual de Kingdom y progresión](docs/REVISION_GDD_KINGDOM_SURVIVORS.md).
-
-La partida nueva comienza con una explicación que detiene el reloj hasta pulsar Comenzar. Las torretas ya apuntan y tienen retroceso; el Portador camina al norte/sur en la arena y el recuperador se anima al trabajar. Los objetivos de pantalla guían hasta el tren. El final del jefe completa esta demo y permite volver al menú. Detalles y comprobaciones en [PULIDO_JUGABLE.md](docs/PULIDO_JUGABLE.md).
+Abre `project.godot` en Godot 4 y pulsa **F5**. Nueva partida inicia la campaña; Continuar recupera tu colonia y operaciones. Hay guardado al amanecer y al completar operaciones. Perder el núcleo permite recuperar el último guardado. La campaña tiene cinco capítulos y un final; **la meta de cuatro horas aún necesita más contenido y pruebas de duración**.
 
 ## Controles
 
 | Acción | Teclado | Mando Xbox |
 |---|---|---|
 | Mover | A/D o flechas | Stick izquierdo / cruceta |
-| Atacar (puedes mantener) | J | X |
-| Esquivar, cuesta 30 de resistencia | Espacio | A |
-| Construir, reparar, reclutar o curar | Mantener E | Mantener Y |
-| Sobrecargar tu frente | Q | LB |
+| Construir, reclutar, comprar herramientas, operar | Mantener E | Mantener Y |
+| Asaltar el frente donde estás / retirar tropas | F | Cruceta arriba |
+| Esquivar | Espacio | A |
+| Sobrecargar el frente | Q | LB |
+| Diario y objetivo | L | RB |
 | Pausar | Esc | Start |
-| Reiniciar después del resultado | R | Select / Back |
-| Silenciar música y efectos | M | — |
+| Atacar, solo en arenas de jefe | J | X |
 
-PlayStation: X de Xbox corresponde a Cuadrado; A a Cruz; Y a Triángulo; LB a L1. El HUD de mando usa etiquetas Xbox.
+En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora, recoge datos, esquiva y activa sobrecargas. Sus armas personales funcionan contra los jefes; los módulos equipados también transmiten una bonificación de daño a los soldados.
 
-## Primera partida
+## Primeros pasos
 
-1. Empiezas con 90 de chatarra, un constructor y un recuperador. Los marcos vacíos a ambos lados son puntos de construcción.
-2. Acércate a cada punto y mantén E: muralla 20, torreta 25. Las cuatro obras cuestan 90. El constructor las realiza automáticamente: encargar no significa completar instantáneamente.
-3. El recuperador sale de día y deposita ocho unidades por viaje. En el centro, mantén E para contratar un segundo constructor y después un segundo recuperador, por 15 cada uno.
-4. Al llegar el aviso, los recuperadores regresan. Los constructores evitan obras cercanas a enemigos. Puedes encargar reparaciones por ocho de chatarra, pero debes despejar la zona para que trabajen.
-5. Durante la noche, consulta las amenazas de ambos lados, apoya la muralla más presionada y esquiva los ataques anunciados con un signo sobre el enemigo.
-6. Q sobrecarga el lado donde estás: seis segundos de disparos y obras más rápidos, después dieciocho segundos de enfriamiento. Cada frente tiene su propio temporizador.
-7. Sobrevive tres noches. Si te derrotan, reapareces a los cuatro segundos mientras la colonia sigue luchando. Si cae el núcleo, termina la partida.
+1. Empiezas con 90 de chatarra, un constructor y un recuperador. Mantén E en los cuatro cimientos centrales: dos murallas de 20 y dos torretas de 25. El constructor debe caminar y ejecutar las obras.
+2. Explora los suministros y construye un generador a izquierda o derecha, a 360 del núcleo. Añade cuarteles para alojar tropas. El generador amplía la capacidad energética; no produce una moneda consumible.
+3. Recluta personas en los campamentos de ambos extremos con E. Compra herramientas en el taller izquierdo: martillo, equipo recuperador, fusil, escudo, herramienta técnica o botiquín. Una persona sin profesión recoge una herramienta disponible. Conviene formar un guardián y dos tiradores por cuartel antes de asaltar.
+4. Durante la noche mantén las defensas y usa Q en el frente bajo presión. Los trabajadores se retiran ante el peligro. Para ampliar el perímetro paga murallas exteriores y espera a los constructores.
+5. F ordena a los soldados del frente atacar la entrada más cercana. Los portales avisan y generan defensores al perder vida. Otra F retira la escuadra. Esos refuerzos no dan botín: no se puede ganar experiencia infinita provocando una puerta.
+6. Recoge los datos que dejan los enemigos. Cada nivel pausa el juego y ofrece armas, pasivas o implantes con iconos. Hay dos ranuras de módulo y cuatro pasivas; evoluciona con nivel 5, catalizador y núcleo. La clínica permite consultar y equipar lo que ya obtuviste.
 
-En el centro puedes curarte de día con E. Al amanecer se restauran 40 puntos del núcleo, se cura al personaje y recibes 25 de chatarra. El dron cercano al personaje dispara automáticamente, con alcance y daño limitados.
+## Historia, operaciones y tren
 
-## Contenido jugable
+**L abre el diario.** La ruta es Periferia → Fundición → Barrio inundado → Ciudadela → Núcleo de la red. Mara, Ivo, Vera, Nox y ECO revelan por qué las máquinas siguen ejecutando una emergencia que nunca terminó.
 
-- Cinco enemigos: errante, corredor, blindado, saltador y ariete; ataques con aviso, vida, muerte y recompensa.
-- Cuatro habitantes como máximo, con oficios automáticos y reserva individual de obras.
-- Dos murallas, dos torretas, energía de capacidad fija (4), sobrecarga por frente.
-- HUD de recursos, salud, resistencia, amenazas, obras y temporizadores.
-- Pausa, victoria, derrota y reinicio completo.
-- Clínica a la izquierda del núcleo: cada seis máquinas derrotadas dan un punto; mantener E de día permite mejorar filo, dron o capacitor. Tres rangos por mejora. El mundo se pausa mientras eliges; Esc/Start cierra.
-- En la pestaña Equipo hay tres módulos, dos ranuras, cinco niveles y pasivas. La última unidad de cada oleada entrega un núcleo para evolucionar un equipo de nivel cinco con su pasiva compatible.
-- Sonidos de combate, música de trabajo por fases, ceniza ambiental y reflejos estilizados de luces y personajes.
+Cada capítulo exige rescatar la baliza occidental (-760), recuperar el relé oriental (+1080) y escoltar el transporte (-1240) hasta el núcleo. El relé necesita energía, 30 de chatarra y un técnico que llegue y trabaje. El transporte requiere al Portador cerca y soldados que lo protejan. Tras activarlo, F retira la orden de asalto para que las tropas izquierdas pasen a escoltarlo. Una avería se repara con E por 25.
 
-Simplificaciones actuales: chatarra en una bolsa común, trabajadores económicos sin daño y torretas sin selección como objetivo enemigo. Ya hay herramientas, profesiones, generadores, experiencia con elecciones, tres zonas y tres jefes. Perder el núcleo conserva el último guardado diario en todas las colonias. Música, personajes y contenido final siguen pendientes de producción y equilibrio con jugadores.
+Cierra las entradas con tus tropas, completa las tres operaciones y estabiliza la colonia: dos murallas centrales, generación y al menos una noche resistida. Después toma el tren de día con E. Los días siguen avanzando después del tercero y reponen reclutas. El daño y vida de los enemigos no crecen indefinidamente por tardar.
 
-Tus ajustes del personaje siguen en `entities/player/player.tscn`: velocidad 220 y daño 50. La revisión del GDD asigna `data/cycles/kingdom.tres` al nodo `Cycle`: 180 segundos de día, 20 de aviso y 90 de noche. Los presets anteriores `district.tres` (10/10/60) y `standard.tres` (90/10/60) se conservan.
+## Jefes
 
-Jugador, recuperador, constructor, errante y corredor utilizan sprites animados. Para comprobarlo, encarga una obra con E y observa cómo el constructor camina y trabaja. Blindado, saltador y ariete usan siluetas mecánicas propias animadas por piezas, con los sprites anteriores conservados como alternativa.
+- **Recaudador:** haz que embista una cobertura y golpea su núcleo expuesto.
+- **Santa Caldera:** evita franjas calientes, salvas y arremetidas; ataca durante la purga.
+- **Coro Sumergido:** corta sus tres enlaces y aprovecha la apertura.
+- **Prefecto:** rodea su escudo, esquiva la estocada y sal del barrido. En segunda fase encadena estocadas.
+- **MADRE CERO:** mantén al menos dos relés activos. E cerca de uno repara a cambio de resistencia; Q protege de los pulsos. El enlace abre la ventana para atacar. Tus soldados de la colonia aportan apoyo a los relés.
 
-## Arte
+Las arenas permiten movimiento en ocho direcciones y combate personal. Si pierdes vuelves a la colonia; si ganas continúas con tus mejoras y habitantes económicos. La última victoria cierra la historia.
 
-La dirección visual y los prompts están en `docs/GUIA_ARTE.md`. Primero prepara un cuadro maestro del personaje, del errante y del corredor. No generes todas las animaciones hasta aprobar esos tres.
+## Pruebas rápidas en Godot
 
-## Verificación técnica
+- Colonias finales: F6 en `levels/zones/citadel.tscn` o `network.tscn`.
+- Jefes: F6 en `levels/expedition/recaudador_arena.tscn`, `caldera_arena.tscn`, `choir_arena.tscn`, `prefect_arena.tscn` o `mother_arena.tscn`.
+- Laboratorio con presupuesto de práctica: `levels/zones/expansion_playground.tscn`. Esa escena no guarda sobre tu partida.
+- Batería automática: `godot --headless --path . --script res://tests/run_all.gd` (sustituye `godot` por tu ejecutable de consola).
 
-Con el ejecutable de Godot desde esta carpeta:
-
-```text
-godot --headless --path . --import
-godot --headless --path . --script res://tests/run_all.gd
-godot --headless --path . --script res://tests/combat_smoke.gd
-godot --headless --path . --script res://tests/siege_smoke.gd
-godot --headless --path . --script res://tests/session_simulation.gd
-godot --headless --path . --script res://tests/session_simulation.gd -- --assist
-```
-
-Las simulaciones parten de defensas ya construidas. Sin apoyo, la colonia debe caer; con --assist, un jugador automatizado se desplaza, ataca, sobrecarga y encarga reparaciones durante el día. Esta segunda prueba no valida la construcción inicial ni sustituye la prueba de dificultad humana.
-
-## Expedición al jefe (Distrito 1)
-
-1. De día, ve a los extremos del mapa y destruye los dos **repetidores** enemigos (torres con luces rosas).
-2. Al caer ambos llega el **tren blindado** a la estación, a la derecha del núcleo.
-3. De día, mantén **E** en la estación para viajar a la arena de **El Recaudador** (vista cenital, movimiento en ocho direcciones).
-4. Su escudo bloquea los golpes de frente. Esquiva su embestida: si choca contra una pared queda aturdido y su núcleo expuesto recibe doble daño.
-5. Si pierdes, vuelves a la colonia en el mismo momento. Si ganas, pulsa **Viajar a Fundición** para continuar con tus mejoras y habitantes.
-
-## Fundición y Barrio inundado
-
-La ruta disponible tiene tres distritos. Fundición añade rejillas nocturnas y Santa Caldera; Barrio inundado añade charcos y el Coro Sumergido. Cada zona tiene repetidores y estación propios. La victoria guarda la llegada al siguiente distrito antes de viajar, y **Continuar** en el menú recupera esa ruta.
-
-Para probar sin recorrer la campaña, abre `levels/zones/foundry.tscn` o `flooded.tscn` y pulsa F6. Para practicar sus jefes, abre `levels/expedition/caldera_arena.tscn` o `choir_arena.tscn`. El Recaudador conserva su escena original. [Mecánicas y validación del bloque](docs/CAMPANA_Y_JEFES.md).
-
-## Más estructuras y unidades
-
-**Reglas actuales:** [guía del GDD, Kingdom y progresión](docs/REVISION_GDD_KINGDOM_SURVIVORS.md). Los edificios requieren constructores; las tropas, supervivientes y herramientas. F ordena avance/retirada. La experiencia se recoge y abre tres opciones al subir. Todas las colonias recuperan su guardado diario al perder el núcleo.
-
-Los tres mapas tienen ahora 3200 unidades de ancho. Explora cajas de suministros y despliega de día, con E, cuarteles, puestos médicos, generadores y recicladoras. Los generadores dan energía a los fusileros y sanitarios; artilleros y saboteadores enemigos aparecen en las oleadas avanzadas.
-
-Para ver las novedades rápidamente, abre **`levels/zones/expansion_playground.tscn` y pulsa F6**: defensas listas, presupuesto de práctica y tiempo para desplegar. Esa escena no guarda sobre tu partida. [Costes, funciones y controles](docs/EXPANSION_Y_UNIDADES.md).
+Se conservan los tiempos de 180 s de día, 20 de aviso y 90 de noche. [Historia, objetivos, arte y estado real de duración](docs/HISTORIA_Y_CAMPANA.md). [Reglas de comandante y estudio de Kingdom Two Crowns](docs/COMANDANTE_Y_PORTALES.md).

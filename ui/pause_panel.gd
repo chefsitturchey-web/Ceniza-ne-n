@@ -113,7 +113,7 @@ func display_dashboard(data: Dictionary) -> void:
 	icons.dia.visible = phase == "DÍA"
 	icons.aviso.visible = phase == "AVISO"
 	icons.noche.visible = phase == "NOCHE"
-	values.phase.text = "%s %d/%d   %ds" % [phase, data.day, data.nights, data.seconds]
+	values.phase.text = "%s %d   %ds" % [phase, data.day, data.seconds]
 	values.chatarra.text = str(data.scrap)
 	values.energia.text = "%d/%d" % [data.energy, data.capacity]
 	values.habitantes.text = "%d/%d" % [data.population, data.population_max]
