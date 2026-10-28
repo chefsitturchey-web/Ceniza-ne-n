@@ -64,6 +64,8 @@ func _draw() -> void:
 	if actor.flash > 0.0:
 		color = Color.WHITE
 	var height: float = actor.data.provisional_height
+	if actor.elite:
+		draw_polyline(PackedVector2Array([Vector2(-6, -height - 8), Vector2(0, -height - 12), Vector2(6, -height - 8)]), Color("ffce75"), 1)
 	if actor.data.id == &"saltador":
 		# Resortes y toberas hacen reconocible su función incluso en silueta.
 		var side: float = -actor.facing

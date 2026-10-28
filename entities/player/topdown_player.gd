@@ -15,6 +15,8 @@ var attack_damage: int = 50
 var attack_range: float = 42.0
 var attack_cooldown: float = 0.4
 var neural_regen: float = 0.0
+var drone_rank: int = 0
+var module_state: Dictionary = {}
 var facing: Vector2 = Vector2.DOWN
 var dodge_direction: Vector2 = Vector2.DOWN
 var invulnerable: float = 0.0
@@ -37,6 +39,9 @@ func copy_from(source: Player) -> void:
 	speed = source.speed
 	attack_damage = source.attack_damage + source.neural_damage
 	neural_regen = source.neural_regen
+	if source.modules != null:
+		module_state = source.modules.snapshot()
+		drone_rank = source.modules.defenses.drone_rank
 	attack_range = source.attack_range
 	attack_cooldown = source.attack_cooldown
 

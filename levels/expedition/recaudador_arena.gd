@@ -24,6 +24,7 @@ var hit_count: int = 0
 var camera: Camera2D = Camera2D.new()
 var sound: GameSound = GameSound.new()
 var configured: bool = false
+var modules: ModuleSystem = ModuleSystem.new()
 
 func configure(source: Player) -> void:
 	configured = true
@@ -55,6 +56,11 @@ func _ready() -> void:
 	boss.target = player
 	actors.add_child(player)
 	actors.add_child(boss)
+	modules.actor = player
+	modules.boss = boss
+	modules.planar = true
+	modules.restore(player.module_state)
+	world.add_child(modules)
 	player.slash.connect(strike)
 	player.damaged.connect(on_damage)
 	player.died.connect(func() -> void: finish(false))
@@ -73,6 +79,7 @@ func _ready() -> void:
 	build_hud()
 	sound.music_enabled = not configured
 	add_child(sound)
+	modules.fired.connect(func() -> void: sound.play_cue("shot", -5))
 	player.dodged.connect(func() -> void: sound.play_cue("dodge"))
 	boss.cue_requested.connect(func(id: String) -> void: sound.play_cue(id, -4))
 	player.slash.connect(func(_o: Vector2, _d: Vector2, _a: int, _r: float) -> void: sound.play_cue("slash"))

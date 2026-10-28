@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModuleData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://data/module_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "drone"
+title = "Dron centinela"
+description = "Disparo dirigido. Conserva la mejora Dron perforador."
+passive = "optic"
+passive_title = "Óptica táctica"
+evolution = "Enjambre"
+damage = 12
+damage_per_level = 2
+attack_range = 105.0
+interval = 1.2

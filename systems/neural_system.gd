@@ -10,9 +10,26 @@ var kills: int = 0
 var ranks: Dictionary = {"blade": 0, "drone": 0, "capacitor": 0}
 var player: Player
 var defenses: DefenseSystem
+var modules: ModuleSystem
 
 func points() -> int:
-	return kills / KILLS_PER_POINT - int(ranks.blade) - int(ranks.drone) - int(ranks.capacitor)
+	return kills / KILLS_PER_POINT - int(ranks.blade) - int(ranks.drone) - int(ranks.capacitor) - (modules.spent() if modules != null else 0)
+
+func upgrade_module(id: String) -> bool:
+	if modules == null or not modules.levels.has(id) or points() <= 0 or modules.levels[id] >= ModuleSystem.MAX_LEVEL:
+		return false
+	modules.levels[id] += 1
+	if id not in modules.equipped and modules.equipped.size() < ModuleSystem.SLOTS:
+		modules.equipped.append(id)
+	changed.emit()
+	return true
+
+func install_passive(id: String) -> bool:
+	if modules == null or not modules.passives.has(id) or modules.passives[id] or points() <= 0:
+		return false
+	modules.passives[id] = true
+	changed.emit()
+	return true
 
 func recover_data(_reward: int) -> void:
 	kills += 1
@@ -34,13 +51,15 @@ func apply_modules() -> void:
 	defenses.drone_rank = int(ranks.drone)
 
 func snapshot() -> Dictionary:
-	return {"kills": kills, "ranks": ranks.duplicate()}
+	return {"kills": kills, "ranks": ranks.duplicate(), "modules": modules.snapshot() if modules != null else {}}
 
 func restore(data: Dictionary) -> void:
 	kills = int(data.get("kills", 0))
 	var saved: Dictionary = data.get("ranks", {})
 	for id: String in IDS:
 		ranks[id] = int(saved.get(id, 0))
+	if modules != null:
+		modules.restore(data.get("modules", {}))
 	apply_modules()
 	changed.emit()
 
@@ -61,4 +80,5 @@ static func valid(value: Variant) -> bool:
 		if not (rank is int or rank is float) or not is_finite(float(rank)) or rank < 0 or rank > MAX_RANK or floorf(rank) != rank:
 			return false
 		spent += int(rank)
-	return spent <= int(count) / KILLS_PER_POINT
+	var equipment: Variant = value.get("modules", {})
+	return ModuleSystem.valid(equipment) and spent + ModuleSystem.saved_spent(equipment) <= int(count) / KILLS_PER_POINT

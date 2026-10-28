@@ -13,10 +13,11 @@ var core: ColonyCore
 var session: SessionController
 var facing: float = 1.0
 var night: int = 1
+var elite: bool = false
 var state: State = State.APPROACH
-var health_component: HealthComponent = HealthComponent.new()
-var hurtbox: HurtboxComponent = HurtboxComponent.new()
-var visual: EnemyVisual = EnemyVisual.new()
+var health_component: HealthComponent
+var hurtbox: HurtboxComponent
+var visual: EnemyVisual
 var health: int:
 	get: return health_component.current
 	set(value): health_component.reset(value)
@@ -34,6 +35,11 @@ var attack_visual_remaining: float = 0.0
 @onready var sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 
 func _ready() -> void:
+	# Las escenas heredadas pueden reasignar el script al instanciarse.
+	# Crear nodos aquí evita componentes huérfanos de los inicializadores anteriores.
+	health_component = HealthComponent.new()
+	hurtbox = HurtboxComponent.new()
+	visual = EnemyVisual.new()
 	if data == null:
 		data = EnemyData.new()
 	add_child(health_component)

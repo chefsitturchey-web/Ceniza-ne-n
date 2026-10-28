@@ -19,6 +19,8 @@ func create_arena() -> RecaudadorArena:
 	root.add_child(arena)
 	arena.boss.set_physics_process(false)
 	arena.player.set_physics_process(false)
+	# Esta suite mide ataques manuales y patrones; los módulos tienen suite propia.
+	arena.modules.set_physics_process(false)
 	arena.set_process(false)
 	arena.resolved.connect(func(victory: bool) -> void: outcomes.append(victory))
 	return arena

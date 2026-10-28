@@ -46,6 +46,7 @@ var respawn_remaining: float = 0.0
 var enabled: bool = true
 var neural_damage: int = 0
 var neural_regen: float = 0.0
+var modules: ModuleSystem
 
 func _ready() -> void:
 	health_component.maximum = MAX_HEALTH

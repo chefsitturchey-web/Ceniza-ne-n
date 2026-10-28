@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-prototipo%20jugable-e89e54">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-17%20suites-47dacb">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-19%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -74,6 +74,7 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 - **Expediciones:** la colonia se pausa mientras luchas contra el jefe; si caes, vuelves al mismo momento para prepararte mejor.
 - **Guardado automático** al comenzar cada día (incluye repetidores destruidos y el tren).
 - **Clínica de enlace:** cada seis máquinas derrotadas dan un punto para mejorar filo, dron o recuperación de resistencia; tres rangos por módulo. Terminal a la izquierda del núcleo, mantener E de día.
+- **Equipo automático:** dos ranuras, dron, Tesla y disco orbital; cinco niveles, pasivas y tres evoluciones mediante núcleos de enlace. [Cómo equiparlos y evolucionarlos](docs/MODULOS_Y_EVOLUCIONES.md).
 - **Audio por fases:** música original de trabajo por capas y efectos CC0 de combate. M silencia el audio; mezcla separada de música y efectos.
 - **Arte pixel coherente:** todo en vista lateral plana (la arena es cenital), paleta propia, fuentes pixel y fondo con parallax.
 
@@ -159,7 +160,7 @@ godot --headless --path . --import
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta 17 suites (combate, asedio, animaciones, guardado, efectos, HUD, expedición, jefe, enemigos, Resources, clínica/audio y dos simulaciones completas de partida) y termina con error ante cualquier fallo detectado. El aviso previo de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [revisión y audio](docs/REVISION_Y_AUDIO.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
+`run_all.gd` ejecuta 19 suites, incluyendo menú/opciones, módulos/evoluciones, combate, guardado, expedición y dos simulaciones de partida. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
 
 ### Flujo de trabajo
 

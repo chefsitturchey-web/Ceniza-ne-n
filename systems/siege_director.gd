@@ -22,14 +22,14 @@ func start(number: int) -> void:
 func tick(delta: float) -> void:
 	spawn_remaining -= delta
 	if spawn_remaining <= 0.0 and spawn_count < wave.enemies.size():
-		spawn_enemy(wave.sides[spawn_count], wave.enemies[spawn_count], night)
+		spawn_enemy(wave.sides[spawn_count], wave.enemies[spawn_count], night, spawn_count == wave.enemies.size() - 1)
 		spawn_count += 1
 		spawn_remaining = wave.cadence
 
 func is_cleared() -> bool:
 	return spawn_count >= wave.enemies.size() and get_tree().get_nodes_in_group(GameRules.ENEMIES).is_empty()
 
-func spawn_enemy(side: float, data: EnemyData, number: int = 1) -> SiegeEnemy:
+func spawn_enemy(side: float, data: EnemyData, number: int = 1, elite: bool = false) -> SiegeEnemy:
 	var enemy: SiegeEnemy = data.scene.instantiate() as SiegeEnemy
 	enemy.data = data
 	enemy.player = player
@@ -37,6 +37,7 @@ func spawn_enemy(side: float, data: EnemyData, number: int = 1) -> SiegeEnemy:
 	enemy.core = core
 	enemy.session = session
 	enemy.night = number
+	enemy.elite = elite
 	enemy.reward_requested.connect(bank.deposit)
 	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
 	enemy.position = Vector2(side * data.spawn_distance, GameRules.FLOOR_Y)

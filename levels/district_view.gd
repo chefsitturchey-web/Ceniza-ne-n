@@ -42,7 +42,7 @@ var time: float = 0.0
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
-	get_parent().add_child.call_deferred(daylight)
+	add_child(daylight)
 
 func _process(delta: float) -> void:
 	time += delta
@@ -73,11 +73,14 @@ func _draw() -> void:
 	draw_texture_rect(GROUND, Rect2(-960, FLOOR_Y, 1920, GROUND.get_height()), true)
 	_draw_wet_ground(camera_x)
 	_draw_ash(camera_x)
-	if is_instance_valid(player) and player.health > 0:
+	if is_instance_valid(player) and player.health > 0 and (defenses.modules == null or "drone" in defenses.modules.equipped):
 		_draw_drone(player.position + Vector2(-18, -48))
+		if defenses.modules != null and defenses.modules.evolved.drone:
+			_draw_drone(player.position + Vector2(18, -44))
 	for beam: Dictionary in defenses.beams:
+		var tint: Color = Color("47dacb") if beam.get("electric", false) else Color("ffce75")
 		draw_line(beam.from, beam.to, Color(1.0, 0.66, 0.3, 0.12), 7.0)
-		draw_line(beam.from, beam.to, Color("ffce75"), 2.0)
+		draw_line(beam.from, beam.to, tint, 2.0)
 		draw_line(beam.from, beam.to, Color("fff2cd"), 1.0)
 
 func _draw_drone(origin: Vector2) -> void:

@@ -7,6 +7,7 @@ var overload: OverloadSystem
 var drone_timer: float = 0.0
 var beams: Array[Dictionary] = []
 var drone_rank: int = 0
+var modules: ModuleSystem
 signal shot_fired(origin: Vector2)
 
 func update_beams(delta: float) -> void:
@@ -26,7 +27,7 @@ func nearest_enemy(x: float, distance_limit: float) -> Node2D:
 
 func fire_from(origin: Vector2, target: Node2D, damage: int, electric: bool = false) -> void:
 	shot_fired.emit(origin)
-	beams.append({"from": origin, "to": target.position + Vector2(0, -16), "time": GameRules.BEAM_DURATION})
+	beams.append({"from": origin, "to": target.position + Vector2(0, -16), "time": GameRules.BEAM_DURATION, "electric": electric})
 	var hurtbox: HurtboxComponent = target.get_node("Hurtbox") as HurtboxComponent
 	if target is SiegeEnemy:
 		(target as SiegeEnemy).receive_shot(damage, origin, electric)
@@ -45,8 +46,16 @@ func update_defenses(delta: float) -> void:
 				fire_from(Vector2(site.x, GameRules.FLOOR_Y - 42), target, site.data.damage, overload.overloaded(site.x))
 				site.shot = site.data.overloaded_interval if overload.overloaded(site.x) else site.data.interval
 	drone_timer = maxf(0.0, drone_timer - delta)
-	if drone_timer == 0.0 and player.health > 0:
-		var target: Node2D = nearest_enemy(player.position.x, GameRules.DRONE_RANGE)
+	if drone_timer == 0.0 and player.health > 0 and (modules == null or "drone" in modules.equipped):
+		var reach: float = modules.range_for("drone") if modules != null else GameRules.DRONE_RANGE
+		var target: Node2D = nearest_enemy(player.position.x, reach)
 		if target != null:
-			fire_from(player.position + Vector2(-18, -48), target, GameRules.DRONE_DAMAGE + drone_rank * 4)
+			var amount: int = modules.damage_for("drone") if modules != null else GameRules.DRONE_DAMAGE
+			fire_from(player.position + Vector2(-18, -48), target, amount + drone_rank * 4)
+			if modules != null and modules.evolved.drone:
+				var next: Node2D = nearest_enemy(player.position.x, reach)
+				if next != null:
+					fire_from(player.position + Vector2(18, -44), next, maxi(1, roundi((amount + drone_rank * 4) * 0.65)))
 			drone_timer = GameRules.DRONE_INTERVAL * (1.0 - drone_rank * 0.1)
+	if modules != null:
+		modules.update_lateral(delta)

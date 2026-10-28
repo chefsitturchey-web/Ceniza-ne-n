@@ -21,6 +21,7 @@ var clinic: NeuralClinic = NeuralClinic.new()
 var clinic_panel: ClinicPanel = ClinicPanel.new()
 var sound: GameSound = GameSound.new()
 var options: SettingsPanel = SettingsPanel.new()
+var modules: ModuleSystem = ModuleSystem.new()
 
 func _ready() -> void:
 	InputSetup.configure_input()
@@ -88,6 +89,12 @@ func _ready() -> void:
 	cycle.boss_required = true
 	neural.player = player
 	neural.defenses = defenses
+	modules.actor = player
+	modules.defenses = defenses
+	add_child(modules)
+	defenses.modules = modules
+	neural.modules = modules
+	player.modules = modules
 	add_child(neural)
 	session.neural = neural
 	clinic.position = Vector2(-110, GameRules.FLOOR_Y)
@@ -102,7 +109,7 @@ func _ready() -> void:
 	interaction.clinic_panel = clinic_panel
 	interaction.clinic = clinic
 	presenter.neural = neural
-	neural.changed.connect(func() -> void: clinic.available = neural.points() > 0)
+	neural.changed.connect(func() -> void: clinic.available = neural.points() > 0 or modules.cores > 0)
 	neural.point_earned.connect(func() -> void: presenter.show_notice("Punto neuronal: visita la clínica a la izquierda del núcleo"))
 	director.spawned.connect(_connect_neural)
 	session.initialize()
@@ -112,3 +119,8 @@ func _ready() -> void:
 
 func _connect_neural(enemy: SiegeEnemy, _side: float) -> void:
 	enemy.reward_requested.connect(neural.recover_data)
+	if enemy.elite:
+		enemy.reward_requested.connect(func(_reward: int) -> void:
+			modules.cores += 1
+			neural.changed.emit()
+			presenter.show_notice("Núcleo de enlace recuperado: evolución disponible en la clínica"))
