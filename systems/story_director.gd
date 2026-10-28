@@ -23,6 +23,7 @@ func setup(world: District) -> void:
 	if not InputMap.has_action("journal"): InputSetup.add_action("journal", KEY_L, JOY_BUTTON_RIGHT_SHOULDER)
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	journal = JournalPanel.new()
 	journal.story = self
 	add_child(journal)
@@ -68,6 +69,7 @@ func objective() -> String:
 		if site.hp > 0: built += 1
 	if built < 4: return "Construye las cuatro defensas centrales - mantener E"
 	if district.expansion.energy_bonus() == 0: return "Estabiliza: construye un generador cerca (+/-360)"
+	if district.core.tier < 2: return "Mejora el núcleo con E: desbloquea apoyo y defensas Nv.2"
 	if soldiers() < 2: return "Cuartel + reclutas + fusil y escudo en el taller"
 	if not completed[0]: return "Rescata la baliza occidental (izq. 760) - E" if district.civic.safe_to_build(RESCUE_X) else "F: asalta la brecha izquierda para llegar al rescate"
 	if not completed[1]:
@@ -187,13 +189,14 @@ static func valid(data: Variant) -> bool:
 	return true
 
 func _draw() -> void:
-	draw_texture_rect_region(GameArt.CIVIC, Rect2(RESCUE_X - 40, 198, 80, 70), GameArt.region(GameArt.CIVIC, 2, 2, 0), Color.WHITE if not completed[0] else Color("53616d"))
+	var rescue: Rect2 = ArtScale.source(GameArt.CIVIC, 0)
+	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(rescue, 44, Vector2(RESCUE_X, GameRules.FLOOR_Y)), rescue, Color.WHITE if not completed[0] else Color("53616d"))
 	draw_texture_rect(EnemyRepeater.TEXTURE, Rect2(RELAY_X - 14, 212, 28, 48), false, Color("47dacb") if completed[1] else Color("8299a8"))
 	if relay_ordered and not completed[1]:
 		draw_rect(Rect2(RELAY_X - 20, 202, 40 * relay_progress / 6, 3), Color("ffce75"))
 	if not completed[2]:
-		draw_texture_rect(TRAIN, Rect2(convoy_x - 45, 216, 90, 44), false, Color.WHITE if convoy_health > 0 else Color("53616d"))
+		draw_texture_rect(TRAIN, Rect2(convoy_x - 50, GameRules.FLOOR_Y - 31, 100, 31), false, Color.WHITE if convoy_health > 0 else Color("53616d"))
 		draw_rect(Rect2(convoy_x - 25, 208, 50, 3), Color("182639"))
 		draw_rect(Rect2(convoy_x - 25, 208, convoy_health / 180 * 50, 3), Color("47dacb"))
 		for wheel: int in [-1, 1]:
-			draw_arc(Vector2(convoy_x + wheel * 27, 257), 5, elapsed * 3 if convoy_active else 0, (elapsed * 3 if convoy_active else 0) + PI, 12, Color("8299a8"), 1)
+			draw_arc(Vector2(convoy_x + wheel * 27, GameRules.FLOOR_Y - 4), 4, elapsed * 3 if convoy_active else 0, (elapsed * 3 if convoy_active else 0) + PI, 12, Color("8299a8"), 1)

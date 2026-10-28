@@ -27,6 +27,10 @@ var visual: PlayerVisual = PlayerVisual.new()
 ## Combate manual y esquiva. Los ajustes del Inspector se conservan.
 @export var speed: float = 150.0
 var terrain_speed_factor: float = 1.0
+var travel_speed_factor: float = 1.0
+var mobility: MobilitySystem
+var riding: bool:
+	get: return mobility != null and mobility.mounted
 @export var acceleration: float = 1200.0
 @export var gravity: float = 980.0
 @export var attack_damage: int = 25
@@ -77,7 +81,9 @@ func refresh_state() -> void:
 	else:
 		set_state(State.MOVE if absf(velocity.x) > 0.0 else State.IDLE)
 	visual.face(facing < 0.0)
-	if state == State.DODGE:
+	if riding and state != State.DEAD:
+		visual.play_visual(&"reposo")
+	elif state == State.DODGE:
 		visual.play_visual(&"esquiva", DODGE_DURATION)
 	elif state == State.DEAD:
 		visual.play_visual(&"muerte")
@@ -116,12 +122,12 @@ func _physics_process(delta: float) -> void:
 		dodge_remaining = maxf(0.0, dodge_remaining - delta)
 		velocity.x = dodge_direction * DODGE_SPEED
 	else:
-		velocity.x = move_toward(velocity.x, direction * speed * terrain_speed_factor, acceleration * delta)
+		velocity.x = move_toward(velocity.x, direction * speed * terrain_speed_factor * travel_speed_factor, acceleration * delta)
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	move_and_slide()
 	step_timer = maxf(0, step_timer - delta)
-	if is_on_floor() and absf(velocity.x) > 20 and dodge_remaining <= 0 and step_timer == 0:
+	if is_on_floor() and absf(velocity.x) > 20 and dodge_remaining <= 0 and step_timer == 0 and not riding:
 		stepped.emit(global_position)
 		step_timer = 0.3
 	visual.movement_dust(delta, was_grounded, previous_speed)

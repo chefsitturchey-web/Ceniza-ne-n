@@ -1,9 +1,9 @@
 class_name TurretVisual
 extends Node2D
-## El PNG original se dibuja en dos piezas: pedestal fijo y cabezal articulado.
+## Pedestal y cabezal propios de cada nivel, con pivote, seguimiento y retroceso.
 const HEAD_HEIGHT: float = 20.0
 const PIVOT: Vector2 = Vector2(13, 17)
-const BARREL: Vector2 = Vector2(23, -8)
+const BARREL: Vector2 = Vector2(31, 0)
 const TURN_SPEED: float = 4.5
 var site: Node2D
 var facing: float = 1.0
@@ -30,14 +30,13 @@ func clear_target() -> void:
 	tracking = false
 
 func pivot_position() -> Vector2:
-	var extent: Vector2 = site.data.texture.get_size()
-	return Vector2((PIVOT.x - extent.x / 2.0) * facing, -extent.y + PIVOT.y)
+	return Vector2(0, -FortressArt.TURRET_HEIGHTS[site.tier - 1] + 5)
 
 func recoil_offset() -> Vector2:
 	return Vector2(-2.0 * clampf(site.recoil / 0.09, 0, 1), 0)
 
 func muzzle_position() -> Vector2:
-	var offset: Vector2 = (BARREL + recoil_offset()).rotated(aim_angle)
+	var offset: Vector2 = (BARREL + Vector2((site.tier - 1) * 3, 0) + recoil_offset()).rotated(aim_angle)
 	offset.x *= facing
 	return site.to_global(pivot_position() + offset)
 
@@ -57,26 +56,18 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	if site.hp <= 0 or site.data.texture == null:
-		return
-	var texture: Texture2D = site.data.texture
-	var size: Vector2 = texture.get_size()
-	var tint: Color = Color(0.8, 1.3, 1.25) if site.boosted else Color.WHITE
-	# El pedestal conserva su orientación de construcción y no recibe retroceso.
-	draw_set_transform(Vector2.ZERO, 0, Vector2(-1 if site.position.x < 0 else 1, 1))
-	draw_texture_rect_region(texture, Rect2(-size.x / 2, -size.y + HEAD_HEIGHT, size.x, size.y - HEAD_HEIGHT), Rect2(0, HEAD_HEIGHT, size.x, size.y - HEAD_HEIGHT), tint)
-	draw_set_transform(Vector2.ZERO)
+	if site.hp <= 0: return
+	var base: Texture2D = FortressArt.texture("turret_base", site.tier)
+	var head: Texture2D = FortressArt.texture("turret_head", site.tier)
+	var source: Rect2 = ArtScale.source(base)
+	var tint: Color = Color(0.8, 1.25, 1.2) if site.boosted else Color.WHITE
+	draw_texture_rect_region(base, ArtScale.grounded(source, FortressArt.TURRET_HEIGHTS[site.tier - 1]), source, tint)
 	var pivot: Vector2 = pivot_position()
-	draw_circle(pivot, 3, Color("0b1322"))
-	draw_circle(pivot, 2, Color("8299a8"))
-	# Reflejar antes de rotar mantiene el mismo ángulo local en ambos frentes.
-	var frame: Transform2D = Transform2D(0, Vector2(facing, 1), 0, pivot)
-	frame = frame * Transform2D(aim_angle, Vector2.ZERO)
+	var frame: Transform2D = Transform2D(0, Vector2(facing, 1), 0, pivot) * Transform2D(aim_angle, Vector2.ZERO)
 	frame.origin += frame.basis_xform(recoil_offset())
 	draw_set_transform_matrix(frame)
-	draw_texture_rect_region(texture, Rect2(-PIVOT, Vector2(size.x, HEAD_HEIGHT)), Rect2(0, 0, size.x, HEAD_HEIGHT), tint)
+	var head_source: Rect2 = ArtScale.source(head)
+	var width: float = 39 + site.tier * 3
+	var height: float = width * head_source.size.y / head_source.size.x
+	draw_texture_rect_region(head, Rect2(-11, -height * 0.5, width, height), head_source, tint)
 	draw_set_transform(Vector2.ZERO)
-	var intensity: float = 0.8 if GamePreferences.current().reduced_flashes else 0.65 + sin(elapsed * 3) * 0.2
-	draw_rect(Rect2(-3, -6, 5, 1), Color("47dacb", intensity))
-	if site.boosted:
-		draw_rect(Rect2(-3, -9, 5, 1), Color("ffce75", intensity))

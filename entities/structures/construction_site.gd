@@ -20,6 +20,10 @@ var upgrade_pending: bool = false
 var viewer: Player
 var payment_fraction: float = 0
 var powered: bool = true
+var core: ColonyCore
+
+func visual_height() -> float:
+	return FortressArt.WALL_HEIGHTS[tier - 1] if data.blocks_enemies else FortressArt.TURRET_HEIGHTS[tier - 1] + 18
 
 func muzzle_position() -> Vector2:
 	if turret_visual != null:
@@ -98,48 +102,40 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw_construction() -> void:
-	var size: Vector2 = data.texture.get_size()
-	var built: float = floorf(size.y * clampf(progress / GameRules.BUILD_TIME, 0, 1))
+	var art: Texture2D = FortressArt.texture("wall" if data.blocks_enemies else "turret_base", tier)
+	var source: Rect2 = ArtScale.source(art)
+	var height: float = FortressArt.WALL_HEIGHTS[tier - 1] if data.blocks_enemies else FortressArt.TURRET_HEIGHTS[tier - 1]
+	var frame: Rect2 = ArtScale.grounded(source, height)
+	var size: Vector2 = frame.size
+	var fraction: float = clampf(progress / GameRules.BUILD_TIME, 0, 1)
+	var built: float = floorf(size.y * fraction)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(-1.0 if x < 0.0 else 1.0, 1.0))
 	draw_rect(Rect2(-size.x / 2.0, -size.y, size.x, size.y - built), Color("b075ae", 0.4), false, 1.0)
 	if built > 0:
-		draw_texture_rect_region(data.texture, Rect2(-size.x / 2.0, -built, size.x, built), Rect2(0, size.y - built, size.x, built))
+		draw_texture_rect_region(art, Rect2(-size.x / 2, -built, size.x, built), Rect2(source.position + Vector2(0, source.size.y * (1 - fraction)), Vector2(source.size.x, source.size.y * fraction)))
 	var amber: Color = Color("ffce75")
 	amber.a = 1.0 if int(effects.elapsed * 12) % 2 == 0 else 0.45
 	draw_line(Vector2(-size.x / 2.0, -built), Vector2(size.x / 2.0, -built), amber)
 	draw_set_transform(Vector2.ZERO)
 
 func _draw() -> void:
-	if is_instance_valid(viewer) and absf(viewer.position.x - x) < 85 and not ordered and (hp < max_hp or (data.blocks_enemies and tier < 3)):
+	var can_upgrade: bool = tier < (core.tier if core != null else 3)
+	if is_instance_valid(viewer) and absf(viewer.position.x - x) < 85 and not ordered and (hp < max_hp or can_upgrade):
 		var price: int = cost if hp == 0 else (25 * tier if hp == max_hp else data.repair_cost)
 		var pips: int = ceili(price / 5.0)
 		for index: int in range(pips):
-			draw_circle(Vector2((index % 5 - 2) * 7, -55 - (index / 5) * 6), 2, Color("ffce75") if index < int(payment_fraction * pips) else Color("8299a8"))
-	if data.blocks_enemies and hp > 0 and tier > 1:
-		for side: int in [-1, 1]:
-			draw_rect(Rect2(side * 14 - 3, -48 - tier * 4, 6, 48 + tier * 4), Color("304356"))
-			draw_line(Vector2(side * 14, 0), Vector2(side * 14, -48 - tier * 4), Color("8299a8"), 1)
-	var color: Color = Color("47dacb") if boosted else Color("8299a8")
-	if ordered and hp == 0 and progress < GameRules.BUILD_TIME and data.texture != null:
+			draw_circle(Vector2((index % 5 - 2) * 7, -visual_height() - 10 - (index / 5) * 6), 2, Color("ffce75") if index < int(payment_fraction * pips) else Color("8299a8"))
+	if ordered and hp == 0:
 		_draw_construction()
-	elif hp > 0 and data.texture != null:
-		if turret_visual != null:
-			return
-		var size: Vector2 = data.texture.get_size()
-		# Los sprites miran a la derecha; en el frente izquierdo deben mirar hacia afuera.
-		var kick: float = (1.0 if x < 0 else -1.0) if recoil > 0 else 0.0
-		draw_set_transform(Vector2(kick, 0), 0.0, Vector2(-1.0 if x < 0.0 else 1.0, 1.0))
-		draw_texture(data.texture, Vector2(-size.x / 2.0, -size.y), Color(0.75, 1.5, 1.45) if boosted else Color.WHITE)
-		draw_set_transform(Vector2.ZERO)
 	elif hp > 0:
-		if data.blocks_enemies:
-			draw_rect(Rect2(-10, -45, 20, 45), color)
-			draw_rect(Rect2(-5, -40, 10, 30), Color("304356"))
-		else:
-			draw_rect(Rect2(-5, -35, 10, 35), color)
-			draw_rect(Rect2(-14, -45, 28, 12), color)
+		if turret_visual == null:
+			var art: Texture2D = FortressArt.texture("wall", tier)
+			var source: Rect2 = ArtScale.source(art)
+			draw_set_transform(Vector2.ZERO, 0, Vector2(-1 if x < 0 else 1, 1))
+			draw_texture_rect_region(art, ArtScale.grounded(source, FortressArt.WALL_HEIGHTS[tier - 1]), source, Color(0.8, 1.2, 1.15) if boosted else Color.WHITE)
+			draw_set_transform(Vector2.ZERO)
+		if upgrade_pending:
+			for side: int in [-1, 1]: draw_line(Vector2(side * 20, 0), Vector2(side * 20, -visual_height() - 5), Color("8299a8"), 1)
 	else:
 		draw_rect(Rect2(-14, -4, 28, 4), Color("304356"))
-		for side: int in [-1, 1]:
-			draw_rect(Rect2(side * 12 - 1, -9, 3, 9), Color("8299a8"))
-			draw_rect(Rect2(side * 12 - 1, -9, 3, 2), Color("47dacb"))
+		for side: int in [-1, 1]: draw_rect(Rect2(side * 12 - 1, -7, 3, 7), Color("8299a8"))

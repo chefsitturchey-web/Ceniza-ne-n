@@ -1,6 +1,7 @@
 class_name CivicSystem
 extends Node2D
 ## Reclutar personas y ofrecer herramientas; las tropas ya no se crean del edificio.
+const REFUGE_X: float = 140.0
 const RACK_X: Array[float] = [-675.0, -645.0, -615.0, -585.0, -555.0, -525.0]
 const ROLES: Array[String] = ["builder", "collector", "ranger", "guardian", "technician", "medic"]
 const NAMES: Array[String] = ["Martillo", "Equipo recuperador", "Fusil", "Escudo", "Herramienta técnica", "Botiquín"]
@@ -27,6 +28,7 @@ func setup(world: Node2D) -> void:
 			var site: ConstructionSite = data.scene.instantiate() as ConstructionSite
 			site.data = data
 			site.viewer = district.player
+			site.core = district.core
 			site.position = Vector2(side * distance, GameRules.FLOOR_Y)
 			walls.append(site)
 			add_child(site)
@@ -97,17 +99,23 @@ func target_at(x: float) -> int:
 		if absf(x - RACK_X[index]) < 13: return -320 - index
 	for index: int in range(walls.size()):
 		if absf(x - walls[index].x) < 24: return -340 - index
-	if absf(x - 80) < 15: return -360
+	if absf(x - REFUGE_X) < 24: return -360
 	return GameRules.NO_TARGET
 
 func describe(target: int) -> Dictionary:
 	if target == -360:
+		if capacity < 20 and capacity >= FortressRules.CAPACITY[district.core.tier - 1]:
+			return {"text": "Refugio: requiere núcleo Nv.%d" % (district.core.tier + 1), "cost": -1, "locked": true}
 		return {"text": "Refugio: reasignar un trabajador", "cost": -1} if capacity >= 20 else {"text": "Refugio: ampliar población %d → %d" % [capacity, capacity + 4], "cost": 30}
 	if target <= -340:
 		var wall: ConstructionSite = walls[-340 - target]
+		if wall.hp == wall.max_hp and wall.tier < 3 and wall.tier >= district.core.tier:
+			return {"text": "Muralla: requiere núcleo Nv.%d" % (wall.tier + 1), "cost": -1, "locked": true}
 		return {"text": "Muralla exterior · Nv.%d" % wall.tier, "cost": wall.cost if wall.hp <= 0 else (wall.tier * 25 if wall.hp == wall.max_hp else wall.data.repair_cost)}
 	if target <= -320:
 		var index: int = -320 - target
+		if district.core.tier < int(FortressRules.ROLES[ROLES[index]]):
+			return {"text": NAMES[index] + ": requiere núcleo Nv.%d" % int(FortressRules.ROLES[ROLES[index]]), "cost": -1, "locked": true}
 		return {"text": NAMES[index] + " · herramientas %d" % tools[index], "cost": COSTS[index]}
 	return {"text": "Reclutar superviviente · %d disponibles" % camp_stock[-300 - target], "cost": 5}
 
@@ -119,10 +127,13 @@ func interact(target: int) -> bool:
 		if capacity >= 20:
 			if district.colony.workers.size() <= GameRules.INITIAL_POPULATION: return false
 			var worker: ColonyWorker = district.colony.workers.pop_back()
-			villagers.append({"x": 80.0, "side": worker.side})
+			villagers.append({"x": REFUGE_X, "side": worker.side})
 			worker.free()
 			district.presenter.show_notice("Habitante disponible: compra la nueva herramienta")
 		else:
+			if capacity >= FortressRules.CAPACITY[district.core.tier - 1]:
+				district.presenter.show_notice("Mejora el núcleo para ampliar el refugio")
+				return false
 			if not district.bank.spend(30): return false
 			capacity += 4
 	elif target <= -340 and target > -346:
@@ -133,6 +144,9 @@ func interact(target: int) -> bool:
 		return district.construction.order_site(walls[index])
 	elif target <= -320 and target > -326:
 		var index: int = -320 - target
+		if district.core.tier < int(FortressRules.ROLES[ROLES[index]]):
+			district.presenter.show_notice("Herramienta bloqueada: mejora el núcleo a Nv.%d" % int(FortressRules.ROLES[ROLES[index]]))
+			return false
 		if tools[index] >= 4 or not district.bank.spend(COSTS[index]): return false
 		tools[index] += 1
 	elif target in [-300, -301]:
@@ -252,19 +266,24 @@ static func valid(data: Variant, gate_count: int) -> bool:
 	return true
 
 func _draw() -> void:
-	draw_texture_rect_region(GameArt.CIVIC, Rect2(-721, 118, 242, 158), GameArt.region(GameArt.CIVIC, 2, 2, 2))
+	var workshop: Rect2 = ArtScale.source(GameArt.CIVIC, 2)
+	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(workshop, 94, Vector2(-600, GameRules.FLOOR_Y)), workshop)
 	for side: int in [-1, 1]:
 		var x: float = side * 1340
-		draw_texture_rect_region(GameArt.CIVIC, Rect2(x - 70, 173, 140, 100), GameArt.region(GameArt.CIVIC, 2, 2, 0))
+		var camp: Rect2 = ArtScale.source(GameArt.CIVIC, 0)
+		draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(camp, 50, Vector2(x, GameRules.FLOOR_Y)), camp)
 		for spark: int in range(4):
 			var rise: float = fmod(elapsed * 14 + spark * 7, 23)
-			draw_rect(Rect2(x + 36 + sin(elapsed * 2 + spark) * 3, 242 - rise, 1, 2), Color("ffce75", 1 - rise / 23))
+			draw_rect(Rect2(x + 25 + sin(elapsed * 2 + spark) * 2, GameRules.FLOOR_Y - 7 - rise, 1, 2), Color("ffce75", 1 - rise / 23))
 	var ids: Array[String] = ["wrench", "scrap", "blade", "shield", "wrench", "medical"]
 	for index: int in range(RACK_X.size()):
 		var x: float = RACK_X[index]
-		draw_texture_rect(GameArt.icon(ids[index]), Rect2(x - 11, 228, 22, 22), false, Color.WHITE if tools[index] > 0 else Color("8299a8"))
+		var unlocked: bool = district.core.tier >= int(FortressRules.ROLES[ROLES[index]])
+		draw_texture_rect(GameArt.icon(ids[index]), Rect2(x - 9, 229, 18, 18), false, Color.WHITE if tools[index] > 0 else (Color("8299a8") if unlocked else Color("304356")))
 		for item: int in range(tools[index]): draw_rect(Rect2(x - 8 + item * 5, 254, 3, 2), Color("ffce75"))
-	draw_texture_rect_region(GameArt.CIVIC, Rect2(28, 166, 104, 106), GameArt.region(GameArt.CIVIC, 2, 2, 1))
+	var refuge: Rect2 = ArtScale.source(GameArt.CIVIC, 1)
+	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)), refuge)
 	for citizen: Dictionary in villagers:
-		var bob: float = roundf(sin(elapsed * 8 + float(citizen.x)))
-		draw_texture_rect_region(GameArt.UNITS, Rect2(float(citizen.x) - 25, 214 + bob, 50, 50), GameArt.region(GameArt.UNITS, 4, 2, 4))
+		var region: Rect2 = ArtScale.source(GameArt.UNITS, 4)
+		var bounce: float = minf(0, roundf(sin(elapsed * 8 + float(citizen.x))))
+		draw_texture_rect_region(GameArt.UNITS, ArtScale.grounded(region, 34, Vector2(float(citizen.x), GameRules.FLOOR_Y + bounce)), region)

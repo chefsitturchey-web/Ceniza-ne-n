@@ -1,5 +1,7 @@
 # Historia y campaña actual
 
+Actualización posterior: [escala, niveles del núcleo y movilidad](ESCALA_NIVELES_Y_MOVILIDAD.md). Los servicios de apoyo exigen núcleo 2; sus obras y desbloqueos se guardan. La batería general contiene ahora 32 suites.
+
 ## Qué se puede jugar
 
 La ruta conecta cinco capítulos: Periferia oxidada, Fundición, Barrio inundado, Ciudadela corporativa y Núcleo de la red. Hay cinco jefes: Recaudador, Santa Caldera, Coro Sumergido, Prefecto y MADRE CERO. Las entradas totales son 2, 4, 6, 8 y 8 respectivamente: dos repetidores terminales y brechas intermedias. El cierre de entradas permite ampliar las defensas y, cuando se cumplen las operaciones y la estabilidad, viajar en tren.

@@ -141,7 +141,7 @@ func run_checks() -> void:
 	context_site.ordered = false
 	context_site.progress = 0
 	var site: ConstructionSite = world.construction.sites[0]
-	var anchor: Vector2 = site.get_global_transform_with_canvas() * Vector2(0, -site.data.texture.get_height())
+	var anchor: Vector2 = site.get_global_transform_with_canvas() * Vector2(0, -site.visual_height())
 	verify(is_equal_approx(hud.context_row.position.y, clampf(anchor.y - 24, 50, 280)), "Rótulo anclado sobre objeto en pantalla")
 	world.player.position.x = 900
 	world.presenter.publish()
@@ -150,7 +150,7 @@ func run_checks() -> void:
 	world.player.position.x = 0
 	world.presenter.publish()
 	verify_hud_text(hud)
-	verify(hud.context_row.visible and "campamentos" in hud.context_label.text, "Núcleo orienta hacia el reclutamiento físico")
+	verify(hud.context_row.visible and hud.context_label.text == world.core.upgrade_blocker() and not hud.context_label.text.is_empty(), "Núcleo explica el requisito aplicable de su próxima mejora")
 	world.player.health = Player.MAX_HEALTH - 1
 	world.presenter.publish()
 	verify(hud.context_label.text == "Curarte" and not hud.context_icon.visible and not hud.context_cost.visible, "Curación sin coste")

@@ -2,13 +2,13 @@ class_name ConduitGate
 extends EnemyRepeater
 
 func _draw() -> void:
-	var source: Rect2 = GameArt.region(GameArt.CIVIC, 2, 2, 3)
+	var source: Rect2 = ArtScale.source(GameArt.CIVIC, 3)
 	if health.current <= 0:
 		source.position.y += source.size.y * 0.84
 		source.size.y *= 0.16
-		draw_texture_rect_region(GameArt.CIVIC, Rect2(-44, -13, 88, 18), source, Color("8299a8"))
+		draw_texture_rect_region(GameArt.CIVIC, Rect2(-44, -13, 88, 13), source, Color("8299a8"))
 		return
-	draw_texture_rect_region(GameArt.CIVIC, Rect2(-44, -91, 88, 100), source)
+	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(source, 72), source)
 	var center: Vector2 = Vector2(0, -39)
 	draw_arc(center, 13, effects.elapsed * 1.4, effects.elapsed * 1.4 + 4.5, 24, Color("dd6482", 0.7), 1)
 	for index: int in range(6):

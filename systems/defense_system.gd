@@ -38,7 +38,7 @@ func update_defenses(delta: float) -> void:
 	for site: ConstructionSite in sites:
 		if site.data.damage == 0 or site.hp <= 0 or not site.powered:
 			continue
-		var target: Node2D = nearest_enemy(site.x, site.data.attack_range)
+		var target: Node2D = nearest_enemy(site.x, FortressRules.reach(site))
 		if site.turret_visual != null:
 			if target != null:
 				site.turret_visual.track(target.global_position + Vector2(0, -16))
@@ -48,8 +48,8 @@ func update_defenses(delta: float) -> void:
 		if site.shot == 0.0:
 			if target != null:
 				site.fire_effects()
-				fire_from(site.muzzle_position(), target, site.data.damage, overload.overloaded(site.x))
-				site.shot = site.data.overloaded_interval if overload.overloaded(site.x) else site.data.interval
+				fire_from(site.muzzle_position(), target, FortressRules.damage(site), overload.overloaded(site.x))
+				site.shot = FortressRules.interval(site, overload.overloaded(site.x))
 	# La colonia se defiende con tropas y edificios; el equipo personal va al jefe.
 	if not player.combat_enabled: return
 	drone_timer = maxf(0.0, drone_timer - delta)

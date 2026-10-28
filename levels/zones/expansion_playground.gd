@@ -20,6 +20,8 @@ func prepare() -> void:
 	world.cycle.phase_remaining = 180
 	world.colony.add_worker(&"builder")
 	world.colony.add_worker(&"collector")
+	world.core.restore({"tier": 3, "ordered": false, "progress": 0})
+	world.core.health = world.core.health_component.maximum
 	for site: ConstructionSite in world.construction.sites: site.complete_work()
 	world.presenter.show_notice("PRÁCTICA: campamentos → herramientas → profesiones. Sin guardado.")
 

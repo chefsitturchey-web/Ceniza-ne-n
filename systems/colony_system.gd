@@ -10,6 +10,7 @@ var cycle: CycleSystem
 var bank: ResourceBank
 var overload: OverloadSystem
 var civic: CivicSystem
+var core: ColonyCore
 
 func add_worker(role: StringName) -> void:
 	var data: WorkerData = builder_data if role == &"builder" else collector_data
@@ -22,6 +23,7 @@ func add_worker(role: StringName) -> void:
 	worker_added.emit(worker)
 
 func update_workers(delta: float) -> void:
+	var core_crew: int = 0
 	for index: int in range(workers.size()):
 		var worker: ColonyWorker = workers[index]
 		var previous_x: float = worker.x
@@ -42,6 +44,17 @@ func update_workers(delta: float) -> void:
 			worker.update_visual(previous_x, gathering)
 			continue
 		# Una reserva por obra impide que los constructores dupliquen tareas.
+		if core != null and core.ordered and core_crew < 2 and not unsafe_at(core.position.x):
+			core_crew += 1
+			worker.job = -1
+			worker.external_job = -1
+			worker.x = move_toward(worker.x, core.position.x, worker.data.speed * delta)
+			var arrived: bool = absf(worker.x - core.position.x) < GameRules.BUILD_ARRIVAL_DISTANCE
+			if arrived:
+				core.progress = minf(ColonyCore.BUILD_TIME, core.progress + delta)
+				if core.progress >= ColonyCore.BUILD_TIME: core.complete_work()
+			worker.update_visual(previous_x, arrived)
+			continue
 		if civic != null and worker.job == -1 and work_external(worker, delta):
 			continue
 		if worker.job >= 0:

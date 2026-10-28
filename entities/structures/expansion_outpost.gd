@@ -128,14 +128,15 @@ func plate(rect: Rect2, tint: Color = Color("304356")) -> void:
 	for x: float in [rect.position.x + 2, rect.end.x - 3]: draw_rect(Rect2(x, rect.position.y + 3, 1, 1), Color("8299a8"))
 
 func _draw() -> void:
-	var cell: Vector2 = ART.get_size() * 0.5
 	var index: int = ["barracks", "medical", "generator", "recycler"].find(spec.id)
-	var source: Rect2 = Rect2(Vector2(index % 2, index / 2) * cell, cell)
-	var height: float = 96 * cell.y / cell.x
+	var source: Rect2 = ArtScale.source(ART, index)
+	var height: float = [64.0, 60.0, 52.0, 68.0][index]
+	var frame: Rect2 = ArtScale.grounded(source, height)
+
 	if hp > 0 or ordered:
 		var fraction: float = clampf(progress / 6, 0, 1) if ordered else 1.0
 		var shown: float = height * fraction
-		draw_texture_rect_region(ART, Rect2(-48, -shown, 96, shown), Rect2(source.position + Vector2(0, cell.y * (1 - fraction)), Vector2(cell.x, cell.y * fraction)), Color.WHITE if hp > MAX_HEALTH / 2 or ordered else Color("ac8d7b"))
+		draw_texture_rect_region(ART, Rect2(-frame.size.x * 0.5, -shown, frame.size.x, shown), Rect2(source.position + Vector2(0, source.size.y * (1 - fraction)), Vector2(source.size.x, source.size.y * fraction)), Color.WHITE if hp > MAX_HEALTH / 2 or ordered else Color("ac8d7b"))
 		if ordered:
 			for x: int in [-49, 49]:
 				draw_line(Vector2(x, 0), Vector2(x, -height), Color("8299a8"), 2)

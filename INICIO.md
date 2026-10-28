@@ -11,6 +11,8 @@ Abre `project.godot` en Godot 4 y pulsa **F5**. Nueva partida inicia la campaña
 | Asaltar el frente donde estás / retirar tropas | F | Cruceta arriba |
 | Esquivar | Espacio | A |
 | Sobrecargar el frente | Q | LB |
+| Alimentación de una torreta cercana | T | B |
+| Subir o bajar de la plataforma cercana | V | Pulsar stick izquierdo |
 | Diario y objetivo | L | RB |
 | Pausar | Esc | Start |
 | Atacar, solo en arenas de jefe | J | X |
@@ -21,10 +23,11 @@ En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora,
 
 1. Empiezas con 90 de chatarra, un constructor y un recuperador. Mantén E en los cuatro cimientos centrales: dos murallas de 20 y dos torretas de 25. El constructor debe caminar y ejecutar las obras.
 2. Explora los suministros y construye un generador a izquierda o derecha, a 360 del núcleo. Añade cuarteles para alojar tropas. El generador amplía la capacidad energética; no produce una moneda consumible.
-3. Recluta personas en los campamentos de ambos extremos con E. Compra herramientas en el taller izquierdo: martillo, equipo recuperador, fusil, escudo, herramienta técnica o botiquín. Una persona sin profesión recoge una herramienta disponible. Conviene formar un guardián y dos tiradores por cuartel antes de asaltar.
-4. Durante la noche mantén las defensas y usa Q en el frente bajo presión. Los trabajadores se retiran ante el peligro. Para ampliar el perímetro paga murallas exteriores y espera a los constructores.
-5. F ordena a los soldados del frente atacar la entrada más cercana. Los portales avisan y generan defensores al perder vida. Otra F retira la escuadra. Esos refuerzos no dan botín: no se puede ganar experiencia infinita provocando una puerta.
-6. Recoge los datos que dejan los enemigos. Cada nivel pausa el juego y ofrece armas, pasivas o implantes con iconos. Hay dos ranuras de módulo y cuatro pasivas; evoluciona con nivel 5, catalizador y núcleo. La clínica permite consultar y equipar lo que ya obtuviste.
+3. El núcleo comienza en nivel 1 y tus defensas también. Tras terminar el generador y las cuatro defensas, mantén E en el núcleo: por 60 encargas el nivel 2. El constructor debe terminarlo. Se desbloquean mejoras de defensas, guardianes, técnicos, médicos y transporte. El nivel 3 cuesta 120 y exige una noche resistida y dos instalaciones. Cada nivel cambia de diseño.
+4. Recluta personas en los campamentos con E y compra herramientas en el taller izquierdo. Una persona sin profesión recoge una herramienta disponible. Conviene formar un guardián y dos tiradores por cuartel antes de asaltar. El refugio se amplía según el nivel del núcleo.
+5. Durante la noche mantén las defensas y usa Q en el frente bajo presión. Los trabajadores se retiran ante el peligro. Para ampliar el perímetro paga murallas exteriores y espera a los constructores.
+6. F ordena a los soldados del frente atacar la entrada más cercana. Los portales avisan y generan defensores al perder vida. Otra F retira la escuadra. Esos refuerzos no dan botín: no se puede ganar experiencia infinita provocando una puerta.
+7. Recoge los datos que dejan los enemigos. Cada nivel pausa el juego y ofrece armas, pasivas o implantes con iconos. Hay dos ranuras de módulo y cuatro pasivas; evoluciona con nivel 5, catalizador y núcleo. La clínica permite consultar y equipar lo que ya obtuviste.
 
 ## Historia, operaciones y tren
 
@@ -44,8 +47,13 @@ Cierra las entradas con tus tropas, completa las tres operaciones y estabiliza l
 
 Las arenas permiten movimiento en ocho direcciones y combate personal. Si pierdes vuelves a la colonia; si ganas continúas con tus mejoras y habitantes económicos. La última victoria cierra la historia.
 
+## Transporte opcional
+
+Con núcleo de nivel 2 puedes comprar una plataforma eléctrica por 45 junto al taller de x=-880. E compra o monta; V sube y baja cerca de ella. Aumenta la velocidad de viaje un 45 %. Detente en el núcleo o en ese taller para recargar la batería. Queda aparcada al bajar y viaja contigo en tren. Contra los jefes vas a pie. [Niveles, medidas, desbloqueos y pruebas](docs/ESCALA_NIVELES_Y_MOVILIDAD.md).
+
 ## Pruebas rápidas en Godot
 
+- Niveles, diseños y transporte: **F6 en `levels/zones/fortress_playground.tscn`**. Ofrece presupuesto, generador y defensas de práctica, sin guardar en campaña.
 - Colonias finales: F6 en `levels/zones/citadel.tscn` o `network.tscn`.
 - Jefes: F6 en `levels/expedition/recaudador_arena.tscn`, `caldera_arena.tscn`, `choir_arena.tscn`, `prefect_arena.tscn` o `mother_arena.tscn`.
 - Laboratorio con presupuesto de práctica: `levels/zones/expansion_playground.tscn`. Esa escena no guarda sobre tu partida.

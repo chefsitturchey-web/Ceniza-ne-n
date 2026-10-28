@@ -73,6 +73,8 @@ func _snapshot() -> Dictionary:
 		"expansion": session.expansion.snapshot() if session.expansion != null else {},
 		"civic": session.civic.snapshot() if session.civic != null else {},
 		"story": session.interaction.story.snapshot() if session.interaction.story != null else {},
+		"core_building": session.core.snapshot(),
+		"mobility": session.interaction.mobility.snapshot() if session.interaction.mobility != null else {},
 		"core_health": session.core.health, "player": player, "structures": structures,
 		"workers": workers, "overload": _fields(session.overload, OVERLOAD_FIELDS),
 		"drone_timer": session.defenses.drone_timer,
@@ -121,6 +123,9 @@ func load_game() -> bool:
 		apply_handoff(data)
 		return true
 	session.campaign = CampaignRoute.initial_state(int(data.get("campaign", CampaignRoute.initial_state()).zone))
+	var saved_core: Dictionary = data.get("core_building", {"tier": ColonyCore.saved_tier(data), "ordered": false, "progress": 0})
+	session.core.restore(saved_core)
+	if session.interaction.mobility != null: session.interaction.mobility.restore(data.get("mobility", {}))
 	if session.expansion != null:
 		session.expansion.restore(data.get("expansion", {}))
 	if session.civic != null: session.civic.restore(data.get("civic", {}))
@@ -168,6 +173,7 @@ func apply_handoff(data: Dictionary) -> void:
 	session.campaign = CampaignRoute.initial_state(int(data.campaign.zone))
 	session.bank.scrap = int(data.scrap)
 	session.neural.restore(data.neural)
+	if session.interaction.mobility != null: session.interaction.mobility.restore(data.get("mobility", {}))
 	if session.civic != null: session.civic.capacity = mini(20, maxi(8, ceili(data.crew.size() / 4.0) * 4))
 	for worker: ColonyWorker in session.colony.workers:
 		worker.free()
@@ -190,10 +196,14 @@ func _valid(value: Variant) -> bool:
 	if not value is Dictionary:
 		return false
 	var data: Dictionary = value
+	if not ColonyCore.valid(data.get("core_building", {})): return false
+	if not MobilitySystem.valid(data.get("mobility", {})): return false
 	if not ExpansionSystem.valid(data.get("expansion", {})):
 		return false
 	if not StoryDirector.valid(data.get("story", {})): return false
 	if not CivicSystem.valid(data.get("civic", {}), mini(3, session.zone_index) * 2): return false
+	for wall: Dictionary in data.get("civic", {}).get("walls", []):
+		if int(wall.tier) > ColonyCore.saved_tier(data): return false
 	if not data.get("civic", {}).is_empty() and data.get("workers") is Array:
 		var population: int = data.workers.size() + data.civic.villagers.size()
 		for site: Dictionary in data.get("expansion", {}).get("sites", []):
@@ -210,7 +220,7 @@ func _valid(value: Variant) -> bool:
 		return false
 	if not _number(data, "version", 1, 1, true) or data.get("phase") != "DÍA":
 		return false
-	if not _number(data, "day", 1, 1000000 if session.cycle.boss_required else session.cycle.config.nights, true) or not _number(data, "core_health", 1, session.core.health_component.maximum, true):
+	if not _number(data, "day", 1, 1000000 if session.cycle.boss_required else session.cycle.config.nights, true) or not _number(data, "core_health", 1, FortressRules.CORE_HEALTH[ColonyCore.saved_tier(data) - 1], true):
 		return false
 	for field: String in ["scrap", "energy_capacity"]:
 		if not _number(data, field, 0, 2147483647, true):
@@ -240,7 +250,7 @@ func _valid(value: Variant) -> bool:
 			return false
 		var tier: Variant = entry.get("tier", 1)
 		if not entry.get("powered", true) is bool: return false
-		if not ExpansionSystem.number(tier, 1, 3, true) or not entry.get("upgrade", false) is bool: return false
+		if not ExpansionSystem.number(tier, 1, 3, true) or int(tier) > ColonyCore.saved_tier(data) or not entry.get("upgrade", false) is bool: return false
 		if not _number(entry, "hp", 0, site.data.health * tier, true) or not _number(entry, "progress", 0, GameRules.BUILD_TIME) or not _number(entry, "shot", 0, maxf(site.data.interval, site.data.overloaded_interval)):
 			return false
 	if not data.get("workers") is Array or data.workers.size() < GameRules.INITIAL_POPULATION or data.workers.size() > 20:

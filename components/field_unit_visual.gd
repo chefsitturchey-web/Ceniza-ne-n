@@ -28,19 +28,22 @@ func _draw() -> void:
 	var enemy: bool = actor is SiegeEnemy
 	var dead: bool = actor.health <= 0 if enemy else actor.hp <= 0
 	var firing: bool = actor.state == SiegeEnemy.State.ATTACK and actor.cooldown > actor.data.cooldown - 0.15 if enemy else actor.shot > 0
-	var source: Rect2 = GameArt.region(GameArt.UNITS, 4, 2, maxi(0, GameArt.UNIT_IDS.find(role)))
+	var source: Rect2 = ArtScale.source(GameArt.UNITS, maxi(0, GameArt.UNIT_IDS.find(role)))
+	var height: float = 40 if role == "artillero" else (38 if role == "guardian" else ArtScale.PERSON_HEIGHT)
+	var frame: Rect2 = ArtScale.grounded(source, height)
 	if dead:
-		draw_set_transform(Vector2(0, -2), actor.facing * minf(PI * 0.5, death_time * 5), Vector2(actor.facing, 0.75))
-		draw_texture_rect_region(GameArt.UNITS, Rect2(-28, -51, 56, 56), source, Color(1, 1, 1, maxf(0, 1 - death_time * 0.8)))
+		var fall: float = minf(PI * 0.5, death_time * 5)
+		draw_set_transform(Vector2(0, -sin(fall) * frame.size.x * 0.5), actor.facing * fall, Vector2(actor.facing, 0.75))
+		draw_texture_rect_region(GameArt.UNITS, frame, source, Color(1, 1, 1, maxf(0, 1 - death_time * 0.8)))
 		return
-	var bob: float = roundf(sin(stride * 2)) if moving else sin(elapsed * 2) * 0.35
+	var bob: float = minf(0, roundf(sin(stride * 2))) if moving else 0.0
 	draw_set_transform(Vector2(0, bob), 0, Vector2(actor.facing, 1))
 	var torso: Rect2 = Rect2(source.position, Vector2(source.size.x, source.size.y * 0.72))
-	draw_texture_rect_region(GameArt.UNITS, Rect2(-28 - (1 if firing else 0), -51, 56, 40.32), torso)
+	draw_texture_rect_region(GameArt.UNITS, Rect2(frame.position - Vector2(1 if firing else 0, 0), Vector2(frame.size.x, height * 0.72)), torso)
 	for side: int in range(2):
 		var leg: Rect2 = Rect2(source.position + Vector2(source.size.x * 0.5 * side, source.size.y * 0.72), Vector2(source.size.x * 0.5, source.size.y * 0.28))
 		var step: float = sin(stride + side * PI) if moving else 0.0
-		draw_texture_rect_region(GameArt.UNITS, Rect2(-28 + side * 28 + step * 2, -10.68 - maxf(0, step) * 2, 28, 15.68), leg)
+		draw_texture_rect_region(GameArt.UNITS, Rect2(frame.position.x + side * frame.size.x * 0.5 + step * 1.5, -height * 0.28 - maxf(0, step) * 2, frame.size.x * 0.5, height * 0.28), leg)
 	if firing:
 		var color: Color = Color("47dacb") if role in ["medic", "technician"] else Color("ffce75")
 		draw_circle(Vector2(23, -27), 4, Color(color, 0.22))

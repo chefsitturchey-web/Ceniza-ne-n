@@ -47,6 +47,8 @@ func start() -> bool:
 		district.session.save_system.save_game()
 	active = true
 	district.experience.hud.hide()
+	if district.story != null: district.story.hud.hide()
+	if district.mobility != null: district.mobility.hud.hide()
 	victory_resolved = false
 	arena = ARENA.instantiate() as CanvasLayer
 	arena.configure(district.player, district.zone_index)
@@ -78,7 +80,7 @@ func resolve(victory: bool) -> void:
 		district.experience.gain(40)
 		district.modules.cores += 1
 		if district.zone_index < CampaignRoute.COUNT - 1:
-			next_checkpoint = CampaignRoute.handoff(district.zone_index + 1, district.neural.snapshot(), district.bank.scrap, district.colony.workers)
+			next_checkpoint = CampaignRoute.handoff(district.zone_index + 1, district.neural.snapshot(), district.bank.scrap, district.colony.workers, district.mobility.snapshot())
 			var saved: bool = true
 			if district.session.save_system != null:
 				saved = district.session.save_system.save_handoff(next_checkpoint)
@@ -98,6 +100,8 @@ func resolve(victory: bool) -> void:
 	active = false
 	district.show()
 	district.experience.hud.show()
+	if district.story != null: district.story.hud.show()
+	if district.mobility != null: district.mobility.hud.show()
 	district.get_node("HUD").show()
 
 func continue_district() -> void:

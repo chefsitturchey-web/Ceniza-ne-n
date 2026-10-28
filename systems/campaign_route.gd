@@ -33,7 +33,7 @@ static func valid_state(value: Variant) -> bool:
 			return false
 	return true
 
-static func handoff(zone: int, neural: Dictionary, scrap: int, workers: Array) -> Dictionary:
+static func handoff(zone: int, neural: Dictionary, scrap: int, workers: Array, mobility: Dictionary = {}) -> Dictionary:
 	var roles: Array[String] = []
 	for worker: Variant in workers:
 		roles.append(String(worker.role))
@@ -41,14 +41,19 @@ static func handoff(zone: int, neural: Dictionary, scrap: int, workers: Array) -
 	if not carried.get("experience", {}).is_empty():
 		carried.experience.drops = []
 		carried.experience.lost = {}
+	var transport: Dictionary = mobility.duplicate()
+	if not transport.is_empty():
+		transport.mounted = false
+		transport.parked_x = 0.0
 	return {"version": 1, "handoff": true, "campaign": initial_state(zone), "phase": "DÍA", "day": 1,
-		"scrap": GameRules.INITIAL_SCRAP + mini(40, maxi(0, scrap)), "neural": carried, "crew": roles}
+		"scrap": GameRules.INITIAL_SCRAP + mini(40, maxi(0, scrap)), "neural": carried, "crew": roles, "mobility": transport}
 
 static func valid_handoff(value: Variant) -> bool:
 	if not value is Dictionary or value.get("version") != 1 or value.get("handoff") != true or value.get("phase") != "DÍA" or value.get("day") != 1:
 		return false
 	if not valid_state(value.get("campaign")) or value.campaign.zone < 1 or not NeuralSystem.valid(value.get("neural")):
 		return false
+	if not MobilitySystem.valid(value.get("mobility", {})): return false
 	var scrap: Variant = value.get("scrap")
 	if not (scrap is int or scrap is float) or not is_finite(float(scrap)) or scrap != floorf(scrap) or scrap < GameRules.INITIAL_SCRAP or scrap > GameRules.INITIAL_SCRAP + 40:
 		return false

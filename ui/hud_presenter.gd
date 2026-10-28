@@ -74,7 +74,7 @@ func publish() -> void:
 		player.health_component.damaged.connect(_player_damaged)
 		core.health_component.damaged.connect(_core_damaged)
 		damage_connected = true
-	if cycle.phase == "NOCHE" and core.health > 0 and core.health <= GameRules.CORE_HEALTH * 0.3 and warned_night != cycle.day:
+	if cycle.phase == "NOCHE" and core.health > 0 and core.health <= core.health_component.maximum * 0.3 and warned_night != cycle.day:
 		warned_night = cycle.day
 		show_notice("Núcleo dañado")
 	var offscreen_left: int = 0
@@ -113,6 +113,7 @@ func publish() -> void:
 		var detail: Dictionary = interaction.civic.describe(target)
 		context = detail.text
 		context_cost = detail.cost
+		context_key = not detail.get("locked", false) and cycle.phase == "DÍA"
 		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -60)
 	elif target <= -200 and interaction.expansion != null:
 		context = "Recuperar suministros: +20"
@@ -127,6 +128,16 @@ func publish() -> void:
 		context_key = cycle.phase == "DÍA" and not outpost.ordered and outpost.hp < outpost.MAX_HEALTH
 		context_progress = outpost.progress / 6 if outpost.ordered else context_progress
 		context_screen = outpost.get_global_transform_with_canvas() * Vector2(0, -48)
+		var required: int = FortressRules.BUILDINGS[outpost.spec.id]
+		if core.tier < required:
+			context = outpost.spec.title + ": requiere núcleo Nv.%d" % required
+			context_key = false
+			context_cost = -1
+	elif target == InteractionSystem.MOBILITY_TARGET:
+		var detail: Dictionary = interaction.mobility.describe()
+		context = detail.text
+		context_cost = detail.cost
+		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -35)
 	elif target == InteractionSystem.CLINIC_TARGET:
 		context = "Clínica: %d puntos" % neural.points() if cycle.phase == "DÍA" else "Clínica: solo de día"
 		context_key = cycle.phase == "DÍA"
@@ -142,16 +153,16 @@ func publish() -> void:
 			context_progress = 0
 		context_screen = expedition.station.get_global_transform_with_canvas() * Vector2(0, -56)
 	elif target == -1:
-		context = "Curarte" if player.health < Player.MAX_HEALTH else "Reclutar"
-		context_cost = -1 if player.health < Player.MAX_HEALTH else (colony.builder_data.cost if colony.workers.size() == GameRules.INITIAL_POPULATION else colony.collector_data.cost)
-		if session.civic != null and player.health == Player.MAX_HEALTH:
-			context = "Recluta en campamentos; equipa en el taller"
-			context_cost = -1
-			context_key = false
-		context_screen = core.get_global_transform_with_canvas() * Vector2(0, -ColonyCore.TEXTURE.get_height())
+		context = "Curarte" if player.health < Player.MAX_HEALTH else "Núcleo Nv.%d - mejorar a Nv.%d" % [core.tier, mini(3, core.tier + 1)]
+		context_cost = -1 if player.health < Player.MAX_HEALTH else core.upgrade_cost()
+		if player.health == Player.MAX_HEALTH:
+			var reason: String = core.upgrade_blocker()
+			if not reason.is_empty(): context = reason; context_key = false; context_cost = -1
+			if core.ordered: context_progress = core.progress / ColonyCore.BUILD_TIME
+		context_screen = core.get_global_transform_with_canvas() * Vector2(0, -FortressArt.CORE_HEIGHTS[core.tier - 1])
 	elif target >= 0:
 		var site: ConstructionSite = construction.sites[target]
-		context_screen = site.get_global_transform_with_canvas() * Vector2(0, -site.data.texture.get_height() if site.data.texture != null else -45)
+		context_screen = site.get_global_transform_with_canvas() * Vector2(0, -site.visual_height())
 		if site.ordered:
 			context = "Construyendo"
 			context_key = false
@@ -159,11 +170,16 @@ func publish() -> void:
 		elif site.hp != site.max_hp:
 			context = "Construir" if site.hp == 0 else "Reparar"
 			context_cost = site.cost if site.hp == 0 else site.data.repair_cost
-		elif site.data.blocks_enemies and site.tier < 3:
-			context = "Mejorar muralla %d → %d" % [site.tier, site.tier + 1]
+		elif site.tier < 3:
+			context = "Mejorar %s %d > %d" % ["muralla" if site.data.blocks_enemies else "torreta", site.tier, site.tier + 1]
 			context_cost = site.tier * 25
+			if site.tier >= core.tier:
+				context = "Necesitas núcleo Nv.%d" % (site.tier + 1)
+				context_key = false
+				context_cost = -1
 		elif site.kind == &"turret":
-			context = "Apagar torreta: liberar energía" if site.powered else "Reactivar torreta"
+			context = "T: apagar torreta" if site.powered else "T: reactivar torreta"
+		if site.kind == &"turret": context += " - T: energía"
 	var hint_text: String = context
 	var result_text: String = ""
 	if player.health <= 0:
@@ -185,7 +201,7 @@ func publish() -> void:
 		"seconds": ceili(cycle.phase_remaining), "scrap": bank.scrap,
 		"energy": bank.energy_used(), "capacity": bank.available_capacity(),
 		"population": session.civic.population() if session.civic != null else colony.workers.size(), "population_max": session.civic.capacity if session.civic != null else GameRules.POPULATION,
-		"health": player.health, "stamina": int(player.stamina), "core": core.health,
+		"health": player.health, "stamina": int(player.stamina), "core": core.health, "core_max": core.health_component.maximum,
 		"left": left_count, "right": right_count,
 		"overload_left": overload.overload_status(true), "overload_right": overload.overload_status(false)
 	})

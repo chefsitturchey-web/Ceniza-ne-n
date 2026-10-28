@@ -30,6 +30,7 @@ var expansion: ExpansionSystem
 var experience: ExperienceSystem
 var civic: CivicSystem
 var story: StoryDirector
+var mobility: MobilitySystem
 
 func _ready() -> void:
 	player.combat_enabled = false
@@ -47,6 +48,9 @@ func _ready() -> void:
 		cycle.config.day_duration = zone.day_duration
 		director.waves.assign(zone.waves)
 	construction.bank = bank
+	core.district = self
+	construction.core = core
+	colony.core = core
 	construction.viewer = player
 	construction.create_sites()
 	for site: ConstructionSite in construction.sites:
@@ -175,6 +179,10 @@ func _ready() -> void:
 	story.setup(self)
 	add_child(story)
 	interaction.story = story
+	mobility = MobilitySystem.new()
+	mobility.setup(self)
+	add_child(mobility)
+	interaction.mobility = mobility
 	for portal: EnemyRepeater in civic.gates + expedition.repeaters:
 		portal.defense_requested.connect(civic.defend_portal)
 	var arriving: bool = not CampaignRoute.pending.is_empty()

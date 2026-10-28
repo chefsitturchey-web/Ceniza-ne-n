@@ -134,12 +134,17 @@ func _process(delta: float) -> void:
 		presenter.show_notice("Escolta: retirada" if civic.advance_side == 0 else "Escolta: atacar entrada del frente")
 	if civic != null: civic.tick(delta)
 	if interaction.story != null: interaction.story.tick(delta)
+	if interaction.mobility != null: interaction.mobility.tick(delta)
 	if expansion != null:
 		expansion.tick(delta)
 	if terrain != null:
 		terrain.tick(delta)
 	defenses.update_defenses(delta)
 	interaction.update_interaction(delta)
+	if Input.is_action_just_pressed("toggle_power") and player.health > 0:
+		var target: int = interaction.interaction_target()
+		if target >= 0 and target < interaction.construction.sites.size():
+			interaction.construction.toggle_power(interaction.construction.sites[target])
 	if expedition != null and expedition.active:
 		return
 	if Input.is_action_just_pressed("overload") and player.health > 0:

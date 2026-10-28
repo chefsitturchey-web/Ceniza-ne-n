@@ -118,6 +118,7 @@ func display_dashboard(data: Dictionary) -> void:
 	values.energia.text = "%d/%d" % [data.energy, data.capacity]
 	values.habitantes.text = "%d/%d" % [data.population, data.population_max]
 	var amounts: Array[int] = [data.health, data.stamina, data.core]
+	bars.nucleo.max_value = data.get("core_max", GameRules.CORE_HEALTH)
 	var keys: Array[String] = ["vida", "resistencia", "nucleo"]
 	for index: int in range(keys.size()):
 		bars[keys[index]].value = amounts[index]

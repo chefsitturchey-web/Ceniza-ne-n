@@ -45,6 +45,10 @@ func interact(target: int) -> bool:
 		return true
 	if target > -100 or target <= -100 - sites.size(): return false
 	var site: ExpansionOutpost = sites[-100 - target]
+	var required: int = FortressRules.BUILDINGS[site.spec.id]
+	if district.core.tier < required:
+		district.presenter.show_notice("%s necesita núcleo Nv.%d" % [site.spec.title, required])
+		return false
 	if district.civic != null and not district.civic.safe_to_build(site.position.x):
 		district.presenter.show_notice("Destruye primero la brecha de esa franja")
 		return false

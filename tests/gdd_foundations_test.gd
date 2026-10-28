@@ -38,17 +38,18 @@ func run_checks() -> void:
 	world.experience.present_choices = false
 	world.bank.scrap = 2000
 	for site: ConstructionSite in world.construction.sites: site.complete_work()
-	verify(world.construction.order(1) and world.bank.energy_used() == 2, "Desactivar torreta libera energía sin destruirla")
-	verify(world.construction.order(1) and world.bank.energy_used() == 4, "Reactivar comprueba y reserva capacidad")
+	verify(world.construction.toggle_power(world.construction.sites[1]) and world.bank.energy_used() == 2, "Desactivar torreta libera energía sin destruirla")
+	verify(world.construction.toggle_power(world.construction.sites[1]) and world.bank.energy_used() == 4, "Reactivar comprueba y reserva capacidad")
 	world.player.position.x = world.construction.sites[1].x
 	Input.action_press("interact")
 	world.interaction.update_interaction(0)
 	world.interaction.update_interaction(0.81)
 	world.interaction.update_interaction(2)
-	verify(not world.construction.sites[1].powered, "Mantener E no repite activación tras completar una acción")
+	verify(world.construction.sites[1].powered and not world.construction.sites[1].ordered, "E bloqueada por tecnología no cambia alimentación ni encarga obras")
 	Input.action_release("interact")
 	world.interaction.update_interaction(0)
-	world.construction.order(1)
+	# El resto de esta suite comprueba profesiones y murallas; la progresión tiene suite propia.
+	world.core.restore({"tier": 3, "ordered": false, "progress": 0})
 	verify(world.civic.gates.size() == 2 and world.expedition.repeaters.size() == 2, "Fundición tiene dos brechas intermedias y dos repetidores terminales")
 	verify(world.civic.entrance(-1) == -1180, "Las oleadas parten de la entrada abierta más cercana")
 	verify(not world.expedition.can_travel(), "No viaja antes de estabilizar colonia y entradas")
