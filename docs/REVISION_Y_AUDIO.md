@@ -1,5 +1,7 @@
 # Revisión y bloque de progresión — 28/10/2026
 
+Este documento registra el primer bloque. Avances posteriores: `MENU_Y_OPCIONES.md`, `MODULOS_Y_EVOLUCIONES.md` y `SILUETAS_MECANICAS.md`; los pendientes de esta revisión deben leerse junto con esas entregas.
+
 ## Entregado
 
 - Datos neuronales: una máquina derrotada por cualquier aliado entrega un dato; seis datos dan un punto. La recompensa solo se registra una vez.

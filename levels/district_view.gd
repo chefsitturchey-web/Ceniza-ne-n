@@ -133,7 +133,7 @@ func _reflect_actor(actor: Node2D) -> void:
 	if not is_instance_valid(actor) or absf(actor.position.y - FLOOR_Y) > 5:
 		return
 	var sprite: AnimatedSprite2D = actor.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
-	if sprite == null or sprite.sprite_frames == null:
+	if sprite == null or not sprite.visible or sprite.sprite_frames == null:
 		return
 	var texture: Texture2D = sprite.sprite_frames.get_frame_texture(sprite.animation, sprite.frame)
 	if texture == null:

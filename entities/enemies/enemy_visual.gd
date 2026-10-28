@@ -5,11 +5,19 @@ extends EntityVisual
 const WORLD_BARS_ENABLED: bool = false
 
 var base_tint: Color = Color.WHITE
+var rig: MachineRig
 
 func bind(value: AnimatedSprite2D) -> void:
 	super.bind(value)
 	if sprite != null:
 		base_tint = sprite.modulate
+	if actor.detailed_silhouette and actor.data.id in [&"blindado", &"saltador", &"ariete"]:
+		rig = MachineRig.new()
+		rig.actor = actor
+		rig.kind = String(actor.data.id)
+		add_child(rig)
+		if sprite != null:
+			sprite.hide()
 
 var actor: SiegeEnemy
 var effects: DebrisEmitter = DebrisEmitter.new()
@@ -66,7 +74,7 @@ func _draw() -> void:
 	var height: float = actor.data.provisional_height
 	if actor.elite:
 		draw_polyline(PackedVector2Array([Vector2(-6, -height - 8), Vector2(0, -height - 12), Vector2(6, -height - 8)]), Color("ffce75"), 1)
-	if actor.data.id == &"saltador":
+	if actor.data.id == &"saltador" and rig == null:
 		# Resortes y toberas hacen reconocible su función incluso en silueta.
 		var side: float = -actor.facing
 		draw_rect(Rect2(side * 13 - 3, -21, 6, 10), Color("0b1322"))

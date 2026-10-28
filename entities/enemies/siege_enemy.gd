@@ -2,6 +2,7 @@
 extends Node2D
 ## Las animaciones no determinan el instante del daño.
 @export var sprite_faces_right: bool = true
+@export var detailed_silhouette: bool = true
 enum State { APPROACH, WINDUP, ATTACK, DEAD }
 const DEATH_VISUAL_GRACE: float = 0.1
 signal state_changed(state: State)

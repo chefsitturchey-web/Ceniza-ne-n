@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-prototipo%20jugable-e89e54">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-19%20suites-47dacb">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-20%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -69,6 +69,7 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 
 - **Combate exigente:** ataque cuerpo a cuerpo, esquiva con invulnerabilidad y resistencia; el cansancio se nota en la animación.
 - **Cinco tipos de enemigo:** Errante, Corredor, Blindado (escudo frontal), Saltador (pasa la primera muralla) y Ariete (rompe murallas).
+- **Siluetas propias:** Blindado, Saltador y Ariete usan piezas mecánicas animadas con armadura, muelles y pistón; conservan los sprites anteriores como alternativa del Inspector.
 - **Colonia automática:** constructores y recuperadores con tareas propias; recluta hasta cuatro habitantes.
 - **Economía y energía:** chatarra para construir, capacidad energética para mantener torretas y sobrecarga independiente por frente.
 - **Expediciones:** la colonia se pausa mientras luchas contra el jefe; si caes, vuelves al mismo momento para prepararte mejor.
@@ -160,7 +161,7 @@ godot --headless --path . --import
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta 19 suites, incluyendo menú/opciones, módulos/evoluciones, combate, guardado, expedición y dos simulaciones de partida. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
+`run_all.gd` ejecuta 20 suites, incluyendo menú/opciones, módulos/evoluciones, siluetas, combate, guardado, expedición y dos simulaciones de partida. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
 
 ### Flujo de trabajo
 
@@ -174,6 +175,9 @@ godot --headless --path . --script res://tests/run_all.gd
 - [Guía de arte y paleta](docs/GUIA_ARTE.md)
 - [Guía de la versión actual](INICIO.md)
 - [Revisión, mejoras neuronales, audio y recursos pendientes](docs/REVISION_Y_AUDIO.md)
+- [Menú ilustrado y opciones persistentes](docs/MENU_Y_OPCIONES.md)
+- [Equipo y evoluciones](docs/MODULOS_Y_EVOLUCIONES.md)
+- [Siluetas mecánicas y presentación de enemigos](docs/SILUETAS_MECANICAS.md)
 - [Documento de diseño (GDD)](CENIZA_NEON_GDD.docx)
 
 ### Añadir contenido
