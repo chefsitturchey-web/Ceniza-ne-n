@@ -13,7 +13,7 @@ func available_capacity() -> int:
 func energy_used() -> int:
 	var used: int = expansion.energy_used() if expansion != null else 0
 	for site: ConstructionSite in sites:
-		if site.hp > 0 or site.ordered:
+		if (site.hp > 0 and site.powered) or site.ordered:
 			used += site.data.energy
 	return used
 

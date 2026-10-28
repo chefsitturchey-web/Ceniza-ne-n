@@ -2,6 +2,7 @@ class_name InputSetup
 extends RefCounted
 
 static func configure_input() -> void:
+	if not InputMap.has_action("escort"): add_action("escort", KEY_F, JOY_BUTTON_DPAD_UP)
 	add_action("move_left", KEY_A, JOY_BUTTON_DPAD_LEFT)
 	add_action("move_right", KEY_D, JOY_BUTTON_DPAD_RIGHT)
 	for entry: Array in [["move_left", KEY_LEFT, -1.0], ["move_right", KEY_RIGHT, 1.0]]:

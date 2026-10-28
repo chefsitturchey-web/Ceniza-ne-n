@@ -13,10 +13,15 @@ var cycle: CycleSystem
 var bank: ResourceBank
 var player: Player
 var expansion: ExpansionSystem
+var civic: CivicSystem
+var committed_target: int = GameRules.NO_TARGET
 var hold_time: float = 0.0
 var hold_target: int = GameRules.NO_TARGET
 
 func interaction_target() -> int:
+	if civic != null:
+		var civic_target: int = civic.target_at(player.position.x)
+		if civic_target != GameRules.NO_TARGET: return civic_target
 	if clinic != null and absf(player.position.x - clinic.position.x) < 30:
 		return CLINIC_TARGET
 	if expedition != null and absf(player.position.x - expedition.station.position.x) < 55:
@@ -37,19 +42,26 @@ func interaction_target() -> int:
 	return best
 
 func update_interaction(delta: float) -> void:
+	for site: ConstructionSite in construction.defensive_sites(): site.payment_fraction = 0
 	var target: int = interaction_target()
+	if target != committed_target or not Input.is_action_pressed("interact"): committed_target = GameRules.NO_TARGET
 	if target != hold_target or not Input.is_action_pressed("interact") or player.health <= 0:
 		hold_time = 0.0
 		hold_target = target
 		return
+	if committed_target == target: return
 	if target == GameRules.NO_TARGET:
 		return
 	hold_time += delta
+	if target >= 0 and target < construction.sites.size(): construction.sites[target].payment_fraction = hold_time / GameRules.INTERACT_HOLD
+	elif target <= -340 and target > -346 and civic != null: civic.walls[-340 - target].payment_fraction = hold_time / GameRules.INTERACT_HOLD
 	if hold_time >= GameRules.INTERACT_HOLD:
 		perform_interaction(target)
+		committed_target = target
 		hold_time = 0.0
 
 func perform_interaction(target: int) -> bool:
+	if target <= -300 and civic != null: return civic.interact(target)
 	if expansion != null and target <= -100:
 		return expansion.interact(target)
 	if target == CLINIC_TARGET:
@@ -69,6 +81,9 @@ func perform_interaction(target: int) -> bool:
 			return true
 		if colony.workers.size() >= GameRules.POPULATION:
 			notice_requested.emit("Colonia completa")
+			return false
+		if civic != null:
+			notice_requested.emit("Recluta en los campamentos; paga herramientas en el taller")
 			return false
 		var data: WorkerData = colony.builder_data if colony.workers.size() == GameRules.INITIAL_POPULATION else colony.collector_data
 		if bank.scrap < data.cost:

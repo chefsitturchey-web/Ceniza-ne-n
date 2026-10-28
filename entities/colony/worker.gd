@@ -3,6 +3,7 @@ extends Node2D
 
 @export var data: WorkerData
 var job: int = -1
+var external_job: int = -1
 var gather: float = 0.0
 var cargo: int = 0
 var side: float = -1.0

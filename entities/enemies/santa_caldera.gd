@@ -43,6 +43,10 @@ func _physics_process(delta: float) -> void:
 	facing = (target.global_position - global_position).normalized()
 	match state:
 		State.APPROACH:
+			var offset: Vector2 = Vector2.from_angle(elapsed * 0.35 + pattern) * 130
+			var destination: Vector2 = (target.global_position + offset).clamp(Vector2(90, 95), Vector2(550, 385))
+			velocity = (destination - global_position).normalized() * (85 if phase == 2 else 65)
+			move_and_slide()
 			if timer <= 0: prepare_heat()
 		State.CLAW_WINDUP:
 			if timer <= 0:
@@ -71,11 +75,29 @@ func _physics_process(delta: float) -> void:
 				fire_fan()
 				volleys += 1
 				shot_timer = 0.45
-			if timer <= 0: change_state(State.APPROACH, 1.3)
+			if timer <= 0:
+				charges_left = 2 if phase == 2 else 1
+				charge_direction = (target.global_position - global_position).normalized()
+				change_state(State.CHARGE_WINDUP, 1.1)
+		State.CHARGE_WINDUP:
+			if timer <= 0: change_state(State.CHARGE, 0.7)
+		State.CHARGE:
+			velocity = charge_direction * (390 if phase == 2 else 330)
+			move_and_slide()
+			if global_position.distance_to(target.global_position) < 55:
+				target.take_damage(22, charge_direction * 150)
+			if timer <= 0 or get_slide_collision_count() > 0:
+				effects.emit_pixels(global_position, 15, Color("ffce75"))
+				charges_left -= 1
+				if charges_left > 0:
+					charge_direction = (target.global_position - global_position).normalized()
+					change_state(State.CHARGE_WINDUP, 0.8)
+				else: change_state(State.APPROACH, 1.8)
 	update_puppet(delta)
 
-func update_puppet(_delta: float) -> void:
+func update_puppet(delta: float) -> void:
 	puppet.position.y = roundf(sin(elapsed * 2))
+	puppet.rotation = lerp_angle(puppet.rotation, facing.angle() - PI / 2, minf(1, delta * 2))
 	machine.queue_redraw()
 	queue_redraw()
 
@@ -85,6 +107,8 @@ func status_text() -> String:
 		State.CLAW: return "CALOR ACTIVO: busca los corredores sin fuego"
 		State.RECOVER: return "PURGA DE ENFRIAMIENTO: núcleo expuesto"
 		State.VOLLEY_WINDUP, State.VOLLEY: return "ESCORIA: evita el abanico de proyectiles"
+		State.CHARGE_WINDUP: return "ARREMETIDA: sal del corredor marcado"
+		State.CHARGE: return "¡APÁRTATE! La Caldera atraviesa la plataforma"
 	return "Santa Caldera prepara las rejillas; observa el suelo"
 
 func _draw() -> void:

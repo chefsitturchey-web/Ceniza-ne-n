@@ -149,10 +149,18 @@ func wall(center: Vector2, extent: Vector2) -> StaticBody2D:
 	return body
 
 func build_geometry() -> void:
-	wall(Vector2(320, 6), Vector2(640, 12))
-	wall(Vector2(320, 474), Vector2(640, 12))
-	wall(Vector2(6, 240), Vector2(12, 480))
-	wall(Vector2(634, 240), Vector2(12, 480))
+	if zone_index == 1:
+		var boundary: Array[Vector2] = [Vector2(140, 24), Vector2(500, 24), Vector2(616, 140), Vector2(616, 340), Vector2(500, 456), Vector2(140, 456), Vector2(24, 340), Vector2(24, 140)]
+		for index: int in range(boundary.size()):
+			var a: Vector2 = boundary[index]
+			var b: Vector2 = boundary[(index + 1) % boundary.size()]
+			var edge: StaticBody2D = wall((a + b) * 0.5, Vector2(a.distance_to(b), 14))
+			edge.rotation = (b - a).angle()
+	else:
+		wall(Vector2(320, 6), Vector2(640, 12))
+		wall(Vector2(320, 474), Vector2(640, 12))
+		wall(Vector2(6, 240), Vector2(12, 480))
+		wall(Vector2(634, 240), Vector2(12, 480))
 	var positions: Array[Vector2] = [Vector2(180, 160), Vector2(460, 160), Vector2(180, 320), Vector2(460, 320), Vector2(85, 245), Vector2(555, 245)]
 	var assets: Array[String] = ["pillar_top", "pillar_top", "crate_top", "crate_top", "barrel_top", "barrel_top"]
 	if zone_index == 1:

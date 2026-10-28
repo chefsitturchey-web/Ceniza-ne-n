@@ -8,13 +8,13 @@ Al vencer al jefe aparece **Viajar a…**. Conservas puntos y mejoras neuronales
 
 La victoria guarda primero un documento de llegada: si vuelves al menú, **Continuar** te lleva al distrito desbloqueado. El primer guardado allí lo convierte en una instantánea completa. No se guardan referencias a los nodos de la escena anterior. Los guardados anteriores sin campo de campaña siguen correspondiendo a la Periferia.
 
-En Fundición y Barrio inundado, perder el núcleo conserva el último amanecer; **Reintentar** restaura ese checkpoint. La primera zona conserva su reinicio desde cero. Abrir otra colonia con F6 no sobrescribe una partida perteneciente a un distrito distinto. No se publica nada en un remoto.
+En todas las colonias, perder el núcleo conserva el último amanecer; **Reintentar** restaura ese checkpoint. Abrir otra colonia con F6 no sobrescribe una partida perteneciente a un distrito distinto. La [revisión del GDD](REVISION_GDD_KINGDOM_SURVIVORS.md) añade brechas intermedias, estabilización previa y progresión por experiencia.
 
 | Zona | Preparación diurna | Terreno | Jefe |
 |---|---|---|---|
-| Periferia oxidada | 10 s, ajuste existente | Suelo original | El Recaudador |
-| Fundición | 45 s | Cuatro rejillas; aviso de 1.2 s, calor de 1.8 s y descanso; solo queman de noche | Santa Caldera |
-| Barrio inundado | 50 s | Charcos que reducen los pasos al 82 %; la esquiva mantiene su impulso | El Coro Sumergido |
+| Periferia oxidada | 180 s | Suelo original y canal frontal | El Recaudador |
+| Fundición | 180 s | Rejillas con aviso y calor nocturno | Santa Caldera |
+| Barrio inundado | 180 s | Charcos que reducen los pasos al 82 %; la esquiva mantiene su impulso | El Coro Sumergido |
 
 Las defensas de las zonas nuevas están más separadas. Se duplican sus recursos antes de ajustar las posiciones y los tiempos, para conservar los del primer distrito. Las oleadas reutilizan combinaciones más fuertes de los cinco enemigos existentes.
 
@@ -23,6 +23,8 @@ Las defensas de las zonas nuevas están más separadas. Se duplican sus recursos
 **El Recaudador** conserva sus estadísticas y patrones. Ahora explica su ataque actual, dibuja el corredor de la embestida y señala la segunda fase. El abanico de aviso representa los siete disparos de su segunda fase.
 
 **Santa Caldera** tiene 8500 de vida. Alterna franjas verticales y horizontales con aviso antes del calor, abre el núcleo durante una purga de cuatro segundos y después lanza tres abanicos con aviso. La armadura recibe el 35 % del daño; la purga recibe el doble. Al 50 % de vida aumenta el ancho de las franjas y el número de proyectiles. Su cuerpo tiene compuertas que deslizan, rejillas, pistones y vapor al abrir.
+
+La revisión actual añade desplazamiento, una arremetida anunciada —dos en segunda fase—, arte nuevo y plataforma octogonal con colisión diagonal y metal fundido.
 
 **El Coro Sumergido** tiene 9000 de vida y tres antenas. El cuerpo bloquea daño hasta romperlas con ataques manuales: los módulos no resuelven ese objetivo por sí solos. Respeta alcance, dirección y coberturas. Romper los tres enlaces elimina los peligros y abre una ventana de seis segundos con daño doble. Después se reconstruyen; en segunda fase son más débiles, mientras los pulsos aceleran y aparecen más marcas. Los anillos se esquivan al cruzarlos; las marcas fijan posiciones y avisan 0.9 s antes de impactar. Cada peligro golpea una sola vez y se elimina. Las compuertas y el anillo mecánico se animan.
 
@@ -41,7 +43,7 @@ Para probar directamente una zona con F6: `levels/zones/foundry.tscn` o `flooded
 
 `tests/campaign_bosses_test.gd`: 69 comprobaciones de ataques, avisos sin daño, invulnerabilidad, aperturas, fases, límites de peligros, muerte, botones, esquema de campaña, guardados anteriores, protección entre zonas, viajes reales, persistencia de equipo y habitantes, reintento y Continuar desde el menú.
 
-`tests/fresh_colony_simulation.gd -- --foundry` y `-- --flooded` prueban preparar las cuatro obras y resistir tres noches con apoyo automatizado, sin mejoras ni recursos gratuitos. Fundición: obras encargadas en 7.7 s, final en 345.2 s. Barrio: 8.2 s, final en 360.2 s. La Periferia mantiene 7.1 s y 240.5 s. Tras incorporar artilleros, el núcleo termina con 286/258/272 respectivamente; los detalles están en [Expansión y unidades](EXPANSION_Y_UNIDADES.md). Son simulaciones de sistemas; falta equilibrar dificultad con personas jugando.
+`tests/fresh_colony_simulation.gd` y sus variantes `-- --foundry` / `-- --flooded` prueban preparar las obras y superar tres noches con apoyo automatizado. Ahora recogen experiencia y eligen mejoras; con el nuevo calendario terminan alrededor de 870.5 s. Las métricas anteriores pertenecen a los presets previos. Falta equilibrar dificultad con personas jugando.
 
 `tests/run_all.gd` ejecuta 26 casos. Las capturas OpenGL de GTX 1070 se generan con:
 

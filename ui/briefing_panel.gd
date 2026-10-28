@@ -15,8 +15,8 @@ func _ready() -> void:
 	add_child(shade)
 	var panel: PanelContainer = PanelContainer.new()
 	panel.theme = preload("res://ui/theme.tres")
-	panel.position = Vector2(60, 30)
-	panel.size = Vector2(520, 300)
+	panel.position = Vector2(40, 15)
+	panel.size = Vector2(560, 330)
 	add_child(panel)
 	var margin: MarginContainer = MarginContainer.new()
 	for side: String in ["left", "right", "top", "bottom"]:
@@ -32,15 +32,15 @@ func _ready() -> void:
 		title.text = zone.title.to_upper()
 	title.add_theme_color_override("font_color", Color("47dacb"))
 	rows.add_child(title)
-	var instructions: Array[String] = ["Encarga ambas murallas y torretas manteniendo E en los marcos. El constructor se ocupa de levantarlas.", "En el núcleo puedes curarte y reclutar de día. El recuperador trae chatarra automáticamente.", "Explora suministros y módulos exteriores con E. Generadores dan energía a cuarteles y puestos médicos.", "Defiende ambos frentes y destruye las antenas de los extremos. Toma el tren de día para desafiar al jefe.", "A/D: mover   J: atacar   E: mantener para interactuar\nEspacio: esquiva   Q: sobrecarga   Esc o Start: pausa"]
+	var instructions: Array[String] = ["Construye murallas y torretas: mantén E en sus cimientos.", "Recluta en campamentos. Compra herramientas en el taller izquierdo.", "Los constructores viajan a las obras y se retiran si hay peligro.", "Resiste una noche, genera energía y cierra entradas para tomar el tren.", "A/D mover · J atacar · E interactuar · Espacio esquivar\nQ sobrecarga · F escolta · Esc o Start pausa"]
 	if zone != null and zone.id != "periphery":
 		instructions = ["Tus mejoras y habitantes han llegado contigo. Levanta las defensas de esta colonia con E antes del asedio.", "Las rejillas avisan en amarillo antes de quemar durante la noche." if zone.id == "foundry" else "Los charcos frenan tus pasos. Puedes cruzarlos con una esquiva.", "Destruye los repetidores de ambos extremos y toma el tren de día para desafiar a " + zone.boss_title + ".", zone.briefing, "A/D: mover   J: atacar   E: interactuar\nEspacio: esquivar   Q: sobrecarga   Esc: pausa"]
 	for text: String in instructions:
 		var label: Label = Label.new()
 		label.text = text
-		label.custom_minimum_size.x = 480
+		label.custom_minimum_size.x = 528
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.add_theme_font_size_override("font_size", 13)
+		label.add_theme_font_size_override("font_size", 12)
 		rows.add_child(label)
 	begin_button = Button.new()
 	begin_button.text = "Comenzar"

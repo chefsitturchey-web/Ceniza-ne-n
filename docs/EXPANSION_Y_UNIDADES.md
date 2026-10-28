@@ -1,5 +1,7 @@
 # Colonias ampliadas y unidades de apoyo
 
+> Registro anterior. Los módulos autónomos y relevos gratuitos se sustituyeron por trabajo y herramientas. Para jugar con las reglas actuales consulta [la revisión del GDD](REVISION_GDD_KINGDOM_SURVIVORS.md).
+
 Bloque del 28 de octubre de 2026. Los tres distritos laterales pasan de 1920 a **3200 unidades de ancho**, con suelo físico, límites y cámara adaptados. Las antenas se desplazan a ±1440. El núcleo, la clínica, la estación, las cuatro defensas iniciales y los ajustes de velocidad/daño conservan sus posiciones o valores anteriores.
 
 ## Probar rápido

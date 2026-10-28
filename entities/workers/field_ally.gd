@@ -10,6 +10,7 @@ var facing: float = 1
 var shot: float = 0
 var beam_to: Vector2
 var visual: FieldUnitVisual
+var dismissed: bool = false
 
 func _ready() -> void:
 	add_to_group(GameRules.ALLIES)
@@ -20,44 +21,74 @@ func _ready() -> void:
 
 func take_damage(amount: int) -> void:
 	if hp <= 0: return
+	if role == "guardian": amount = maxi(1, ceili(amount * 0.35))
 	hp = maxi(0, hp - maxi(0, amount))
 	queue_redraw()
 	if hp == 0:
-		respawn = 18
 		remove_from_group(GameRules.ALLIES)
+		demobilize()
+
+func demobilize() -> void:
+	if dismissed: return
+	dismissed = true
+	home.staffed = home.staff_count() > 0
+	if home.expansion.district.civic != null:
+		home.expansion.district.civic.villagers.append({"x": position.x, "side": signf(home.position.x)})
+		home.expansion.district.presenter.show_notice("Unidad desarmada: necesita una nueva herramienta")
 
 func tick(delta: float) -> void:
 	queue_redraw()
 	shot = maxf(0, shot - delta)
 	cooldown = maxf(0, cooldown - delta)
-	if home.hp <= 0 or not home.expansion.powered(home): return
 	if hp <= 0:
-		respawn = maxf(0, respawn - delta)
-		if respawn == 0:
-			hp = 90
-			position = home.position
-			add_to_group(GameRules.ALLIES)
+		demobilize()
 		return
+	if home.hp <= 0 or not home.staffed or not home.expansion.powered(home): return
 	var world: Node2D = home.expansion.district
 	var destination: float = home.position.x
+	var anchor: float = home.position.x
+	if world.civic != null and role in ["ranger", "guardian"]:
+		anchor = signf(home.position.x) * maxf(absf(home.position.x), world.civic.frontier(signf(home.position.x)) - (35 if role == "ranger" else -8))
+		destination = anchor
 	var enemy: SiegeEnemy
 	var nearest: float = 260
-	if role == "ranger":
+	if world.civic != null and world.civic.advance_side == int(signf(home.position.x)) and role in ["ranger", "guardian"] and world.defenses.nearest_enemy(position.x, 180) == null:
+		var portal: EnemyRepeater
+		for gate: EnemyRepeater in world.civic.gates + world.expedition.repeaters:
+			if gate.health.current <= 0 or signf(gate.position.x) != signf(home.position.x): continue
+			if portal == null or absf(gate.position.x) < absf(portal.position.x): portal = gate
+		if portal != null:
+			facing = signf(portal.position.x - position.x)
+			position.x = move_toward(position.x, portal.position.x - facing * (30 if role == "guardian" else 110), delta * 70)
+			if absf(portal.position.x - position.x) < (45 if role == "guardian" else 150) and cooldown <= 0:
+				portal.hurtbox.receive(14)
+				beam_to = portal.position + Vector2(0, -30)
+				shot = 0.12
+				cooldown = 1.2
+			return
+	if role in ["ranger", "guardian"]:
 		for candidate: Node in get_tree().get_nodes_in_group(GameRules.ENEMIES):
-			var distance: float = absf(candidate.position.x - home.position.x)
+			var distance: float = absf(candidate.position.x - anchor)
 			if distance < nearest:
 				nearest = distance
 				enemy = candidate as SiegeEnemy
 		if enemy != null:
 			if absf(enemy.position.x - position.x) > 0.1:
 				facing = signf(enemy.position.x - position.x)
-			destination = enemy.position.x - facing * 145
-			if absf(enemy.position.x - position.x) <= 180 and cooldown <= 0:
-				enemy.receive_shot(16, global_position + Vector2(0, -24))
+			destination = enemy.position.x - facing * (30 if role == "guardian" else 145)
+			if absf(enemy.position.x - position.x) <= (42 if role == "guardian" else 180) and cooldown <= 0:
+				if role == "guardian": enemy.take_damage(22)
+				else: enemy.receive_shot(16, global_position + Vector2(0, -24))
 				beam_to = enemy.position + Vector2(0, -20)
 				cooldown = 0.9
 				shot = 0.12
 				world.sound.play_cue("shot", -10)
+	elif role == "technician":
+		if home.hp < home.MAX_HEALTH and cooldown <= 0 and absf(position.x - home.position.x) < 60:
+			home.hp = mini(home.MAX_HEALTH, home.hp + 8)
+			beam_to = home.position + Vector2(0, -24)
+			shot = 0.3
+			cooldown = 3
 	else:
 		var patient: Node2D
 		var best: float = 260
@@ -80,7 +111,7 @@ func tick(delta: float) -> void:
 				shot = 0.35
 	if absf(destination - position.x) > 2:
 		facing = signf(destination - position.x)
-	position.x = move_toward(position.x, clampf(destination, home.position.x - 260, home.position.x + 260), delta * 85)
+	position.x = move_toward(position.x, clampf(destination, anchor - 260, anchor + 260), delta * 85)
 
 func snapshot() -> Dictionary:
 	return {"hp": hp, "x": position.x, "respawn": respawn, "cooldown": cooldown}

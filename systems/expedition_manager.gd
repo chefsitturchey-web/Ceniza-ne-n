@@ -34,10 +34,10 @@ func _process(delta: float) -> void:
 			district.presenter.show_notice("Tren en camino")
 
 func all_destroyed() -> bool:
-	return repeaters.all(func(repeater: EnemyRepeater) -> bool: return repeater.health.current == 0)
+	return repeaters.all(func(repeater: EnemyRepeater) -> bool: return repeater.health.current == 0) and (district.civic == null or district.civic.gates.all(func(gate: EnemyRepeater) -> bool: return gate.health.current == 0))
 
 func can_travel() -> bool:
-	return not active and all_destroyed() and station.train_arrived and district.cycle.phase == "DÍA" and not district.session.finished and district.player.health > 0 and not get_tree().paused
+	return not active and all_destroyed() and station.train_arrived and district.cycle.phase == "DÍA" and (district.civic == null or district.civic.stabilized()) and not district.session.finished and district.player.health > 0 and not get_tree().paused
 
 func start() -> bool:
 	if not can_travel():
@@ -45,6 +45,7 @@ func start() -> bool:
 	if district.session.save_system != null:
 		district.session.save_system.save_game()
 	active = true
+	district.experience.hud.hide()
 	victory_resolved = false
 	arena = ARENA.instantiate() as CanvasLayer
 	arena.configure(district.player, district.zone_index)
@@ -73,6 +74,8 @@ func resolve(victory: bool) -> void:
 		if victory_resolved:
 			return
 		victory_resolved = true
+		district.experience.gain(40)
+		district.modules.cores += 1
 		if district.zone_index < CampaignRoute.COUNT - 1:
 			next_checkpoint = CampaignRoute.handoff(district.zone_index + 1, district.neural.snapshot(), district.bank.scrap, district.colony.workers)
 			var saved: bool = true
@@ -93,6 +96,7 @@ func resolve(victory: bool) -> void:
 	suspended.clear()
 	active = false
 	district.show()
+	district.experience.hud.show()
 	district.get_node("HUD").show()
 
 func continue_district() -> void:

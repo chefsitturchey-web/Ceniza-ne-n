@@ -87,6 +87,14 @@ func _draw() -> void:
 			var saw: Vector2 = Vector2.from_angle(elapsed * 14) * 6
 			draw_line(Vector2(reach, -24) - saw, Vector2(reach, -24) + saw, tint, 2)
 			plate(Rect2(-15, -30, 7, 17))
+		elif role == "guardian":
+			plate(Rect2(7, -32, 9, 28), Color("8299a8"))
+			draw_line(Vector2(10, -29), Vector2(10, -9), tint, 2)
+			joint(Vector2(-5, -24), Vector2(-12, -14))
+		elif role == "technician":
+			plate(Rect2(-15, -30, 8, 17))
+			joint(Vector2(4, -26), Vector2(13, -18))
+			draw_rect(Rect2(11, -22, 9, 4), tint)
 		else:
 			joint(Vector2(-3, -28), Vector2(6, -23))
 			plate(Rect2(4 - (2 if firing else 0), -26, 20, 4))

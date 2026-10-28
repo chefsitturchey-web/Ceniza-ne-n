@@ -42,6 +42,8 @@ func objective_text() -> String:
 		return "Construye las defensas de ambos lados - mantener E"
 	if completed < construction.sites.size():
 		return "Las defensas se están construyendo - protege las obras"
+	if session.civic != null and not session.civic.stabilized():
+		return "Estabiliza: resiste una noche y construye un generador"
 	if interaction.expedition == null:
 		return "Defiende el núcleo hasta el amanecer"
 	var expedition: ExpeditionManager = interaction.expedition
@@ -51,6 +53,11 @@ func objective_text() -> String:
 			destroyed += 1
 	if destroyed < 2:
 		return "Antenas enemigas: %d/2 - busca los extremos del distrito" % destroyed
+	if session.civic != null:
+		var open_gates: int = 0
+		for gate: EnemyRepeater in session.civic.gates:
+			if gate.health.current > 0: open_gates += 1
+		if open_gates > 0: return "Cierra las %d brechas de entrada restantes" % open_gates
 	if not expedition.station.train_arrived:
 		return "Antenas destruidas - espera el tren en la estación"
 	return "Tren listo - mantén E en la estación" if cycle.phase == "DÍA" else "Resiste hasta el amanecer para viajar en tren"
@@ -96,7 +103,12 @@ func publish() -> void:
 	var context_key: bool = true
 	var context_screen: Vector2 = Vector2.ZERO
 	var target: int = interaction.interaction_target()
-	if target <= -200 and interaction.expansion != null:
+	if target <= -300 and interaction.civic != null:
+		var detail: Dictionary = interaction.civic.describe(target)
+		context = detail.text
+		context_cost = detail.cost
+		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -60)
+	elif target <= -200 and interaction.expansion != null:
 		context = "Recuperar suministros: +20"
 		context_screen = interaction.expansion.get_global_transform_with_canvas() * Vector2(ExpansionSystem.CACHE_X[-200 - target], GameRules.FLOOR_Y - 25)
 	elif target <= -100 and interaction.expansion != null:
@@ -116,6 +128,7 @@ func publish() -> void:
 	elif target == InteractionSystem.STATION_TARGET:
 		var expedition: ExpeditionManager = interaction.expedition
 		context = "Destruye los repetidores"
+		if session.civic != null and not session.civic.stabilized(): context = "Falta estabilizar: una noche y generación eléctrica"
 		if expedition.all_destroyed():
 			context = "Tren en camino" if not expedition.station.train_arrived else ("Viajar" if cycle.phase == "DÍA" else "Solo de dia")
 		context_key = expedition.can_travel()
@@ -125,6 +138,10 @@ func publish() -> void:
 	elif target == -1:
 		context = "Curarte" if player.health < Player.MAX_HEALTH else "Reclutar"
 		context_cost = -1 if player.health < Player.MAX_HEALTH else (colony.builder_data.cost if colony.workers.size() == GameRules.INITIAL_POPULATION else colony.collector_data.cost)
+		if session.civic != null and player.health == Player.MAX_HEALTH:
+			context = "Recluta en campamentos; equipa en el taller"
+			context_cost = -1
+			context_key = false
 		context_screen = core.get_global_transform_with_canvas() * Vector2(0, -ColonyCore.TEXTURE.get_height())
 	elif target >= 0:
 		var site: ConstructionSite = construction.sites[target]
@@ -136,6 +153,11 @@ func publish() -> void:
 		elif site.hp != site.max_hp:
 			context = "Construir" if site.hp == 0 else "Reparar"
 			context_cost = site.cost if site.hp == 0 else site.data.repair_cost
+		elif site.data.blocks_enemies and site.tier < 3:
+			context = "Mejorar muralla %d → %d" % [site.tier, site.tier + 1]
+			context_cost = site.tier * 25
+		elif site.kind == &"turret":
+			context = "Apagar torreta: liberar energía" if site.powered else "Reactivar torreta"
 	var hint_text: String = context
 	var result_text: String = ""
 	if player.health <= 0:
@@ -156,7 +178,7 @@ func publish() -> void:
 		"phase": cycle.phase, "day": cycle.day, "nights": cycle.config.nights,
 		"seconds": ceili(cycle.phase_remaining), "scrap": bank.scrap,
 		"energy": bank.energy_used(), "capacity": bank.available_capacity(),
-		"population": colony.workers.size(), "population_max": GameRules.POPULATION,
+		"population": session.civic.population() if session.civic != null else colony.workers.size(), "population_max": session.civic.capacity if session.civic != null else GameRules.POPULATION,
 		"health": player.health, "stamina": int(player.stamina), "core": core.health,
 		"left": left_count, "right": right_count,
 		"overload_left": overload.overload_status(true), "overload_right": overload.overload_status(false)

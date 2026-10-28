@@ -27,6 +27,8 @@ var options: SettingsPanel = SettingsPanel.new()
 var modules: ModuleSystem = ModuleSystem.new()
 var briefing: BriefingPanel
 var expansion: ExpansionSystem
+var experience: ExperienceSystem
+var civic: CivicSystem
 
 func _ready() -> void:
 	InputSetup.configure_input()
@@ -42,6 +44,7 @@ func _ready() -> void:
 		cycle.config.day_duration = zone.day_duration
 		director.waves.assign(zone.waves)
 	construction.bank = bank
+	construction.viewer = player
 	construction.create_sites()
 	for site: ConstructionSite in construction.sites:
 		overload.changed.connect(site.update_overload)
@@ -100,6 +103,7 @@ func _ready() -> void:
 	view.cycle = cycle
 	view.defenses = defenses
 	view.zone = zone
+	add_child(CanalForeground.new())
 	if zone_index > 0:
 		var terrain: ZoneHazards = ZoneHazards.new()
 		terrain.zone_index = zone_index
@@ -129,6 +133,18 @@ func _ready() -> void:
 	defenses.modules = modules
 	neural.modules = modules
 	player.modules = modules
+	experience = ExperienceSystem.new()
+	experience.setup(self)
+	add_child(experience)
+	neural.experience = experience
+	session.experience = experience
+	civic = CivicSystem.new()
+	civic.setup(self)
+	add_child(civic)
+	construction.external_sites = civic.walls
+	colony.civic = civic
+	interaction.civic = civic
+	session.civic = civic
 	add_child(neural)
 	session.neural = neural
 	clinic.position = Vector2(-110, GameRules.FLOOR_Y)
@@ -166,9 +182,5 @@ func _ready() -> void:
 		briefing.open_panel()
 
 func _connect_neural(enemy: SiegeEnemy, _side: float) -> void:
-	enemy.reward_requested.connect(neural.recover_data)
-	if enemy.elite:
-		enemy.reward_requested.connect(func(_reward: int) -> void:
-			modules.cores += 1
-			neural.changed.emit()
-			presenter.show_notice("Núcleo de enlace recuperado: evolución disponible en la clínica"))
+	enemy.reward_requested.connect(func(reward: int) -> void:
+		experience.drop(enemy.position, reward, enemy.elite))

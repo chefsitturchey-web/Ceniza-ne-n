@@ -21,7 +21,7 @@ func run_checks() -> void:
 	var hud: GameHud = world.get_node("HUD") as GameHud
 	hud.set_process(false)
 	var pixel_theme: Theme = load("res://ui/theme.tres")
-	verify(ProjectSettings.get_setting("gui/theme/custom") == "res://ui/theme.tres" and pixel_theme.default_font_size == 10, "Tema global Micro5 a 10 px")
+	verify(ProjectSettings.get_setting("gui/theme/custom") == "res://ui/theme.tres" and pixel_theme.default_font_size == 12, "Texto pixel legible a 12 px")
 	for path: String in ["Micro5-Regular.ttf", "Silkscreen-Regular.ttf"]:
 		var font: FontFile = load("res://assets/fonts/" + path)
 		verify(font.antialiasing == TextServer.FONT_ANTIALIASING_NONE and font.hinting == TextServer.HINTING_NONE and font.subpixel_positioning == TextServer.SUBPIXEL_POSITIONING_DISABLED and not font.generate_mipmaps, "Fuente sin suavizado: " + path)
@@ -57,7 +57,7 @@ func run_checks() -> void:
 	verify_hud_text(hud)
 	verify(paused and hud.pause_panel.visible and not hud.get_node("Gameplay").visible, "Esc/Start abre pausa y oculta HUD jugable")
 	await process_frame
-	verify(hud.pause_panel.size.x <= 496 and hud.pause_panel.size.y <= 264, "Detalle y controles caben en el panel")
+	verify(hud.pause_panel.size.x <= 560 and hud.pause_panel.size.y <= 332, "Texto ampliado y controles caben en el panel")
 	if "--capture" in OS.get_cmdline_user_args():
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("res://.godot/hud-pause.png")
@@ -150,7 +150,7 @@ func run_checks() -> void:
 	world.player.position.x = 0
 	world.presenter.publish()
 	verify_hud_text(hud)
-	verify(hud.context_row.visible and "Reclutar" in hud.context_label.text, "Núcleo tiene rótulo propio")
+	verify(hud.context_row.visible and "campamentos" in hud.context_label.text, "Núcleo orienta hacia el reclutamiento físico")
 	world.player.health = Player.MAX_HEALTH - 1
 	world.presenter.publish()
 	verify(hud.context_label.text == "Curarte" and not hud.context_icon.visible and not hud.context_cost.visible, "Curación sin coste")

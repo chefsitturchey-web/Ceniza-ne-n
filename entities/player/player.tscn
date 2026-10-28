@@ -16,11 +16,12 @@ position = Vector2(0, -15)
 shape = SubResource("BodyShape")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1867234079]
-position = Vector2(0, -100)
+position = Vector2(0, -68)
+zoom = Vector2(1.25, 1.25)
 limit_left = -1600
 limit_top = -200
 limit_right = 1600
-limit_bottom = 320
+limit_bottom = 380
 position_smoothing_enabled = true
 position_smoothing_speed = 6.0
 

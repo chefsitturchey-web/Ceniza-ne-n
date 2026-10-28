@@ -48,7 +48,7 @@ func _physics_process(delta: float) -> void:
 	if not jumped:
 		var index: int = find_wall()
 		if index >= 0:
-			var wall_x: float = construction.sites[index].x
+			var wall_x: float = construction.defensive_sites()[index].x
 			jump_from = position.x
 			jump_to = wall_x - signf(wall_x) * LAND_OFFSET
 			ground_y = position.y

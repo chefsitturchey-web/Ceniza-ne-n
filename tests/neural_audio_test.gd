@@ -27,7 +27,11 @@ func run_checks() -> void:
 		var enemy: SiegeEnemy = world.director.spawn_enemy(-1, data)
 		enemy.take_damage(10000)
 		enemy.take_damage(10000)
-	verify(neural.kills == 6 and neural.points() == 1, "Las muertes reales dan datos una sola vez")
+	world.experience.present_choices = false
+	world.player.position.x = -1440
+	world.experience.tick(0)
+	world.player.position.x = 0
+	verify(world.experience.defeated == 6 and neural.points() == 1, "Las muertes dejan experiencia que se recoge una sola vez")
 	verify(not neural.install("inexistente") and neural.points() == 1, "Una mejora desconocida no consume puntos")
 	verify(neural.install("blade") and world.player.neural_damage == 10, "Filo instalado")
 	verify(world.player.attack_damage == 50 and world.player.speed == 220, "Se conservan ajustes del Inspector")

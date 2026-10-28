@@ -24,21 +24,22 @@ func _ready() -> void:
 		illustration = load("res://assets/menu/ruinas_menu.png") as Texture2D
 	var content: VBoxContainer = VBoxContainer.new()
 	content.position = Vector2(38, 23)
-	content.size = Vector2(258, 310)
+	content.size = Vector2(300, 310)
 	content.add_theme_constant_override("separation", 7)
 	add_child(content)
 	var marker: Label = Label.new()
 	marker.text = "ENLACE NEURONAL // SEÑAL ACTIVA"
+	marker.add_theme_font_size_override("font_size", 10)
 	marker.add_theme_color_override("font_color", Color("47dacb"))
 	content.add_child(marker)
 	var title: Label = Label.new()
 	title.text = "CENIZA\nNEÓN"
 	title.theme_type_variation = &"Title"
-	title.add_theme_font_size_override("font_size", 34)
+	title.add_theme_font_size_override("font_size", 30)
 	content.add_child(title)
 	var tagline: Label = Label.new()
 	tagline.text = "Construye de día. Resiste de noche.\nRecupera la ciudad."
-	tagline.add_theme_font_size_override("font_size", 13)
+	tagline.add_theme_font_size_override("font_size", 11)
 	content.add_child(tagline)
 	continue_button = _button(content, "Continuar", _continue_game)
 	new_button = _button(content, "Nueva partida", request_new_game)
@@ -46,7 +47,7 @@ func _ready() -> void:
 	_button(content, "Salir", func() -> void: get_tree().quit())
 	status = Label.new()
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status.custom_minimum_size = Vector2(258, 22)
+	status.custom_minimum_size = Vector2(300, 22)
 	status.add_theme_color_override("font_color", Color("8299a8"))
 	content.add_child(status)
 	add_child(options)

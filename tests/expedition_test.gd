@@ -20,6 +20,7 @@ func run_checks() -> void:
 	world.player.set_physics_process(false)
 	await process_frame
 	var manager: ExpeditionManager = world.expedition
+	load("res://tests/game_fixture.gd").stabilize(world)
 	var station: RailwayStation = manager.station
 	verify(not manager.can_travel() and not manager.start(), "No viajar sin tren")
 	verify(world.defenses.nearest_enemy(-880, 50) == null, "Defensas ignoran repetidores")

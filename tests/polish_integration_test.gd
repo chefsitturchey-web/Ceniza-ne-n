@@ -52,7 +52,7 @@ func run_checks() -> void:
 		site.complete_work()
 		if site.kind == &"turret":
 			turrets.append(site)
-	verify("0/2" in world.presenter.objective_text(), "Con defensas encargadas señala las antenas")
+	verify("Estabiliza" in world.presenter.objective_text(), "Con defensas construidas señala la estabilización pendiente")
 	var turret: ConstructionSite = turrets[0]
 	var base_position: Vector2 = turret.position
 	verify(turret.turret_visual != null, "Torreta dispone de cabezal articulado")
@@ -95,6 +95,7 @@ func run_checks() -> void:
 	collector.x = collector.side * collector.data.gather_distance
 	collector.gather = 0
 	collector.cargo = 0
+	enemy.position.x = -1450
 	world.colony.update_workers(0.1)
 	verify(collector.visual.working and collector.visual.sprite.animation == &"reparar", "Recuperador trabaja de verdad al alcanzar la chatarra")
 	var gathered: float = collector.gather
@@ -127,6 +128,7 @@ func run_checks() -> void:
 			world.view.queue_redraw()
 			await snapshot("res://.godot/pulido/torreta_%03d.png" % frame)
 	enemy.take_damage(100000)
+	load("res://tests/game_fixture.gd").stabilize(world)
 	world.expedition.restore({"destroyed": [true, false], "train_arrived": false})
 	verify("1/2" in world.presenter.objective_text(), "El objetivo cuenta antenas reales")
 	world.expedition.restore({"destroyed": [true, true], "train_arrived": false})

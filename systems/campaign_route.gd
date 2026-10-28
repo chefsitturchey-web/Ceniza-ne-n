@@ -36,8 +36,12 @@ static func handoff(zone: int, neural: Dictionary, scrap: int, workers: Array) -
 	var roles: Array[String] = []
 	for worker: Variant in workers:
 		roles.append(String(worker.role))
+	var carried: Dictionary = neural.duplicate(true)
+	if not carried.get("experience", {}).is_empty():
+		carried.experience.drops = []
+		carried.experience.lost = {}
 	return {"version": 1, "handoff": true, "campaign": initial_state(zone), "phase": "DÍA", "day": 1,
-		"scrap": GameRules.INITIAL_SCRAP + mini(40, maxi(0, scrap)), "neural": neural.duplicate(true), "crew": roles}
+		"scrap": GameRules.INITIAL_SCRAP + mini(40, maxi(0, scrap)), "neural": carried, "crew": roles}
 
 static func valid_handoff(value: Variant) -> bool:
 	if not value is Dictionary or value.get("version") != 1 or value.get("handoff") != true or value.get("phase") != "DÍA" or value.get("day") != 1:
@@ -48,7 +52,7 @@ static func valid_handoff(value: Variant) -> bool:
 	if not (scrap is int or scrap is float) or not is_finite(float(scrap)) or scrap != floorf(scrap) or scrap < GameRules.INITIAL_SCRAP or scrap > GameRules.INITIAL_SCRAP + 40:
 		return false
 	var crew: Variant = value.get("crew")
-	if not crew is Array or crew.size() < GameRules.INITIAL_POPULATION or crew.size() > GameRules.POPULATION:
+	if not crew is Array or crew.size() < GameRules.INITIAL_POPULATION or crew.size() > 20:
 		return false
 	for role: Variant in crew:
 		if role not in ["builder", "collector"]:

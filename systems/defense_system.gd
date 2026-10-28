@@ -36,7 +36,7 @@ func fire_from(origin: Vector2, target: Node2D, damage: int, electric: bool = fa
 
 func update_defenses(delta: float) -> void:
 	for site: ConstructionSite in sites:
-		if site.data.damage == 0 or site.hp <= 0:
+		if site.data.damage == 0 or site.hp <= 0 or not site.powered:
 			continue
 		var target: Node2D = nearest_enemy(site.x, site.data.attack_range)
 		if site.turret_visual != null:

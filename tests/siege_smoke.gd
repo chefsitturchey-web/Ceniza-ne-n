@@ -37,8 +37,9 @@ func run_checks() -> void:
 	world.bank.energy_capacity = 4
 	verify(world.interaction.perform_interaction(1), "encargar torreta")
 	verify(world.bank.energy_used() == 2, "reservar energía en obra")
-	verify(world.interaction.perform_interaction(-1) and world.interaction.perform_interaction(-1), "reclutar hasta cuatro")
-	verify(not world.interaction.perform_interaction(-1), "respetar capacidad de población")
+	verify(world.civic.interact(-300) and world.civic.interact(-300) and world.civic.interact(-320) and world.civic.interact(-321), "reclutar personas y pagar herramientas")
+	for step: int in range(160): world.civic.tick(0.1)
+	verify(world.colony.workers.size() == 4 and not world.interaction.perform_interaction(-1), "Las profesiones llegan por herramientas y no por invocación en el núcleo")
 	world.player.position.x = -100
 	world.overload.activate_overload()
 	verify(world.overload.overload_left == 6.0 and world.overload.overload_right == 0.0, "sobrecarga por frente")

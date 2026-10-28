@@ -1,6 +1,6 @@
 # CENIZA NEÓN — prototipo de colonia y asedio
 
-Abre `project.godot` con Godot 4 y pulsa F5. El menú permite Nueva partida, Continuar y Opciones. Se conserva tu ajuste de pruebas: 10 segundos de día, 10 de aviso y 60 de noche. La noche se prolonga si quedan enemigos vivos. Hay guardado automático al amanecer; tras la tercera noche el asedio continúa hasta derrotar al jefe. Consulta también [menú y opciones](docs/MENU_Y_OPCIONES.md), [equipo y evoluciones](docs/MODULOS_Y_EVOLUCIONES.md) y [siluetas](docs/SILUETAS_MECANICAS.md).
+Abre `project.godot` con Godot 4 y pulsa F5. El menú permite Nueva partida, Continuar y Opciones. La revisión del GDD usa 180 segundos de día, 20 de aviso y 90 de noche; los presets anteriores se conservan. Hay guardado al amanecer y recuperación diaria al perder el núcleo. Empieza por [la guía actual de Kingdom y progresión](docs/REVISION_GDD_KINGDOM_SURVIVORS.md).
 
 La partida nueva comienza con una explicación que detiene el reloj hasta pulsar Comenzar. Las torretas ya apuntan y tienen retroceso; el Portador camina al norte/sur en la arena y el recuperador se anima al trabajar. Los objetivos de pantalla guían hasta el tren. El final del jefe completa esta demo y permite volver al menú. Detalles y comprobaciones en [PULIDO_JUGABLE.md](docs/PULIDO_JUGABLE.md).
 
@@ -42,9 +42,9 @@ En el centro puedes curarte de día con E. Al amanecer se restauran 40 puntos de
 - En la pestaña Equipo hay tres módulos, dos ranuras, cinco niveles y pasivas. La última unidad de cada oleada entrega un núcleo para evolucionar un equipo de nivel cinco con su pasiva compatible.
 - Sonidos de combate, música de trabajo por fases, ceniza ambiental y reflejos estilizados de luces y personajes.
 
-Simplificaciones del prototipo: trabajadores sin daño ni selección de herramientas; chatarra en una bolsa común; generación eléctrica fija; torretas no son objetivo de enemigos. Hay progresión neuronal, guardado, tres zonas conectadas y tres jefes, con música y varios personajes aún pendientes de producción final. Perder el núcleo reinicia la primera colonia; en las siguientes puedes reintentar desde el último amanecer guardado. La dificultad necesita pruebas con jugadores.
+Simplificaciones actuales: chatarra en una bolsa común, trabajadores económicos sin daño y torretas sin selección como objetivo enemigo. Ya hay herramientas, profesiones, generadores, experiencia con elecciones, tres zonas y tres jefes. Perder el núcleo conserva el último guardado diario en todas las colonias. Música, personajes y contenido final siguen pendientes de producción y equilibrio con jugadores.
 
-Tus ajustes del personaje siguen en `entities/player/player.tscn`: velocidad 220 y daño 50. Los tiempos se editan en el Resource `config` del nodo `Cycle` en `levels/main.tscn`. Está asignado `data/cycles/district.tres` (10/10/60). Para disponer de 90 segundos de construcción, asigna `data/cycles/standard.tres` (90/10/60). Los controles y costos no han cambiado.
+Tus ajustes del personaje siguen en `entities/player/player.tscn`: velocidad 220 y daño 50. La revisión del GDD asigna `data/cycles/kingdom.tres` al nodo `Cycle`: 180 segundos de día, 20 de aviso y 90 de noche. Los presets anteriores `district.tres` (10/10/60) y `standard.tres` (90/10/60) se conservan.
 
 Jugador, recuperador, constructor, errante y corredor utilizan sprites animados. Para comprobarlo, encarga una obra con E y observa cómo el constructor camina y trabaja. Blindado, saltador y ariete usan siluetas mecánicas propias animadas por piezas, con los sprites anteriores conservados como alternativa.
 
@@ -82,6 +82,8 @@ La ruta disponible tiene tres distritos. Fundición añade rejillas nocturnas y 
 Para probar sin recorrer la campaña, abre `levels/zones/foundry.tscn` o `flooded.tscn` y pulsa F6. Para practicar sus jefes, abre `levels/expedition/caldera_arena.tscn` o `choir_arena.tscn`. El Recaudador conserva su escena original. [Mecánicas y validación del bloque](docs/CAMPANA_Y_JEFES.md).
 
 ## Más estructuras y unidades
+
+**Reglas actuales:** [guía del GDD, Kingdom y progresión](docs/REVISION_GDD_KINGDOM_SURVIVORS.md). Los edificios requieren constructores; las tropas, supervivientes y herramientas. F ordena avance/retirada. La experiencia se recoge y abre tres opciones al subir. Todas las colonias recuperan su guardado diario al perder el núcleo.
 
 Los tres mapas tienen ahora 3200 unidades de ancho. Explora cajas de suministros y despliega de día, con E, cuarteles, puestos médicos, generadores y recicladoras. Los generadores dan energía a los fusileros y sanitarios; artilleros y saboteadores enemigos aparecen en las oleadas avanzadas.
 

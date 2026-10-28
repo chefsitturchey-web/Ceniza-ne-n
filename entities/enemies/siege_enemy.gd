@@ -144,7 +144,7 @@ func _physics_process(delta: float) -> void:
 	if choose_special_target(delta): return
 	ally_target = null
 	for ally: Node in get_tree().get_nodes_in_group(GameRules.ALLIES):
-		if absf(ally.position.x - position.x) < 30:
+		if absf(ally.position.x - position.x) < 30 and ally.position.y >= GameRules.FLOOR_Y - 20:
 			ally_target = ally as Node2D
 			break
 	if player.health > 0 and absf(player.position.x - position.x) < data.player_notice_range:
@@ -156,7 +156,7 @@ func _physics_process(delta: float) -> void:
 	elif find_wall() >= 0:
 		target_kind = "wall"
 		target_index = find_wall()
-		face_toward(construction.sites[target_index].x)
+		face_toward(construction.defensive_sites()[target_index].x)
 	elif absf(position.x) < data.core_range:
 		target_kind = "core"
 		face_toward(0.0)
@@ -176,8 +176,9 @@ func _physics_process(delta: float) -> void:
 	update_visual(moving)
 
 func find_wall() -> int:
-	for index: int in range(construction.sites.size()):
-		var site: ConstructionSite = construction.sites[index]
+	var fortifications: Array[ConstructionSite] = construction.defensive_sites()
+	for index: int in range(fortifications.size()):
+		var site: ConstructionSite = fortifications[index]
 		if site.data.blocks_enemies and site.hp > 0 and absf(position.x - site.x) < data.wall_range:
 			return index
 	return -1

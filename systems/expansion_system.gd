@@ -45,6 +45,9 @@ func interact(target: int) -> bool:
 		return true
 	if target > -100 or target <= -100 - sites.size(): return false
 	var site: ExpansionOutpost = sites[-100 - target]
+	if district.civic != null and not district.civic.safe_to_build(site.position.x):
+		district.presenter.show_notice("Destruye primero la brecha de esa franja")
+		return false
 	if district.cycle.phase != "DÍA":
 		district.presenter.show_notice("Despliega y repara módulos de día")
 		return false
@@ -61,7 +64,7 @@ func interact(target: int) -> bool:
 		return false
 	site.ordered = true
 	site.progress = 0
-	district.presenter.show_notice("Dron desplegando " + site.spec.title.to_lower())
+	district.presenter.show_notice("Obra pagada: los constructores acudirán")
 	checkpoint()
 	return true
 
@@ -88,7 +91,7 @@ func powered(site: ExpansionOutpost) -> bool:
 	# Las defensas originales tienen prioridad al perder un generador.
 	var used: int = 0
 	for base: ConstructionSite in district.construction.sites:
-		if base.hp > 0 or base.ordered: used += base.data.energy
+		if (base.hp > 0 and base.powered) or base.ordered: used += base.data.energy
 	for candidate: ExpansionOutpost in sites:
 		if candidate.hp > 0 or candidate.ordered:
 			used += int(candidate.spec.energy)
@@ -133,12 +136,19 @@ static func valid(data: Variant) -> bool:
 	for index: int in range(entries.size()):
 		var entry: Variant = entries[index]
 		if not entry is Dictionary or entry.get("id") != SPECS[index % 4].id or not entry.get("ordered") is bool: return false
+		if entry.has("staffed") and (not entry.staffed is bool or entry.get("role", "") not in ["", "ranger", "guardian", "technician", "medic"]): return false
 		if not number(entry.get("hp"), 0, 180, true) or not number(entry.get("progress"), 0, 6) or not number(entry.get("income"), 0, 12): return false
 		var ally: Variant = entry.get("ally", {})
 		if not ally is Dictionary: return false
 		if not ally.is_empty():
-			if index % 4 > 1: return false
+			if index % 4 == 3: return false
 			if not number(ally.get("hp"), 0, 90, true) or not number(ally.get("x"), -1600, 1600) or not number(ally.get("respawn"), 0, 18) or not number(ally.get("cooldown"), 0, 3): return false
+		if entry.has("crew"):
+			if not entry.crew is Array or entry.crew.size() > (3 if index % 4 == 0 else 1): return false
+			if entry.staffed != (not entry.crew.is_empty()): return false
+			for member: Variant in entry.crew:
+				if not member is Dictionary or member.get("role") not in (["ranger", "guardian"] if index % 4 == 0 else (["medic"] if index % 4 == 1 else ["technician"])): return false
+				if not number(member.get("hp"), 1, 90, true) or not number(member.get("x"), -1600, 1600) or not number(member.get("respawn"), 0, 18) or not number(member.get("cooldown"), 0, 3): return false
 	return true
 
 func _draw() -> void:

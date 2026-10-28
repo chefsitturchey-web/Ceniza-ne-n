@@ -15,6 +15,11 @@ var progress: float = 0.0
 var shot: float = 0.0
 var recoil: float = 0.0
 var turret_visual: TurretVisual
+var tier: int = 1
+var upgrade_pending: bool = false
+var viewer: Player
+var payment_fraction: float = 0
+var powered: bool = true
 
 func muzzle_position() -> Vector2:
 	if turret_visual != null:
@@ -37,7 +42,7 @@ var kind: StringName:
 var cost: int:
 	get: return data.cost
 var max_hp: int:
-	get: return data.health
+	get: return health_component.maximum
 var hp: int:
 	get: return health_component.current
 	set(value): health_component.reset(value)
@@ -59,12 +64,17 @@ func take_damage(amount: int) -> void:
 	health_component.take_damage(amount)
 
 func complete_work() -> void:
+	if upgrade_pending:
+		tier = mini(3, tier + 1)
+		health_component.maximum = data.health * tier
+		upgrade_pending = false
 	effects.repair_sparks()
 	health_component.reset()
 	ordered = false
 	progress = 0.0
 
 func _on_destroyed() -> void:
+	upgrade_pending = false
 	if turret_visual != null:
 		turret_visual.clear_target()
 	effects.shatter()
@@ -77,6 +87,7 @@ func update_overload(left_active: bool, right_active: bool) -> void:
 	queue_redraw()
 
 func _process(delta: float) -> void:
+	modulate = Color.WHITE if powered else Color(0.5, 0.56, 0.63)
 	recoil = maxf(0.0, recoil - delta)
 	weld_timer -= delta
 	if ordered and weld_timer <= 0.0:
@@ -99,6 +110,15 @@ func _draw_construction() -> void:
 	draw_set_transform(Vector2.ZERO)
 
 func _draw() -> void:
+	if is_instance_valid(viewer) and absf(viewer.position.x - x) < 85 and not ordered and (hp < max_hp or (data.blocks_enemies and tier < 3)):
+		var price: int = cost if hp == 0 else (25 * tier if hp == max_hp else data.repair_cost)
+		var pips: int = ceili(price / 5.0)
+		for index: int in range(pips):
+			draw_circle(Vector2((index % 5 - 2) * 7, -55 - (index / 5) * 6), 2, Color("ffce75") if index < int(payment_fraction * pips) else Color("8299a8"))
+	if data.blocks_enemies and hp > 0 and tier > 1:
+		for side: int in [-1, 1]:
+			draw_rect(Rect2(side * 14 - 3, -48 - tier * 4, 6, 48 + tier * 4), Color("304356"))
+			draw_line(Vector2(side * 14, 0), Vector2(side * 14, -48 - tier * 4), Color("8299a8"), 1)
 	var color: Color = Color("47dacb") if boosted else Color("8299a8")
 	if ordered and hp == 0 and progress < GameRules.BUILD_TIME and data.texture != null:
 		_draw_construction()
@@ -119,4 +139,7 @@ func _draw() -> void:
 			draw_rect(Rect2(-5, -35, 10, 35), color)
 			draw_rect(Rect2(-14, -45, 28, 12), color)
 	else:
-		draw_rect(Rect2(-12, -40, 24, 40), Color("b075ae"), false, 1.0)
+		draw_rect(Rect2(-14, -4, 28, 4), Color("304356"))
+		for side: int in [-1, 1]:
+			draw_rect(Rect2(side * 12 - 1, -9, 3, 9), Color("8299a8"))
+			draw_rect(Rect2(side * 12 - 1, -9, 3, 2), Color("47dacb"))

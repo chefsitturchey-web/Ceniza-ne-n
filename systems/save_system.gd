@@ -58,11 +58,11 @@ func _snapshot() -> Dictionary:
 	var structures: Array = []
 	for site: ConstructionSite in session.bank.sites:
 		structures.append({"kind": String(site.kind), "x": site.x, "hp": site.hp,
-			"ordered": site.ordered, "progress": site.progress, "shot": site.shot})
+			"ordered": site.ordered, "progress": site.progress, "shot": site.shot, "tier": site.tier, "upgrade": site.upgrade_pending, "powered": site.powered})
 	var workers: Array = []
 	for worker: ColonyWorker in session.colony.workers:
 		workers.append({"role": String(worker.role), "side": worker.side, "x": worker.x,
-			"job": worker.job, "gather": worker.gather, "cargo": worker.cargo})
+			"job": worker.job, "external_job": worker.external_job, "gather": worker.gather, "cargo": worker.cargo})
 	var player: Dictionary = _fields(session.player, PLAYER_FIELDS)
 	player["x"] = session.player.position.x
 	player["y"] = session.player.position.y
@@ -71,6 +71,7 @@ func _snapshot() -> Dictionary:
 	return {"version": 1, "day": session.cycle.day, "phase": session.cycle.phase, "campaign": session.campaign.duplicate(true),
 		"scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
 		"expansion": session.expansion.snapshot() if session.expansion != null else {},
+		"civic": session.civic.snapshot() if session.civic != null else {},
 		"core_health": session.core.health, "player": player, "structures": structures,
 		"workers": workers, "overload": _fields(session.overload, OVERLOAD_FIELDS),
 		"drone_timer": session.defenses.drone_timer,
@@ -121,6 +122,7 @@ func load_game() -> bool:
 	session.campaign = CampaignRoute.initial_state(int(data.get("campaign", CampaignRoute.initial_state()).zone))
 	if session.expansion != null:
 		session.expansion.restore(data.get("expansion", {}))
+	if session.civic != null: session.civic.restore(data.get("civic", {}))
 	if session.neural != null:
 		session.neural.restore(data.get("neural", {}))
 	if session.expedition != null:
@@ -133,6 +135,10 @@ func load_game() -> bool:
 	session.core.health = int(data.core_health)
 	for index: int in range(data.structures.size()):
 		var site: ConstructionSite = session.bank.sites[index]
+		site.tier = int(data.structures[index].get("tier", 1))
+		site.health_component.maximum = site.data.health * site.tier
+		site.upgrade_pending = data.structures[index].get("upgrade", false)
+		site.powered = data.structures[index].get("powered", true)
 		for field: String in ["hp", "ordered", "progress", "shot"]:
 			site.set(field, data.structures[index][field])
 		site.queue_redraw()
@@ -142,6 +148,7 @@ func load_game() -> bool:
 	for saved: Dictionary in data.workers:
 		session.colony.add_worker(StringName(saved.role))
 		var worker: ColonyWorker = session.colony.workers.back()
+		worker.external_job = int(saved.get("external_job", -1))
 		for field: String in ["side", "x", "job", "gather", "cargo"]:
 			worker.set(field, saved[field])
 	for field: String in PLAYER_FIELDS:
@@ -159,6 +166,7 @@ func apply_handoff(data: Dictionary) -> void:
 	session.campaign = CampaignRoute.initial_state(int(data.campaign.zone))
 	session.bank.scrap = int(data.scrap)
 	session.neural.restore(data.neural)
+	if session.civic != null: session.civic.capacity = mini(20, maxi(8, ceili(data.crew.size() / 4.0) * 4))
 	for worker: ColonyWorker in session.colony.workers:
 		worker.free()
 	session.colony.workers.clear()
@@ -182,6 +190,12 @@ func _valid(value: Variant) -> bool:
 	var data: Dictionary = value
 	if not ExpansionSystem.valid(data.get("expansion", {})):
 		return false
+	if not CivicSystem.valid(data.get("civic", {}), session.zone_index * 2): return false
+	if not data.get("civic", {}).is_empty() and data.get("workers") is Array:
+		var population: int = data.workers.size() + data.civic.villagers.size()
+		for site: Dictionary in data.get("expansion", {}).get("sites", []):
+			population += site.get("crew", [site.ally] if not site.get("ally", {}).is_empty() else []).size()
+		if population > data.civic.capacity: return false
 	if data.get("handoff", false) == true:
 		return CampaignRoute.valid_handoff(data) and int(data.campaign.zone) == session.zone_index
 	var route: Variant = data.get("campaign", CampaignRoute.initial_state())
@@ -221,15 +235,19 @@ func _valid(value: Variant) -> bool:
 			return false
 		if entry.get("kind") != String(site.kind) or not _number(entry, "x", site.x, site.x) or not entry.get("ordered") is bool:
 			return false
-		if not _number(entry, "hp", 0, site.max_hp, true) or not _number(entry, "progress", 0, GameRules.BUILD_TIME) or not _number(entry, "shot", 0, maxf(site.data.interval, site.data.overloaded_interval)):
+		var tier: Variant = entry.get("tier", 1)
+		if not entry.get("powered", true) is bool: return false
+		if not ExpansionSystem.number(tier, 1, 3, true) or not entry.get("upgrade", false) is bool: return false
+		if not _number(entry, "hp", 0, site.data.health * tier, true) or not _number(entry, "progress", 0, GameRules.BUILD_TIME) or not _number(entry, "shot", 0, maxf(site.data.interval, site.data.overloaded_interval)):
 			return false
-	if not data.get("workers") is Array or data.workers.size() < GameRules.INITIAL_POPULATION or data.workers.size() > GameRules.POPULATION:
+	if not data.get("workers") is Array or data.workers.size() < GameRules.INITIAL_POPULATION or data.workers.size() > 20:
 		return false
 	var jobs: Array[int] = []
 	for entry: Variant in data.workers:
 		if not entry is Dictionary or entry.get("role") not in ["builder", "collector"]:
 			return false
 		var worker_data: WorkerData = session.colony.builder_data if entry.role == "builder" else session.colony.collector_data
+		if not ExpansionSystem.number(entry.get("external_job", -1), -1, 13, true): return false
 		if not _number(entry, "side", -1, 1) or absf(entry.side) != 1 or not _number(entry, "x", -1000000, 1000000):
 			return false
 		if not _number(entry, "job", -1, data.structures.size() - 1, true) or not _number(entry, "cargo", 0, worker_data.cargo, true) or not _number(entry, "gather", 0, worker_data.gather_time):

@@ -17,7 +17,7 @@ func choose_special_target(delta: float) -> bool:
 		var nearest: float = 245
 		var candidates: Array[Node2D] = [core]
 		if player.health > 0: candidates.append(player)
-		for site: ConstructionSite in construction.sites:
+		for site: ConstructionSite in construction.defensive_sites():
 			if site.hp > 0 and site.data.blocks_enemies: candidates.append(site)
 		if session.expansion != null:
 			for site: ExpansionOutpost in session.expansion.sites:

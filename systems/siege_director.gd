@@ -23,7 +23,9 @@ func start(number: int) -> void:
 func tick(delta: float) -> void:
 	spawn_remaining -= delta
 	if spawn_remaining <= 0.0 and spawn_count < wave.enemies.size():
-		spawn_enemy(wave.sides[spawn_count], wave.enemies[spawn_count], night, spawn_count == wave.enemies.size() - 1)
+		var side: float = wave.sides[spawn_count]
+		if session.civic == null or not session.civic.side_closed(side):
+			spawn_enemy(side, wave.enemies[spawn_count], night, spawn_count == wave.enemies.size() - 1)
 		spawn_count += 1
 		spawn_remaining = wave.cadence
 
@@ -43,6 +45,7 @@ func spawn_enemy(side: float, data: EnemyData, number: int = 1, elite: bool = fa
 	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
 	var distance: float = maxf(data.spawn_distance, expansion.frontier(side) + 180) if expansion != null else data.spawn_distance
 	enemy.position = Vector2(side * minf(GameRules.MAP_HALF_WIDTH - 25, distance), GameRules.FLOOR_Y)
+	if session.civic != null: enemy.position.x = session.civic.entrance(side)
 	add_child(enemy)
 	spawned.emit(enemy, side)
 	return enemy

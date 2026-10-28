@@ -49,7 +49,7 @@ func run_checks() -> void:
 		verify(neural.upgrade_module("tesla"), "Subir Tesla de nivel")
 	verify(not neural.upgrade_module("tesla"), "Límite de cinco niveles")
 	verify(not gear.evolve("tesla"), "Nivel cinco no basta sin pasiva y núcleo")
-	verify(neural.install_passive("battery") and not neural.install_passive("battery"), "Pasiva cuesta un punto y no se compra dos veces")
+	verify(neural.install_passive("battery") and gear.passive_rank("battery") == 1, "Pasiva comienza en nivel uno")
 	verify(not gear.evolve("tesla"), "La pasiva no reemplaza el núcleo")
 	clear_enemies()
 	world.director.start(1)
@@ -59,6 +59,11 @@ func run_checks() -> void:
 	verify(carrier.elite and carrier.max_health == carrier.data.health, "Última unidad porta núcleo sin inflar sus estadísticas")
 	carrier.take_damage(100000)
 	carrier.take_damage(100000)
+	world.experience.present_choices = false
+	world.player.position.x = carrier.position.x
+	world.experience.tick(0)
+	world.experience.choose({"id": "core", "type": "core", "title": "Guardar núcleo", "text": "Conservarlo para una evolución posterior."}, true)
+	world.player.position.x = 0
 	verify(gear.cores == 1, "El portador entrega un solo núcleo")
 	verify(gear.evolve("tesla") and gear.cores == 0 and not gear.evolve("tesla"), "Tormenta consume exactamente un núcleo")
 	var victims: Array[SiegeEnemy] = []

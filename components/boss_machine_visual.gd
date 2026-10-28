@@ -7,6 +7,7 @@ var opening: float = 0.0
 const DARK: Color = Color("0b1322")
 const STEEL: Color = Color("304356")
 const EDGE: Color = Color("8299a8")
+const CALDERA_ART: Texture2D = preload("res://assets/expedition/boss/caldera_v2.png")
 
 func _process(delta: float) -> void:
 	if not is_instance_valid(actor) or actor.health <= 0:
@@ -30,6 +31,27 @@ func _draw() -> void:
 		draw_choir()
 
 func draw_caldera() -> void:
+	draw_detailed_caldera()
+
+func draw_detailed_caldera() -> void:
+	var moving: bool = actor.velocity.length() > 1
+	var step: float = sin(actor.elapsed * 8) * (2.0 if moving else 0.4)
+	draw_set_transform(Vector2(0, roundf(step)), sin(actor.elapsed * 3) * (0.025 if moving else 0.005))
+	draw_texture_rect(CALDERA_ART, Rect2(-66, -66, 132, 132), false)
+	for side: int in [-1, 1]:
+		var foot: Vector2 = Vector2(side * 50, 28 + roundf(step * side))
+		draw_line(Vector2(side * 35, 9), foot, DARK, 5)
+		draw_line(Vector2(side * 35, 9), foot, EDGE, 2)
+		if GamePreferences.current().particles:
+			for puff: int in range(4):
+				var age: float = fposmod(actor.elapsed * (25 if opening > 0 else 12) + puff * 8, 34)
+				draw_rect(Rect2(side * 18 - 3 + sin(age * 0.3) * 3, -56 - age, 6, 4), Color(0.65, 0.76, 0.81, (1.0 - age / 34) * 0.35))
+	if opening > 0:
+		draw_circle(Vector2(0, -9), 13, Color(1, 0.78, 0.3, opening * 0.55))
+		draw_arc(Vector2(0, -9), 18 + opening * 3, 0, TAU, 24, Color("ffce75"), 2)
+	draw_set_transform(Vector2.ZERO)
+
+func draw_legacy_caldera() -> void:
 	var open: bool = actor.core_exposed
 	for side: int in [-1, 1]:
 		plate(Rect2(side * 35 - 9, 25, 18, 28))

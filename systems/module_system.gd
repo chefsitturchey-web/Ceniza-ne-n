@@ -4,8 +4,12 @@ extends Node2D
 const DATA: Array[ModuleData] = [preload("res://data/modules/drone.tres"), preload("res://data/modules/tesla.tres"), preload("res://data/modules/orbital.tres")]
 const MAX_LEVEL: int = 5
 const SLOTS: int = 2
+const PASSIVE_IDS: Array[String] = ["optic", "battery", "bearing", "magnet", "condenser", "recovery"]
+const PASSIVE_TITLES: Dictionary = {"optic": "Óptica táctica", "battery": "Batería auxiliar", "bearing": "Rodamiento magnético", "magnet": "Bobina de atracción", "condenser": "Condensador de impacto", "recovery": "Recuperador cinético"}
+const PASSIVE_TEXT: Dictionary = {"optic": "Mayor alcance del dron; catalizador de Enjambre.", "battery": "Mayor alcance Tesla; catalizador de Tormenta.", "bearing": "Mayor radio orbital; catalizador de Corona de acero.", "magnet": "Atrae datos neuronales desde más lejos.", "condenser": "+4 daño de hoja por nivel de pasiva.", "recovery": "+2 regeneración de resistencia por nivel."}
 var levels: Dictionary = {"drone": 1, "tesla": 0, "orbital": 0}
-var passives: Dictionary = {"optic": false, "battery": false, "bearing": false}
+var passives: Dictionary = {"optic": false, "battery": false, "bearing": false, "magnet": false, "condenser": false, "recovery": false}
+var passive_levels: Dictionary = {"optic": 0, "battery": 0, "bearing": 0, "magnet": 0, "condenser": 0, "recovery": 0}
 var evolved: Dictionary = {"drone": false, "tesla": false, "orbital": false}
 var equipped: Array[String] = ["drone"]
 var cores: int = 0
@@ -28,9 +32,24 @@ func spent() -> int:
 	var total: int = -1 # El primer nivel del dron es gratuito.
 	for value: int in levels.values():
 		total += value
-	for value: bool in passives.values():
-		total += 1 if value else 0
+	for id: String in PASSIVE_IDS:
+		total += passive_rank(id)
 	return total
+
+func passive_rank(id: String) -> int:
+	return maxi(int(passive_levels.get(id, 0)), 1 if passives.get(id, false) else 0)
+
+func passive_count() -> int:
+	var count: int = 0
+	for id: String in PASSIVE_IDS:
+		if passives[id]: count += 1
+	return count
+
+func toggle_passive(id: String) -> bool:
+	if id not in PASSIVE_IDS or passive_rank(id) == 0: return false
+	if not passives[id] and passive_count() >= 4: return false
+	passives[id] = not passives[id]
+	return true
 
 func damage_for(id: String) -> int:
 	var data: ModuleData = definition(id)
@@ -39,11 +58,11 @@ func damage_for(id: String) -> int:
 func range_for(id: String) -> float:
 	var result: float = definition(id).attack_range
 	if id == "drone" and passives.optic:
-		result += 25
+		result += 25 + maxi(0, passive_rank("optic") - 1) * 5
 	elif id == "tesla" and passives.battery:
-		result += 20
+		result += 20 + maxi(0, passive_rank("battery") - 1) * 3
 	elif id == "orbital" and passives.bearing:
-		result += 8
+		result += 8 + maxi(0, passive_rank("bearing") - 1) * 2
 	if id == "orbital" and evolved.orbital:
 		result += 18
 	return result
@@ -73,11 +92,18 @@ func evolve(id: String) -> bool:
 	return true
 
 func snapshot() -> Dictionary:
-	return {"levels": levels.duplicate(), "passives": passives.duplicate(), "evolved": evolved.duplicate(), "equipped": equipped.duplicate(), "cores": cores}
+	var ranks: Dictionary = {}
+	for id: String in PASSIVE_IDS: ranks[id] = passive_rank(id)
+	return {"levels": levels.duplicate(), "passives": passives.duplicate(), "passive_levels": ranks, "evolved": evolved.duplicate(), "equipped": equipped.duplicate(), "cores": cores}
 
 func restore(data: Dictionary) -> void:
 	levels = data.get("levels", {"drone": 1, "tesla": 0, "orbital": 0}).duplicate()
 	passives = data.get("passives", {"optic": false, "battery": false, "bearing": false}).duplicate()
+	passives["magnet"] = passives.get("magnet", false)
+	passive_levels = data.get("passive_levels", {}).duplicate()
+	for id: String in PASSIVE_IDS:
+		passives[id] = passives.get(id, false)
+		passive_levels[id] = int(passive_levels.get(id, 1 if passives[id] else 0))
 	evolved = data.get("evolved", {"drone": false, "tesla": false, "orbital": false}).duplicate()
 	equipped.assign(data.get("equipped", ["drone"]))
 	cores = int(data.get("cores", 0))
@@ -91,9 +117,20 @@ static func valid(value: Variant) -> bool:
 		return false
 	if value.is_empty():
 		return true
-	for field: String in ["levels", "passives", "evolved"]:
+	for field: String in ["levels", "evolved"]:
 		if not value.get(field) is Dictionary or value[field].size() != 3:
 			return false
+	if not value.get("passives") is Dictionary or value.passives.size() not in [3, 4, 6]: return false
+	var active: int = 0
+	for id: Variant in value.passives:
+		if id not in PASSIVE_IDS or not value.passives[id] is bool: return false
+		if value.passives[id]: active += 1
+	if active > 4: return false
+	if value.passives.has("magnet") and not value.passives.magnet is bool: return false
+	if value.has("passive_levels"):
+		if not value.passive_levels is Dictionary or value.passive_levels.size() not in [4, 6]: return false
+		for id: String in PASSIVE_IDS:
+			if not ExpansionSystem.number(value.passive_levels.get(id, 0), 0, 5, true) or (value.passives.get(id, false) and value.passive_levels.get(id, 0) == 0): return false
 	var core_count: Variant = value.get("cores")
 	if not (core_count is int or core_count is float) or not is_finite(float(core_count)) or core_count < 0 or core_count > 1000000 or floorf(core_count) != core_count:
 		return false
@@ -103,7 +140,7 @@ static func valid(value: Variant) -> bool:
 			return false
 		if not value.evolved.get(data.id) is bool or not value.passives.get(data.passive) is bool:
 			return false
-		if value.evolved[data.id] and (level != MAX_LEVEL or not value.passives[data.passive]):
+		if value.evolved[data.id] and level != MAX_LEVEL:
 			return false
 	var slots: Variant = value.get("equipped")
 	if not slots is Array or slots.is_empty() or slots.size() > SLOTS:
@@ -121,8 +158,8 @@ static func saved_spent(value: Dictionary) -> int:
 	var total: int = -1
 	for level: Variant in value.levels.values():
 		total += int(level)
-	for installed: bool in value.passives.values():
-		total += 1 if installed else 0
+	for id: String in PASSIVE_IDS:
+		total += int(value.get("passive_levels", {}).get(id, 1 if value.passives.get(id, false) else 0))
 	return total
 
 func _process(delta: float) -> void:

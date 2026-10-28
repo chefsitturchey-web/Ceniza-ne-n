@@ -12,6 +12,11 @@ func _draw() -> void:
 	if boss is SantaCaldera:
 		var boiler: SantaCaldera = boss as SantaCaldera
 		var active: bool = boiler.state == Recaudador.State.CLAW
+		if boiler.state == Recaudador.State.CHARGE_WINDUP:
+			var side: Vector2 = boiler.charge_direction.orthogonal() * 28
+			var end: Vector2 = boiler.position + boiler.charge_direction * 260
+			draw_colored_polygon(PackedVector2Array([boiler.position + side, end + side, end - side, boiler.position - side]), Color("dd6482", 0.22))
+			draw_line(boiler.position, end, Color("ffce75"), 2)
 		for area: Rect2 in boiler.heat_areas:
 			draw_rect(area, Color(1, 0.36, 0.12, 0.36 if active else 0.08))
 			draw_rect(area, Color("e89e54") if active else Color("ffce75"), false, 2)

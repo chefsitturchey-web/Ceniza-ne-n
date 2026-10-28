@@ -25,6 +25,8 @@ var zone_index: int = 0
 var campaign: Dictionary = CampaignRoute.initial_state()
 var terrain: ZoneHazards
 var expansion: ExpansionSystem
+var experience: ExperienceSystem
+var civic: CivicSystem
 
 func initialize() -> void:
 	var transfer: Dictionary = CampaignRoute.take(zone_index)
@@ -79,7 +81,7 @@ func on_phase_changed(phase: String, _day: int) -> void:
 func restart() -> void:
 	if save_system != null:
 		CampaignRoute.resume_path = save_system.save_path
-	if save_system != null and (zone_index == 0 or not save_system.has_save()):
+	if save_system != null and won:
 		save_system.delete_save()
 	get_tree().paused = false
 	get_tree().reload_current_scene()
@@ -94,6 +96,7 @@ func resume_game() -> void:
 	presenter.publish()
 
 func _process(delta: float) -> void:
+	if experience != null and experience.panel.opened: return
 	if briefing != null and (briefing.opened or briefing.closed_frame == Engine.get_process_frames()):
 		return
 	if options != null and (options.opened or options.closed_frame == Engine.get_process_frames()):
@@ -118,11 +121,18 @@ func _process(delta: float) -> void:
 		finish(false)
 		return
 	presenter.tick(delta)
+	if experience != null:
+		experience.tick(delta)
+		if get_tree().paused: return
 	overload.tick(delta)
 	cycle.update_phase(delta)
 	if finished:
 		return
 	colony.update_workers(delta)
+	if civic != null and Input.is_action_just_pressed("escort"):
+		civic.advance_side = 0 if civic.advance_side != 0 else (-1 if player.position.x < 0 else 1)
+		presenter.show_notice("Escolta: retirada" if civic.advance_side == 0 else "Escolta: atacar entrada del frente")
+	if civic != null: civic.tick(delta)
 	if expansion != null:
 		expansion.tick(delta)
 	if terrain != null:
@@ -146,7 +156,7 @@ func win() -> void:
 	finish(true)
 
 func finish(victory: bool) -> void:
-	if save_system != null and (victory or zone_index == 0):
+	if save_system != null and victory:
 		save_system.delete_save()
 	finished = true
 	won = victory

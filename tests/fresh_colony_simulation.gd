@@ -12,12 +12,13 @@ func simulate() -> void:
 	root.add_child(world)
 	world.cycle.boss_required = false # Aquí se verifica el asedio; expedición tiene pruebas propias.
 	world.session.set_process(false)
+	world.experience.present_choices = false
 	world.player.set_physics_process(false)
 	var player: Player = world.player
 	var next_order: int = 0
 	var order_time: float = -1
 	var all_built: bool = false
-	for step: int in range(5000):
+	for step: int in range(15000):
 		player.invulnerable = maxf(0, player.invulnerable - 0.1)
 		player.cooldown_remaining = maxf(0, player.cooldown_remaining - 0.1)
 		Input.action_release("interact")
@@ -62,6 +63,10 @@ func simulate() -> void:
 							Input.action_press("interact")
 						break
 		world.session._process(0.1)
+		if world.experience.pending > 0:
+			world.experience.choose(world.experience.options()[0], false)
+		if world.experience.chest_pending > 0:
+			world.experience.choose(world.experience.options(true)[0], true)
 		var complete: int = 0
 		for site: ConstructionSite in world.construction.sites:
 			if site.hp > 0:

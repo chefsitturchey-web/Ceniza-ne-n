@@ -56,14 +56,15 @@ func _ready() -> void:
 	_item(third, "amenaza")
 	_item(third, "sobrecarga")
 	var controls: GridContainer = GridContainer.new()
-	controls.columns = 2
-	controls.add_theme_constant_override("h_separation", 24)
+	controls.columns = 4
+	controls.add_theme_constant_override("h_separation", 12)
 	controls.add_theme_constant_override("v_separation", 2)
 	rows.add_child(controls)
 	for text: String in ["Mover", "A/D / Stick", "Atacar", "J / X", "Esquivar", "Espacio / A",
-		"Interactuar", "Mantener E / Y", "Sobrecarga", "Q / LB", "Continuar", "Esc / Start",
-		"Reintentar al final", "R / Select", "Silenciar audio", "M"]:
+		"Interactuar", "Mantén E / Y", "Sobrecarga", "Q / LB", "Continuar", "Esc / Start",
+		"Reintentar", "R / Select", "Audio", "M", "Escolta", "F / Arriba"]:
 		var label: Label = Label.new()
+		label.add_theme_font_size_override("font_size", 10)
 		label.text = text
 		controls.add_child(label)
 	var actions: HBoxContainer = _row()

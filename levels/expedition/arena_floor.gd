@@ -25,6 +25,7 @@ func _ready() -> void:
 	_add_dust()
 
 func _process(delta: float) -> void:
+	if theme_id == "foundry" and int(light_time * 8) != int((light_time + delta) * 8): queue_redraw()
 	if dust != null:
 		dust.emitting = GamePreferences.current().particles
 	# Luces industriales con parpadeos ocasionales y alarma que respira.
@@ -60,6 +61,35 @@ func _draw() -> void:
 	for x: int in [48, 592]:
 		for y: int in [80, 400]:
 			draw_rect(Rect2(x - 5, y - 2, 10, 4), AMBER)
+	if theme_id == "foundry": _draw_foundry_basin()
+
+func _draw_foundry_basin() -> void:
+	var boundary: PackedVector2Array = PackedVector2Array([Vector2(140, 24), Vector2(500, 24), Vector2(616, 140), Vector2(616, 340), Vector2(500, 456), Vector2(140, 456), Vector2(24, 340), Vector2(24, 140), Vector2(140, 24)])
+	for corner: Vector2 in [Vector2.ZERO, Vector2(640, 0), Vector2(640, 480), Vector2(0, 480)]:
+		var inward: Vector2 = Vector2(1 if corner.x == 0 else -1, 1 if corner.y == 0 else -1)
+		draw_colored_polygon(PackedVector2Array([corner, corner + Vector2(inward.x * 164, 0), corner + Vector2(0, inward.y * 164)]), Color("140f15"))
+		for line: int in range(7):
+			var at: Vector2 = corner + inward * (12 + line * 10)
+			draw_line(at, at + Vector2(inward.x * (120 - line * 15), 0), Color(0.8, 0.27 + 0.04 * sin(light_time + line), 0.09, 0.5), 3)
+	draw_polyline(boundary, Color("0b1322"), 13)
+	draw_polyline(boundary, Color("704c43"), 8)
+	draw_polyline(boundary, Color("8299a8"), 1)
+	for side: int in [-1, 1]:
+		for y: int in [195, 285]:
+			var center: Vector2 = Vector2(320 + side * 269, y)
+			draw_circle(center, 15, Color("0b1322"))
+			draw_arc(center, 13, 0, TAU, 20, Color("704c43"), 3)
+			for tooth: int in range(8):
+				var arm: Vector2 = Vector2.from_angle(light_time * side * 0.4 + tooth * TAU / 8) * 11
+				draw_line(center, center + arm, Color("8299a8"), 2)
+			if GamePreferences.current().particles:
+				for puff: int in range(4):
+					var rise: float = fposmod(light_time * 14 + puff * 8, 35)
+					draw_rect(Rect2(center + Vector2(-3 + sin(rise) * 2, -rise), Vector2(5, 4)), Color(0.6, 0.7, 0.75, (1.0 - rise / 35) * 0.25))
+	for index: int in range(8):
+		var point: Vector2 = boundary[index]
+		draw_circle(point, 7, Color("182639"))
+		draw_circle(point, 2, Color("ffce75"))
 
 func _draw_tiles() -> void:
 	for x: int in range(20):

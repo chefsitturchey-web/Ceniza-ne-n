@@ -35,6 +35,8 @@ Para liberar un distrito destruyes sus **repetidores enemigos**, tomas el **tren
 
 La ruta jugable conecta **Periferia oxidada → Fundición → Barrio inundado** y tres jefes distintos. Viajas conservando mejoras y habitantes; cada nueva colonia tiene terreno, preparación y defensas propias. [Ruta, jefes y pruebas directas](docs/CAMPANA_Y_JEFES.md).
 
+La revisión actual sigue el GDD: **campamentos → herramientas → profesiones**, construcción con trabajadores, murallas por etapas y **experiencia recogible con tres elecciones al subir de nivel**. [Revisión a fondo, referencias y pendientes](docs/REVISION_GDD_KINGDOM_SURVIVORS.md).
+
 > *"De día, la ciudad parecía muerta. De noche, las máquinas vuelven a conectarse."*
 
 Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión), **Dark Souls** (resistencia, esquiva y jefes legibles), **Enter the Gungeon** (arenas de jefe) y **Vampire Survivors** (armamento automático, en desarrollo).
@@ -71,14 +73,14 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 
 - **Combate exigente:** ataque cuerpo a cuerpo, esquiva con invulnerabilidad y resistencia; el cansancio se nota en la animación.
 - **Siete tipos de enemigo:** Errante, Corredor, Blindado, Saltador, Ariete, Artillero con proyectiles interceptables y Saboteador que busca instalaciones.
-- **Colonias ampliadas:** mapas de 3200 unidades, suministros, generadores, recicladoras, cuarteles y puestos médicos. Fusileros y drones sanitarios aliados, con animaciones propias. [Cómo desplegarlos y escena de práctica](docs/EXPANSION_Y_UNIDADES.md).
+- **Colonias ampliadas:** mapas de 3200 unidades, suministros, generadores, recicladoras, cuarteles y puestos médicos. Profesiones, escuadras y expansión por murallas. [Reglas actuales y escena de práctica](docs/REVISION_GDD_KINGDOM_SURVIVORS.md).
 - **Siluetas propias:** Blindado, Saltador y Ariete usan piezas mecánicas animadas con armadura, muelles y pistón; conservan los sprites anteriores como alternativa del Inspector.
 - **Defensas articuladas:** las torretas siguen blancos y disparan con retroceso desde el cañón. Introducción sin consumir tiempo, objetivos visibles y viajes entre colonias con guardado.
-- **Colonia automática:** constructores y recuperadores con tareas propias; recluta hasta cuatro habitantes.
+- **Colonia con profesiones:** recluta supervivientes y ofrece herramientas a trabajadores, tiradores, guardianes, técnicos y médicos. Refugios amplían la población hasta veinte.
 - **Economía y energía:** chatarra para construir, capacidad energética para mantener torretas y sobrecarga independiente por frente.
 - **Expediciones:** la colonia se pausa mientras luchas contra el jefe; si caes, vuelves al mismo momento para prepararte mejor.
 - **Guardado automático** al comenzar cada día (incluye repetidores destruidos y el tren).
-- **Clínica de enlace:** cada seis máquinas derrotadas dan un punto para mejorar filo, dron o recuperación de resistencia; tres rangos por módulo. Terminal a la izquierda del núcleo, mantener E de día.
+- **Experiencia y clínica:** recoge datos, sube de nivel y elige una mejora. La clínica permite configurar equipo y cambiar cuatro pasivas entre seis disponibles, conservando las evoluciones.
 - **Equipo automático:** dos ranuras, dron, Tesla y disco orbital; cinco niveles, pasivas y tres evoluciones mediante núcleos de enlace. [Cómo equiparlos y evolucionarlos](docs/MODULOS_Y_EVOLUCIONES.md).
 - **Audio por fases:** música original de trabajo por capas y efectos CC0 de combate. M silencia el audio; mezcla separada de música y efectos.
 - **Arte pixel coherente:** todo en vista lateral plana (la arena es cenital), paleta propia, fuentes pixel y fondo con parallax.

@@ -21,7 +21,7 @@ func _physics_process(delta: float) -> void:
 	var next_x: float = position.x + direction * 300 * delta
 	var candidates: Array[Node2D] = [session.core]
 	if session.player.health > 0: candidates.append(session.player)
-	for site: ConstructionSite in session.bank.sites:
+	for site: ConstructionSite in session.expansion.district.construction.defensive_sites():
 		if site.hp > 0 and site.data.blocks_enemies: candidates.append(site)
 	if session.expansion != null:
 		for site: ExpansionOutpost in session.expansion.sites:
