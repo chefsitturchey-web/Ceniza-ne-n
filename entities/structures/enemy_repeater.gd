@@ -2,6 +2,9 @@ class_name EnemyRepeater
 extends Node2D
 
 signal destroyed
+signal defense_requested(portal: EnemyRepeater)
+var defense_warning: float = 0
+var defense_pending: int = 0
 const TEXTURE: Texture2D = preload("res://assets/expedition/repeater.png")
 var health: HealthComponent = HealthComponent.new()
 var effects: StructureEffects = StructureEffects.new()
@@ -17,17 +20,21 @@ func _ready() -> void:
 	hurtbox.actor = self
 	hurtbox.bounds = Rect2(-16, -78, 32, 78)
 	add_child(hurtbox)
-	hurtbox.hit.connect(health.take_damage)
+	hurtbox.hit.connect(receive_assault)
 	add_child(effects)
 	effects.setup(health, TEXTURE)
 	health.died.connect(_destroyed)
 
 func _destroyed() -> void:
+	defense_warning = 0
+	defense_pending = 0
 	remove_from_group(GameRules.REPEATERS)
 	effects.shatter()
 	destroyed.emit()
 
 func restore(broken: bool) -> void:
+	defense_warning = 0
+	defense_pending = 0
 	health.reset(0 if broken else 300)
 	if broken:
 		remove_from_group(GameRules.REPEATERS)
@@ -35,7 +42,23 @@ func restore(broken: bool) -> void:
 		add_to_group(GameRules.REPEATERS)
 	queue_redraw()
 
-func _process(_delta: float) -> void:
+func receive_assault(amount: int) -> void:
+	if health.current <= 0 or amount <= 0: return
+	var before: int = health.current
+	health.take_damage(amount)
+	if health.current <= 0: return
+	# Tres refuerzos por portal. Se derivan del daño: retirarse no reinicia la reserva.
+	for threshold: int in [300, 200, 100]:
+		if before >= threshold and health.current < threshold:
+			defense_pending += 1
+			defense_warning = 0.8
+
+func _process(delta: float) -> void:
+	if defense_warning > 0:
+		defense_warning = maxf(0, defense_warning - delta)
+		if defense_warning == 0 and health.current > 0:
+			for index: int in range(defense_pending): defense_requested.emit(self)
+			defense_pending = 0
 	queue_redraw()
 
 func _draw() -> void:

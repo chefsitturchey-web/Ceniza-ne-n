@@ -115,7 +115,7 @@ func publish() -> void:
 		var outpost: ExpansionOutpost = interaction.expansion.sites[-100 - target]
 		context = outpost.spec.title + (": operativo" if outpost.hp >= outpost.MAX_HEALTH else (": desplegando" if outpost.ordered else (": reparar" if outpost.hp > 0 else ": desplegar")))
 		if outpost.hp >= outpost.MAX_HEALTH:
-			var purpose: Dictionary = {"generator": "+2 energía", "recycler": "+5 chatarra / 12 s de día", "barracks": "fusilero de guardia", "medical": "dron sanitario"}
+			var purpose: Dictionary = {"generator": "+2 energía", "recycler": "+5 chatarra / 12 s de día", "barracks": "guarnición", "medical": "puesto de médicos"}
 			context = outpost.spec.title + ": " + (String(purpose[outpost.spec.id]) if interaction.expansion.powered(outpost) else "sin energía")
 		context_cost = -1 if outpost.hp >= outpost.MAX_HEALTH or outpost.ordered else (12 if outpost.hp > 0 else int(outpost.spec.cost))
 		context_key = cycle.phase == "DÍA" and not outpost.ordered and outpost.hp < outpost.MAX_HEALTH

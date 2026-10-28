@@ -33,6 +33,10 @@ func open_choices(is_chest: bool) -> void:
 	rows.add_child(heading)
 	for option: Dictionary in experience.options(chest):
 		var button: Button = Button.new()
+		button.icon = GameArt.icon(option.id)
+		button.expand_icon = true
+		button.add_theme_constant_override("icon_max_width", 44)
+		button.add_theme_constant_override("h_separation", 14)
 		button.text = option.title + "\n" + option.text
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -41,7 +45,7 @@ func open_choices(is_chest: bool) -> void:
 		button.pressed.connect(select.bind(option))
 		rows.add_child(button)
 	var hint: Label = Label.new()
-	hint.text = "Dos módulos automáticos · cuatro pasivas · progreso de campaña"
+	hint.text = "Colonia: enlaces a tropas · Jefes: armas propias · 4 pasivas"
 	hint.add_theme_font_size_override("font_size", 10)
 	rows.add_child(hint)
 	show()

@@ -32,9 +32,9 @@ func _ready() -> void:
 		title.text = zone.title.to_upper()
 	title.add_theme_color_override("font_color", Color("47dacb"))
 	rows.add_child(title)
-	var instructions: Array[String] = ["Construye murallas y torretas: mantén E en sus cimientos.", "Recluta en campamentos. Compra herramientas en el taller izquierdo.", "Los constructores viajan a las obras y se retiran si hay peligro.", "Resiste una noche, genera energía y cierra entradas para tomar el tren.", "A/D mover · J atacar · E interactuar · Espacio esquivar\nQ sobrecarga · F escolta · Esc o Start pausa"]
+	var instructions: Array[String] = ["Construye murallas y torretas: mantén E en sus cimientos.", "Recluta en campamentos. Compra herramientas en el taller izquierdo.", "Los constructores viajan a las obras y se retiran si hay peligro.", "Resiste una noche, genera energía y cierra entradas para tomar el tren.", "A/D mover · J: solo jefes · E interactuar · Espacio esquivar\nQ sobrecarga · F escolta · Esc o Start pausa"]
 	if zone != null and zone.id != "periphery":
-		instructions = ["Tus mejoras y habitantes han llegado contigo. Levanta las defensas de esta colonia con E antes del asedio.", "Las rejillas avisan en amarillo antes de quemar durante la noche." if zone.id == "foundry" else "Los charcos frenan tus pasos. Puedes cruzarlos con una esquiva.", "Destruye los repetidores de ambos extremos y toma el tren de día para desafiar a " + zone.boss_title + ".", zone.briefing, "A/D: mover   J: atacar   E: interactuar\nEspacio: esquivar   Q: sobrecarga   Esc: pausa"]
+		instructions = ["Tus mejoras y habitantes han llegado contigo. Levanta las defensas de esta colonia con E antes del asedio.", "Las rejillas avisan en amarillo antes de quemar durante la noche." if zone.id == "foundry" else "Los charcos frenan tus pasos. Puedes cruzarlos con una esquiva.", "Ordena cerrar los repetidores de ambos extremos y toma el tren de día para desafiar a " + zone.boss_title + ".", zone.briefing, "A/D: mover   J: solo jefes   E: interactuar\nEspacio: esquivar   Q: sobrecarga   Esc: pausa"]
 	for text: String in instructions:
 		var label: Label = Label.new()
 		label.text = text

@@ -26,9 +26,9 @@ func run_checks() -> void:
 	verify(world.defenses.nearest_enemy(-880, 50) == null, "Defensas ignoran repetidores")
 	for repeater: EnemyRepeater in manager.repeaters:
 		verify(not repeater.is_in_group(GameRules.ENEMIES), "Repetidores fuera de oleadas")
-		world.player.hitbox.strike(repeater.hurtbox.world_rect(), 50)
-		verify(repeater.health.current == 250, "Hitbox del jugador golpea torre")
-		world.player.hitbox.strike(repeater.hurtbox.world_rect(), 250)
+		repeater.hurtbox.receive(50)
+		verify(repeater.health.current == 250, "Asalto de tropas golpea torre")
+		repeater.hurtbox.receive(250)
 		verify(repeater.health.current == 0, "Destruir torre")
 		if repeater == manager.repeaters[0]:
 			verify(not station.unlocked, "Una torre no activa tren")

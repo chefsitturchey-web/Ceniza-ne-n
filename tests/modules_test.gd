@@ -28,6 +28,9 @@ func run_checks() -> void:
 	world = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	# Banco de combate aislado de las reglas de colonia.
+	world.player.combat_enabled = true
+	world.player.hitbox.enabled = true
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	await process_frame

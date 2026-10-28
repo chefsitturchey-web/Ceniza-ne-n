@@ -40,7 +40,7 @@ func run_checks() -> void:
 	world.add_child(target)
 	world.player.facing = 1
 	world.player.attack()
-	verify(target.health == 40, "El golpe real suma 10 al daño base de 50")
+	verify(target.health == 100, "La colonia bloquea la hoja aunque tenga implantes")
 	target.free()
 	var arena_player: TopdownPlayer = TopdownPlayer.new()
 	arena_player.copy_from(world.player)
@@ -58,8 +58,8 @@ func run_checks() -> void:
 	drone_target.position = world.player.position + Vector2(80, 0)
 	world.defenses.drone_timer = 0
 	world.defenses.update_defenses(0)
-	verify(drone_target.health == 100 - GameRules.DRONE_DAMAGE - 12, "El disparo real del dron suma el daño instalado")
-	verify(is_equal_approx(world.defenses.drone_timer, GameRules.DRONE_INTERVAL * 0.7), "La mejora reduce el intervalo del dron")
+	verify(drone_target.health == 100, "El dron personal no dispara en la colonia")
+	verify(world.defenses.drone_timer == 0, "El dron queda reservado al jefe")
 	drone_target.take_damage(10000)
 	var capacitor_player: TopdownPlayer = TopdownPlayer.new()
 	capacitor_player.copy_from(world.player)

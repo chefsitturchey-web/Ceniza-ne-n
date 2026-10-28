@@ -18,6 +18,7 @@ func simulate() -> void:
 	var next_order: int = 0
 	var order_time: float = -1
 	var all_built: bool = false
+	var strategy: RefCounted = load("res://tests/commander_strategy.gd").new()
 	for step: int in range(15000):
 		player.invulnerable = maxf(0, player.invulnerable - 0.1)
 		player.cooldown_remaining = maxf(0, player.cooldown_remaining - 0.1)
@@ -43,6 +44,8 @@ func simulate() -> void:
 				player.health = Player.MAX_HEALTH
 				player.position.x = 0
 				player.invulnerable = Player.RESPAWN_INVULNERABILITY
+		elif strategy.tick(world, 0.1):
+			pass
 		else:
 			var target: Node2D = null
 			for enemy: Node2D in get_nodes_in_group(GameRules.ENEMIES):

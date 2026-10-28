@@ -31,6 +31,8 @@ var experience: ExperienceSystem
 var civic: CivicSystem
 
 func _ready() -> void:
+	player.combat_enabled = false
+	player.hitbox.enabled = false
 	InputSetup.configure_input()
 	zone = CampaignRoute.zone(zone_index)
 	if zone_index > 0:
@@ -168,6 +170,8 @@ func _ready() -> void:
 	neural.changed.connect(func() -> void: clinic.available = neural.points() > 0 or modules.cores > 0)
 	neural.point_earned.connect(func() -> void: presenter.show_notice("Punto neuronal: visita la clínica a la izquierda del núcleo"))
 	director.spawned.connect(_connect_neural)
+	for portal: EnemyRepeater in civic.gates + expedition.repeaters:
+		portal.defense_requested.connect(civic.defend_portal)
 	var arriving: bool = not CampaignRoute.pending.is_empty()
 	session.initialize()
 	sound.district = self
@@ -183,4 +187,4 @@ func _ready() -> void:
 
 func _connect_neural(enemy: SiegeEnemy, _side: float) -> void:
 	enemy.reward_requested.connect(func(reward: int) -> void:
-		experience.drop(enemy.position, reward, enemy.elite))
+		if reward > 0: experience.drop(enemy.position, reward, enemy.elite))

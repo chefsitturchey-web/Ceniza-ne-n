@@ -16,6 +16,9 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	# Banco de combate aislado de las reglas de colonia.
+	world.player.combat_enabled = true
+	world.player.hitbox.enabled = true
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	var runner: SiegeEnemy = world.director.spawn_enemy(1.0, load("res://data/enemies/corredor.tres"))

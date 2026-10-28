@@ -52,6 +52,7 @@ func tick(delta: float) -> void:
 		destination = anchor
 	var enemy: SiegeEnemy
 	var nearest: float = 260
+	var assaulting: bool = world.civic != null and world.civic.advance_side == int(signf(home.position.x)) and role in ["ranger", "guardian"]
 	if world.civic != null and world.civic.advance_side == int(signf(home.position.x)) and role in ["ranger", "guardian"] and world.defenses.nearest_enemy(position.x, 180) == null:
 		var portal: EnemyRepeater
 		for gate: EnemyRepeater in world.civic.gates + world.expedition.repeaters:
@@ -61,11 +62,12 @@ func tick(delta: float) -> void:
 			facing = signf(portal.position.x - position.x)
 			position.x = move_toward(position.x, portal.position.x - facing * (30 if role == "guardian" else 110), delta * 70)
 			if absf(portal.position.x - position.x) < (45 if role == "guardian" else 150) and cooldown <= 0:
-				portal.hurtbox.receive(14)
+				portal.hurtbox.receive(14 + world.modules.command_damage())
 				beam_to = portal.position + Vector2(0, -30)
 				shot = 0.12
 				cooldown = 1.2
 			return
+	if assaulting: anchor = position.x
 	if role in ["ranger", "guardian"]:
 		for candidate: Node in get_tree().get_nodes_in_group(GameRules.ENEMIES):
 			var distance: float = absf(candidate.position.x - anchor)
@@ -77,8 +79,8 @@ func tick(delta: float) -> void:
 				facing = signf(enemy.position.x - position.x)
 			destination = enemy.position.x - facing * (30 if role == "guardian" else 145)
 			if absf(enemy.position.x - position.x) <= (42 if role == "guardian" else 180) and cooldown <= 0:
-				if role == "guardian": enemy.take_damage(22)
-				else: enemy.receive_shot(16, global_position + Vector2(0, -24))
+				if role == "guardian": enemy.take_damage(22 + world.modules.command_damage())
+				else: enemy.receive_shot(16 + world.modules.command_damage(), global_position + Vector2(0, -24))
 				beam_to = enemy.position + Vector2(0, -20)
 				cooldown = 0.9
 				shot = 0.12

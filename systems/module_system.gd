@@ -55,6 +55,13 @@ func damage_for(id: String) -> int:
 	var data: ModuleData = definition(id)
 	return data.damage + maxi(0, int(levels[id]) - 1) * data.damage_per_level
 
+func command_damage() -> int:
+	# Los enlaces equipados transmiten mejoras a las tropas sin disparar en colonia.
+	var bonus: int = 0
+	for id: String in equipped:
+		bonus += int(levels[id]) + (3 if evolved[id] else 0)
+	return bonus + (passive_rank("condenser") if passives.condenser else 0)
+
 func range_for(id: String) -> float:
 	var result: float = definition(id).attack_range
 	if id == "drone" and passives.optic:
@@ -175,6 +182,7 @@ func _physics_process(delta: float) -> void:
 		update_arena(delta)
 
 func update_lateral(delta: float) -> void:
+	if actor is Player and not actor.combat_enabled: return
 	if actor == null or actor.health <= 0:
 		return
 	for id: String in ["tesla", "orbital"]:

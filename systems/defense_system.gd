@@ -50,6 +50,8 @@ func update_defenses(delta: float) -> void:
 				site.fire_effects()
 				fire_from(site.muzzle_position(), target, site.data.damage, overload.overloaded(site.x))
 				site.shot = site.data.overloaded_interval if overload.overloaded(site.x) else site.data.interval
+	# La colonia se defiende con tropas y edificios; el equipo personal va al jefe.
+	if not player.combat_enabled: return
 	drone_timer = maxf(0.0, drone_timer - delta)
 	if drone_timer == 0.0 and player.health > 0 and (modules == null or "drone" in modules.equipped):
 		var reach: float = modules.range_for("drone") if modules != null else GameRules.DRONE_RANGE

@@ -4,7 +4,7 @@ extends Node2D
 const SPECS: Array[Dictionary] = [
 	{"id": "barracks", "title": "Cuartel", "x": 450.0, "cost": 50, "energy": 1},
 	{"id": "medical", "title": "Puesto médico", "x": 820.0, "cost": 45, "energy": 1},
-	{"id": "generator", "title": "Generador", "x": 1040.0, "cost": 35, "energy": 0},
+	{"id": "generator", "title": "Generador", "x": 360.0, "cost": 35, "energy": 0},
 	{"id": "recycler", "title": "Recicladora", "x": 1230.0, "cost": 40, "energy": 0},
 ]
 const CACHE_X: Array[float] = [-1500.0, -1140.0, -700.0, 700.0, 1140.0, 1500.0]

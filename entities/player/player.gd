@@ -46,6 +46,7 @@ var dodge_remaining: float = 0.0
 var dodge_direction: float = 1.0
 var respawn_remaining: float = 0.0
 var enabled: bool = true
+var combat_enabled: bool = true
 var neural_damage: int = 0
 var neural_regen: float = 0.0
 var modules: ModuleSystem
@@ -149,6 +150,7 @@ func take_damage(amount: int) -> void:
 	refresh_state()
 
 func attack() -> void:
+	if not combat_enabled: return
 	if not enabled or health <= 0 or cooldown_remaining > 0.0 or dodge_remaining > 0.0:
 		return
 	cooldown_remaining = attack_cooldown

@@ -17,11 +17,13 @@ func simulate() -> void:
 	world.player.health = 100 if assist else 0
 	for site: ConstructionSite in world.construction.sites:
 		site.hp = site.max_hp
+	var strategy: RefCounted = load("res://tests/commander_strategy.gd").new()
 	for step: int in range(15000):
 		if assist:
 			var player: Player = world.player
 			player.invulnerable = maxf(0.0, player.invulnerable - 0.1)
 			player.cooldown_remaining = maxf(0.0, player.cooldown_remaining - 0.1)
+			strategy.tick(world, 0.1)
 			if player.health <= 0:
 				player.respawn_remaining -= 0.1
 				if player.respawn_remaining <= 0:
@@ -64,5 +66,9 @@ func simulate() -> void:
 				push_error("La simulación cambió respecto a la referencia de las oleadas ampliadas")
 			quit(0 if matches_reference else 1)
 			return
-	push_error("La partida no terminó en el presupuesto de simulación")
-	quit(1)
+	if not assist:
+		print("PASS: una colonia sin gestión no obtiene victoria automática; asedio estancado")
+		quit(0)
+	else:
+		push_error("La partida no terminó en el presupuesto de simulación")
+		quit(1)

@@ -48,6 +48,18 @@ func stabilized() -> bool:
 		if site.hp > 0 and site.data.blocks_enemies: walls_ready += 1
 	return walls_ready >= 2 and district.expansion.energy_bonus() > 0
 
+func defend_portal(portal: EnemyRepeater) -> void:
+	if portal.health.current <= 0 or district.session.finished: return
+	# Refuerzos sin botín: no se puede cultivar experiencia provocando una puerta.
+	if get_tree().get_nodes_in_group(GameRules.ENEMIES).size() >= 24: return
+	district.presenter.show_notice("El portal se defiende: protege a tus tiradores")
+	district.sound.play_cue("warning")
+	for id: String in ["errante", "corredor"]:
+		var data: EnemyData = load("res://data/enemies/" + id + ".tres").duplicate() as EnemyData
+		data.reward = 0
+		var enemy: SiegeEnemy = district.director.spawn_enemy(signf(portal.position.x), data, district.cycle.day)
+		enemy.position.x = portal.position.x - signf(portal.position.x) * 20
+
 func entrance(side: float) -> float:
 	var closest: float = 1440
 	for gate: EnemyRepeater in gates:
@@ -240,43 +252,19 @@ static func valid(data: Variant, gate_count: int) -> bool:
 	return true
 
 func _draw() -> void:
-	var cell: Vector2 = ExpansionOutpost.ART.get_size() * 0.5
-	draw_texture_rect_region(ExpansionOutpost.ART, Rect2(-706, 118, 202, 142), Rect2(Vector2.ZERO, cell), Color("a5b4ba"))
+	draw_texture_rect_region(GameArt.CIVIC, Rect2(-721, 118, 242, 158), GameArt.region(GameArt.CIVIC, 2, 2, 2))
 	for side: int in [-1, 1]:
 		var x: float = side * 1340
-		draw_rect(Rect2(x - 25, GameRules.FLOOR_Y - 31, 50, 31), Color("182639"))
-		draw_colored_polygon(PackedVector2Array([Vector2(x - 30, 229), Vector2(x, 209), Vector2(x + 30, 229)]), Color("704c43"))
-		draw_circle(Vector2(x + 17, 255), 5, Color("ffce75"))
+		draw_texture_rect_region(GameArt.CIVIC, Rect2(x - 70, 173, 140, 100), GameArt.region(GameArt.CIVIC, 2, 2, 0))
+		for spark: int in range(4):
+			var rise: float = fmod(elapsed * 14 + spark * 7, 23)
+			draw_rect(Rect2(x + 36 + sin(elapsed * 2 + spark) * 3, 242 - rise, 1, 2), Color("ffce75", 1 - rise / 23))
+	var ids: Array[String] = ["wrench", "scrap", "blade", "shield", "wrench", "medical"]
 	for index: int in range(RACK_X.size()):
 		var x: float = RACK_X[index]
-		draw_rect(Rect2(x - 10, 230, 20, 30), Color("304356"))
-		draw_rect(Rect2(x - 11, 229, 22, 3), Color("8299a8"))
-		for item: int in range(tools[index]): draw_line(Vector2(x - 7 + item * 4, 236), Vector2(x - 7 + item * 4, 252), Color("ffce75"), 2)
-		draw_rect(Rect2(x - 3, 224, 6, 3), Color("47dacb") if index < 2 else Color("ffce75"))
-		var tint: Color = Color("ffce75") if tools[index] > 0 else Color("8299a8")
-		match index:
-			0:
-				draw_rect(Rect2(x - 1, 236, 2, 14), tint)
-				draw_rect(Rect2(x - 5, 236, 10, 4), tint)
-			1:
-				draw_rect(Rect2(x - 5, 239, 10, 10), tint)
-				draw_rect(Rect2(x - 3, 236, 6, 3), tint)
-			2:
-				draw_line(Vector2(x - 3, 236), Vector2(x + 3, 251), tint, 2)
-			3:
-				draw_colored_polygon(PackedVector2Array([Vector2(x - 5, 236), Vector2(x + 5, 236), Vector2(x + 5, 245), Vector2(x, 251), Vector2(x - 5, 245)]), tint)
-			4:
-				draw_line(Vector2(x, 238), Vector2(x, 251), tint, 2)
-				draw_arc(Vector2(x, 238), 4, 0, PI, 8, tint, 2)
-			5:
-				draw_rect(Rect2(x - 1, 236, 3, 14), tint)
-				draw_rect(Rect2(x - 5, 241, 11, 4), tint)
-	draw_rect(Rect2(60, 220, 40, 40), Color("182639"))
-	draw_colored_polygon(PackedVector2Array([Vector2(56, 221), Vector2(80, 205), Vector2(104, 221)]), Color("704c43"))
+		draw_texture_rect(GameArt.icon(ids[index]), Rect2(x - 11, 228, 22, 22), false, Color.WHITE if tools[index] > 0 else Color("8299a8"))
+		for item: int in range(tools[index]): draw_rect(Rect2(x - 8 + item * 5, 254, 3, 2), Color("ffce75"))
+	draw_texture_rect_region(GameArt.CIVIC, Rect2(28, 166, 104, 106), GameArt.region(GameArt.CIVIC, 2, 2, 1))
 	for citizen: Dictionary in villagers:
-		var x: float = citizen.x
-		var sway: float = roundf(sin(elapsed * 8 + x) * 2)
-		draw_line(Vector2(x - 3, 247), Vector2(x - 4 - sway, 259), Color("8299a8"), 3)
-		draw_line(Vector2(x + 3, 247), Vector2(x + 4 + sway, 259), Color("8299a8"), 3)
-		draw_rect(Rect2(x - 5, 232, 10, 17), Color("704c43"))
-		draw_rect(Rect2(x - 4, 224, 8, 9), Color("8299a8"))
+		var bob: float = roundf(sin(elapsed * 8 + float(citizen.x)))
+		draw_texture_rect_region(GameArt.UNITS, Rect2(float(citizen.x) - 25, 214 + bob, 50, 50), GameArt.region(GameArt.UNITS, 4, 2, 4))
