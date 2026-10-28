@@ -17,7 +17,8 @@ var voices: Array[AudioStreamPlayer] = []
 var music: Array[AudioStreamPlayer] = []
 var cooldowns: Dictionary = {}
 var elapsed: float = 0.0
-var muted: bool = false
+var muted: bool:
+	get: return GamePreferences.current().muted
 var music_enabled: bool = true
 var playback_enabled: bool = true
 
@@ -98,10 +99,3 @@ func _process(delta: float) -> void:
 	var base_db: float = -24.0 if quiet else -12.0
 	music[0].volume_db = move_toward(music[0].volume_db, -60.0 if muted else base_db, delta * 20.0)
 	music[1].volume_db = move_toward(music[1].volume_db, -60.0 if muted or intensity == 0 else base_db - 5.0 + intensity * 5.0, delta * 20.0)
-
-func _unhandled_key_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_M:
-		muted = not muted
-		if muted:
-			for voice: AudioStreamPlayer in voices:
-				voice.stop()

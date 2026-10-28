@@ -41,7 +41,7 @@ func _process(delta: float) -> void:
 func update_state(moving: bool = false) -> void:
 	walking = moving
 	if sprite != null:
-		sprite.modulate = Color(1.6, 1.3, 1.3) if actor.flash > 0.0 else base_tint
+		sprite.modulate = Color(1.6, 1.3, 1.3) if actor.flash > 0.0 and not GamePreferences.current().reduced_flashes else base_tint
 	if actor.windup > 0.0:
 		play_visual(&"ataque", actor.data.attack_visual_duration)
 	elif actor.hurt_remaining > 0.0:

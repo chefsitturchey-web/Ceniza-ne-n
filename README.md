@@ -95,8 +95,8 @@ git clone https://github.com/chefsitturchey-web/Ceniza-ne-n.git
 ```
 
 1. Abre Godot y pulsa **Importar**; elige `project.godot` dentro de la carpeta.
-2. Espera la importación inicial (la primera vez importa fuentes y sprites).
-3. Pulsa **F5** para jugar.
+2. Espera la importación inicial (la primera vez importa fuentes, sprites y audio).
+3. Pulsa **F5**, elige **Nueva partida** o **Continuar**. **Opciones** permite ajustar audio, ventana y efectos; también está en la pausa.
 
 También puedes usar **Code → Download ZIP**. Este repositorio no incluye ejecutable: el juego se prueba desde el editor.
 

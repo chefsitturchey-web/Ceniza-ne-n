@@ -20,6 +20,7 @@ var neural: NeuralSystem = NeuralSystem.new()
 var clinic: NeuralClinic = NeuralClinic.new()
 var clinic_panel: ClinicPanel = ClinicPanel.new()
 var sound: GameSound = GameSound.new()
+var options: SettingsPanel = SettingsPanel.new()
 
 func _ready() -> void:
 	InputSetup.configure_input()
@@ -93,6 +94,10 @@ func _ready() -> void:
 	add_child(clinic)
 	clinic_panel.district = self
 	add_child(clinic_panel)
+	add_child(options)
+	session.options = options
+	$HUD/PausePanel.options_requested.connect(options.open_panel)
+	$HUD/PausePanel.menu_requested.connect(session.return_to_menu)
 	session.clinic_panel = clinic_panel
 	interaction.clinic_panel = clinic_panel
 	interaction.clinic = clinic

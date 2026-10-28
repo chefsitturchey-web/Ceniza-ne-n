@@ -36,7 +36,7 @@ func _process(delta: float) -> void:
 	var offset: Vector2 = Vector2.ZERO
 	if tired and actor.state == Player.State.IDLE:
 		offset.y = roundf(sin(elapsed * 4))
-	if shake > 0:
+	if shake > 0 and not GamePreferences.current().reduced_flashes:
 		offset.x = 1 if int(elapsed * 45) % 2 == 0 else -1
 	if sprite != null:
 		sprite.position = rest_position + offset

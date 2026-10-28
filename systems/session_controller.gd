@@ -19,6 +19,7 @@ var persistence_enabled: bool = true
 var save_system: SaveSystem
 var neural: NeuralSystem
 var clinic_panel: ClinicPanel
+var options: SettingsPanel
 
 func initialize() -> void:
 	if not persistence_enabled:
@@ -28,10 +29,16 @@ func initialize() -> void:
 		add_child(save_system)
 	save_system.session = self
 	cycle.phase_changed.connect(on_phase_changed)
-	if save_system.has_save() and save_system.load_game():
-		presenter.show_notice("Partida cargada")
-	else:
-		on_phase_changed(cycle.phase, cycle.day)
+	if save_system.has_save():
+		if save_system.load_game():
+			presenter.show_notice("Partida cargada")
+			return
+		# La copia precede al nuevo guardado: un documento inválido no se pierde.
+		if not SaveSystem.archive_checkpoint(save_system.save_path, false):
+			presenter.show_notice("Guardado no válido: no se sobrescribirá")
+			save_system = null
+			return
+	on_phase_changed(cycle.phase, cycle.day)
 
 func on_phase_changed(phase: String, _day: int) -> void:
 	if phase == "DÍA" and save_system != null and save_system.save_game():
@@ -43,7 +50,13 @@ func restart() -> void:
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
+func return_to_menu() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://ui/main_menu.tscn")
+
 func _process(delta: float) -> void:
+	if options != null and (options.opened or options.closed_frame == Engine.get_process_frames()):
+		return
 	if clinic_panel != null and clinic_panel.opened:
 		return
 	if clinic_panel != null and clinic_panel.closed_frame == Engine.get_process_frames():

@@ -7,6 +7,32 @@ var save_path: String = "user://partida.json"
 const PLAYER_FIELDS: Array[String] = ["health", "stamina", "facing", "attack_facing", "cooldown_remaining", "slash_remaining", "invulnerable", "dodge_remaining", "dodge_direction", "respawn_remaining"]
 const OVERLOAD_FIELDS: Array[String] = ["overload_left", "overload_right", "cooldown_left", "cooldown_right"]
 
+static func checkpoint_info(path: String = "user://partida.json") -> Dictionary:
+	if not FileAccess.file_exists(path):
+		return {}
+	var parser: JSON = JSON.new()
+	if parser.parse(FileAccess.get_file_as_string(path)) != OK or not parser.data is Dictionary:
+		return {}
+	var data: Dictionary = parser.data
+	if data.get("version") != 1 or data.get("phase") != "DÍA":
+		return {}
+	for field: String in ["day", "scrap"]:
+		var number: Variant = data.get(field)
+		if not (number is int or number is float) or not is_finite(float(number)) or number < (1 if field == "day" else 0) or number > 2147483647 or number != floorf(number):
+			return {}
+	if not data.get("player") is Dictionary or not data.get("structures") is Array:
+		return {}
+	return {"day": int(data.day), "scrap": int(data.scrap)}
+
+static func archive_checkpoint(path: String = "user://partida.json", remove_original: bool = true) -> bool:
+	if not FileAccess.file_exists(path):
+		return true
+	var original: String = ProjectSettings.globalize_path(path)
+	var backup: String = original + ".anterior"
+	if DirAccess.copy_absolute(original, backup) != OK:
+		return false
+	return not remove_original or DirAccess.remove_absolute(original) == OK
+
 func has_save() -> bool:
 	return FileAccess.file_exists(save_path)
 

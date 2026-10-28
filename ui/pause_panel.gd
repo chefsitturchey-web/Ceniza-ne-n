@@ -1,6 +1,9 @@
 class_name PausePanel
 extends PanelContainer
 
+signal options_requested
+signal menu_requested
+
 const ICON_NAMES: Array[String] = ["dia", "aviso", "noche", "chatarra", "energia", "habitantes", "vida", "resistencia", "nucleo", "amenaza", "sobrecarga"]
 var icons: Dictionary = {}
 var values: Dictionary = {}
@@ -61,6 +64,12 @@ func _ready() -> void:
 		var label: Label = Label.new()
 		label.text = text
 		controls.add_child(label)
+	var actions: HBoxContainer = _row()
+	for pair: Array in [["Opciones", func() -> void: options_requested.emit()], ["Menú principal", func() -> void: menu_requested.emit()]]:
+		var button: Button = Button.new()
+		button.text = pair[0]
+		button.pressed.connect(pair[1])
+		actions.add_child(button)
 
 
 func _row() -> HBoxContainer:

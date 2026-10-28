@@ -46,7 +46,7 @@ func run_checks() -> void:
 	for index: int in range(48):
 		neural.recover_data(3)
 	for id: String in NeuralSystem.IDS:
-		while neural.ranks[id] < 3:
+		for rank: int in range(3 - int(neural.ranks[id])):
 			verify(neural.install(id), "Instalar rango disponible: " + id)
 	verify(neural.points() == 0 and not neural.install("blade"), "Límite de tres rangos y sin saldo negativo")
 	verify(world.defenses.drone_rank == 3 and world.player.neural_regen == 15, "Dron y capacitor aplicados")

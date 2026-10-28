@@ -93,6 +93,8 @@ func _draw_drone(origin: Vector2) -> void:
 		draw_rect(Rect2(origin + Vector2(-3 + rank * 3, -3), Vector2(2, 1)), Color("ffce75"))
 
 func _draw_ash(camera_x: float) -> void:
+	if not GamePreferences.current().particles:
+		return
 	# Campo determinista acotado; no usa el RNG de combate ni crea nodos.
 	for index: int in range(54):
 		var x: float = fposmod(index * 73.0 + time * (5.0 + index % 4) - camera_x * 0.25, 800.0) + camera_x - 400
@@ -162,7 +164,7 @@ func _draw_lamp_glow(bulb: Vector2, index: int) -> void:
 	# Parpadeo ocasional distinto por farola, sin aleatoriedad: depende del tiempo y del índice.
 	var flicker: float = 1.0
 	var phase: float = fmod(time * 0.7 + index * 1.37, 6.0)
-	if phase < 0.25:
+	if phase < 0.25 and not GamePreferences.current().reduced_flashes:
 		flicker = 0.35 if int(phase * 40.0) % 2 == 0 else 1.0
 	var strength: float = light["lamps"] * flicker
 	for ring: int in range(3):

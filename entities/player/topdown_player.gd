@@ -132,7 +132,7 @@ func update_visual() -> void:
 	var roll: float = TAU * (1.0 - dodge_remaining / Player.DODGE_DURATION) if dodge_remaining > 0 else 0.0
 	sprite.rotation = roll
 	runner.rotation = roll
-	modulate.a = 0.35 if invulnerable > 0 and int(elapsed * 24) % 2 == 0 else 1.0
+	modulate.a = 0.35 if invulnerable > 0 and int(elapsed * 24) % 2 == 0 and not GamePreferences.current().reduced_flashes else 1.0
 	queue_redraw()
 
 func _draw() -> void:
