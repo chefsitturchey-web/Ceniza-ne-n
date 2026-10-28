@@ -14,6 +14,10 @@ static func checkpoint_info(path: String = "user://partida.json") -> Dictionary:
 	if parser.parse(FileAccess.get_file_as_string(path)) != OK or not parser.data is Dictionary:
 		return {}
 	var data: Dictionary = parser.data
+	if data.get("handoff", false) == true:
+		return {"day": 1, "scrap": int(data.scrap), "zone": int(data.campaign.zone)} if CampaignRoute.valid_handoff(data) else {}
+	if not CampaignRoute.valid_state(data.get("campaign", CampaignRoute.initial_state())):
+		return {}
 	if data.get("version") != 1 or data.get("phase") != "DÍA":
 		return {}
 	for field: String in ["day", "scrap"]:
@@ -22,7 +26,7 @@ static func checkpoint_info(path: String = "user://partida.json") -> Dictionary:
 			return {}
 	if not data.get("player") is Dictionary or not data.get("structures") is Array:
 		return {}
-	return {"day": int(data.day), "scrap": int(data.scrap)}
+	return {"day": int(data.day), "scrap": int(data.scrap), "zone": int(data.get("campaign", CampaignRoute.initial_state()).zone)}
 
 static func archive_checkpoint(path: String = "user://partida.json", remove_original: bool = true) -> bool:
 	if not FileAccess.file_exists(path):
@@ -64,7 +68,7 @@ func _snapshot() -> Dictionary:
 	player["y"] = session.player.position.y
 	player["velocity_x"] = session.player.velocity.x
 	player["velocity_y"] = session.player.velocity.y
-	return {"version": 1, "day": session.cycle.day, "phase": session.cycle.phase,
+	return {"version": 1, "day": session.cycle.day, "phase": session.cycle.phase, "campaign": session.campaign.duplicate(true),
 		"scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
 		"core_health": session.core.health, "player": player, "structures": structures,
 		"workers": workers, "overload": _fields(session.overload, OVERLOAD_FIELDS),
@@ -76,6 +80,14 @@ func save_game() -> bool:
 	var data: Dictionary = _snapshot()
 	if session.finished or not _valid(data):
 		return false
+	return write_document(data)
+
+func save_handoff(data: Dictionary) -> bool:
+	if not CampaignRoute.valid_handoff(data) or int(data.campaign.zone) != session.zone_index + 1:
+		return false
+	return write_document(data)
+
+func write_document(data: Dictionary) -> bool:
 	# Escribir aparte evita truncar la partida anterior si falla la escritura.
 	var pending_path: String = save_path + ".tmp"
 	var file: FileAccess = FileAccess.open(pending_path, FileAccess.WRITE)
@@ -102,6 +114,10 @@ func load_game() -> bool:
 		return false
 	# Validar todo antes de modificar la sesión evita cargas parciales.
 	var data: Dictionary = parser.data
+	if data.get("handoff", false) == true:
+		apply_handoff(data)
+		return true
+	session.campaign = CampaignRoute.initial_state(int(data.get("campaign", CampaignRoute.initial_state()).zone))
 	if session.neural != null:
 		session.neural.restore(data.get("neural", {}))
 	if session.expedition != null:
@@ -136,6 +152,21 @@ func load_game() -> bool:
 	session.bank.changed.emit(session.bank.scrap, session.bank.energy_used(), session.bank.energy_capacity)
 	return true
 
+func apply_handoff(data: Dictionary) -> void:
+	session.campaign = CampaignRoute.initial_state(int(data.campaign.zone))
+	session.bank.scrap = int(data.scrap)
+	session.neural.restore(data.neural)
+	for worker: ColonyWorker in session.colony.workers:
+		worker.free()
+	session.colony.workers.clear()
+	for role: String in data.crew:
+		session.colony.add_worker(StringName(role))
+	session.player.health = Player.MAX_HEALTH
+	session.player.stamina = Player.MAX_STAMINA
+	session.player.position = Vector2(0, GameRules.FLOOR_Y)
+	session.player.refresh_state()
+	session.bank.changed.emit(session.bank.scrap, session.bank.energy_used(), session.bank.energy_capacity)
+
 func _number(data: Dictionary, key: String, minimum: float, maximum: float, integer: bool = false) -> bool:
 	var value: Variant = data.get(key)
 	if not (value is int or value is float):
@@ -146,6 +177,11 @@ func _valid(value: Variant) -> bool:
 	if not value is Dictionary:
 		return false
 	var data: Dictionary = value
+	if data.get("handoff", false) == true:
+		return CampaignRoute.valid_handoff(data) and int(data.campaign.zone) == session.zone_index
+	var route: Variant = data.get("campaign", CampaignRoute.initial_state())
+	if not CampaignRoute.valid_state(route) or int(route.zone) != session.zone_index:
+		return false
 	if not NeuralSystem.valid(data.get("neural", {})):
 		return false
 	if not ExpeditionManager.valid(data.get("expedition", {})):

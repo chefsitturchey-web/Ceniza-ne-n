@@ -6,7 +6,8 @@ func _initialize() -> void:
 	call_deferred("simulate")
 
 func simulate() -> void:
-	var world: District = load("res://levels/main.tscn").instantiate() as District
+	var zone: int = 2 if "--flooded" in OS.get_cmdline_user_args() else (1 if "--foundry" in OS.get_cmdline_user_args() else 0)
+	var world: District = load(CampaignRoute.SCENES[zone]).instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
 	world.cycle.boss_required = false # Aquí se verifica el asedio; expedición tiene pruebas propias.
@@ -32,7 +33,7 @@ func simulate() -> void:
 						quit(1)
 						return
 			else:
-				player.position.x = move_toward(player.position.x, site.x, player.speed * 0.1)
+				player.position.x = move_toward(player.position.x, site.x, player.speed * player.terrain_speed_factor * 0.1)
 				if absf(player.position.x - site.x) < 22:
 					Input.action_press("interact")
 		elif player.health <= 0:
@@ -48,7 +49,7 @@ func simulate() -> void:
 					target = enemy
 			if target != null:
 				player.facing = signf(target.position.x - player.position.x)
-				player.position.x = move_toward(player.position.x, target.position.x - player.facing * 30, player.speed * 0.1)
+				player.position.x = move_toward(player.position.x, target.position.x - player.facing * 30, player.speed * player.terrain_speed_factor * 0.1)
 				player.attack()
 				if (world.overload.cooldown_left if player.position.x < 0 else world.overload.cooldown_right) == 0:
 					world.overload.activate_overload()
@@ -56,7 +57,7 @@ func simulate() -> void:
 				for index: int in range(world.construction.sites.size()):
 					var site: ConstructionSite = world.construction.sites[index]
 					if site.hp < site.max_hp and not site.ordered:
-						player.position.x = move_toward(player.position.x, site.x, player.speed * 0.1)
+						player.position.x = move_toward(player.position.x, site.x, player.speed * player.terrain_speed_factor * 0.1)
 						if absf(player.position.x - site.x) < 22:
 							Input.action_press("interact")
 						break
@@ -71,8 +72,8 @@ func simulate() -> void:
 			enemy._physics_process(0.1)
 		if world.session.finished:
 			Input.action_release("interact")
-			var valid: bool = world.session.won and all_built and order_time > 0 and order_time < 10 and world.core.health > 0
-			print("Colonia nueva: obras encargadas=%.1fs; cuatro defensas construidas=%s; victoria=%s; núcleo=%d; sesión=%.1fs" % [order_time, all_built, world.session.won, world.core.health, step * 0.1])
+			var valid: bool = world.session.won and all_built and order_time > 0 and order_time < world.cycle.config.day_duration and world.core.health > 0
+			print("Colonia nueva zona=%d: obras encargadas=%.1fs; cuatro defensas construidas=%s; victoria=%s; núcleo=%d; sesión=%.1fs" % [zone, order_time, all_built, world.session.won, world.core.health, step * 0.1])
 			world.free()
 			await process_frame
 			if valid:

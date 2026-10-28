@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-22%20suites-47dacb">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-25%20casos-47dacb">
 </p>
 
 <p align="center">
@@ -32,6 +32,8 @@
 Tras un colapso tecnológico, una red autónoma de máquinas intenta borrar los últimos asentamientos humanos. Eres el **Portador**, la persona que lleva una llave neuronal capaz de reactivar la infraestructura antigua. De día recuperas chatarra, reclutas supervivientes y levantas defensas; de noche las máquinas vuelven a conectarse y atacan la colonia por ambos lados.
 
 Para liberar un distrito destruyes sus **repetidores enemigos**, tomas el **tren blindado** y enfrentas al jefe que protege el enlace de transporte en una arena con vista cenital.
+
+La ruta jugable conecta **Periferia oxidada → Fundición → Barrio inundado** y tres jefes distintos. Viajas conservando mejoras y habitantes; cada nueva colonia tiene terreno, preparación y defensas propias. [Ruta, jefes y pruebas directas](docs/CAMPANA_Y_JEFES.md).
 
 > *"De día, la ciudad parecía muerta. De noche, las máquinas vuelven a conectarse."*
 
@@ -70,7 +72,7 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 - **Combate exigente:** ataque cuerpo a cuerpo, esquiva con invulnerabilidad y resistencia; el cansancio se nota en la animación.
 - **Cinco tipos de enemigo:** Errante, Corredor, Blindado (escudo frontal), Saltador (pasa la primera muralla) y Ariete (rompe murallas).
 - **Siluetas propias:** Blindado, Saltador y Ariete usan piezas mecánicas animadas con armadura, muelles y pistón; conservan los sprites anteriores como alternativa del Inspector.
-- **Defensas articuladas:** las torretas siguen blancos y disparan con retroceso desde el cañón. Introducción sin consumir tiempo, objetivos visibles y final de demo con regreso al menú.
+- **Defensas articuladas:** las torretas siguen blancos y disparan con retroceso desde el cañón. Introducción sin consumir tiempo, objetivos visibles y viajes entre colonias con guardado.
 - **Colonia automática:** constructores y recuperadores con tareas propias; recluta hasta cuatro habitantes.
 - **Economía y energía:** chatarra para construir, capacidad energética para mantener torretas y sobrecarga independiente por frente.
 - **Expediciones:** la colonia se pausa mientras luchas contra el jefe; si caes, vuelves al mismo momento para prepararte mejor.
@@ -130,10 +132,10 @@ La guía detallada de esta versión está en [INICIO.md](INICIO.md).
 
 | Hecho | En curso | Próximo |
 |---|---|---|
-| Distrito 1, datos neuronales y Clínica de enlace con tres mejoras | Producción musical final; audio de trabajo integrado | Más módulos automáticos y progresión entre distritos |
-| Primer jefe: El Recaudador, con arena ambientada | Animaciones norte/sur del Portador en la arena; arte definitivo de los enemigos nuevos | Módulos automáticos, pasivas y evoluciones |
+| Tres distritos conectados, Clínica y equipo persistente | Producción musical final; audio de trabajo integrado | Pruebas de equilibrio con jugadores |
+| Recaudador, Santa Caldera y Coro Sumergido; módulos, pasivas y evoluciones | Arte definitivo del Corredor y Constructor | Distritos y jefes restantes del GDD |
 | Errante, Corredor, Blindado, Saltador y Ariete | Nuevo Corredor y Constructor con el estilo actual | Saboteador, Dron cazador, Artillero, Portador y Reparador |
-| Efectos, ciclo de luz, HUD mínimo y fuentes pixel | Menús principal, de opciones y de pausa | Distritos 2 a 4 y los demás jefes |
+| Efectos, ciclo de luz, menús, animaciones y opciones | Pulido y variedad de encuentros | Más eventos y objetivos por distrito |
 
 El alcance completo está en el [documento de diseño (GDD)](CENIZA_NEON_GDD.docx).
 
@@ -162,7 +164,7 @@ godot --headless --path . --import
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta 22 suites, incluyendo menú/opciones, animación/pulido, módulos/evoluciones, siluetas, combate, guardado, expedición y simulaciones con defensas preparadas y desde una colonia nueva. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
+`run_all.gd` ejecuta 25 casos, incluyendo campaña y jefes, menú/opciones, animación/pulido, módulos/evoluciones, siluetas, combate, guardado, expedición y simulaciones desde una colonia nueva en los tres distritos. Termina con error ante cualquier fallo detectado. El aviso de referencias al cerrar el comprobador estático y los límites del ejecutor se detallan en [menú y opciones](docs/MENU_Y_OPCIONES.md). En Windows sustituye `godot` por la ruta del ejecutable de consola.
 
 ### Flujo de trabajo
 

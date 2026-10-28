@@ -4,6 +4,8 @@ extends CharacterBody2D
 signal died
 signal fired(origin: Vector2, direction: Vector2)
 signal cue_requested(id: String)
+signal phase_changed(number: int)
+signal hit_feedback(blocked: bool)
 enum State { APPROACH, CLAW_WINDUP, CLAW, VOLLEY_WINDUP, VOLLEY, CHARGE_WINDUP, CHARGE, STUNNED, RECOVER, DEAD }
 ## Around 20 exposed windows at base damage; target 3-5 minutes with flank hits.
 @export var max_health: int = 10000
@@ -21,14 +23,14 @@ var volleys: int = 0
 var elapsed: float = 0.0
 var smoke_timer: float = 0.0
 var core_exposed: bool:
-	get: return state == State.STUNNED
+	get: return is_core_exposed()
 var puppet: Node2D = Node2D.new()
 var pieces: Array[Sprite2D] = []
 var tracks: Array[Sprite2D] = []
 var claws: Array[Sprite2D] = []
 var core: Sprite2D
 var shield: Sprite2D
-var hatch: Polygon2D = Polygon2D.new()
+var hatch: Polygon2D
 var effects: DebrisEmitter = DebrisEmitter.new()
 
 func _ready() -> void:
@@ -42,6 +44,12 @@ func _ready() -> void:
 	collider.shape = shape
 	add_child(collider)
 	add_child(puppet)
+	build_visual()
+	effects.planar = true
+	add_child(effects)
+
+func build_visual() -> void:
+	hatch = Polygon2D.new()
 	for side: int in [-1, 1]:
 		tracks.append(piece("tread", Vector2(side * 34, 0)))
 	piece("body", Vector2.ZERO)
@@ -54,8 +62,28 @@ func _ready() -> void:
 		claw.flip_h = side < 0
 		claws.append(claw)
 	shield = piece("shield", Vector2(0, 37))
-	effects.planar = true
-	add_child(effects)
+
+func is_core_exposed() -> bool:
+	return state == State.STUNNED
+
+func hit_multiplier(origin: Vector2) -> float:
+	var front: bool = facing.dot((origin - global_position).normalized()) > 0.45
+	return 2.0 if core_exposed else (0.0 if front else 0.25)
+
+func strike_attachments(_origin: Vector2, _direction: Vector2, _amount: int, _reach: float) -> bool:
+	return false
+
+func clear_hazards() -> void:
+	pass
+
+func status_text() -> String:
+	match state:
+		State.CHARGE_WINDUP: return "EMBESTIDA: esquiva hacia un lado cuando arranque"
+		State.CHARGE: return "Deja que choque contra una pared o cobertura"
+		State.STUNNED: return "NÚCLEO EXPUESTO: ataca antes de que cierre"
+		State.CLAW_WINDUP, State.CLAW: return "GARRAZO: toma distancia"
+		State.VOLLEY_WINDUP, State.VOLLEY: return "COBRO: usa las coberturas"
+	return "Escudo frontal: provoca una embestida contra un obstáculo"
 
 func piece(asset: String, offset: Vector2) -> Sprite2D:
 	var sprite: Sprite2D = Sprite2D.new()
@@ -166,16 +194,20 @@ func fire_fan() -> void:
 		fired.emit(global_position + facing * 42, direction)
 
 func receive_hit(origin: Vector2, amount: int) -> int:
-	if health <= 0:
+	if health <= 0 or amount <= 0:
 		return 0
-	var front: bool = facing.dot((origin - global_position).normalized()) > 0.45
-	var damage: int = amount * 2 if core_exposed else (0 if front else maxi(1, int(amount * 0.25)))
+	var factor: float = hit_multiplier(origin)
+	var damage: int = maxi(1, int(amount * factor)) if factor > 0 else 0
+	hit_feedback.emit(damage == 0)
 	effects.emit_pixels(global_position + (origin - global_position).normalized() * 28, 5, Color("ffce75"))
 	health = maxi(0, health - damage)
-	if health <= max_health * 0.5:
+	if phase == 1 and health <= max_health * 0.5:
 		phase = 2
+		phase_changed.emit(phase)
+		cue_requested.emit("alarm")
 	if health == 0:
 		change_state(State.DEAD, 0)
+		clear_hazards()
 		for sprite: Sprite2D in pieces:
 			effects.emit_fragments(sprite.global_position, sprite.texture, 8, sprite.flip_h, true)
 		puppet.hide()
@@ -198,7 +230,7 @@ func update_puppet(delta: float) -> void:
 		claws[0].rotation = lerpf(1.2, -0.9, timer / 0.35)
 	hatch.position.x = move_toward(hatch.position.x, 23 if core_exposed else 0, delta * 100)
 	core.visible = core_exposed
-	core.modulate = Color(1.4, 0.9 + sin(elapsed * 12) * 0.3, 0.5)
+	core.modulate = Color(1.2, 0.9, 0.5) if GamePreferences.current().reduced_flashes else Color(1.4, 0.9 + sin(elapsed * 12) * 0.3, 0.5)
 	shield.position.y = move_toward(shield.position.y, 47 if core_exposed else 37, delta * 50)
 	puppet.modulate = Color("ffaaa0") if phase == 2 else Color.WHITE
 	smoke_timer -= delta
@@ -218,10 +250,13 @@ func _draw() -> void:
 	if core_exposed:
 		draw_circle(Vector2.ZERO, 26 + sin(elapsed * 12) * 3, Color(1, 0.55, 0.15, 0.18))
 	if state == State.CHARGE_WINDUP:
+		var side: Vector2 = charge_direction.orthogonal() * 26
+		draw_colored_polygon(PackedVector2Array([charge_direction * 40 - side, charge_direction * 900 - side, charge_direction * 900 + side, charge_direction * 40 + side]), Color(1, 0.2, 0.23, 0.1))
 		draw_line(charge_direction * 40, charge_direction * 900, Color(1, 0.2, 0.23, 0.4), 2)
 	elif state in [State.CLAW_WINDUP, State.CLAW]:
 		draw_arc(Vector2.ZERO, 85, facing.angle() - 1.1, facing.angle() + 1.1, 20, Color(1, 0.5, 0.2, 0.5), 2)
 	elif state == State.VOLLEY_WINDUP:
-		for index: int in range(5):
-			var direction: Vector2 = facing.rotated((index - 2) * 0.19)
+		var count: int = 7 if phase == 2 else 5
+		for index: int in range(count):
+			var direction: Vector2 = facing.rotated((index - (count - 1) * 0.5) * 0.19)
 			draw_line(direction * 44, direction * 72, Color(1, 0.7, 0.3, 0.6), 1)

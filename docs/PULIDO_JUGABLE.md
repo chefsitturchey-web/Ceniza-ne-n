@@ -17,7 +17,7 @@
 2. Durante la noche observa ambas torretas. Deben apuntar hacia las máquinas y disparar con retroceso; al pasar una máquina hacia el núcleo, el cabezal puede cambiar de lado. Q acelera la cadencia en tu frente.
 3. Mira al recuperador en el punto de recolección y al volver cargado. Encarga reparaciones para ver al constructor trabajar.
 4. Destruye las antenas y viaja. En la arena mueve con WASD, ataca con J y esquiva con Espacio. Comprueba caminar vertical, ataque, dron, pausa, opciones y vuelta al menú.
-5. Tras derrotar al Recaudador aparece el final de esta demo. La campaña de los otros distritos sigue fuera de este bloque.
+5. Tras derrotar al Recaudador puedes viajar a Fundición. La ampliación posterior se documenta en [Campaña y jefes](CAMPANA_Y_JEFES.md).
 
 ## Comprobaciones
 

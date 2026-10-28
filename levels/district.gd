@@ -1,6 +1,9 @@
 class_name District
 extends Node2D
 
+@export_range(0, 2) var zone_index: int = 0
+var zone: ZoneData
+
 @onready var player: Player = $Player
 @onready var cycle: CycleSystem = $Cycle
 @onready var bank: ResourceBank = $Bank
@@ -26,6 +29,17 @@ var briefing: BriefingPanel
 
 func _ready() -> void:
 	InputSetup.configure_input()
+	zone = CampaignRoute.zone(zone_index)
+	if zone_index > 0:
+		var blueprints: Array[StructureData] = []
+		for original: StructureData in construction.blueprints:
+			var copy: StructureData = original.duplicate() as StructureData
+			copy.offset = zone.wall_offset if copy.blocks_enemies else zone.turret_offset
+			blueprints.append(copy)
+		construction.blueprints = blueprints
+		cycle.config = cycle.config.duplicate() as CycleConfig
+		cycle.config.day_duration = zone.day_duration
+		director.waves.assign(zone.waves)
 	construction.bank = bank
 	construction.create_sites()
 	for site: ConstructionSite in construction.sites:
@@ -55,6 +69,8 @@ func _ready() -> void:
 	interaction.colony = colony
 	interaction.construction = construction
 	session.player = player
+	session.zone_index = zone_index
+	session.campaign = CampaignRoute.initial_state(zone_index)
 	session.core = core
 	session.bank = bank
 	session.cycle = cycle
@@ -75,6 +91,15 @@ func _ready() -> void:
 	view.player = player
 	view.cycle = cycle
 	view.defenses = defenses
+	view.zone = zone
+	if zone_index > 0:
+		var terrain: ZoneHazards = ZoneHazards.new()
+		terrain.zone_index = zone_index
+		terrain.player = player
+		terrain.cycle = cycle
+		terrain.z_index = 1
+		add_child(terrain)
+		session.terrain = terrain
 	cycle.dawn.connect(session.on_dawn)
 	cycle.victory_requested.connect(session.win)
 	cycle.notice_requested.connect(presenter.show_notice)
@@ -119,13 +144,15 @@ func _ready() -> void:
 	neural.changed.connect(func() -> void: clinic.available = neural.points() > 0 or modules.cores > 0)
 	neural.point_earned.connect(func() -> void: presenter.show_notice("Punto neuronal: visita la clínica a la izquierda del núcleo"))
 	director.spawned.connect(_connect_neural)
+	var arriving: bool = not CampaignRoute.pending.is_empty()
 	session.initialize()
 	sound.district = self
 	add_child(sound)
 	presenter.publish()
-	if GamePreferences.current().briefing_requested:
+	if GamePreferences.current().briefing_requested or arriving:
 		GamePreferences.current().briefing_requested = false
 		briefing = BriefingPanel.new()
+		briefing.zone = zone
 		add_child(briefing)
 		session.briefing = briefing
 		briefing.open_panel()

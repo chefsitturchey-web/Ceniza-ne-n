@@ -18,17 +18,21 @@ const ENEMY: Color = Color("dd6482")
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var light_time: float = 0.0
+var theme_id: String = "periphery"
+var dust: CPUParticles2D
 
 func _ready() -> void:
 	_add_dust()
 
 func _process(delta: float) -> void:
+	if dust != null:
+		dust.emitting = GamePreferences.current().particles
 	# Luces industriales con parpadeos ocasionales y alarma que respira.
 	light_time += delta
 	var index: int = 0
 	for light: Node in get_tree().get_nodes_in_group(&"arena_light"):
 		var phase: float = fmod(light_time * 0.8 + index * 1.7, 7.0)
-		(light as PointLight2D).energy = 0.45 if phase < 0.18 and int(phase * 40.0) % 2 == 0 else 1.1
+		(light as PointLight2D).energy = 0.45 if phase < 0.18 and int(phase * 40.0) % 2 == 0 and not GamePreferences.current().reduced_flashes else 1.1
 		index += 1
 	for alarm: Node in get_tree().get_nodes_in_group(&"arena_alarm"):
 		(alarm as PointLight2D).energy = 0.25 + 0.15 * sin(light_time * 2.0)
@@ -43,6 +47,16 @@ func _draw() -> void:
 	_draw_debris()
 	_draw_edges()
 	_draw_wall_pipes()
+	if theme_id == "foundry":
+		for x: int in [130, 325, 520]:
+			for y: int in range(80, 430, 18):
+				draw_rect(Rect2(x - 25, y, 50, 10), Color("0b1322", 0.7))
+				for rib: int in range(8):
+					draw_line(Vector2(x - 22 + rib * 6, y + 1), Vector2(x - 22 + rib * 6, y + 8), Color("704c43"), 2)
+	elif theme_id == "flooded":
+		draw_rect(Rect2(15, 55, 610, 410), Color("103b4a", 0.26))
+		for y: int in range(90, 450, 45):
+			draw_line(Vector2(30, y), Vector2(610, y + 2), Color("47dacb", 0.08), 1)
 	for x: int in [48, 592]:
 		for y: int in [80, 400]:
 			draw_rect(Rect2(x - 5, y - 2, 10, 4), AMBER)
@@ -52,7 +66,8 @@ func _draw_tiles() -> void:
 		for y: int in range(15):
 			# Variación leve por baldosa: placas más gastadas o más limpias.
 			var shade: float = rng.randf_range(0.82, 1.0)
-			draw_texture(FLOOR, Vector2(x * 32, y * 32), Color("929aa4") * Color(shade, shade, shade))
+			var tint: Color = Color("b8947a") if theme_id == "foundry" else (Color("628c96") if theme_id == "flooded" else Color("929aa4"))
+			draw_texture(FLOOR, Vector2(x * 32, y * 32), tint * Color(shade, shade, shade))
 
 func _draw_rails() -> void:
 	# Vías del tren blindado que cruzan la parte alta de la plataforma.
@@ -148,7 +163,8 @@ func _draw_wall_pipes() -> void:
 
 func _add_dust() -> void:
 	# Polvo y ceniza flotando con la luz.
-	var dust: CPUParticles2D = CPUParticles2D.new()
+	dust = CPUParticles2D.new()
+	dust.emitting = GamePreferences.current().particles
 	dust.amount = 40
 	dust.lifetime = 6.0
 	dust.preprocess = 6.0

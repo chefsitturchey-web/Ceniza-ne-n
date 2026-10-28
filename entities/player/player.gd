@@ -26,6 +26,7 @@ var visual: PlayerVisual = PlayerVisual.new()
 
 ## Combate manual y esquiva. Los ajustes del Inspector se conservan.
 @export var speed: float = 150.0
+var terrain_speed_factor: float = 1.0
 @export var acceleration: float = 1200.0
 @export var gravity: float = 980.0
 @export var attack_damage: int = 25
@@ -114,7 +115,7 @@ func _physics_process(delta: float) -> void:
 		dodge_remaining = maxf(0.0, dodge_remaining - delta)
 		velocity.x = dodge_direction * DODGE_SPEED
 	else:
-		velocity.x = move_toward(velocity.x, direction * speed, acceleration * delta)
+		velocity.x = move_toward(velocity.x, direction * speed * terrain_speed_factor, acceleration * delta)
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	move_and_slide()

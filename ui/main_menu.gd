@@ -89,7 +89,7 @@ func _button(parent: Node, text: String, action: Callable) -> Button:
 func refresh_checkpoint() -> void:
 	var info: Dictionary = SaveSystem.checkpoint_info(checkpoint_path)
 	continue_button.disabled = info.is_empty()
-	status.text = "Sin partida guardada. Empieza una colonia." if info.is_empty() else "Día %d · %d chatarra · preparación guardada" % [info.day, info.scrap]
+	status.text = "Sin partida guardada. Empieza una colonia." if info.is_empty() else "%s\nDía %d · %d chatarra" % [CampaignRoute.zone(int(info.get("zone", 0))).title, info.day, info.scrap]
 
 func request_new_game() -> void:
 	if FileAccess.file_exists(checkpoint_path):
@@ -109,7 +109,12 @@ func _launch(fresh: bool) -> void:
 	if navigation_enabled:
 		GamePreferences.current().briefing_requested = fresh
 		get_tree().paused = false
-		get_tree().change_scene_to_file("res://levels/main.tscn")
+		CampaignRoute.pending.clear()
+		var info: Dictionary = SaveSystem.checkpoint_info(checkpoint_path)
+		CampaignRoute.resume_path = checkpoint_path
+		if not fresh and int(info.get("zone", 0)) > 0:
+			GamePreferences.current().briefing_requested = true
+		get_tree().change_scene_to_file(CampaignRoute.SCENES[0 if fresh else int(info.get("zone", 0))])
 
 func _process(delta: float) -> void:
 	elapsed += delta

@@ -21,23 +21,53 @@ var neural: NeuralSystem
 var clinic_panel: ClinicPanel
 var options: SettingsPanel
 var briefing: BriefingPanel
+var zone_index: int = 0
+var campaign: Dictionary = CampaignRoute.initial_state()
+var terrain: ZoneHazards
 
 func initialize() -> void:
+	var transfer: Dictionary = CampaignRoute.take(zone_index)
+	if not transfer.is_empty():
+		persistence_enabled = transfer.persistence
+		var importer: SaveSystem = SaveSystem.new()
+		importer.session = self
+		importer.save_path = transfer.path
+		add_child(importer)
+		importer.apply_handoff(transfer.data)
+		if persistence_enabled:
+			save_system = importer
+			cycle.phase_changed.connect(on_phase_changed)
+			save_system.save_game()
+		else:
+			importer.queue_free()
+		presenter.show_notice("Llegada a " + CampaignRoute.zone(zone_index).title)
+		return
 	if not persistence_enabled:
 		return
 	if save_system == null:
 		save_system = SaveSystem.new()
+		if not CampaignRoute.resume_path.is_empty():
+			save_system.save_path = CampaignRoute.resume_path
+			CampaignRoute.resume_path = ""
 		add_child(save_system)
 	save_system.session = self
 	cycle.phase_changed.connect(on_phase_changed)
 	if save_system.has_save():
+		var info: Dictionary = SaveSystem.checkpoint_info(save_system.save_path)
+		if not info.is_empty() and info.get("zone", 0) != zone_index:
+			presenter.show_notice("Vista de otra zona: guardado conservado")
+			save_system = null
+			persistence_enabled = false
+			return
 		if save_system.load_game():
+			save_system.save_game()
 			presenter.show_notice("Partida cargada")
 			return
 		# La copia precede al nuevo guardado: un documento inválido no se pierde.
 		if not SaveSystem.archive_checkpoint(save_system.save_path, false):
 			presenter.show_notice("Guardado no válido: no se sobrescribirá")
 			save_system = null
+			persistence_enabled = false
 			return
 	on_phase_changed(cycle.phase, cycle.day)
 
@@ -47,6 +77,8 @@ func on_phase_changed(phase: String, _day: int) -> void:
 
 func restart() -> void:
 	if save_system != null:
+		CampaignRoute.resume_path = save_system.save_path
+	if save_system != null and (zone_index == 0 or not save_system.has_save()):
 		save_system.delete_save()
 	get_tree().paused = false
 	get_tree().reload_current_scene()
@@ -90,6 +122,8 @@ func _process(delta: float) -> void:
 	if finished:
 		return
 	colony.update_workers(delta)
+	if terrain != null:
+		terrain.tick(delta)
 	defenses.update_defenses(delta)
 	interaction.update_interaction(delta)
 	if expedition != null and expedition.active:
@@ -109,7 +143,7 @@ func win() -> void:
 	finish(true)
 
 func finish(victory: bool) -> void:
-	if save_system != null:
+	if save_system != null and (victory or zone_index == 0):
 		save_system.delete_save()
 	finished = true
 	won = victory

@@ -13,7 +13,7 @@ var ending_victory: bool = false
 var ending_timer: float = 0.0
 var emitted: bool = false
 var player: TopdownPlayer = TopdownPlayer.new()
-var boss: Recaudador = Recaudador.new()
+var boss: Recaudador
 var world: Node2D = Node2D.new()
 var actors: Node2D = Node2D.new()
 var viewport: SubViewport = SubViewport.new()
@@ -29,13 +29,22 @@ var modules: ModuleSystem = ModuleSystem.new()
 var options: SettingsPanel = SettingsPanel.new()
 var exit_button: Button
 var result_shade: ColorRect
+@export_range(0, 2) var zone_index: int = 0
+var zone: ZoneData
+var boss_status: Label
+var phase_notice: Label
+var phase_notice_time: float = 0.0
 
-func configure(source: Player) -> void:
+func configure(source: Player, index: int = 0) -> void:
 	configured = true
+	zone_index = index
 	player.copy_from(source)
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	zone = CampaignRoute.zone(zone_index)
+	# Creación directa: no hay componentes de un jefe anterior que queden huérfanos.
+	boss = Recaudador.new() if zone_index == 0 else (load("res://entities/enemies/santa_caldera.gd") if zone_index == 1 else load("res://entities/enemies/coro_sumergido.gd")).new() as Recaudador
 	configure_controls()
 	var screen: SubViewportContainer = SubViewportContainer.new()
 	screen.size = Vector2(640, 360)
@@ -51,7 +60,11 @@ func _ready() -> void:
 	viewport.add_child(world)
 	var floor_node: Node2D = Node2D.new()
 	floor_node.set_script(preload("res://levels/expedition/arena_floor.gd"))
+	floor_node.set("theme_id", zone.id)
 	world.add_child(floor_node)
+	var telegraphs: EncounterTelegraphs = EncounterTelegraphs.new()
+	telegraphs.boss = boss
+	world.add_child(telegraphs)
 	actors.y_sort_enabled = true
 	world.add_child(actors)
 	build_geometry()
@@ -60,6 +73,8 @@ func _ready() -> void:
 	boss.target = player
 	actors.add_child(player)
 	actors.add_child(boss)
+	if boss is CoroSumergido:
+		(boss as CoroSumergido).install_relays(actors)
 	modules.actor = player
 	modules.boss = boss
 	modules.planar = true
@@ -70,13 +85,25 @@ func _ready() -> void:
 	player.died.connect(func() -> void: finish(false))
 	boss.died.connect(func() -> void: finish(true))
 	boss.fired.connect(spawn_bullet)
+	boss.phase_changed.connect(func(_phase: int) -> void:
+		phase_notice_time = 1.8
+		phase_notice.text = "SEGUNDA FASE")
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 5
 	camera.limit_left = 0
 	camera.limit_top = 0
 	camera.limit_right = 640
 	camera.limit_bottom = 480
-	player.add_child(camera)
+	if zone_index == 0:
+		player.add_child(camera)
+	else:
+		# Las franjas y enlaces necesitan verse completos antes de elegir una ruta segura.
+		camera.position_smoothing_enabled = false
+		camera.zoom = Vector2(0.75, 0.75)
+		camera.limit_left = -107
+		camera.limit_right = 747
+		camera.position = Vector2(320, 240)
+		world.add_child(camera)
 	camera.make_current()
 	camera.reset_smoothing()
 	build_lighting()
@@ -128,6 +155,12 @@ func build_geometry() -> void:
 	wall(Vector2(634, 240), Vector2(12, 480))
 	var positions: Array[Vector2] = [Vector2(180, 160), Vector2(460, 160), Vector2(180, 320), Vector2(460, 320), Vector2(85, 245), Vector2(555, 245)]
 	var assets: Array[String] = ["pillar_top", "pillar_top", "crate_top", "crate_top", "barrel_top", "barrel_top"]
+	if zone_index == 1:
+		positions = [Vector2(90, 140), Vector2(550, 140), Vector2(90, 360), Vector2(550, 360)]
+		assets = ["pillar_top", "pillar_top", "crate_top", "crate_top"]
+	elif zone_index == 2:
+		positions = [Vector2(90, 240), Vector2(550, 240), Vector2(320, 65)]
+		assets = ["pillar_top", "pillar_top", "crate_top"]
 	for index: int in range(positions.size()):
 		var texture: Texture2D = load("res://assets/expedition/arena/%s.png" % assets[index]) as Texture2D
 		var body: StaticBody2D = wall(positions[index], texture.get_size())
@@ -186,7 +219,11 @@ func build_hud() -> void:
 	damage_edges.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(damage_edges)
 	damage_edges.set_state({"health": player.health})
-	label("EL RECAUDADOR", Rect2(160, 325, 320, 14))
+	label(zone.boss_title, Rect2(110, 325, 420, 14))
+	boss_status = label(zone.briefing, Rect2(8, 15, 624, 28))
+	boss_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	phase_notice = label("", Rect2(80, 60, 480, 22), true)
+	phase_notice.add_theme_color_override("font_color", Color("dd6482"))
 	var backing: ColorRect = ColorRect.new()
 	backing.color = Color("0b1322")
 	backing.position = Vector2(159, 345)
@@ -234,7 +271,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause") and not event.is_echo() and not ending and not completed:
 		toggle_pause()
 		get_viewport().set_input_as_handled()
-	elif completed and (event.is_action_pressed("restart") or event.is_action_pressed("ui_accept")):
+	elif completed and event.is_action_pressed("restart"):
 		if not configured:
 			if ending_victory:
 				return_to_menu()
@@ -260,6 +297,10 @@ func return_to_menu() -> void:
 		get_tree().change_scene_to_file("res://ui/main_menu.tscn")
 
 func strike(origin: Vector2, direction: Vector2, amount: int, reach: float) -> void:
+	if ending:
+		return
+	if boss.strike_attachments(origin, direction, amount, reach):
+		return
 	var offset: Vector2 = boss.global_position - origin
 	if ending or offset.length() > reach + 29 or direction.dot(offset.normalized()) < cos(0.85):
 		return
@@ -283,11 +324,13 @@ func finish(victory: bool) -> void:
 	if ending or completed:
 		return
 	ending = true
+	boss.clear_hazards()
 	sound.play_cue("destroy" if victory else "alarm")
 	ending_victory = victory
 	ending_timer = 2.2 if victory else 1.2
 	player.set_physics_process(false)
 	boss.set_physics_process(false)
+	modules.set_physics_process(false)
 	for child: Node in world.get_children():
 		if child is RecaudadorBullet:
 			child.queue_free()
@@ -297,11 +340,14 @@ func _process(delta: float) -> void:
 	if get_tree().paused:
 		return
 	bar.size.x = 320 * float(boss.health) / boss.max_health
+	boss_status.text = boss.status_text() if not ending else ""
+	phase_notice_time = maxf(0, phase_notice_time - delta)
+	phase_notice.visible = phase_notice_time > 0 and not ending
 	bar.color = Color("dd6482") if boss.phase == 2 else Color("e99b43")
 	if ending and not emitted:
 		ending_timer -= delta
 		if ending_victory and ending_timer <= 1.6:
-			banner.text = "EL RECAUDADOR - DERROTADO"
+			banner.text = zone.boss_title + " - DERROTADO"
 		if ending_timer <= 0:
 			emitted = true
 			resolved.emit(ending_victory)
@@ -313,7 +359,8 @@ func _process(delta: float) -> void:
 
 func retry_arena() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://levels/expedition/recaudador_arena.tscn")
+	var scenes: Array[String] = ["res://levels/expedition/recaudador_arena.tscn", "res://levels/expedition/caldera_arena.tscn", "res://levels/expedition/choir_arena.tscn"]
+	get_tree().change_scene_to_file(scenes[zone_index])
 
 func show_standalone_defeat() -> void:
 	if completed:
@@ -336,25 +383,38 @@ func show_standalone_defeat() -> void:
 	add_child(menu)
 	retry.grab_focus()
 
-func show_completed() -> void:
+func show_completed(next_zone: String = "") -> void:
 	if completed:
 		return
 	completed = true
 	result_shade.show()
 	player.set_physics_process(false)
 	boss.set_physics_process(false)
+	modules.set_physics_process(false)
 	player.velocity = Vector2.ZERO
 	player.dodge_remaining = 0
 	player.attack_anim_remaining = 0
 	player.slash_remaining = 0
 	player.update_visual()
-	banner.text = "DISTRITO 1 COMPLETADO"
-	label("Has recuperado la Periferia. Demo completada.", Rect2(90, 178, 460, 16))
+	banner.text = "DISTRITO %d COMPLETADO" % (zone_index + 1)
+	label("Ruta disponible completada." if next_zone.is_empty() else "Siguiente destino: " + next_zone + ". Equipo y tripulación conservados.", Rect2(40, 178, 560, 16))
 	var button: Button = Button.new()
 	button.theme = THEME
-	button.text = "Volver al menú"
-	button.position = Vector2(265, 200)
-	button.size = Vector2(130, 28)
-	button.pressed.connect(func() -> void: continued.emit())
+	button.text = "Volver al menú" if next_zone.is_empty() else "Viajar a " + next_zone
+	button.position = Vector2(210, 200)
+	button.size = Vector2(220, 28)
+	button.pressed.connect(func() -> void:
+		if configured:
+			continued.emit()
+		else:
+			return_to_menu())
 	add_child(button)
 	button.grab_focus()
+	if not next_zone.is_empty():
+		var menu: Button = Button.new()
+		menu.theme = THEME
+		menu.text = "Volver al menú"
+		menu.position = Vector2(245, 238)
+		menu.size = Vector2(150, 25)
+		menu.pressed.connect(return_to_menu)
+		add_child(menu)

@@ -42,7 +42,7 @@ En el centro puedes curarte de día con E. Al amanecer se restauran 40 puntos de
 - En la pestaña Equipo hay tres módulos, dos ranuras, cinco niveles y pasivas. La última unidad de cada oleada entrega un núcleo para evolucionar un equipo de nivel cinco con su pasiva compatible.
 - Sonidos de combate, música de trabajo por fases, ceniza ambiental y reflejos estilizados de luces y personajes.
 
-Simplificaciones del prototipo: trabajadores sin daño ni selección de herramientas; chatarra en una bolsa común; generación eléctrica fija; torretas no son objetivo de enemigos. Hay progresión neuronal, guardado, primer jefe y audio integrado, con música y varios personajes aún pendientes de producción final. Al perder el núcleo se reinicia la sesión. La dificultad necesita pruebas con jugadores.
+Simplificaciones del prototipo: trabajadores sin daño ni selección de herramientas; chatarra en una bolsa común; generación eléctrica fija; torretas no son objetivo de enemigos. Hay progresión neuronal, guardado, tres zonas conectadas y tres jefes, con música y varios personajes aún pendientes de producción final. Perder el núcleo reinicia la primera colonia; en las siguientes puedes reintentar desde el último amanecer guardado. La dificultad necesita pruebas con jugadores.
 
 Tus ajustes del personaje siguen en `entities/player/player.tscn`: velocidad 220 y daño 50. Los tiempos se editan en el Resource `config` del nodo `Cycle` en `levels/main.tscn`. Está asignado `data/cycles/district.tres` (10/10/60). Para disponer de 90 segundos de construcción, asigna `data/cycles/standard.tres` (90/10/60). Los controles y costos no han cambiado.
 
@@ -73,4 +73,10 @@ Las simulaciones parten de defensas ya construidas. Sin apoyo, la colonia debe c
 2. Al caer ambos llega el **tren blindado** a la estación, a la derecha del núcleo.
 3. De día, mantén **E** en la estación para viajar a la arena de **El Recaudador** (vista cenital, movimiento en ocho direcciones).
 4. Su escudo bloquea los golpes de frente. Esquiva su embestida: si choca contra una pared queda aturdido y su núcleo expuesto recibe doble daño.
-5. Si pierdes, vuelves a la colonia en el mismo momento; si ganas, el Distrito 1 queda completado.
+5. Si pierdes, vuelves a la colonia en el mismo momento. Si ganas, pulsa **Viajar a Fundición** para continuar con tus mejoras y habitantes.
+
+## Fundición y Barrio inundado
+
+La ruta disponible tiene tres distritos. Fundición añade rejillas nocturnas y Santa Caldera; Barrio inundado añade charcos y el Coro Sumergido. Cada zona tiene repetidores y estación propios. La victoria guarda la llegada al siguiente distrito antes de viajar, y **Continuar** en el menú recupera esa ruta.
+
+Para probar sin recorrer la campaña, abre `levels/zones/foundry.tscn` o `flooded.tscn` y pulsa F6. Para practicar sus jefes, abre `levels/expedition/caldera_arena.tscn` o `choir_arena.tscn`. El Recaudador conserva su escena original. [Mecánicas y validación del bloque](docs/CAMPANA_Y_JEFES.md).

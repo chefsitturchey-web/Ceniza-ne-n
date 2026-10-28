@@ -5,6 +5,12 @@ const FLOOR_Y: float = GameRules.FLOOR_Y
 var cycle: CycleSystem
 var defenses: DefenseSystem
 var player: Player
+var zone: ZoneData:
+	set(value):
+		zone = value
+		district_background = load(zone.background_path) as Texture2D if zone != null and not zone.background_path.is_empty() else null
+		queue_redraw()
+var district_background: Texture2D
 const GROUND: Texture2D = preload("res://assets/structures/ground_strip.png")
 const BACKGROUND_FAR: Texture2D = preload("res://assets/background/background_far.png")
 const BACKGROUND_MID: Texture2D = preload("res://assets/background/background_mid.png")
@@ -58,10 +64,22 @@ func _draw() -> void:
 	var camera: Camera2D = get_viewport().get_camera_2d()
 	var camera_x: float = camera.get_screen_center_position().x if camera != null else 0.0
 	_draw_sky(camera_x)
-	_draw_layer(BACKGROUND_FAR, camera_x * FAR_FOLLOW)
-	_draw_haze(camera_x, light["far_haze"])
-	_draw_layer(BACKGROUND_MID, camera_x * MID_FOLLOW)
-	_draw_haze(camera_x, light["mid_haze"])
+	if district_background != null:
+		var width: float = 640.0
+		var base: int = floori(camera_x * 0.2 / width)
+		for tile: int in range(-3, 4):
+			var index: int = base + tile
+			var x: float = index * width + camera_x * 0.8 - width * 0.5
+			var mirrored: bool = posmod(index, 2) == 1
+			draw_set_transform(Vector2(x + (width if mirrored else 0.0), 0), 0, Vector2(-1 if mirrored else 1, 1))
+			draw_texture_rect(district_background, Rect2(0, FLOOR_Y - 360, width, 360), false, Color(0.78, 0.82, 0.9))
+			draw_set_transform(Vector2.ZERO)
+		_draw_haze(camera_x, light["far_haze"] * 0.25)
+	else:
+		_draw_layer(BACKGROUND_FAR, camera_x * FAR_FOLLOW)
+		_draw_haze(camera_x, light["far_haze"])
+		_draw_layer(BACKGROUND_MID, camera_x * MID_FOLLOW)
+		_draw_haze(camera_x, light["mid_haze"])
 	for index: int in range(PROPS.size()):
 		var texture: Texture2D = PROPS[index][0]
 		var size: Vector2 = texture.get_size()

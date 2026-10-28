@@ -8,6 +8,8 @@ var repeaters: Array[EnemyRepeater] = []
 var arena: CanvasLayer
 var suspended: Dictionary = {}
 var active: bool = false
+var victory_resolved: bool = false
+var next_checkpoint: Dictionary = {}
 
 func setup(world: District) -> void:
 	district = world
@@ -43,8 +45,9 @@ func start() -> bool:
 	if district.session.save_system != null:
 		district.session.save_system.save_game()
 	active = true
+	victory_resolved = false
 	arena = ARENA.instantiate() as CanvasLayer
-	arena.configure(district.player)
+	arena.configure(district.player, district.zone_index)
 	arena.resolved.connect(resolve)
 	arena.continued.connect(continue_district)
 	arena.menu_requested.connect(leave_to_menu)
@@ -67,9 +70,21 @@ func resolve(victory: bool) -> void:
 	if not active:
 		return
 	if victory:
-		if district.session.save_system != null:
-			district.session.save_system.delete_save()
-		arena.show_completed()
+		if victory_resolved:
+			return
+		victory_resolved = true
+		if district.zone_index < CampaignRoute.COUNT - 1:
+			next_checkpoint = CampaignRoute.handoff(district.zone_index + 1, district.neural.snapshot(), district.bank.scrap, district.colony.workers)
+			var saved: bool = true
+			if district.session.save_system != null:
+				saved = district.session.save_system.save_handoff(next_checkpoint)
+			arena.show_completed(CampaignRoute.zone(district.zone_index + 1).title)
+			if not saved:
+				arena.label("Avance en memoria: no se pudo guardar en disco.", Rect2(50, 275, 540, 20))
+		else:
+			if district.session.save_system != null:
+				district.session.save_system.delete_save()
+			arena.show_completed()
 		return
 	arena.queue_free()
 	arena = null
@@ -81,7 +96,21 @@ func resolve(victory: bool) -> void:
 	district.get_node("HUD").show()
 
 func continue_district() -> void:
-	leave_to_menu()
+	if next_checkpoint.is_empty():
+		leave_to_menu()
+		return
+	var path: String = district.session.save_system.save_path if district.session.save_system != null else "user://partida.json"
+	CampaignRoute.queue_handoff(next_checkpoint, path, district.session.persistence_enabled)
+	if arena != null:
+		arena.queue_free()
+		arena = null
+	active = false
+	get_tree().paused = false
+	get_tree().change_scene_to_file(CampaignRoute.SCENES[district.zone_index + 1])
+
+func _exit_tree() -> void:
+	if is_instance_valid(arena):
+		arena.queue_free()
 
 func leave_to_menu() -> void:
 	if arena != null:

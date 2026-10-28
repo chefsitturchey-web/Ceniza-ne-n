@@ -4,6 +4,7 @@ extends CanvasLayer
 var opened: bool = false
 var closed_frame: int = -1
 var begin_button: Button
+var zone: ZoneData
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -27,9 +28,14 @@ func _ready() -> void:
 	var title: Label = Label.new()
 	title.theme_type_variation = &"Title"
 	title.text = "LEVANTA LA COLONIA"
+	if zone != null and zone.id != "periphery":
+		title.text = zone.title.to_upper()
 	title.add_theme_color_override("font_color", Color("47dacb"))
 	rows.add_child(title)
-	for text: String in ["Encarga ambas murallas y torretas manteniendo E en los marcos. El constructor se ocupa de levantarlas.", "En el núcleo puedes curarte y reclutar de día. El recuperador trae chatarra automáticamente.", "Defiende ambos frentes. Esquiva con Espacio; Q sobrecarga las defensas del lado donde estás.", "Destruye las dos antenas de los extremos. Cuando llegue el tren, viaja de día para derrotar al jefe.", "A/D: mover   J: atacar   E: mantener para interactuar\nMando: stick / X / A / Y / LB   Esc o Start: pausa"]:
+	var instructions: Array[String] = ["Encarga ambas murallas y torretas manteniendo E en los marcos. El constructor se ocupa de levantarlas.", "En el núcleo puedes curarte y reclutar de día. El recuperador trae chatarra automáticamente.", "Defiende ambos frentes. Esquiva con Espacio; Q sobrecarga las defensas del lado donde estás.", "Destruye las dos antenas de los extremos. Cuando llegue el tren, viaja de día para derrotar al jefe.", "A/D: mover   J: atacar   E: mantener para interactuar\nMando: stick / X / A / Y / LB   Esc o Start: pausa"]
+	if zone != null and zone.id != "periphery":
+		instructions = ["Tus mejoras y habitantes han llegado contigo. Levanta las defensas de esta colonia con E antes del asedio.", "Las rejillas avisan en amarillo antes de quemar durante la noche." if zone.id == "foundry" else "Los charcos frenan tus pasos. Puedes cruzarlos con una esquiva.", "Destruye los repetidores de ambos extremos y toma el tren de día para desafiar a " + zone.boss_title + ".", zone.briefing, "A/D: mover   J: atacar   E: interactuar\nEspacio: esquivar   Q: sobrecarga   Esc: pausa"]
+	for text: String in instructions:
 		var label: Label = Label.new()
 		label.text = text
 		label.custom_minimum_size.x = 480
