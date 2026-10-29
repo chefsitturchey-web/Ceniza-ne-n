@@ -16,18 +16,20 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	world.get_node("Session").persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	await process_frame
 	var manager: ExpeditionManager = world.expedition
+	load("res://tests/game_fixture.gd").stabilize(world)
 	var station: RailwayStation = manager.station
 	verify(not manager.can_travel() and not manager.start(), "No viajar sin tren")
 	verify(world.defenses.nearest_enemy(-880, 50) == null, "Defensas ignoran repetidores")
 	for repeater: EnemyRepeater in manager.repeaters:
 		verify(not repeater.is_in_group(GameRules.ENEMIES), "Repetidores fuera de oleadas")
-		world.player.hitbox.strike(repeater.hurtbox.world_rect(), 50)
-		verify(repeater.health.current == 250, "Hitbox del jugador golpea torre")
-		world.player.hitbox.strike(repeater.hurtbox.world_rect(), 250)
+		repeater.hurtbox.receive(50)
+		verify(repeater.health.current == 250, "Asalto de tropas golpea torre")
+		repeater.hurtbox.receive(250)
 		verify(repeater.health.current == 0, "Destruir torre")
 		if repeater == manager.repeaters[0]:
 			verify(not station.unlocked, "Una torre no activa tren")

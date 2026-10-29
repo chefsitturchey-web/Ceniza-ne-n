@@ -4,8 +4,11 @@
 [ext_resource type="FontFile" path="res://assets/fonts/Silkscreen-Regular.ttf" id="2"]
 
 [resource]
-default_font = ExtResource("1")
-default_font_size = 10
+default_font = ExtResource("2")
+default_font_size = 12
+Label/constants/line_spacing = 3
+Button/font_sizes/font_size = 12
+Button/colors/font_disabled_color = Color(0.56, 0.66, 0.71, 1)
 Label/colors/font_shadow_color = Color(0.043137, 0.07451, 0.133333, 1)
 Label/constants/shadow_offset_x = 1
 Label/constants/shadow_offset_y = 1
@@ -14,4 +17,4 @@ Title/fonts/font = ExtResource("2")
 Title/font_sizes/font_size = 16
 SmallTitle/base_type = &"Label"
 SmallTitle/fonts/font = ExtResource("2")
-SmallTitle/font_sizes/font_size = 8
+SmallTitle/font_sizes/font_size = 10

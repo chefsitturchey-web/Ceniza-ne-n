@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ZoneData" load_steps=6 format=3]
+[ext_resource type="Script" path="res://data/zone_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/waves/night_1.tres" id="2"]
+[ext_resource type="Resource" path="res://data/waves/night_2.tres" id="3"]
+[ext_resource type="Resource" path="res://data/waves/night_3.tres" id="4"]
+[ext_resource type="Script" path="res://data/wave_data.gd" id="5"]
+[resource]
+script = ExtResource("1")
+id = "network"
+title = "Núcleo de la red"
+boss_id = "mother"
+boss_title = "MADRE CERO"
+briefing = "Mantén dos relés activos. E repara cerca de uno; Q protege. Ataca cuando el enlace se abra."
+day_duration = 180.0
+wall_offset = 320.0
+turret_offset = 230.0
+background_path = "res://assets/background/network.png"
+accent = Color(0.28, 0.85, 0.8, 1)
+waves = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4")])

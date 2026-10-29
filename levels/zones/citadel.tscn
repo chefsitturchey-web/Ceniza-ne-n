@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://levels/main.tscn" id="1"]
+[node name="CiudadelaCorporativa" instance=ExtResource("1")]
+zone_index = 3

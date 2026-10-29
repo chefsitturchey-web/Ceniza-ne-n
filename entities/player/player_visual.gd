@@ -11,7 +11,7 @@ var dust_timer: float = 0.0
 
 func movement_dust(delta: float, was_grounded: bool, previous_speed: float) -> void:
 	dust_timer = maxf(0.0, dust_timer - delta)
-	if actor.health <= 0 or not actor.is_on_floor():
+	if actor.health <= 0 or not actor.is_on_floor() or actor.riding:
 		return
 	var braking: bool = absf(previous_speed) > 10 and (absf(actor.velocity.x) <= 10 or previous_speed * actor.velocity.x < 0)
 	if not was_grounded or braking:
@@ -34,9 +34,10 @@ func _process(delta: float) -> void:
 	sweat_timer -= delta
 	var tired: bool = actor.health > 0 and actor.stamina < Player.MAX_STAMINA * 0.3 and actor.state in [Player.State.IDLE, Player.State.MOVE] and actor.attack_anim_remaining <= 0
 	var offset: Vector2 = Vector2.ZERO
+	if actor.riding: offset.y = actor.mobility.rider_offset()
 	if tired and actor.state == Player.State.IDLE:
-		offset.y = roundf(sin(elapsed * 4))
-	if shake > 0:
+		offset.y += roundf(sin(elapsed * 4))
+	if shake > 0 and not GamePreferences.current().reduced_flashes:
 		offset.x = 1 if int(elapsed * 45) % 2 == 0 else -1
 	if sprite != null:
 		sprite.position = rest_position + offset

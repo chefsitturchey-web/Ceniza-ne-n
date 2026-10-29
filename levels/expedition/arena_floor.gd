@@ -18,17 +18,22 @@ const ENEMY: Color = Color("dd6482")
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var light_time: float = 0.0
+var theme_id: String = "periphery"
+var dust: CPUParticles2D
 
 func _ready() -> void:
 	_add_dust()
 
 func _process(delta: float) -> void:
+	if theme_id == "foundry" and int(light_time * 8) != int((light_time + delta) * 8): queue_redraw()
+	if dust != null:
+		dust.emitting = GamePreferences.current().particles
 	# Luces industriales con parpadeos ocasionales y alarma que respira.
 	light_time += delta
 	var index: int = 0
 	for light: Node in get_tree().get_nodes_in_group(&"arena_light"):
 		var phase: float = fmod(light_time * 0.8 + index * 1.7, 7.0)
-		(light as PointLight2D).energy = 0.45 if phase < 0.18 and int(phase * 40.0) % 2 == 0 else 1.1
+		(light as PointLight2D).energy = 0.45 if phase < 0.18 and int(phase * 40.0) % 2 == 0 and not GamePreferences.current().reduced_flashes else 1.1
 		index += 1
 	for alarm: Node in get_tree().get_nodes_in_group(&"arena_alarm"):
 		(alarm as PointLight2D).energy = 0.25 + 0.15 * sin(light_time * 2.0)
@@ -43,16 +48,72 @@ func _draw() -> void:
 	_draw_debris()
 	_draw_edges()
 	_draw_wall_pipes()
+	if theme_id == "foundry":
+		for x: int in [130, 325, 520]:
+			for y: int in range(80, 430, 18):
+				draw_rect(Rect2(x - 25, y, 50, 10), Color("0b1322", 0.7))
+				for rib: int in range(8):
+					draw_line(Vector2(x - 22 + rib * 6, y + 1), Vector2(x - 22 + rib * 6, y + 8), Color("704c43"), 2)
+	elif theme_id == "flooded":
+		draw_rect(Rect2(15, 55, 610, 410), Color("103b4a", 0.26))
+		for y: int in range(90, 450, 45):
+			draw_line(Vector2(30, y), Vector2(610, y + 2), Color("47dacb", 0.08), 1)
+	elif theme_id == "citadel":
+		for x: int in range(60, 620, 80):
+			draw_line(Vector2(x, 25), Vector2(x, 455), Color("ffce75", 0.2), 2)
+		draw_arc(Vector2(320, 240), 130, 0, TAU, 96, Color("ffce75", 0.35), 2)
+	elif theme_id == "network":
+		for x: int in range(45, 600, 55):
+			draw_line(Vector2(x, 25), Vector2(320, 240), Color("47dacb", 0.14), 2)
+			draw_line(Vector2(x, 455), Vector2(320, 240), Color("47dacb", 0.14), 2)
+		for radius: int in [80, 145, 205]: draw_arc(Vector2(320, 240), radius, 0, TAU, 96, Color("47dacb", 0.13), 2)
 	for x: int in [48, 592]:
 		for y: int in [80, 400]:
 			draw_rect(Rect2(x - 5, y - 2, 10, 4), AMBER)
+	if theme_id == "foundry": _draw_foundry_basin()
+	if theme_id == "network":
+		for index: int in range(12):
+			var a: Vector2 = Vector2(320, 240) + Vector2(cos(index * TAU / 12) * 285, sin(index * TAU / 12) * 215)
+			var b: Vector2 = Vector2(320, 240) + Vector2(cos((index + 1) * TAU / 12) * 285, sin((index + 1) * TAU / 12) * 215)
+			draw_colored_polygon(PackedVector2Array([a, b, Vector2(320, 240) + (b - Vector2(320, 240)) * 4, Vector2(320, 240) + (a - Vector2(320, 240)) * 4]), Color("06121d"))
+			draw_line(a, b, Color("304356"), 10)
+			draw_line(a, b, Color("47dacb", 0.7), 2)
+
+func _draw_foundry_basin() -> void:
+	var boundary: PackedVector2Array = PackedVector2Array([Vector2(140, 24), Vector2(500, 24), Vector2(616, 140), Vector2(616, 340), Vector2(500, 456), Vector2(140, 456), Vector2(24, 340), Vector2(24, 140), Vector2(140, 24)])
+	for corner: Vector2 in [Vector2.ZERO, Vector2(640, 0), Vector2(640, 480), Vector2(0, 480)]:
+		var inward: Vector2 = Vector2(1 if corner.x == 0 else -1, 1 if corner.y == 0 else -1)
+		draw_colored_polygon(PackedVector2Array([corner, corner + Vector2(inward.x * 164, 0), corner + Vector2(0, inward.y * 164)]), Color("140f15"))
+		for line: int in range(7):
+			var at: Vector2 = corner + inward * (12 + line * 10)
+			draw_line(at, at + Vector2(inward.x * (120 - line * 15), 0), Color(0.8, 0.27 + 0.04 * sin(light_time + line), 0.09, 0.5), 3)
+	draw_polyline(boundary, Color("0b1322"), 13)
+	draw_polyline(boundary, Color("704c43"), 8)
+	draw_polyline(boundary, Color("8299a8"), 1)
+	for side: int in [-1, 1]:
+		for y: int in [195, 285]:
+			var center: Vector2 = Vector2(320 + side * 269, y)
+			draw_circle(center, 15, Color("0b1322"))
+			draw_arc(center, 13, 0, TAU, 20, Color("704c43"), 3)
+			for tooth: int in range(8):
+				var arm: Vector2 = Vector2.from_angle(light_time * side * 0.4 + tooth * TAU / 8) * 11
+				draw_line(center, center + arm, Color("8299a8"), 2)
+			if GamePreferences.current().particles:
+				for puff: int in range(4):
+					var rise: float = fposmod(light_time * 14 + puff * 8, 35)
+					draw_rect(Rect2(center + Vector2(-3 + sin(rise) * 2, -rise), Vector2(5, 4)), Color(0.6, 0.7, 0.75, (1.0 - rise / 35) * 0.25))
+	for index: int in range(8):
+		var point: Vector2 = boundary[index]
+		draw_circle(point, 7, Color("182639"))
+		draw_circle(point, 2, Color("ffce75"))
 
 func _draw_tiles() -> void:
 	for x: int in range(20):
 		for y: int in range(15):
 			# Variación leve por baldosa: placas más gastadas o más limpias.
 			var shade: float = rng.randf_range(0.82, 1.0)
-			draw_texture(FLOOR, Vector2(x * 32, y * 32), Color("929aa4") * Color(shade, shade, shade))
+			var tint: Color = Color("b8947a") if theme_id == "foundry" else (Color("628c96") if theme_id == "flooded" else Color("929aa4"))
+			draw_texture(FLOOR, Vector2(x * 32, y * 32), tint * Color(shade, shade, shade))
 
 func _draw_rails() -> void:
 	# Vías del tren blindado que cruzan la parte alta de la plataforma.
@@ -148,7 +209,8 @@ func _draw_wall_pipes() -> void:
 
 func _add_dust() -> void:
 	# Polvo y ceniza flotando con la luz.
-	var dust: CPUParticles2D = CPUParticles2D.new()
+	dust = CPUParticles2D.new()
+	dust.emitting = GamePreferences.current().particles
 	dust.amount = 40
 	dust.lifetime = 6.0
 	dust.preprocess = 6.0

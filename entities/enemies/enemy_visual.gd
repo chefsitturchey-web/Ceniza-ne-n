@@ -5,11 +5,27 @@ extends EntityVisual
 const WORLD_BARS_ENABLED: bool = false
 
 var base_tint: Color = Color.WHITE
+var rig: MachineRig
+var field_rig: FieldUnitVisual
 
 func bind(value: AnimatedSprite2D) -> void:
 	super.bind(value)
 	if sprite != null:
 		base_tint = sprite.modulate
+	if actor.data.id in [&"artillero", &"saboteador"]:
+		field_rig = FieldUnitVisual.new()
+		field_rig.actor = actor
+		field_rig.role = String(actor.data.id)
+		actor.add_child(field_rig)
+		hide()
+		if sprite != null: sprite.hide()
+	if actor.detailed_silhouette and actor.data.id in [&"blindado", &"saltador", &"ariete"]:
+		rig = MachineRig.new()
+		rig.actor = actor
+		rig.kind = String(actor.data.id)
+		add_child(rig)
+		if sprite != null:
+			sprite.hide()
 
 var actor: SiegeEnemy
 var effects: DebrisEmitter = DebrisEmitter.new()
@@ -41,7 +57,7 @@ func _process(delta: float) -> void:
 func update_state(moving: bool = false) -> void:
 	walking = moving
 	if sprite != null:
-		sprite.modulate = Color(1.6, 1.3, 1.3) if actor.flash > 0.0 else base_tint
+		sprite.modulate = Color(1.6, 1.3, 1.3) if actor.flash > 0.0 and not GamePreferences.current().reduced_flashes else base_tint
 	if actor.windup > 0.0:
 		play_visual(&"ataque", actor.data.attack_visual_duration)
 	elif actor.hurt_remaining > 0.0:
@@ -64,6 +80,17 @@ func _draw() -> void:
 	if actor.flash > 0.0:
 		color = Color.WHITE
 	var height: float = actor.data.provisional_height
+	if actor.elite:
+		draw_polyline(PackedVector2Array([Vector2(-6, -height - 8), Vector2(0, -height - 12), Vector2(6, -height - 8)]), Color("ffce75"), 1)
+	if actor.data.id == &"saltador" and rig == null:
+		# Resortes y toberas hacen reconocible su función incluso en silueta.
+		var side: float = -actor.facing
+		draw_rect(Rect2(side * 13 - 3, -21, 6, 10), Color("0b1322"))
+		draw_rect(Rect2(side * 13 - 2, -20, 4, 6), Color("8299a8"))
+		for y: int in [-13, -10, -7]:
+			draw_line(Vector2(side * 9, y), Vector2(side * 14, y + 2), Color("e89e54"), 1)
+		if float(actor.get("airborne")) > 0:
+			draw_line(Vector2(side * 13, -13), Vector2(side * 15, -5), Color("ffce75"), 2)
 	if sprite == null:
 		draw_rect(Rect2(-10, -height, 20, height), color)
 		draw_rect(Rect2(-7, -height + 5, 14, 6), Color("271d33"))

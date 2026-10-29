@@ -10,10 +10,10 @@ border_color = Color(0.188, 0.263, 0.337, 0.8)
 [node name="PausePanel" type="PanelContainer"]
 texture_filter = 1
 visible = false
-offset_left = 112.0
-offset_top = 64.0
-offset_right = 528.0
-offset_bottom = 296.0
+offset_left = 48.0
+offset_top = 24.0
+offset_right = 592.0
+offset_bottom = 336.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("Background")
 script = ExtResource("1")

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+[ext_resource type="Script" path="res://data/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://entities/enemies/artillero.tscn" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"artillero"
+health = 90
+speed = 28.0
+damage = 14
+reward = 5
+windup = 0.9
+cooldown = 1.8
+attack_visual_duration = 0.95
+scene = ExtResource("2")

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModuleData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://data/module_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "orbital"
+title = "Disco orbital"
+description = "Defensa cercana de área; no alcanza el frente lejano."
+passive = "bearing"
+passive_title = "Rodamiento magnético"
+evolution = "Corona de acero"
+damage = 8
+damage_per_level = 2
+attack_range = 46.0
+interval = 0.85

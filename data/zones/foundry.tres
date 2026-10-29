@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ZoneData" load_steps=6 format=3]
+[ext_resource type="Script" path="res://data/zone_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/waves/night_2.tres" id="2"]
+[ext_resource type="Resource" path="res://data/waves/night_3.tres" id="3"]
+[ext_resource type="Script" path="res://data/wave_data.gd" id="4"]
+[ext_resource type="Resource" path="res://data/waves/night_1.tres" id="early"]
+[resource]
+script = ExtResource("1")
+id = "foundry"
+title = "Fundición"
+boss_id = "caldera"
+boss_title = "SANTA CALDERA"
+briefing = "Evita rejillas calientes y salvas de escoria. Ataca durante la purga de enfriamiento."
+day_duration = 180.0
+wall_offset = 300.0
+turret_offset = 220.0
+background_path = "res://assets/background/foundry.png"
+accent = Color(1, 0.55, 0.22, 1)
+waves = Array[ExtResource("4")]([ExtResource("early"), ExtResource("2"), ExtResource("3")])

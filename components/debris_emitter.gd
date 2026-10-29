@@ -52,6 +52,8 @@ func _ready() -> void:
 	rng.seed = hash(str(global_position)) + 719
 
 func emit_pixels(origin: Vector2, count: int, color: Color, smoke: bool = false) -> void:
+	if not GamePreferences.current().particles:
+		return
 	for index: int in range(mini(count, LIMIT - live_count)):
 		var piece: Pixel = _create(origin)
 		piece.tint = color
@@ -65,6 +67,8 @@ func emit_pixels(origin: Vector2, count: int, color: Color, smoke: bool = false)
 		piece.queue_redraw()
 
 func emit_fragments(origin: Vector2, texture: Texture2D, count: int, mirrored: bool = false, shatter: bool = false) -> void:
+	if not GamePreferences.current().particles:
+		return
 	if texture == null:
 		for index: int in range(mini(count, LIMIT - live_count)):
 			var piece: Pixel = _create(origin + Vector2(0, -20))
@@ -88,6 +92,8 @@ func emit_fragments(origin: Vector2, texture: Texture2D, count: int, mirrored: b
 		piece.queue_redraw()
 
 func emit_sweat(origin: Vector2) -> void:
+	if not GamePreferences.current().particles:
+		return
 	if live_count >= LIMIT:
 		return
 	var piece: Pixel = _create(origin)
@@ -96,6 +102,8 @@ func emit_sweat(origin: Vector2) -> void:
 	piece.lifetime = 0.5
 
 func emit_dust(origin: Vector2, count: int = 2) -> void:
+	if not GamePreferences.current().particles:
+		return
 	for index: int in range(mini(count, LIMIT - live_count)):
 		var piece: Pixel = _create(origin + Vector2(rng.randf_range(-4, 4), -2))
 		piece.effect_kind = &"dust"
@@ -106,6 +114,8 @@ func emit_dust(origin: Vector2, count: int = 2) -> void:
 		piece.lifetime = 0.4
 
 func emit_shot(muzzle: Vector2, direction: float) -> void:
+	if not GamePreferences.current().particles:
+		return
 	if live_count < LIMIT:
 		var flash: Pixel = _create(muzzle)
 		flash.effect_kind = &"muzzle_flash"

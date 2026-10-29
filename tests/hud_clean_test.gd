@@ -16,12 +16,13 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	var hud: GameHud = world.get_node("HUD") as GameHud
 	hud.set_process(false)
 	var pixel_theme: Theme = load("res://ui/theme.tres")
-	verify(ProjectSettings.get_setting("gui/theme/custom") == "res://ui/theme.tres" and pixel_theme.default_font_size == 10, "Tema global Micro5 a 10 px")
+	verify(ProjectSettings.get_setting("gui/theme/custom") == "res://ui/theme.tres" and pixel_theme.default_font_size == 12, "Texto pixel legible a 12 px")
 	for path: String in ["Micro5-Regular.ttf", "Silkscreen-Regular.ttf"]:
 		var font: FontFile = load("res://assets/fonts/" + path)
 		verify(font.antialiasing == TextServer.FONT_ANTIALIASING_NONE and font.hinting == TextServer.HINTING_NONE and font.subpixel_positioning == TextServer.SUBPIXEL_POSITIONING_DISABLED and not font.generate_mipmaps, "Fuente sin suavizado: " + path)
@@ -57,7 +58,7 @@ func run_checks() -> void:
 	verify_hud_text(hud)
 	verify(paused and hud.pause_panel.visible and not hud.get_node("Gameplay").visible, "Esc/Start abre pausa y oculta HUD jugable")
 	await process_frame
-	verify(hud.pause_panel.size.x <= 496 and hud.pause_panel.size.y <= 264, "Detalle y controles caben en el panel")
+	verify(hud.pause_panel.size.x <= 560 and hud.pause_panel.size.y <= 332, "Texto ampliado y controles caben en el panel")
 	if "--capture" in OS.get_cmdline_user_args():
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("res://.godot/hud-pause.png")
@@ -141,7 +142,7 @@ func run_checks() -> void:
 	context_site.ordered = false
 	context_site.progress = 0
 	var site: ConstructionSite = world.construction.sites[0]
-	var anchor: Vector2 = site.get_global_transform_with_canvas() * Vector2(0, -site.data.texture.get_height())
+	var anchor: Vector2 = site.get_global_transform_with_canvas() * Vector2(0, -site.visual_height())
 	verify(is_equal_approx(hud.context_row.position.y, clampf(anchor.y - 24, 50, 280)), "Rótulo anclado sobre objeto en pantalla")
 	world.player.position.x = 900
 	world.presenter.publish()
@@ -150,7 +151,7 @@ func run_checks() -> void:
 	world.player.position.x = 0
 	world.presenter.publish()
 	verify_hud_text(hud)
-	verify(hud.context_row.visible and "Reclutar" in hud.context_label.text, "Núcleo tiene rótulo propio")
+	verify(hud.context_row.visible and hud.context_label.text == world.core.upgrade_blocker() and not hud.context_label.text.is_empty(), "Núcleo explica el requisito aplicable de su próxima mejora")
 	world.player.health = Player.MAX_HEALTH - 1
 	world.presenter.publish()
 	verify(hud.context_label.text == "Curarte" and not hud.context_icon.visible and not hud.context_cost.visible, "Curación sin coste")

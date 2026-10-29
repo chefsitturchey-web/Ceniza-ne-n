@@ -20,6 +20,7 @@ func create_world() -> District:
 	session.save_system.save_path = TEST_PATH
 	session.add_child(session.save_system)
 	root.add_child(world)
+	world.story.present_dialogue = false
 	session.set_process(false)
 	world.player.set_physics_process(false)
 	return world
@@ -97,7 +98,7 @@ func run_checks() -> void:
 	world.bank.scrap = 0
 	verify(save.load_game() and world.bank.scrap == scrap + world.cycle.config.dawn_scrap, "Guardar después de recompensas del amanecer")
 	world.session.finish(false)
-	verify(not save.has_save(), "Derrota elimina guardado")
+	verify(save.has_save(), "Derrota conserva el inicio del día según el GDD")
 	world.session.finished = false
 	verify(save.save_game(), "Preparar guardado para victoria")
 	world.session.win()

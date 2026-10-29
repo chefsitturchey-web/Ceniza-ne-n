@@ -34,7 +34,7 @@ func update_phase(delta: float) -> void:
 		if day == config.nights and not boss_required:
 			victory_requested.emit()
 		else:
-			day = mini(day + 1, config.nights)
+			day = day + 1 if boss_required else mini(day + 1, config.nights)
 			phase = "DÍA"
 			phase_remaining = config.day_duration
 			dawn.emit(config)

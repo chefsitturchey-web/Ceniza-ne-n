@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModuleData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://data/module_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "tesla"
+title = "Emisor Tesla"
+description = "Descarga cercana; atraviesa escudos frontales."
+passive = "battery"
+passive_title = "Batería auxiliar"
+evolution = "Tormenta"
+damage = 14
+damage_per_level = 3
+attack_range = 125.0
+interval = 1.8

@@ -2,6 +2,7 @@
 extends Node2D
 ## Las animaciones no determinan el instante del daño.
 @export var sprite_faces_right: bool = true
+@export var detailed_silhouette: bool = true
 enum State { APPROACH, WINDUP, ATTACK, DEAD }
 const DEATH_VISUAL_GRACE: float = 0.1
 signal state_changed(state: State)
@@ -13,10 +14,11 @@ var core: ColonyCore
 var session: SessionController
 var facing: float = 1.0
 var night: int = 1
+var elite: bool = false
 var state: State = State.APPROACH
-var health_component: HealthComponent = HealthComponent.new()
-var hurtbox: HurtboxComponent = HurtboxComponent.new()
-var visual: EnemyVisual = EnemyVisual.new()
+var health_component: HealthComponent
+var hurtbox: HurtboxComponent
+var visual: EnemyVisual
 var health: int:
 	get: return health_component.current
 	set(value): health_component.reset(value)
@@ -27,6 +29,7 @@ var cooldown: float = 0.0
 var windup: float = 0.0
 var target_kind: String = ""
 var target_index: int = -1
+var ally_target: Node2D
 var flash: float = 0.0
 var hurt_remaining: float = 0.0
 var death_remaining: float = 0.0
@@ -34,6 +37,11 @@ var attack_visual_remaining: float = 0.0
 @onready var sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 
 func _ready() -> void:
+	# Las escenas heredadas pueden reasignar el script al instanciarse.
+	# Crear nodos aquí evita componentes huérfanos de los inicializadores anteriores.
+	health_component = HealthComponent.new()
+	hurtbox = HurtboxComponent.new()
+	visual = EnemyVisual.new()
 	if data == null:
 		data = EnemyData.new()
 	add_child(health_component)
@@ -96,6 +104,8 @@ func take_damage(amount: int) -> void:
 			sprite.modulate = visual.base_tint
 			visual.play_visual(&"destruccion")
 			death_remaining = visual.animation_duration(&"destruccion") + DEATH_VISUAL_GRACE
+		elif data.id in [&"artillero", &"saboteador"]:
+			death_remaining = 1.2
 		else:
 			queue_free()
 		visual.queue_redraw()
@@ -131,13 +141,22 @@ func _physics_process(delta: float) -> void:
 		update_visual()
 		return
 	var moving: bool = false
+	if choose_special_target(delta): return
+	ally_target = null
+	for ally: Node in get_tree().get_nodes_in_group(GameRules.ALLIES):
+		if absf(ally.position.x - position.x) < 30 and ally.position.y >= GameRules.FLOOR_Y - 20:
+			ally_target = ally as Node2D
+			break
 	if player.health > 0 and absf(player.position.x - position.x) < data.player_notice_range:
 		target_kind = "player"
 		face_toward(player.position.x)
+	elif is_instance_valid(ally_target):
+		target_kind = "ally"
+		face_toward(ally_target.position.x)
 	elif find_wall() >= 0:
 		target_kind = "wall"
 		target_index = find_wall()
-		face_toward(construction.sites[target_index].x)
+		face_toward(construction.defensive_sites()[target_index].x)
 	elif absf(position.x) < data.core_range:
 		target_kind = "core"
 		face_toward(0.0)
@@ -157,11 +176,15 @@ func _physics_process(delta: float) -> void:
 	update_visual(moving)
 
 func find_wall() -> int:
-	for index: int in range(construction.sites.size()):
-		var site: ConstructionSite = construction.sites[index]
+	var fortifications: Array[ConstructionSite] = construction.defensive_sites()
+	for index: int in range(fortifications.size()):
+		var site: ConstructionSite = fortifications[index]
 		if site.data.blocks_enemies and site.hp > 0 and absf(position.x - site.x) < data.wall_range:
 			return index
 	return -1
+
+func choose_special_target(_delta: float) -> bool:
+	return false
 
 func land_hit() -> void:
 	if target_kind == "player":
@@ -171,3 +194,5 @@ func land_hit() -> void:
 		construction.damage_site(target_index, damage)
 	elif target_kind == "core":
 		core.take_damage(damage)
+	elif target_kind == "ally" and is_instance_valid(ally_target) and absf(ally_target.position.x - position.x) < 38:
+		ally_target.take_damage(damage)

@@ -13,7 +13,9 @@ func scan(path: String) -> void:
 			continue
 		var script: GDScript = load(path.path_join(file)) as GDScript
 		checks += 1
-		if script == null or script.reload() != OK:
+		# El proceso es nuevo: load ya compila cada script y sus dependencias.
+		# Recompilar clases usadas por el autoload conserva referencias antiguas.
+		if script == null or not script.can_instantiate():
 			failures += 1
 	for directory: String in DirAccess.get_directories_at(path):
 		scan(path.path_join(directory))

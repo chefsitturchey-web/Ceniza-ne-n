@@ -7,6 +7,10 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
+	# Banco de combate aislado de las reglas de colonia.
+	world.player.combat_enabled = true
+	world.player.hitbox.enabled = true
 	var player: Player = world.player
 	player.attack_damage = 25
 	var enemy: TrainingEnemy = TrainingEnemy.new()

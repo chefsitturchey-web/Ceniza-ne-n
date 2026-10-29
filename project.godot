@@ -11,8 +11,17 @@ config_version=5
 [application]
 
 config/name="CENIZA NEÓN"
-run/main_scene="res://levels/main.tscn"
+run/main_scene="res://ui/main_menu.tscn"
 config/features=PackedStringArray("4.7")
+
+[autoload]
+
+Preferences="*res://systems/game_preferences.gd"
+
+[debug]
+
+gdscript/warnings/untyped_declaration=1
+gdscript/warnings/inferred_declaration=1
 
 [display]
 
@@ -22,17 +31,12 @@ window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="canvas_items"
 
+[gui]
+
+theme/custom="res://ui/theme.tres"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 environment/defaults/default_clear_color=Color(0.025, 0.035, 0.06, 1)
-
-[debug]
-
-gdscript/warnings/untyped_declaration=1
-gdscript/warnings/inferred_declaration=1
-
-[gui]
-
-theme/custom="res://ui/theme.tres"

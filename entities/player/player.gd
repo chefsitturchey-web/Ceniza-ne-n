@@ -18,6 +18,7 @@ const MOVE_THRESHOLD: float = 0.1
 const ATTACK_OFFSET: float = 8.0
 const ATTACK_HEIGHT: float = 30.0
 signal state_changed(state: State)
+signal stepped(origin: Vector2)
 var state: State = State.IDLE
 var health_component: HealthComponent = HealthComponent.new()
 var hitbox: HitboxComponent = HitboxComponent.new()
@@ -25,6 +26,11 @@ var visual: PlayerVisual = PlayerVisual.new()
 
 ## Combate manual y esquiva. Los ajustes del Inspector se conservan.
 @export var speed: float = 150.0
+var terrain_speed_factor: float = 1.0
+var travel_speed_factor: float = 1.0
+var mobility: MobilitySystem
+var riding: bool:
+	get: return mobility != null and mobility.mounted
 @export var acceleration: float = 1200.0
 @export var gravity: float = 980.0
 @export var attack_damage: int = 25
@@ -44,6 +50,11 @@ var dodge_remaining: float = 0.0
 var dodge_direction: float = 1.0
 var respawn_remaining: float = 0.0
 var enabled: bool = true
+var combat_enabled: bool = true
+var neural_damage: int = 0
+var neural_regen: float = 0.0
+var modules: ModuleSystem
+var step_timer: float = 0.0
 
 func _ready() -> void:
 	health_component.maximum = MAX_HEALTH
@@ -70,7 +81,9 @@ func refresh_state() -> void:
 	else:
 		set_state(State.MOVE if absf(velocity.x) > 0.0 else State.IDLE)
 	visual.face(facing < 0.0)
-	if state == State.DODGE:
+	if riding and state != State.DEAD:
+		visual.play_visual(&"reposo")
+	elif state == State.DODGE:
 		visual.play_visual(&"esquiva", DODGE_DURATION)
 	elif state == State.DEAD:
 		visual.play_visual(&"muerte")
@@ -81,13 +94,15 @@ func refresh_state() -> void:
 	visual.queue_redraw()
 
 func _physics_process(delta: float) -> void:
+	if Engine.get_process_frames() <= GamePreferences.current().input_block_frame:
+		return
 	if not enabled:
 		return
 	cooldown_remaining = maxf(0.0, cooldown_remaining - delta)
 	slash_remaining = maxf(0.0, slash_remaining - delta)
 	attack_anim_remaining = maxf(0.0, attack_anim_remaining - delta)
 	invulnerable = maxf(0.0, invulnerable - delta)
-	stamina = minf(MAX_STAMINA, stamina + STAMINA_REGEN * delta)
+	stamina = minf(MAX_STAMINA, stamina + (STAMINA_REGEN + neural_regen) * delta)
 	if respawn_remaining > 0.0:
 		respawn_remaining = maxf(0.0, respawn_remaining - delta)
 		if respawn_remaining == 0.0:
@@ -107,10 +122,14 @@ func _physics_process(delta: float) -> void:
 		dodge_remaining = maxf(0.0, dodge_remaining - delta)
 		velocity.x = dodge_direction * DODGE_SPEED
 	else:
-		velocity.x = move_toward(velocity.x, direction * speed, acceleration * delta)
+		velocity.x = move_toward(velocity.x, direction * speed * terrain_speed_factor * travel_speed_factor, acceleration * delta)
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	move_and_slide()
+	step_timer = maxf(0, step_timer - delta)
+	if is_on_floor() and absf(velocity.x) > 20 and dodge_remaining <= 0 and step_timer == 0 and not riding:
+		stepped.emit(global_position)
+		step_timer = 0.3
 	visual.movement_dust(delta, was_grounded, previous_speed)
 	if Input.is_action_pressed("attack"):
 		attack()
@@ -137,6 +156,7 @@ func take_damage(amount: int) -> void:
 	refresh_state()
 
 func attack() -> void:
+	if not combat_enabled: return
 	if not enabled or health <= 0 or cooldown_remaining > 0.0 or dodge_remaining > 0.0:
 		return
 	cooldown_remaining = attack_cooldown
@@ -144,7 +164,7 @@ func attack() -> void:
 	attack_anim_remaining = ATTACK_ANIM_DURATION
 	attack_facing = facing
 	var hit_rect: Rect2 = get_attack_rect()
-	hitbox.strike(hit_rect, attack_damage)
+	hitbox.strike(hit_rect, attack_damage + neural_damage)
 	refresh_state()
 
 func get_attack_rect() -> Rect2:

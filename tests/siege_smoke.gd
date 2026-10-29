@@ -15,6 +15,7 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	verify(world.bank.scrap == 90 and world.colony.workers.size() == 2, "economía inicial")
@@ -37,8 +38,9 @@ func run_checks() -> void:
 	world.bank.energy_capacity = 4
 	verify(world.interaction.perform_interaction(1), "encargar torreta")
 	verify(world.bank.energy_used() == 2, "reservar energía en obra")
-	verify(world.interaction.perform_interaction(-1) and world.interaction.perform_interaction(-1), "reclutar hasta cuatro")
-	verify(not world.interaction.perform_interaction(-1), "respetar capacidad de población")
+	verify(world.civic.interact(-300) and world.civic.interact(-300) and world.civic.interact(-320) and world.civic.interact(-321), "reclutar personas y pagar herramientas")
+	for step: int in range(160): world.civic.tick(0.1)
+	verify(world.colony.workers.size() == 4 and not world.interaction.perform_interaction(-1), "Las profesiones llegan por herramientas y no por invocación en el núcleo")
 	world.player.position.x = -100
 	world.overload.activate_overload()
 	verify(world.overload.overload_left == 6.0 and world.overload.overload_right == 0.0, "sobrecarga por frente")
@@ -89,7 +91,7 @@ func run_checks() -> void:
 	world.director.spawn_count = (load("res://data/waves/night_3.tres") as WaveData).enemies.size()
 	world.cycle.phase_remaining = 0
 	world.cycle.update_phase(0)
-	verify(not world.session.finished and world.cycle.phase == "DÍA" and world.cycle.day == 3, "La tercera noche permite continuar hasta derrotar al jefe")
+	verify(not world.session.finished and world.cycle.phase == "DÍA" and world.cycle.day == 4, "La tercera noche permite continuar hasta derrotar al jefe")
 	world.queue_free()
 	await process_frame
 	var defeat: District = load("res://levels/main.tscn").instantiate() as District

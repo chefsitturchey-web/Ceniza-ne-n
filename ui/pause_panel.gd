@@ -1,12 +1,17 @@
 class_name PausePanel
 extends PanelContainer
 
+signal options_requested
+signal menu_requested
+signal resume_requested
+
 const ICON_NAMES: Array[String] = ["dia", "aviso", "noche", "chatarra", "energia", "habitantes", "vida", "resistencia", "nucleo", "amenaza", "sobrecarga"]
 var icons: Dictionary = {}
 var values: Dictionary = {}
 var bars: Dictionary = {}
 var rows: VBoxContainer
 var phase: String = "DÍA"
+var resume_button: Button
 
 func _ready() -> void:
 	rows = VBoxContainer.new()
@@ -51,16 +56,27 @@ func _ready() -> void:
 	_item(third, "amenaza")
 	_item(third, "sobrecarga")
 	var controls: GridContainer = GridContainer.new()
-	controls.columns = 2
-	controls.add_theme_constant_override("h_separation", 24)
+	controls.columns = 4
+	controls.add_theme_constant_override("h_separation", 12)
 	controls.add_theme_constant_override("v_separation", 2)
 	rows.add_child(controls)
 	for text: String in ["Mover", "A/D / Stick", "Atacar", "J / X", "Esquivar", "Espacio / A",
-		"Interactuar", "Mantener E / Y", "Sobrecarga", "Q / LB", "Continuar", "Esc / Start",
-		"Reintentar al final", "R / Select"]:
+		"Interactuar", "Mantén E / Y", "Sobrecarga", "Q / LB", "Continuar", "Esc / Start",
+		"Reintentar", "R / Select", "Audio", "M", "Escolta", "F / Arriba"]:
 		var label: Label = Label.new()
+		label.add_theme_font_size_override("font_size", 10)
 		label.text = text
 		controls.add_child(label)
+	var actions: HBoxContainer = _row()
+	resume_button = Button.new()
+	resume_button.text = "Continuar"
+	resume_button.pressed.connect(func() -> void: resume_requested.emit())
+	actions.add_child(resume_button)
+	for pair: Array in [["Opciones", func() -> void: options_requested.emit()], ["Menú principal", func() -> void: menu_requested.emit()]]:
+		var button: Button = Button.new()
+		button.text = pair[0]
+		button.pressed.connect(pair[1])
+		actions.add_child(button)
 
 
 func _row() -> HBoxContainer:
@@ -97,11 +113,12 @@ func display_dashboard(data: Dictionary) -> void:
 	icons.dia.visible = phase == "DÍA"
 	icons.aviso.visible = phase == "AVISO"
 	icons.noche.visible = phase == "NOCHE"
-	values.phase.text = "%s %d/%d   %ds" % [phase, data.day, data.nights, data.seconds]
+	values.phase.text = "%s %d   %ds" % [phase, data.day, data.seconds]
 	values.chatarra.text = str(data.scrap)
 	values.energia.text = "%d/%d" % [data.energy, data.capacity]
 	values.habitantes.text = "%d/%d" % [data.population, data.population_max]
 	var amounts: Array[int] = [data.health, data.stamina, data.core]
+	bars.nucleo.max_value = data.get("core_max", GameRules.CORE_HEALTH)
 	var keys: Array[String] = ["vida", "resistencia", "nucleo"]
 	for index: int in range(keys.size()):
 		bars[keys[index]].value = amounts[index]

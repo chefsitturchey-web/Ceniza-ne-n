@@ -41,7 +41,10 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	draw_texture(STATION, Vector2(-64, -56))
+	var source: Rect2 = ArtScale.source(GameArt.CIVIC, 4)
+	var frame: Rect2 = ArtScale.grounded(source, 56)
+	ArtScale.footing(self, frame)
+	draw_texture_rect_region(GameArt.CIVIC, frame, source)
 	if not unlocked:
 		return
 	for index: int in range(5):

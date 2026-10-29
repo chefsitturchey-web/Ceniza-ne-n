@@ -23,6 +23,7 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	world.director.spawned.connect(on_spawned)
@@ -41,7 +42,7 @@ func run_checks() -> void:
 		for index: int in range(spawned.size()):
 			var enemy: SiegeEnemy = spawned[index]
 			verify(enemy.data == wave.enemies[index] and sides[index] == wave.sides[index], "Tipo y lado desde WaveData")
-			verify(enemy.position == Vector2(sides[index] * 650.0, 260.0) and enemy.health == wave.enemies[index].health + (night - 1) * 20, "Posición y escalado exactos")
+			verify(enemy.position == Vector2(sides[index] * 1440.0, 260.0) and enemy.health == wave.enemies[index].health + (night - 1) * 20, "Entrada de asedio y escalado acotado")
 		world.director.tick(100.0)
 		verify(spawned.size() == wave.enemies.size() and not world.director.is_cleared(), "No sobregenerar ni finalizar con amenazas")
 		for enemy: SiegeEnemy in spawned:

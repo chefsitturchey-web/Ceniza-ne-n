@@ -1,11 +1,11 @@
 extends SceneTree
 
 const SUITES: Array[String] = [
-	"static_check", "expedition_test", "recaudador_test",
+	"static_check", "unit_animation_test", "visual_novel_test", "fortress_progression_test", "mobility_test", "commander_test", "story_finale_test", "expansion_test", "campaign_bosses_test", "polish_integration_test", "menu_settings_test", "modules_test", "machine_rig_test", "neural_audio_test", "expedition_test", "recaudador_test",
 	"save_system_test", "effects_test", "hud_clean_test", "enemies_gdd_test",
 	"combat_smoke", "siege_smoke", "errante_animation_smoke",
 	"health_component_test", "resource_test", "director_test", "visual_integration_test",
-	"session_simulation", "session_simulation --assist"
+	"fresh_colony_simulation", "fresh_colony_simulation --foundry", "fresh_colony_simulation --flooded", "fresh_colony_simulation --citadel", "fresh_colony_simulation --network", "session_simulation", "session_simulation --assist"
 ]
 var failures: int = 0
 

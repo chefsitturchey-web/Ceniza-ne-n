@@ -1,0 +1,227 @@
+class_name NovelPanel
+extends CanvasLayer
+## Modal con dueño de pausa; el texto no avanza el reloj ni ejecuta acciones del mundo.
+signal finished(scene_id: String)
+const PORTRAITS: Texture2D = preload("res://assets/story/portraits_manga_v2.png")
+const ANTAGONISTS: Texture2D = preload("res://assets/story/antagonists_manga_v2.png")
+const CAST: Array[String] = ["mara", "ivo", "vera", "nox", "eco", "portador"]
+var opened: bool = false
+var closed_frame: int = -1
+var scene_data: Dictionary = {}
+var line_index: int = 0
+var body: RichTextLabel
+var speaker: Label
+var title: Label
+var counter: Label
+var left: TextureRect
+var right: TextureRect
+var background: TextureRect
+var curtain: ColorRect
+var next_button: Button
+var skip_button: Button
+var previous_button: Button
+var previous_pause: bool = false
+var transitioning: bool = false
+var reveal: float = 0
+var elapsed: float = 0
+var input_after: int = -1
+var partner: String = "mara"
+var transition: Tween
+var stage: Control
+var reduced_motion: bool = false
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	layer = 45
+	stage = Control.new()
+	stage.size = Vector2(640, 360)
+	stage.theme = Theme.new()
+	stage.theme.default_font = ThemeDB.fallback_font
+	stage.theme.default_font_size = 14
+	add_child(stage)
+	background = TextureRect.new()
+	background.size = stage.size
+	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	background.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	stage.add_child(background)
+	var veil: ColorRect = ColorRect.new()
+	veil.size = stage.size
+	veil.color = Color("07101b", 0.58)
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.add_child(veil)
+	left = portrait(Vector2(-4, 24))
+	right = portrait(Vector2(388, 24))
+	title = label("", Vector2(24, 12), Vector2(480, 25), 16)
+	title.add_theme_color_override("font_color", Color("b8e5e6"))
+	var box: Panel = Panel.new()
+	box.position = Vector2(24, 214)
+	box.size = Vector2(592, 130)
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color("0c1825", 0.97)
+	style.border_color = Color("4a7c88")
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(7)
+	style.shadow_color = Color(0, 0, 0, 0.5)
+	style.shadow_size = 12
+	box.add_theme_stylebox_override("panel", style)
+	stage.add_child(box)
+	speaker = label("", Vector2(42, 222), Vector2(420, 23), 16)
+	speaker.add_theme_color_override("font_color", Color("ffce75"))
+	body = RichTextLabel.new()
+	body.position = Vector2(42, 248)
+	body.size = Vector2(552, 61)
+	body.scroll_active = false
+	body.add_theme_font_size_override("normal_font_size", 14)
+	body.add_theme_color_override("default_color", Color("edf3f4"))
+	body.add_theme_constant_override("normal_line_separation", 3)
+	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.add_child(body)
+	counter = label("", Vector2(42, 319), Vector2(90, 19), 11)
+	previous_button = button("Anterior", Vector2(320, 318), Vector2(85, 23), previous_line)
+	next_button = button("Continuar  ›", Vector2(420, 318), Vector2(172, 23), advance)
+	skip_button = button("Omitir", Vector2(548, 12), Vector2(68, 24), close_panel)
+	curtain = ColorRect.new()
+	curtain.size = stage.size
+	curtain.color = Color.BLACK
+	curtain.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.add_child(curtain)
+	hide()
+
+func portrait(at: Vector2) -> TextureRect:
+	var result: TextureRect = TextureRect.new()
+	result.position = at
+	result.size = Vector2(256, 269)
+	result.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	result.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	result.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	result.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.add_child(result)
+	return result
+
+func label(text: String, at: Vector2, extent: Vector2, font_size: int) -> Label:
+	var result: Label = Label.new()
+	result.position = at
+	result.size = extent
+	result.text = text
+	result.add_theme_font_size_override("font_size", font_size)
+	result.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.add_child(result)
+	return result
+
+func button(text: String, at: Vector2, extent: Vector2, action: Callable) -> Button:
+	var result: Button = Button.new()
+	result.position = at
+	result.size = extent
+	result.text = text
+	result.add_theme_font_size_override("font_size", 12)
+	result.pressed.connect(action)
+	stage.add_child(result)
+	return result
+
+func actor_texture(id: String) -> Texture2D:
+	if id in ["prefect", "mother"]: return ArtScale.atlas(ANTAGONISTS, 0 if id == "prefect" else 1)
+	return ArtScale.atlas(PORTRAITS, maxi(0, CAST.find(id)))
+
+func play(data: Dictionary, allow_paused: bool = false) -> bool:
+	if opened or (get_tree().paused and not allow_paused) or data.get("lines", []).is_empty(): return false
+	previous_pause = get_tree().paused
+	scene_data = data.duplicate(true)
+	line_index = 0
+	opened = true
+	transitioning = true
+	input_after = Engine.get_process_frames() + 1
+	reduced_motion = GamePreferences.current().reduced_flashes
+	get_tree().paused = true
+	background.texture = load(data.background) as Texture2D
+	title.text = data.title + "  /  " + data.subtitle
+	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	title.size = Vector2(480, 25)
+	partner = "eco"
+	for line: Dictionary in data.lines:
+		if line.speaker not in ["portador", "narrator"]:
+			partner = line.speaker
+			break
+	right.texture = actor_texture("portador")
+	curtain.color.a = 1
+	show()
+	show_line()
+	transition = create_tween()
+	transition.tween_property(curtain, "color:a", 0.0, 0.12 if reduced_motion else 0.35)
+	transition.finished.connect(func() -> void: transitioning = false; next_button.grab_focus())
+	return true
+
+func show_line() -> void:
+	var line: Dictionary = scene_data.lines[line_index]
+	if line.speaker not in ["portador", "narrator"]: partner = line.speaker
+	left.texture = actor_texture(partner)
+	left.modulate = Color.WHITE if line.speaker == partner else Color(0.56, 0.64, 0.72, 0.85)
+	right.modulate = Color.WHITE if line.speaker == "portador" else Color(0.56, 0.64, 0.72, 0.85)
+	if not reduced_motion and line.speaker == partner:
+		left.position.x = -12
+		create_tween().tween_property(left, "position:x", -4.0, 0.22).set_trans(Tween.TRANS_SINE)
+	speaker.text = VisualStory.actor_name(line.speaker)
+	body.text = line.text
+	body.visible_characters = 0
+	reveal = 0
+	counter.text = "%d / %d" % [line_index + 1, scene_data.lines.size()]
+	previous_button.disabled = line_index == 0
+	next_button.text = "Continuar  ›" if line_index < scene_data.lines.size() - 1 else "Volver al juego"
+
+func _process(delta: float) -> void:
+	if not opened: return
+	elapsed += delta
+	if not reduced_motion:
+		left.position.y = 24 + sin(elapsed * 1.7) * 0.8
+		right.position.y = 24 + sin(elapsed * 1.6 + 1) * 0.8
+	if not transitioning:
+		reveal += delta * 44
+		body.visible_characters = mini(body.get_total_character_count(), int(reveal))
+
+func advance() -> void:
+	if not opened or transitioning or Engine.get_process_frames() <= input_after: return
+	if body.visible_characters < body.get_total_character_count():
+		reveal = body.get_total_character_count()
+		body.visible_characters = int(reveal)
+	elif line_index + 1 < scene_data.lines.size():
+		line_index += 1
+		show_line()
+	else: close_panel()
+
+func previous_line() -> void:
+	if not opened or transitioning or line_index <= 0: return
+	line_index -= 1
+	show_line()
+	reveal = body.get_total_character_count()
+	body.visible_characters = int(reveal)
+
+func close_panel() -> void:
+	if not opened or transitioning: return
+	transitioning = true
+	if transition != null and transition.is_running(): transition.kill()
+	transition = create_tween()
+	transition.tween_property(curtain, "color:a", 1.0, 0.12 if reduced_motion else 0.22)
+	transition.finished.connect(finish_close)
+
+func finish_close() -> void:
+	opened = false
+	transitioning = false
+	closed_frame = Engine.get_process_frames()
+	hide()
+	get_tree().paused = previous_pause
+	GamePreferences.current().block_gameplay_input()
+	finished.emit(scene_data.id)
+
+func _input(event: InputEvent) -> void:
+	if not opened or event.is_echo(): return
+	if event.is_action_pressed("pause"):
+		close_panel()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("interact") or event.is_action_pressed("ui_accept") or (event is InputEventKey and event.pressed and event.physical_keycode == KEY_SPACE):
+		advance()
+		get_viewport().set_input_as_handled()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if opened and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		advance()
+		get_viewport().set_input_as_handled()

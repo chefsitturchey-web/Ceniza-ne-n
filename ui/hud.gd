@@ -19,9 +19,19 @@ var left_arrow: Control
 var right_arrow: Control
 var left_count: int = 0
 var right_count: int = 0
+var objective: Label
+var result_actions: HBoxContainer
+var result_was_visible: bool = false
+var pause_was_visible: bool = false
+signal restart_requested
+signal menu_requested
 @onready var pause_panel: PausePanel = $PausePanel
 
 func _ready() -> void:
+	objective = _label($Gameplay)
+	objective.position = Vector2(10, 10)
+	objective.size = Vector2(620, 20)
+	objective.add_theme_color_override("font_color", Color("8299a8"))
 	var resources: HBoxContainer = HBoxContainer.new()
 	resources.position = Vector2(10, 337)
 	resources.add_theme_constant_override("separation", 6)
@@ -67,6 +77,17 @@ func _ready() -> void:
 	left_arrow = _arrow(Vector2(4, 174), -1)
 	right_arrow = _arrow(Vector2(628, 174), 1)
 	phase_banner.hide()
+	result_actions = HBoxContainer.new()
+	result_actions.position = Vector2(190, 245)
+	result_actions.add_theme_constant_override("separation", 12)
+	add_child(result_actions)
+	for pair: Array in [["Reintentar", func() -> void: restart_requested.emit()], ["Menú principal", func() -> void: menu_requested.emit()]]:
+		var button: Button = Button.new()
+		button.text = pair[0]
+		button.custom_minimum_size = Vector2(124, 25)
+		button.pressed.connect(pair[1])
+		result_actions.add_child(button)
+	result_actions.hide()
 
 func _label(parent: Node) -> Label:
 	var label: Label = Label.new()
@@ -90,8 +111,17 @@ func _icon(parent: Node, key: String) -> TextureRect:
 	return icon
 
 func display_dashboard(data: Dictionary) -> void:
+	objective.text = data.get("objective", "")
+	var result_visible: bool = data.get("finished", false)
+	result_actions.visible = result_visible
+	if result_visible and not result_was_visible:
+		result_actions.get_child(0).grab_focus()
+	result_was_visible = result_visible
 	pause_panel.display_dashboard(data)
 	pause_panel.visible = data.get("paused", false) and not data.get("finished", false)
+	if pause_panel.visible and not pause_was_visible:
+		pause_panel.resume_button.grab_focus()
+	pause_was_visible = pause_panel.visible
 	$Gameplay.visible = not pause_panel.visible and not data.get("finished", false)
 	$DamageEdges.visible = $Gameplay.visible
 	values.chatarra.text = str(data.scrap)
