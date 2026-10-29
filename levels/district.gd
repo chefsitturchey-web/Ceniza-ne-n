@@ -192,6 +192,7 @@ func _ready() -> void:
 	corpse_system = CorpseSystem.new()
 	corpse_system.setup(cycle, player, director)
 	add_child(corpse_system)
+	colony.corpse_system = corpse_system
 	gravedigger = Gravedigger.new()
 	gravedigger.corpse_system = corpse_system
 	gravedigger.director = director

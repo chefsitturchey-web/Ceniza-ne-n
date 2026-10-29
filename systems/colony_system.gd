@@ -11,6 +11,7 @@ var bank: ResourceBank
 var overload: OverloadSystem
 var civic: CivicSystem
 var core: ColonyCore
+var corpse_system: CorpseSystem
 
 func add_worker(role: StringName) -> void:
 	var data: WorkerData = builder_data if role == &"builder" else collector_data
@@ -24,8 +25,13 @@ func add_worker(role: StringName) -> void:
 
 func update_workers(delta: float) -> void:
 	var core_crew: int = 0
+	var dead: Array[ColonyWorker] = []
 	for index: int in range(workers.size()):
 		var worker: ColonyWorker = workers[index]
+		_damage_from_enemies(worker, delta)
+		if worker.hp <= 0:
+			dead.append(worker)
+			continue
 		var previous_x: float = worker.x
 		if worker.role == "collector":
 			var gather_destination: float = worker.side * worker.data.gather_distance if cycle.phase == "DÍA" and worker.cargo == 0 else worker.side * worker.data.home_distance
@@ -84,6 +90,17 @@ func update_workers(delta: float) -> void:
 				worker.job = -1
 
 		worker.update_visual(previous_x, worker.job >= 0 and absf(worker.x - destination) < GameRules.BUILD_ARRIVAL_DISTANCE)
+	for worker: ColonyWorker in dead:
+		if corpse_system != null:
+			corpse_system.spawn(worker.position, &"worker", cycle.day)
+		workers.erase(worker)
+		worker.queue_free()
+
+func _damage_from_enemies(worker: ColonyWorker, delta: float) -> void:
+	for enemy: Node2D in get_tree().get_nodes_in_group(GameRules.ENEMIES):
+		if absf(enemy.position.x - worker.x) < GameRules.UNSAFE_RANGE:
+			worker.apply_dps(GameRules.WORKER_DANGER_DPS, delta)
+			break
 
 func unsafe_at(x: float) -> bool:
 	if civic != null and cycle.phase != "DÍA" and absf(x) > civic.frontier(signf(x)): return true
