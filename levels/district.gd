@@ -32,7 +32,6 @@ var civic: CivicSystem
 var story: StoryDirector
 var mobility: MobilitySystem
 var corpse_system: CorpseSystem
-var gravedigger: Gravedigger
 var scavenge: ScavengeSystem
 var trap_system: TrapSystem
 var pest_system: PestSystem
@@ -191,16 +190,12 @@ func _ready() -> void:
 	interaction.mobility = mobility
 	corpse_system = CorpseSystem.new()
 	corpse_system.setup(cycle, player, director)
+	corpse_system.colony = colony
 	add_child(corpse_system)
+	corpse_system.notice_requested.connect(presenter.show_notice)
+	colony.notice_requested.connect(presenter.show_notice)
 	colony.corpse_system = corpse_system
-	gravedigger = Gravedigger.new()
-	gravedigger.corpse_system = corpse_system
-	gravedigger.director = director
-	gravedigger.cycle = cycle
-	gravedigger.core = core
-	gravedigger.position = Vector2(0, GameRules.FLOOR_Y)
-	add_child(gravedigger)
-	corpse_system.gravedigger = gravedigger
+	interaction.corpse_system = corpse_system
 	session.corpse_system = corpse_system
 	scavenge = ScavengeSystem.new()
 	scavenge.setup(zone, bank)
@@ -217,6 +212,7 @@ func _ready() -> void:
 	add_child(workshop)
 	workshop.notice_requested.connect(presenter.show_notice)
 	interaction.workshop = workshop
+	corpse_system.workshop = workshop
 	var workshop_visual: CubeBody = CubeBody.new()
 	workshop_visual.size = Vector2(20, 30)
 	workshop_visual.fill = Color(0.51, 0.6, 0.66)

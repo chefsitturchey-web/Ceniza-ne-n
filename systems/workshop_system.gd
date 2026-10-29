@@ -1,9 +1,8 @@
 class_name WorkshopSystem
 extends Node
 
-## Dedicated tool workshop. Crafts a shovel (leaves a flag for the gravedigger to
-## consume in a later block) or arms one rat trap at its fixed spot, paying scrap
-## and parts up front.
+## Dedicated tool workshop. Crafts a shovel (unlocks corpse burial) or arms one
+## rat trap at its fixed spot, paying scrap and parts up front.
 
 signal notice_requested(message: String)
 

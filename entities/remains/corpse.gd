@@ -9,6 +9,9 @@ var died_day: int = 0
 var stage: int = 0
 var buried: bool = false
 var cycle: CycleSystem
+## Set when the player reports the corpse; a builder is then dispatched.
+var reported: bool = false
+var bury_progress: float = 0.0
 ## Accumulated cooldown (seconds) between rat_spawn_requested emissions.
 ## Managed by CorpseSystem; a single float, not a Timer node.
 var rat_timer: float = 0.0

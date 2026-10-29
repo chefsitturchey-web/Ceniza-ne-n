@@ -2,6 +2,10 @@ class_name ColonySystem
 extends Node
 
 signal worker_added(worker: ColonyWorker)
+signal notice_requested(message: String)
+
+const BURY_DURATION: float = 3.0
+
 @export var builder_data: WorkerData
 @export var collector_data: WorkerData
 var workers: Array[ColonyWorker] = []
@@ -12,6 +16,8 @@ var overload: OverloadSystem
 var civic: CivicSystem
 var core: ColonyCore
 var corpse_system: CorpseSystem
+## Corpse reported by the player that a builder must bury before resuming work.
+var burial_target: Corpse
 
 func add_worker(role: StringName) -> void:
 	var data: WorkerData = builder_data if role == &"builder" else collector_data
@@ -25,6 +31,7 @@ func add_worker(role: StringName) -> void:
 
 func update_workers(delta: float) -> void:
 	var core_crew: int = 0
+	var burial_crew: int = 0
 	var dead: Array[ColonyWorker] = []
 	for index: int in range(workers.size()):
 		var worker: ColonyWorker = workers[index]
@@ -48,6 +55,21 @@ func update_workers(delta: float) -> void:
 					worker.cargo = 0
 			var gathering: bool = cycle.phase == "DÍA" and worker.cargo == 0 and absf(gather_destination) > GameRules.COLLECTOR_OUTSIDE_THRESHOLD and absf(worker.x - gather_destination) < GameRules.GATHER_ARRIVAL_DISTANCE
 			worker.update_visual(previous_x, gathering)
+			continue
+		# Un solo constructor entierra; espera si el cadáver sigue en zona peligrosa.
+		if burial_target != null and is_instance_valid(burial_target) and not burial_target.buried and burial_crew < 1 and not unsafe_at(burial_target.position.x):
+			burial_crew += 1
+			worker.job = -1
+			worker.external_job = -1
+			worker.x = move_toward(worker.x, burial_target.position.x, worker.data.speed * delta)
+			var arrived: bool = absf(worker.x - burial_target.position.x) < GameRules.BUILD_ARRIVAL_DISTANCE
+			if arrived:
+				burial_target.bury_progress += delta
+				if burial_target.bury_progress >= BURY_DURATION:
+					burial_target.bury()
+					burial_target = null
+					notice_requested.emit("Muerto sepultado")
+			worker.update_visual(previous_x, arrived)
 			continue
 		# Una reserva por obra impide que los constructores dupliquen tareas.
 		if core != null and core.ordered and core_crew < 2 and not unsafe_at(core.position.x):

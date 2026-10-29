@@ -19,6 +19,7 @@ var mobility: MobilitySystem
 var scavenge: ScavengeSystem
 var trap_system: TrapSystem
 var workshop: WorkshopSystem
+var corpse_system: CorpseSystem
 const MOBILITY_TARGET: int = -5
 var committed_target: int = GameRules.NO_TARGET
 var hold_time: float = 0.0
@@ -39,6 +40,8 @@ func interaction_target() -> int:
 		return -1
 	var workshop_target: int = workshop.target_at(player.position.x) if workshop != null else GameRules.NO_TARGET
 	if workshop_target != GameRules.NO_TARGET: return workshop_target
+	var corpse_target: int = corpse_system.target_at(player.position.x) if corpse_system != null else GameRules.NO_TARGET
+	if corpse_target != GameRules.NO_TARGET: return corpse_target
 	if expansion != null:
 		var expansion_target: int = expansion.target_at(player.position.x)
 		if expansion_target != GameRules.NO_TARGET:
@@ -77,6 +80,8 @@ func update_interaction(delta: float) -> void:
 func perform_interaction(target: int) -> bool:
 	if target == MOBILITY_TARGET and mobility != null: return mobility.interact()
 	if target <= -400 and target >= -402 and story != null: return story.interact(target)
+	if target <= -800:
+		return corpse_system.report(target) if corpse_system != null else false
 	if target <= -700:
 		return workshop.interact(target) if workshop != null else false
 	if target <= -500:
