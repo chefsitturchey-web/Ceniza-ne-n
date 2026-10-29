@@ -1,6 +1,6 @@
 # Historia y campaña actual
 
-Actualización posterior: [escala, niveles del núcleo y movilidad](ESCALA_NIVELES_Y_MOVILIDAD.md). Los servicios de apoyo exigen núcleo 2; sus obras y desbloqueos se guardan. La batería general contiene ahora 36 suites.
+Actualización posterior: [escala, niveles del núcleo y movilidad](ESCALA_NIVELES_Y_MOVILIDAD.md). Los servicios de apoyo exigen núcleo 2; sus obras y desbloqueos se guardan. La batería general contiene ahora 37 suites.
 
 ## Qué se puede jugar
 

@@ -4,6 +4,9 @@ extends CanvasLayer
 signal resolved(victory: bool)
 signal continued
 signal menu_requested
+signal practice_exit_requested
+signal practice_retry_requested
+var debug_practice: bool = false
 
 const DAMAGE_EDGES: Script = preload("res://ui/damage_edges.gd")
 const THEME: Theme = preload("res://ui/theme.tres")
@@ -104,9 +107,9 @@ func _ready() -> void:
 	player.died.connect(func() -> void: finish(false))
 	boss.died.connect(func() -> void: finish(true))
 	boss.fired.connect(spawn_bullet)
-	boss.phase_changed.connect(func(_phase: int) -> void:
+	boss.phase_changed.connect(func(number: int) -> void:
 		phase_notice_time = 1.8
-		phase_notice.text = "SEGUNDA FASE")
+		phase_notice.text = "SEGUNDA FASE" if number == 2 else "PRIMERA FASE")
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 5
 	camera.limit_left = 0
@@ -300,12 +303,13 @@ func build_hud() -> void:
 	settings.pressed.connect(options.open_panel)
 	rows.add_child(settings)
 	exit_button = Button.new()
-	exit_button.text = "Menú principal"
+	exit_button.text = "Volver a mi escena" if debug_practice else "Menú principal"
 	exit_button.pressed.connect(return_to_menu)
 	rows.add_child(exit_button)
 	pause_panel.hide()
 
 func _input(event: InputEvent) -> void:
+	if GamePreferences.current().debug_input_blocked(): return
 	if options.opened or options.closed_frame == Engine.get_process_frames():
 		return
 	if event.is_action_pressed("pause") and not event.is_echo() and not ending and not completed:
@@ -330,6 +334,9 @@ func toggle_pause() -> void:
 		pause_panel.get_child(0).get_child(1).grab_focus()
 
 func return_to_menu() -> void:
+	if debug_practice:
+		practice_exit_requested.emit()
+		return
 	get_tree().paused = false
 	if configured:
 		menu_requested.emit()
@@ -408,6 +415,9 @@ func _process(delta: float) -> void:
 					show_standalone_defeat()
 
 func retry_arena() -> void:
+	if debug_practice:
+		practice_retry_requested.emit()
+		return
 	get_tree().paused = false
 	var scenes: Array[String] = ["res://levels/expedition/recaudador_arena.tscn", "res://levels/expedition/caldera_arena.tscn", "res://levels/expedition/choir_arena.tscn", "res://levels/expedition/prefect_arena.tscn", "res://levels/expedition/mother_arena.tscn"]
 	get_tree().change_scene_to_file(scenes[zone_index])
@@ -426,7 +436,7 @@ func show_standalone_defeat() -> void:
 	add_child(retry)
 	var menu: Button = Button.new()
 	menu.theme = THEME
-	menu.text = "Menú principal"
+	menu.text = "Volver a mi escena" if debug_practice else "Menú principal"
 	menu.position = Vector2(245, 235)
 	menu.size = Vector2(150, 25)
 	menu.pressed.connect(return_to_menu)
@@ -457,7 +467,7 @@ func show_completed(next_zone: String = "") -> void:
 	label("Ruta disponible completada." if next_zone.is_empty() else "Siguiente destino: " + next_zone + ". Equipo y tripulación conservados.", Rect2(40, 178, 560, 16))
 	var button: Button = Button.new()
 	button.theme = THEME
-	button.text = "Volver al menú" if next_zone.is_empty() else "Viajar a " + next_zone
+	button.text = ("Volver a mi escena" if debug_practice else "Volver al menú") if next_zone.is_empty() else "Viajar a " + next_zone
 	button.position = Vector2(210, 200)
 	button.size = Vector2(220, 28)
 	button.pressed.connect(func() -> void:

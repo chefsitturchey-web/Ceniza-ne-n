@@ -58,7 +58,7 @@ La búsqueda en el catálogo de plugins no devolvió una integración pertinente
 
 ## Validación
 
-`tests/boss_tactics_test.gd` pasa **118 comprobaciones** sobre decisiones contextuales, memoria, límites de anticipación, navegación física alrededor de un pilar, llegadas, daño manual y automático, recompensas únicas, mecanismos, corriente, abertura de ondas, sabotaje, pausa y limpieza. `--capture` guarda capturas de los cinco recintos en `.godot/tactics/`. Se incorpora a las **36 suites** de `tests/run_all.gd`, junto a las pruebas existentes de campaña, jefes y progresión. Los registros y las capturas de validación no se incluyen en Git; las imágenes seleccionadas en `docs/media/` documentan el estado del juego.
+`tests/boss_tactics_test.gd` pasa **118 comprobaciones** sobre decisiones contextuales, memoria, límites de anticipación, navegación física alrededor de un pilar, llegadas, daño manual y automático, recompensas únicas, mecanismos, corriente, abertura de ondas, sabotaje, pausa y limpieza. `--capture` guarda capturas de los cinco recintos en `.godot/tactics/`. Se incorpora a las **37 suites** de `tests/run_all.gd`, junto a las pruebas existentes de campaña, jefes y progresión. Los registros y las capturas de validación no se incluyen en Git; las imágenes seleccionadas en `docs/media/` documentan el estado del juego.
 
 ```powershell
 godot --headless --path . --script res://tests/boss_tactics_test.gd

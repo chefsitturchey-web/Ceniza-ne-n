@@ -213,6 +213,7 @@ func finish_close() -> void:
 	finished.emit(scene_data.id)
 
 func _input(event: InputEvent) -> void:
+	if GamePreferences.current().debug_input_blocked(): return
 	if not opened or event.is_echo(): return
 	if event.is_action_pressed("pause"):
 		close_panel()
@@ -222,6 +223,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if GamePreferences.current().debug_input_blocked(): return
 	if opened and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		advance()
 		get_viewport().set_input_as_handled()

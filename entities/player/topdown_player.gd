@@ -10,6 +10,7 @@ signal slash(origin: Vector2, direction: Vector2, amount: int, reach: float)
 const FRAMES: SpriteFrames = preload("res://entities/player/player_frames.tres")
 const VIEWS: Array[Texture2D] = [preload("res://assets/player/topdown/idle_south.png"), preload("res://assets/player/topdown/idle_north.png"), preload("res://assets/player/topdown/idle_east.png"), preload("res://assets/player/topdown/idle_west.png")]
 var health: int = Player.MAX_HEALTH
+var debug_invincible: bool = false
 var stamina: float = Player.MAX_STAMINA
 var speed: float = 220.0
 var terrain_speed_factor: float = 1.0
@@ -126,7 +127,7 @@ func attack() -> void:
 	queue_redraw()
 
 func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
-	if health <= 0 or invulnerable > 0:
+	if debug_invincible or health <= 0 or invulnerable > 0:
 		return
 	health = maxi(0, health - amount)
 	invulnerable = Player.HIT_INVULNERABILITY

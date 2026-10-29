@@ -42,4 +42,4 @@ Prompts visuales finales:
 
 `tests/depot_life_test.gd`: 98 comprobaciones sobre recogida automática, reservas, plazas compartidas, taller nocturno, aviso contextual, cadencia entre ticks, pausa ambiental, contornos, aparición, colisión, maquinaria y escala de los fragmentos. Las capturas quedan en `.godot/depot/` al usar `-- --capture`.
 
-La batería general incluye **36 suites**, también con simulaciones desde cero en las cinco zonas. Las referencias de arte y procedencia se registran en `ASSET_SOURCES.csv`.
+La batería general incluye **37 suites**, también con simulaciones desde cero en las cinco zonas. Las referencias de arte y procedencia se registran en `ASSET_SOURCES.csv`.
