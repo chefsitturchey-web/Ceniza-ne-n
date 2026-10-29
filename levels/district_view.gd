@@ -44,6 +44,7 @@ const TRANSITION_TIME: float = 2.5
 var light: Dictionary = LIGHTING["DÍA"].duplicate()
 var daylight: CanvasModulate = CanvasModulate.new()
 var time: float = 0.0
+var redraw_clock: float = 0
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -59,20 +60,30 @@ func _process(delta: float) -> void:
 	for key: String in light:
 		light[key] = lerp(light[key], target[key], weight)
 	daylight.color = light["world"]
+	redraw_clock += delta
+	if redraw_clock >= 1.0 / 30:
+		redraw_clock = fmod(redraw_clock, 1.0 / 30)
+		queue_redraw()
 
 func _draw() -> void:
 	var camera: Camera2D = get_viewport().get_camera_2d()
 	var camera_x: float = camera.get_screen_center_position().x if camera != null else 0.0
 	_draw_sky(camera_x)
 	if district_background != null:
-		var width: float = 640.0
+		var periphery: bool = zone != null and zone.id == "periphery"
+		var width: float = 512.0 if periphery else 640.0
+		var top: float = FLOOR_Y - 216 if periphery else FLOOR_Y - 360
 		var base: int = floori(camera_x * 0.2 / width)
 		for tile: int in range(-3, 4):
 			var index: int = base + tile
 			var x: float = index * width + camera_x * 0.8 - width * 0.5
 			var mirrored: bool = posmod(index, 2) == 1
 			draw_set_transform(Vector2(x + (width if mirrored else 0.0), 0), 0, Vector2(-1 if mirrored else 1, 1))
-			draw_texture_rect(district_background, Rect2(0, FLOOR_Y - 360, width, 360), false, Color(0.78, 0.82, 0.9))
+			draw_texture_rect(district_background, Rect2(0, top, width, 288 if periphery else 360), false, Color(0.78, 0.82, 0.9))
+			if periphery:
+				# Restaurar el transformado del mosaico después de los rotores locales.
+				var tile_frame: Transform2D = Transform2D(0, Vector2(-1 if mirrored else 1, 1), 0, Vector2(x + (width if mirrored else 0), 0))
+				BackdropLife.draw_factory(self, time, top, tile_frame)
 			draw_set_transform(Vector2.ZERO)
 		_draw_haze(camera_x, light["far_haze"] * 0.25)
 	else:

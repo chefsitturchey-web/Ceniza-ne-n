@@ -159,20 +159,21 @@ func run_checks() -> void:
 	arena.player.velocity = Vector2.UP * arena.player.speed
 	arena.player.elapsed = 0.1
 	arena.player.update_visual()
-	var foot: float = arena.player.stride.left_step
-	verify(arena.player.stride.visible and not arena.player.sprite.visible, "Carrera norte articula la vista existente")
+	var foot: int = arena.player.combat_visual.sprite.frame
+	verify(arena.player.combat_visual.current == &"walk_north" and not arena.player.sprite.visible, "Carrera norte usa la secuencia nativa")
 	arena.player.elapsed = 0.35
+	arena.player.position.y -= 12
 	arena.player.update_visual()
-	verify(arena.player.stride.left_step != foot and arena.player.stride.right_step == -arena.player.stride.left_step, "Los pies alternan pasos independientes")
+	verify(arena.player.combat_visual.sprite.frame != foot, "Recorrer distancia cambia la pose de los pies")
 	arena.player.facing = Vector2.DOWN
 	arena.player.update_visual()
-	verify(arena.player.stride.source == TopdownPlayer.VIEWS[0], "Carrera sur conserva el aspecto del personaje")
+	verify(arena.player.combat_visual.current == &"walk_south", "Carrera sur tiene animación completa propia")
 	arena.player.facing = Vector2.RIGHT
 	arena.player.velocity = Vector2.ZERO
 	arena.player.cooldown = 0
 	arena.player.attack()
 	arena.player.update_visual()
-	verify(arena.player.runner.visible and arena.player.runner.animation == &"ataque", "Ataque lateral usa la animación de espada existente")
+	verify(arena.player.combat_visual.current == &"windup_east", "El ataque empieza por una preparación con espada física")
 	arena.toggle_pause()
 	arena.options.open_panel()
 	arena.options.close_panel()

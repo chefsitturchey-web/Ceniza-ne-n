@@ -16,6 +16,7 @@ var expedition: ExpeditionManager
 var finished: bool = false
 var won: bool = false
 var persistence_enabled: bool = true
+var debug_practice: bool = false
 var save_system: SaveSystem
 var neural: NeuralSystem
 var clinic_panel: ClinicPanel
@@ -29,6 +30,8 @@ var experience: ExperienceSystem
 var civic: CivicSystem
 
 func initialize() -> void:
+	var debugger: Node = get_node_or_null("/root/DebugTools")
+	if debugger != null and debugger.consume_practice_launch(get_parent()): return
 	var transfer: Dictionary = CampaignRoute.take(zone_index)
 	if not transfer.is_empty():
 		persistence_enabled = transfer.persistence
@@ -96,6 +99,7 @@ func resume_game() -> void:
 	presenter.publish()
 
 func _process(delta: float) -> void:
+	if GamePreferences.current().debug_input_blocked(): return
 	if interaction.story != null and (interaction.story.novel.opened or interaction.story.novel.closed_frame == Engine.get_process_frames()): return
 	if interaction.story != null and (interaction.story.journal.opened or interaction.story.journal.closed_frame == Engine.get_process_frames()): return
 	if experience != null and experience.panel.opened: return

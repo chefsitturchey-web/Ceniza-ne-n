@@ -287,6 +287,96 @@ const REGIONS: Dictionary = {
       724
     ]
   ],
+  "res://assets/expedition/boss/collector_parts_v2.png": [
+    [
+      68,
+      14,
+      669,
+      603
+    ],
+    [
+      823,
+      42,
+      251,
+      567
+    ],
+    [
+      1210,
+      12,
+      271,
+      627
+    ],
+    [
+      37,
+      681,
+      693,
+      307
+    ],
+    [
+      807,
+      671,
+      300,
+      294
+    ],
+    [
+      1187,
+      662,
+      315,
+      307
+    ]
+  ],
+  "res://assets/expedition/arena/depot_props_v2.png": [
+    [
+      18,
+      14,
+      716,
+      476
+    ],
+    [
+      789,
+      43,
+      732,
+      464
+    ],
+    [
+      22,
+      536,
+      725,
+      428
+    ],
+    [
+      873,
+      555,
+      586,
+      421
+    ]
+  ],
+  "res://assets/expedition/arena/encounter_machines_v1.png": [
+    [
+      118,
+      4,
+      627,
+      469
+    ],
+    [
+      845,
+      6,
+      622,
+      470
+    ],
+    [
+      85,
+      479,
+      593,
+      522
+    ],
+    [
+      821,
+      498,
+      640,
+      509
+    ]
+  ],
   "res://assets/structures/fortress/cargo_board.png": [
     [
       7,

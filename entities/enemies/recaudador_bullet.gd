@@ -3,6 +3,7 @@ extends CharacterBody2D
 
 var lifetime: float = 6.0
 var spent: bool = false
+var boundary: PackedVector2Array = []
 
 func _ready() -> void:
 	collision_layer = 0
@@ -18,6 +19,8 @@ func _physics_process(delta: float) -> void:
 		return
 	lifetime -= delta
 	var hit: KinematicCollision2D = move_and_collide(velocity * delta)
+	if not Rect2(0, 0, 640, 480).has_point(position) or (not boundary.is_empty() and not Geometry2D.is_point_in_polygon(position, boundary)):
+		spent = true
 	if hit != null:
 		var target: TopdownPlayer = hit.get_collider() as TopdownPlayer
 		if target != null:

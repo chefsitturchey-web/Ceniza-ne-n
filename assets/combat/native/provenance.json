@@ -1,0 +1,32 @@
+{
+  "tool": "LibreSprite",
+  "source": "tools/libresprite_projection.js",
+  "helpers": "tools/libresprite_combat.js",
+  "visual_reference": "assets/story/portraits_manga_v2.png: Portador, bottom-right portrait; visual study only.",
+  "method": "Camera-specific pixel drawing and articulated poses in native LibreSprite JavaScript; empty ASE containers only are created by Python.",
+  "layers": [
+    "body",
+    "weapons and mechanisms",
+    "pixel effects"
+  ],
+  "actors": [
+    "portador",
+    "portador_cenital",
+    "recaudador",
+    "caldera",
+    "coro",
+    "prefecto",
+    "madre"
+  ],
+  "frames_per_actor": 256,
+  "external_raster_inputs": [],
+  "sources_sha256": {
+    "portador": "0b1f02e037c41b947bbd7bbc4b818fc2c27e9ed0951114deaac9736e809b0401",
+    "recaudador": "c146f613e2deb1d5e446c40df223846f73ecafaf93266f2fd928a0f8f88b141e",
+    "caldera": "b7d5ded7359bd0ff2b8e949e8717c25285f644993fc0f150b64330fac6b719ad",
+    "coro": "c20ba32d9e33a8550eb8d47a60358e5100e2b75d4574998ad979bcff88b03b0e",
+    "prefecto": "575a950d3c40e8bf03a9380715456d479a0b0a33a1a0754f20843712ee201a09",
+    "madre": "a39d43d6337a39a3cf63748ff3b26c9780604f7fc9b8b62b2098ba3ccd9b7086",
+    "portador_cenital": "a17ad16eaed7c4f79cb0947460a3af759c3ce12f9a0f886a35f53a01e1b4fe0d"
+  }
+}

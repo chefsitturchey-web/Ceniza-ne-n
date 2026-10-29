@@ -106,6 +106,7 @@ func close_panel() -> void:
 	GamePreferences.current().block_gameplay_input()
 
 func _input(event: InputEvent) -> void:
+	if GamePreferences.current().debug_input_blocked(): return
 	if story.novel.opened: return
 	if opened and (event.is_action_pressed("journal") or event.is_action_pressed("pause")) and not event.is_echo():
 		close_panel()

@@ -2,6 +2,10 @@
 
 Abre `project.godot` en Godot 4 y pulsa **F5**. Nueva partida inicia la campaña; Continuar recupera tu colonia y operaciones. Hay guardado al amanecer y al completar operaciones. Perder el núcleo permite recuperar el último guardado. La campaña tiene cinco capítulos y un final; **la meta de cuatro horas aún necesita más contenido y pruebas de duración**.
 
+**Para probar libremente: pulsa F1.** El laboratorio permite entrar a los cinco jefes sin requisitos, elegir fase y equipo, activar invulnerabilidad, cámara lenta, crear unidades y preparar colonias. **F2** invulnerabilidad, **F3** congelar enemigos, **F4** colisiones y rutas. Los trucos marcan la sesión como práctica y conservan el checkpoint normal. [Guía del laboratorio](docs/LABORATORIO_DEPURACION.md).
+
+**Sprites revisados en LibreSprite:** Portador con anatomía humana, el aspecto de su retrato manga y cuerpo lateral de 35 píxeles. Las arenas usan cuatro vistas superiores a tres cuartos dibujadas por separado, sin girar las imágenes completas. Pulsa **F6 en `levels/story/combat_animation_preview.tscn`** y activa **Giro** para revisar orientaciones; alterna cámara para comparar al protagonista con un aliado a escala 1:1. `python tools/live_combat_board.py --directions` abre las cuatro vistas en LibreSprite. [Fuentes, referencias y animaciones](docs/COMBATE_LIBRESPRITE.md).
+
 La historia se presenta con retratos manga a color, conversaciones y fundidos. **E / Enter / Espacio** avanza; **Esc** omite. En **L → Ver conversación** puedes releer escenas. Para probar todo el guion con F6, abre `levels/story/novel_preview.tscn`. [Detalles y dirección visual](docs/NOVELA_VISUAL_Y_COHERENCIA.md).
 
 ## Controles
@@ -23,6 +27,8 @@ Para revisar las animaciones de aliados y profesiones, abre `levels/story/unit_a
 
 En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora, recoge datos, esquiva y activa sobrecargas. Sus armas personales funcionan contra los jefes; los módulos equipados también transmiten una bonificación de daño a los soldados.
 
+En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y trayectoria; observa los avisos y sus ventanas de recuperación. **E** cerca de las consolas cian activa carga, refrigeración, interferencia o parapeto, según el recinto. En Madre Cero, E repara relés y Q los protege. Los refuerzos pueden recibir daño de tu hoja y módulos. [Los cinco jefes, mecanismos y escenas para probar con F6](docs/JEFES_TACTICAS_Y_ARENAS.md).
+
 ## Primeros pasos
 
 1. Empiezas con 90 de chatarra, un constructor y un recuperador. Mantén E en los cuatro cimientos centrales: dos murallas de 20 y dos torretas de 25. El constructor debe caminar y ejecutar las obras.
@@ -32,6 +38,8 @@ En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora,
 5. Durante la noche mantén las defensas y usa Q en el frente bajo presión. Los trabajadores se retiran ante el peligro. Para ampliar el perímetro paga murallas exteriores y espera a los constructores.
 6. F ordena a los soldados del frente atacar la entrada más cercana. Los portales avisan y generan defensores al perder vida. Otra F retira la escuadra. Esos refuerzos no dan botín: no se puede ganar experiencia infinita provocando una puerta.
 7. Recoge los datos que dejan los enemigos. Cada nivel pausa el juego y ofrece armas, pasivas o implantes con iconos. Hay dos ranuras de módulo y cuatro pasivas; evoluciona con nivel 5, catalizador y núcleo. La clínica permite consultar y equipar lo que ya obtuviste.
+
+Si una persona no recoge una herramienta, consulta el aviso sobre el taller: indica la instalación o plaza que falta. Las herramientas reservadas no se pierden. De noche pueden recogerlas si el taller queda dentro de las murallas y está a salvo. [Recogida, animaciones y nuevo depósito del jefe](docs/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
 
 ## Historia, operaciones y tren
 

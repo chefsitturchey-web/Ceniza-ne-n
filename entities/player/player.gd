@@ -55,6 +55,8 @@ var neural_damage: int = 0
 var neural_regen: float = 0.0
 var modules: ModuleSystem
 var step_timer: float = 0.0
+@export var native_combat_art: bool = true
+var combat_visual: CombatFlipbook
 
 func _ready() -> void:
 	health_component.maximum = MAX_HEALTH
@@ -65,6 +67,12 @@ func _ready() -> void:
 	add_child(visual)
 	health_component.damaged.connect(visual.on_damage)
 	visual.bind(get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D)
+	if native_combat_art:
+		combat_visual = CombatFlipbook.new()
+		combat_visual.actor = self
+		add_child(combat_visual)
+		if visual.sprite != null: visual.sprite.hide()
+		health_component.damaged.connect(func(_amount: int, _remaining: int) -> void: combat_visual.pulse_hurt())
 
 func set_state(value: State) -> void:
 	if state != value:

@@ -39,6 +39,14 @@ func draw_detailed_caldera() -> void:
 	var step: float = sin(actor.elapsed * 8) * (2.0 if moving else 0.4)
 	draw_set_transform(Vector2(0, roundf(step)), sin(actor.elapsed * 3) * (0.025 if moving else 0.005))
 	draw_texture_rect(CALDERA_ART, Rect2(-66, -66, 132, 132), false)
+	# Compuertas y válvulas independientes del cuerpo ilustrado.
+	for side: int in [-1, 1]:
+		draw_set_transform(Vector2(side * 27, -43 + roundf(step)), actor.elapsed * side * (4 if opening > 0 else 0.7))
+		draw_texture_rect(DepotArt.part(5), Rect2(-7, -7, 14, 14), false, Color("cba27d"))
+	draw_set_transform(Vector2(0, roundf(step)))
+	if opening > 0:
+		for side: int in [-1, 1]:
+			draw_texture_rect(DepotArt.reactor_shutter(), Rect2(side * (8 + opening * 14) - 7, -15, 14, 27), false)
 	for side: int in [-1, 1]:
 		var foot: Vector2 = Vector2(side * 50, 28 + roundf(step * side))
 		draw_line(Vector2(side * 35, 9), foot, DARK, 5)
@@ -102,6 +110,14 @@ func draw_choir() -> void:
 	draw_set_transform(Vector2.ZERO, turn)
 	draw_texture_rect(CHOIR_ART, Rect2(-73, -78, 146, 146), false, Color(1.12, 1.15, 1.2))
 	draw_set_transform(Vector2.ZERO)
+	for side: int in [-1, 1]:
+		var shoulder: Vector2 = Vector2(side * 35, 0)
+		var elbow: Vector2 = Vector2(side * (52 + sin(actor.elapsed * 1.3 + side) * 5), 15)
+		draw_line(shoulder, elbow, Color("0b1322"), 7)
+		draw_line(shoulder, elbow, Color("8299a8"), 3)
+		draw_set_transform(elbow, sin(actor.elapsed * 0.8 + side) * 0.3)
+		draw_texture_rect(DepotArt.part(4), Rect2(-9, -9, 18, 18), false, Color("8bbac6"))
+		draw_set_transform(Vector2.ZERO)
 	var color: Color = Color("ffce75") if actor.core_exposed else Color("dd6482")
 	var gap: float = 8 + opening * 7
 	draw_arc(Vector2(0, -5), gap, actor.elapsed * 2, actor.elapsed * 2 + 5, 32, color, 2)

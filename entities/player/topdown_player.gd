@@ -10,8 +10,10 @@ signal slash(origin: Vector2, direction: Vector2, amount: int, reach: float)
 const FRAMES: SpriteFrames = preload("res://entities/player/player_frames.tres")
 const VIEWS: Array[Texture2D] = [preload("res://assets/player/topdown/idle_south.png"), preload("res://assets/player/topdown/idle_north.png"), preload("res://assets/player/topdown/idle_east.png"), preload("res://assets/player/topdown/idle_west.png")]
 var health: int = Player.MAX_HEALTH
+var debug_invincible: bool = false
 var stamina: float = Player.MAX_STAMINA
 var speed: float = 220.0
+var terrain_speed_factor: float = 1.0
 var attack_damage: int = 50
 var attack_range: float = 42.0
 var attack_cooldown: float = 0.4
@@ -35,6 +37,9 @@ var sprite: Sprite2D = Sprite2D.new()
 var runner: AnimatedSprite2D = AnimatedSprite2D.new()
 var effects: DebrisEmitter = DebrisEmitter.new()
 var stride: DirectionalStride = DirectionalStride.new()
+@export var native_combat_art: bool = true
+var combat_visual: CombatFlipbook
+var attack_pending: bool = false
 ## Add correr_north / correr_south here when their frames are available.
 @export var directional_frames: SpriteFrames
 
@@ -68,6 +73,11 @@ func _ready() -> void:
 	runner.sprite_frames = FRAMES
 	effects.planar = true
 	add_child(effects)
+	if native_combat_art:
+		combat_visual = CombatFlipbook.new()
+		combat_visual.actor = self
+		combat_visual.actor_id = "portador_cenital"
+		add_child(combat_visual)
 	update_visual()
 
 func _physics_process(delta: float) -> void:
@@ -86,11 +96,15 @@ func _physics_process(delta: float) -> void:
 		facing = direction.normalized()
 	if Input.is_action_just_pressed("dodge"):
 		dodge()
+	if attack_pending and attack_anim_remaining <= Player.ATTACK_ANIM_DURATION * 0.75:
+		attack_pending = false
+		slash_remaining = Player.SLASH_DURATION
+		slash.emit(global_position, slash_direction, attack_damage, attack_range)
 	if dodge_remaining > 0:
 		velocity = dodge_direction * Player.DODGE_SPEED
 		dodge_remaining = maxf(0, dodge_remaining - delta)
 	else:
-		velocity = direction * speed + knockback
+		velocity = direction * speed * terrain_speed_factor * (0.65 if attack_anim_remaining > 0 else 1.0) + knockback
 	knockback = knockback.move_toward(Vector2.ZERO, 900 * delta)
 	move_and_slide()
 	step_timer = maxf(0, step_timer - delta)
@@ -109,6 +123,8 @@ func dodge() -> void:
 	if health <= 0 or stamina < Player.DODGE_COST or dodge_remaining > 0:
 		return
 	stamina -= Player.DODGE_COST
+	attack_pending = false
+	attack_anim_remaining = 0
 	dodge_direction = facing
 	dodge_remaining = Player.DODGE_DURATION
 	invulnerable = maxf(invulnerable, Player.DODGE_DURATION)
@@ -118,18 +134,21 @@ func attack() -> void:
 	if health <= 0 or cooldown > 0 or dodge_remaining > 0:
 		return
 	cooldown = attack_cooldown
-	slash_remaining = Player.SLASH_DURATION
+	slash_remaining = 0
 	attack_anim_remaining = Player.ATTACK_ANIM_DURATION
+	attack_pending = true
 	slash_direction = facing
-	slash.emit(global_position, facing, attack_damage, attack_range)
 	queue_redraw()
 
 func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
-	if health <= 0 or invulnerable > 0:
+	if debug_invincible or health <= 0 or invulnerable > 0:
 		return
 	health = maxi(0, health - amount)
 	invulnerable = Player.HIT_INVULNERABILITY
 	knockback = impulse
+	attack_pending = false
+	attack_anim_remaining = 0
+	if combat_visual != null: combat_visual.pulse_hurt()
 	damaged.emit()
 	if health == 0:
 		velocity = Vector2.ZERO
@@ -137,6 +156,7 @@ func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
 		died.emit()
 
 func _process(delta: float) -> void:
+	if combat_visual != null: return
 	if health > 0:
 		return
 	death_elapsed += delta
@@ -148,6 +168,13 @@ func _process(delta: float) -> void:
 	modulate.a = clampf(1 - death_elapsed / 1.4, 0.15, 1)
 
 func update_visual() -> void:
+	if combat_visual != null:
+		runner.hide()
+		stride.hide()
+		sprite.hide()
+		combat_visual.pose_player()
+		queue_redraw()
+		return
 	var horizontal: bool = absf(facing.x) > absf(facing.y)
 	var moving: bool = velocity.length() > 10
 	var index: int = (2 if facing.x > 0 else 3) if horizontal else (0 if facing.y > 0 else 1)
@@ -179,10 +206,10 @@ func update_visual() -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.4))
+	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.75))
 	draw_circle(Vector2.ZERO, 11, Color(0, 0, 0, 0.4))
 	draw_set_transform(Vector2.ZERO)
-	if slash_remaining > 0 and health > 0:
+	if combat_visual == null and slash_remaining > 0 and health > 0:
 		var angle: float = slash_direction.angle()
 		draw_arc(Vector2.ZERO, attack_range, angle - 0.85, angle + 0.85, 12, Color("ffce75"), 2)
 		var tip: Vector2 = Vector2.from_angle(angle + lerpf(0.85, -0.85, slash_remaining / Player.SLASH_DURATION))

@@ -28,13 +28,12 @@ func _draw() -> void:
 	draw_circle(Vector2(0, 3), 18, Color("0b1322"))
 	draw_set_transform(Vector2.ZERO)
 	if health <= 0:
-		draw_rect(Rect2(-12, -5, 24, 10), Color("304356"))
-		draw_line(Vector2(-11, -7), Vector2(8, 3), Color("8299a8"), 2)
+		draw_set_transform(Vector2(0, -5), 0.3, Vector2(1, 0.55))
+		draw_texture_rect(DepotArt.machine(1), Rect2(-17, -12, 34, 28), false, Color("45424a"))
+		draw_set_transform(Vector2.ZERO)
 		return
-	draw_rect(Rect2(-8, -24, 16, 25), Color("0b1322"))
-	draw_rect(Rect2(-6, -23, 12, 23), Color("304356"))
-	draw_circle(Vector2(0, -24), 12, Color("0b1322"))
-	draw_arc(Vector2(0, -24), 9, 0.2, TAU - 0.2, 16, Color("8299a8"), 2)
-	draw_circle(Vector2(0, -24), 4, Color("ffce75") if pulse > 0 else Color("dd6482"))
-	for y: int in [-15, -11, -7]:
-		draw_rect(Rect2(-3, y, 6, 1), Color("8299a8"))
+	draw_texture_rect(DepotArt.machine(1), Rect2(-21, -34, 42, 36), false, Color("d1b9c3"))
+	var arm: Vector2 = Vector2.from_angle(elapsed * 1.3) * 10
+	draw_line(Vector2(4, -25), Vector2(4, -25) + arm, Color("ffce75"), 1)
+	draw_circle(Vector2(-8, -18), 2, Color("ffce75") if pulse > 0 else Color("dd6482"))
+	draw_arc(Vector2(0, -13), 23, -PI / 2, -PI / 2 + TAU * health / maximum, 32, Color("dd6482", 0.65), 1)

@@ -68,6 +68,7 @@ func replay(index: int, section: String) -> bool:
 	return novel.play(VisualStory.scene(index, section), true)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if GamePreferences.current().debug_input_blocked(): return
 	if event.is_action_pressed("journal") and not event.is_echo():
 		journal.open_panel()
 		get_viewport().set_input_as_handled()

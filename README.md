@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
-  <img alt="Pruebas: 34 suites" src="https://img.shields.io/badge/tests-34%20suites-47dacb">
+  <img alt="Pruebas: 38 suites" src="https://img.shields.io/badge/tests-38%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -31,6 +31,10 @@
 
 Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y final](docs/HISTORIA_Y_CAMPANA.md). En la colonia el Portador dirige y sus tropas combaten; J funciona en arenas. Las cuatro horas siguen siendo una meta pendiente de ampliar y medir.
 
+**Laboratorio con F1:** acceso directo a los cinco jefes, fases, equipo, invulnerabilidad, cámara lenta, colisiones/rutas y creación de unidades. Permite volver a la escena original; las intervenciones de colonia quedan como práctica sin sobrescribir el checkpoint. [Controles y guía](docs/LABORATORIO_DEPURACION.md).
+
+**Arte de combate en LibreSprite:** el Portador y los cinco jefes utilizan 1792 fotogramas en siete variantes, con frente, espalda y perfiles dibujados por separado. La vista superior a tres cuartos mantiene los cuerpos erguidos al cambiar de dirección. El Portador conserva su retrato manga como referencia y un cuerpo lateral de 35 píxeles. La galería F6 incluye **Giro** para revisar las cuatro vistas. [Comparación con aliados, referencias y archivos editables](docs/COMBATE_LIBRESPRITE.md).
+
 El núcleo, murallas y torretas tienen tres niveles, diseños industriales coherentes y desbloqueos. Se normalizó la escala respecto al Portador y se añadió transporte eléctrico opcional. [Progresión, tamaños y movilidad](docs/ESCALA_NIVELES_Y_MOVILIDAD.md).
 
 La historia incluye **30 conversaciones de novela visual**, ocho retratos manga a color, transiciones y repetición desde el diario. Las profesiones aliadas, civiles, Artillero y Saboteador tienen **nueve variantes con 72 fotogramas cada una**, con archivos editables de LibreSprite.
@@ -45,6 +49,8 @@ Tras un colapso tecnológico, una red autónoma de máquinas intenta borrar los 
 Para liberar un distrito destruyes sus **repetidores enemigos**, tomas el **tren blindado** y enfrentas al jefe que protege el enlace de transporte en una arena con vista cenital.
 
 La ruta jugable conecta **Periferia oxidada → Fundición → Barrio inundado → Ciudadela corporativa → Núcleo de la red** y cinco jefes distintos. Viajas conservando mejoras y habitantes; cada colonia tiene tres operaciones de historia y sus propios frentes. [Ruta, jefes y pruebas directas](docs/HISTORIA_Y_CAMPANA.md).
+
+Los **cinco jefes** reaccionan a distancia, trayectoria, coberturas o infraestructura mediante decisiones locales y navegación A*. Las arenas incorporan carga suspendida, refrigeración, corriente y sonar, parapeto temporal y sabotaje de relés; hay artilleros, cazadores y saboteadores con llegada anunciada y límites simultáneos. Maquinaria propia por distrito, relés detallados y avisos más legibles. [Tácticas, mecanismos y escenas para probar con F6](docs/JEFES_TACTICAS_Y_ARENAS.md).
 
 La revisión actual sigue el GDD: **campamentos → herramientas → profesiones**, construcción con trabajadores, murallas por etapas y **experiencia recogible con tres elecciones al subir de nivel**. [Revisión a fondo, referencias y pendientes](docs/REVISION_GDD_KINGDOM_SURVIVORS.md).
 
@@ -72,7 +78,7 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/media/jefe.gif" alt="Arena del Recaudador"><br>
+      <img src="docs/media/recaudador_actual.png" alt="Depósito ferroviario y Recaudador con piezas animadas"><br>
       <b>El Recaudador.</b> Primer jefe, en arena cenital: escudo frontal, abanicos de fichas, garrazo y una embestida que, si choca, deja su núcleo expuesto. Segunda fase al 50 %.
     </td>
     <td width="50%">
@@ -105,6 +111,7 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 - **Equipo automático:** dos ranuras, dron, Tesla y disco orbital; cinco niveles, pasivas y tres evoluciones mediante núcleos de enlace. [Cómo equiparlos y evolucionarlos](docs/MODULOS_Y_EVOLUCIONES.md).
 - **Audio por fases:** música original de trabajo por capas y efectos CC0 de combate. M silencia el audio; mezcla separada de música y efectos.
 - **Presentación:** pixel art lateral en la colonia, arenas cenitales, agua con reflejos, parallax y novela visual con ilustraciones manga a color.
+- **Distrito vivo:** chimeneas con humo, trenes y extractores en el fondo; el primer jefe protege un depósito poligonal junto al canal, con grúa, bombas y maquinaria animada. [Taller, pasos y depósito](docs/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
 
 ## Cómo jugar
 
@@ -194,7 +201,7 @@ godot --headless --path . --editor --import --quit
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta **34 suites**, incluyendo personajes, novela visual, fortificaciones, movilidad, campaña, jefes, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
+`run_all.gd` ejecuta **38 suites**, incluyendo tácticas de los cinco jefes, personajes, novela visual, fortificaciones, movilidad, campaña, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
 
 En una consola de PowerShell dedicada a las pruebas, configura primero el perfil aislado:
 
@@ -224,6 +231,7 @@ Las fuentes editables están en `assets/units/animated/sources/`. [Edición y re
 - [Guía de arte y paleta](docs/GUIA_ARTE.md)
 - [Novela visual manga y coherencia de estructuras](docs/NOVELA_VISUAL_Y_COHERENCIA.md)
 - [Personajes animados y edición en LibreSprite](docs/PERSONAJES_Y_ANIMACIONES.md)
+- [Recogida de herramientas, cadencia y depósito del primer jefe](docs/DEPOSITO_Y_VIDA_DEL_DISTRITO.md)
 - [Referencias visuales y capturas actuales](docs/REFERENCIAS_VISUALES.md)
 - [Guía de la versión actual](INICIO.md)
 - [Revisión, mejoras neuronales, audio y recursos pendientes](docs/REVISION_Y_AUDIO.md)

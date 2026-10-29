@@ -11,6 +11,11 @@ var base_volumes: Dictionary = {}
 var last_error: Error = OK
 var briefing_requested: bool = false
 var input_block_frame: int = -1
+var debug_modal: bool = false
+var debug_closed_frame: int = -1
+
+func debug_input_blocked() -> bool:
+	return debug_modal or Engine.get_process_frames() <= debug_closed_frame
 
 func block_gameplay_input() -> void:
 	input_block_frame = Engine.get_process_frames() + 1
