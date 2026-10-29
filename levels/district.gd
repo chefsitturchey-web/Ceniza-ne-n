@@ -194,6 +194,7 @@ func _ready() -> void:
 		GamePreferences.current().briefing_requested = false
 		briefing = BriefingPanel.new()
 		briefing.zone = zone
+		briefing.closed.connect(func() -> void: story.queue_dialogue("opening"))
 		add_child(briefing)
 		session.briefing = briefing
 		briefing.open_panel()

@@ -8,6 +8,7 @@ func simulate() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
 	# Referencia del asedio original; la campana ahora se completa con el jefe.
 	world.cycle.boss_required = false
 	world.session.set_process(false)

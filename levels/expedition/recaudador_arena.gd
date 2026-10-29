@@ -25,6 +25,8 @@ var hit_count: int = 0
 var camera: Camera2D = Camera2D.new()
 var sound: GameSound = GameSound.new()
 var configured: bool = false
+var present_story: bool = false
+var novel: NovelPanel
 var modules: ModuleSystem = ModuleSystem.new()
 var options: SettingsPanel = SettingsPanel.new()
 var exit_button: Button
@@ -42,6 +44,7 @@ func configure(source: Player, index: int = 0) -> void:
 	player.copy_from(source)
 	var colony: District = source.get_parent() as District
 	if colony != null and colony.story != null: support_units = colony.story.soldiers()
+	if colony != null and colony.story != null: present_story = colony.story.present_dialogue
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -126,6 +129,9 @@ func _ready() -> void:
 	player.stepped.connect(func(_origin: Vector2) -> void: sound.play_cue("step", -18))
 	boss.cue_requested.connect(func(id: String) -> void: sound.play_cue(id, -4))
 	player.slash.connect(func(_o: Vector2, _d: Vector2, _a: int, _r: float) -> void: sound.play_cue("slash"))
+	novel = NovelPanel.new()
+	add_child(novel)
+	if present_story: novel.play(VisualStory.scene(zone_index, "encounter"))
 
 func configure_controls() -> void:
 	if not InputMap.has_action("attack"):
@@ -362,6 +368,7 @@ func finish(victory: bool) -> void:
 	banner.text = "" if victory else "SENAL PERDIDA"
 
 func _process(delta: float) -> void:
+	if novel != null and (novel.opened or novel.closed_frame == Engine.get_process_frames()): return
 	if get_tree().paused:
 		return
 	bar.size.x = 320 * float(boss.health) / boss.max_health
@@ -450,3 +457,4 @@ func show_completed(next_zone: String = "") -> void:
 		menu.size = Vector2(150, 25)
 		menu.pressed.connect(return_to_menu)
 		add_child(menu)
+	if present_story: novel.play(VisualStory.scene(zone_index, "ending"))

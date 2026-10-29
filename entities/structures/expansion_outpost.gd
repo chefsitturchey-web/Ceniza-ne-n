@@ -134,6 +134,7 @@ func _draw() -> void:
 	var frame: Rect2 = ArtScale.grounded(source, height)
 
 	if hp > 0 or ordered:
+		ArtScale.footing(self, frame)
 		var fraction: float = clampf(progress / 6, 0, 1) if ordered else 1.0
 		var shown: float = height * fraction
 		draw_texture_rect_region(ART, Rect2(-frame.size.x * 0.5, -shown, frame.size.x, shown), Rect2(source.position + Vector2(0, source.size.y * (1 - fraction)), Vector2(source.size.x, source.size.y * fraction)), Color.WHITE if hp > MAX_HEALTH / 2 or ordered else Color("ac8d7b"))

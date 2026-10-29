@@ -10,6 +10,7 @@ func simulate() -> void:
 	var world: District = load(CampaignRoute.SCENES[zone]).instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
 	world.cycle.boss_required = false # Aquí se verifica el asedio; expedición tiene pruebas propias.
 	world.session.set_process(false)
 	world.experience.present_choices = false

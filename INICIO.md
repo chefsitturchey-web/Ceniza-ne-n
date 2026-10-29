@@ -2,6 +2,8 @@
 
 Abre `project.godot` en Godot 4 y pulsa **F5**. Nueva partida inicia la campaña; Continuar recupera tu colonia y operaciones. Hay guardado al amanecer y al completar operaciones. Perder el núcleo permite recuperar el último guardado. La campaña tiene cinco capítulos y un final; **la meta de cuatro horas aún necesita más contenido y pruebas de duración**.
 
+La historia se presenta con retratos manga a color, conversaciones y fundidos. **E / Enter / Espacio** avanza; **Esc** omite. En **L → Ver conversación** puedes releer escenas. Para probar todo el guion con F6, abre `levels/story/novel_preview.tscn`. [Detalles y dirección visual](docs/NOVELA_VISUAL_Y_COHERENCIA.md).
+
 ## Controles
 
 | Acción | Teclado | Mando Xbox |

@@ -1,7 +1,7 @@
 class_name CivicSystem
 extends Node2D
 ## Reclutar personas y ofrecer herramientas; las tropas ya no se crean del edificio.
-const REFUGE_X: float = 140.0
+const REFUGE_X: float = 112.0
 const RACK_X: Array[float] = [-675.0, -645.0, -615.0, -585.0, -555.0, -525.0]
 const ROLES: Array[String] = ["builder", "collector", "ranger", "guardian", "technician", "medic"]
 const NAMES: Array[String] = ["Martillo", "Equipo recuperador", "Fusil", "Escudo", "Herramienta técnica", "Botiquín"]
@@ -267,10 +267,12 @@ static func valid(data: Variant, gate_count: int) -> bool:
 
 func _draw() -> void:
 	var workshop: Rect2 = ArtScale.source(GameArt.CIVIC, 2)
+	ArtScale.footing(self, ArtScale.grounded(workshop, 94, Vector2(-600, GameRules.FLOOR_Y)))
 	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(workshop, 94, Vector2(-600, GameRules.FLOOR_Y)), workshop)
 	for side: int in [-1, 1]:
 		var x: float = side * 1340
 		var camp: Rect2 = ArtScale.source(GameArt.CIVIC, 0)
+		ArtScale.footing(self, ArtScale.grounded(camp, 50, Vector2(x, GameRules.FLOOR_Y)))
 		draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(camp, 50, Vector2(x, GameRules.FLOOR_Y)), camp)
 		for spark: int in range(4):
 			var rise: float = fmod(elapsed * 14 + spark * 7, 23)
@@ -282,6 +284,7 @@ func _draw() -> void:
 		draw_texture_rect(GameArt.icon(ids[index]), Rect2(x - 9, 229, 18, 18), false, Color.WHITE if tools[index] > 0 else (Color("8299a8") if unlocked else Color("304356")))
 		for item: int in range(tools[index]): draw_rect(Rect2(x - 8 + item * 5, 254, 3, 2), Color("ffce75"))
 	var refuge: Rect2 = ArtScale.source(GameArt.CIVIC, 1)
+	ArtScale.footing(self, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)))
 	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)), refuge)
 	for citizen: Dictionary in villagers:
 		var region: Rect2 = ArtScale.source(GameArt.UNITS, 4)

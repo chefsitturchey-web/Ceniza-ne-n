@@ -23,6 +23,7 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	world.get_node("Session").persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	world.experience.present_choices = false

@@ -124,6 +124,7 @@ func _draw() -> void:
 	var offset: Vector2 = Vector2(2 if int(effects.elapsed * 40) % 2 == 0 else -1, 0) if effects.shake > 0 and not GamePreferences.current().reduced_flashes else Vector2.ZERO
 	effects.position = offset
 	draw_set_transform(offset)
+	ArtScale.footing(self, frame)
 	draw_texture_rect_region(art, frame, source)
 	if ordered:
 		for side: int in [-1, 1]: draw_line(Vector2(side * frame.size.x * 0.5, 0), Vector2(side * frame.size.x * 0.5, frame.position.y - 5), Color("8299a8"), 2)

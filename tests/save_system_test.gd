@@ -20,6 +20,7 @@ func create_world() -> District:
 	session.save_system.save_path = TEST_PATH
 	session.add_child(session.save_system)
 	root.add_child(world)
+	world.story.present_dialogue = false
 	session.set_process(false)
 	world.player.set_physics_process(false)
 	return world

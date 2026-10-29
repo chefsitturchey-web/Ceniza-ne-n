@@ -132,6 +132,7 @@ func _draw() -> void:
 			var art: Texture2D = FortressArt.texture("wall", tier)
 			var source: Rect2 = ArtScale.source(art)
 			draw_set_transform(Vector2.ZERO, 0, Vector2(-1 if x < 0 else 1, 1))
+			ArtScale.footing(self, ArtScale.grounded(source, FortressArt.WALL_HEIGHTS[tier - 1]))
 			draw_texture_rect_region(art, ArtScale.grounded(source, FortressArt.WALL_HEIGHTS[tier - 1]), source, Color(0.8, 1.2, 1.15) if boosted else Color.WHITE)
 			draw_set_transform(Vector2.ZERO)
 		if upgrade_pending:

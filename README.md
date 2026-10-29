@@ -183,6 +183,7 @@ godot --headless --path . --script res://tests/run_all.gd
 
 - [Arquitectura y señales](docs/ARQUITECTURA.md)
 - [Guía de arte y paleta](docs/GUIA_ARTE.md)
+- [Novela visual manga y coherencia de estructuras](docs/NOVELA_VISUAL_Y_COHERENCIA.md)
 - [Guía de la versión actual](INICIO.md)
 - [Revisión, mejoras neuronales, audio y recursos pendientes](docs/REVISION_Y_AUDIO.md)
 - [Menú ilustrado y opciones persistentes](docs/MENU_Y_OPCIONES.md)
@@ -210,6 +211,6 @@ Con apoyo de asistentes de IA (Claude y Codex) para programación, herramientas 
 - **Motor:** [Godot Engine](https://godotengine.org) (licencia MIT).
 - **Sonidos:** Kenney, Sci-fi Sounds 1.0, CC0; licencia incluida en `assets/audio/sfx/`. Música sintética original de trabajo, reproducible con `tools/generar_musica.py`.
 - **Fuentes:** Micro 5 y Silkscreen, bajo [SIL Open Font License](assets/fonts/) (licencias incluidas).
-- **Arte generado:** PixelLab (según sus [términos de servicio](https://pixellab.ai/termsofservice)) y Stable Diffusion 1.5 (CreativeML OpenRAIL-M) con un LoRA de pixel art. Detalle por recurso en [docs/ASSET_SOURCES.csv](docs/ASSET_SOURCES.csv).
+- **Arte generado:** OpenAI Image Generation (retratos manga y nuevos atlas industriales), PixelLab (según sus [términos de servicio](https://pixellab.ai/termsofservice)) y Stable Diffusion 1.5 (CreativeML OpenRAIL-M) con un LoRA de pixel art. Detalle por recurso en [docs/ASSET_SOURCES.csv](docs/ASSET_SOURCES.csv).
 
 El código y el contenido original de Ceniza Neón son de su autor; **todos los derechos reservados** mientras no se publique una licencia. ¿Encontraste un problema o tienes una idea? Abre un [issue](https://github.com/chefsitturchey-web/Ceniza-ne-n/issues) indicando qué esperabas, qué ocurrió y cómo reproducirlo.

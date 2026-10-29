@@ -1,5 +1,6 @@
 class_name BriefingPanel
 extends CanvasLayer
+signal closed
 ## La primera explicación detiene el reloj; no modifica la duración del día.
 var opened: bool = false
 var closed_frame: int = -1
@@ -68,3 +69,4 @@ func close_panel() -> void:
 	GamePreferences.current().block_gameplay_input()
 	hide()
 	get_tree().paused = false
+	closed.emit()

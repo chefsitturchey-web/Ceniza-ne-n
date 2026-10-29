@@ -32,6 +32,8 @@ func arena_for(index: int) -> RecaudadorArena:
 	return arena
 
 func freeze(world: District) -> void:
+	world.story.present_dialogue = false
+	world.story.dialogue_queue.clear()
 	if world.briefing != null:
 		world.briefing.close_panel()
 	world.session.set_process(false)
@@ -171,6 +173,7 @@ func run_checks() -> void:
 	var world: District = load(CampaignRoute.SCENES[0]).instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
 	current_scene = world
 	freeze(world)
 	verify(world.player.speed == 220 and world.player.attack_damage == 50 and world.cycle.config.day_duration == 180, "Conserva personaje y ofrece preparación de colonia")

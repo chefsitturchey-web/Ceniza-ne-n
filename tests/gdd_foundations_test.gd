@@ -32,6 +32,7 @@ func run_checks() -> void:
 	world = load("res://levels/zones/foundry.tscn").instantiate() as District
 	world.get_node("Session").persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	world.modules.set_physics_process(false)

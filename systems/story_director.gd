@@ -16,6 +16,10 @@ var damage_timer: float = 0
 var journal: JournalPanel
 var hud: CanvasLayer
 var elapsed: float = 0
+var novel: NovelPanel
+var present_dialogue: bool = true
+var seen_scenes: Array[String] = []
+var dialogue_queue: Array[Dictionary] = []
 
 func setup(world: District) -> void:
 	district = world
@@ -27,6 +31,9 @@ func _ready() -> void:
 	journal = JournalPanel.new()
 	journal.story = self
 	add_child(journal)
+	novel = NovelPanel.new()
+	novel.finished.connect(_dialogue_finished)
+	add_child(novel)
 	hud = CanvasLayer.new()
 	hud.layer = 4
 	add_child(hud)
@@ -40,6 +47,25 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	hud.visible = not get_tree().paused and not district.expedition.active and not district.session.finished
+	if present_dialogue and not dialogue_queue.is_empty() and not novel.opened and not get_tree().paused and not district.expedition.active and not district.session.finished:
+		if Engine.get_process_frames() > GamePreferences.current().input_block_frame:
+			novel.play(dialogue_queue.pop_front())
+
+func queue_dialogue(section: String) -> void:
+	if not present_dialogue: return
+	var scene: Dictionary = VisualStory.scene(district.zone_index, section)
+	if scene.id in seen_scenes: return
+	for pending: Dictionary in dialogue_queue:
+		if pending.id == scene.id: return
+	dialogue_queue.append(scene)
+
+func _dialogue_finished(scene_id: String) -> void:
+	if scene_id not in seen_scenes: seen_scenes.append(scene_id)
+	checkpoint()
+
+func replay(index: int, section: String) -> bool:
+	if index > district.zone_index or novel.opened: return false
+	return novel.play(VisualStory.scene(index, section), true)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("journal") and not event.is_echo():
@@ -133,6 +159,7 @@ func complete(index: int) -> void:
 	district.experience.gain(10 + index * 5)
 	district.presenter.show_notice(["Supervivientes a salvo - L: diario", "Relé recuperado - L: diario", "Transporte a salvo - L: diario"][index])
 	district.sound.play_cue("upgrade")
+	queue_dialogue(["rescue", "relay", "convoy"][index])
 	checkpoint()
 
 func checkpoint() -> void:
@@ -162,9 +189,11 @@ func work_relay(delta: float) -> void:
 	if relay_progress >= 6: complete(1)
 
 func snapshot() -> Dictionary:
-	return {"completed": completed.duplicate(), "relay_ordered": relay_ordered, "relay_progress": relay_progress, "convoy_active": convoy_active, "convoy_x": convoy_x, "convoy_health": convoy_health, "ambush_triggered": ambush_triggered}
+	return {"completed": completed.duplicate(), "relay_ordered": relay_ordered, "relay_progress": relay_progress, "convoy_active": convoy_active, "convoy_x": convoy_x, "convoy_health": convoy_health, "ambush_triggered": ambush_triggered, "seen_scenes": seen_scenes.duplicate()}
 
 func restore(data: Dictionary) -> void:
+	seen_scenes.assign(data.get("seen_scenes", []))
+	dialogue_queue.clear()
 	completed.assign(data.get("completed", [false, false, false]))
 	relay_ordered = data.get("relay_ordered", false)
 	relay_progress = float(data.get("relay_progress", 0))
@@ -172,10 +201,19 @@ func restore(data: Dictionary) -> void:
 	convoy_x = float(data.get("convoy_x", -1240))
 	convoy_health = float(data.get("convoy_health", 180))
 	ambush_triggered = data.get("ambush_triggered", convoy_active or convoy_x > -1240)
+	if data.has("seen_scenes"):
+		queue_dialogue("opening")
+		for index: int in range(3):
+			if completed[index]: queue_dialogue(["rescue", "relay", "convoy"][index])
 
 static func valid(data: Variant) -> bool:
 	if not data is Dictionary: return false
 	if data.is_empty(): return true
+	if not data.get("seen_scenes", []) is Array or data.get("seen_scenes", []).size() > 40: return false
+	var unique: Array[String] = []
+	for key: Variant in data.get("seen_scenes", []):
+		if not key is String or not VisualStory.valid_key(key) or key in unique: return false
+		unique.append(key)
 	if not data.get("ambush_triggered", false) is bool: return false
 	if not data.get("completed") is Array or data.completed.size() != 3: return false
 	for flag: Variant in data.completed:

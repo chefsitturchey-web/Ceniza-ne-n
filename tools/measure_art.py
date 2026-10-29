@@ -7,7 +7,14 @@ from PIL import Image, ImageFilter
 ROOT = Path(__file__).resolve().parents[1]
 ATLASES = {'assets/units/field_atlas_v3.png': (4, 2),
            'assets/structures/civic_atlas_v3.png': (2, 2),
-           'assets/structures/industrial_atlas_v2.png': (2, 2)}
+           'assets/structures/industrial_atlas_v2.png': (2, 2),
+           'assets/structures/coherent_fortress_v3.png': (3, 4),
+           'assets/structures/coherent_walls_v3.png': (3, 1),
+           'assets/structures/coherent_civic_v4.png': (3, 2),
+           'assets/story/portraits_manga_v2.png': (3, 2),
+           'assets/story/antagonists_manga_v2.png': (2, 1)}
+ROW_CUTS = {'assets/structures/coherent_fortress_v3.png': [0, 404, 653, 894, 1085],
+            'assets/structures/coherent_civic_v4.png': [0, 565, 1024]}
 
 
 def main_component_bounds(alpha):
@@ -51,6 +58,9 @@ def main():
         for index in range(columns * rows):
             left, top = index % columns * width // columns, index // columns * height // rows
             right, bottom = (index % columns + 1) * width // columns, (index // columns + 1) * height // rows
+            if path in ROW_CUTS:
+                cuts = ROW_CUTS[path]
+                top, bottom = cuts[index // columns:index // columns + 2]
             alpha = image.getchannel('A').crop((left, top, right, bottom))
             bounds = main_component_bounds(alpha)
             if not bounds:

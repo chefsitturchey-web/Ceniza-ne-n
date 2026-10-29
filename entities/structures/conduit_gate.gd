@@ -2,7 +2,7 @@ class_name ConduitGate
 extends EnemyRepeater
 
 func _draw() -> void:
-	var source: Rect2 = ArtScale.source(GameArt.CIVIC, 3)
+	var source: Rect2 = ArtScale.source(GameArt.CIVIC, 5)
 	if health.current <= 0:
 		source.position.y += source.size.y * 0.84
 		source.size.y *= 0.16

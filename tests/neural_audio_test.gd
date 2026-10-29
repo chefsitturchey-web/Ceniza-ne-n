@@ -17,6 +17,7 @@ func run_checks() -> void:
 	world = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	await process_frame

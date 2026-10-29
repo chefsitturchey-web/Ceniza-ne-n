@@ -1,6 +1,8 @@
 extends RefCounted
 ## Preparación para pruebas centradas en expedición; la elegibilidad tiene suite propia.
 static func stabilize(world: District) -> void:
+	world.story.present_dialogue = false
+	world.story.dialogue_queue.clear()
 	world.experience.present_choices = false
 	if world.experience.panel.opened:
 		world.experience.panel.select(world.experience.options(world.experience.panel.chest)[0])

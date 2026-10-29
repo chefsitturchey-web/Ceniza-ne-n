@@ -62,14 +62,14 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	var source: Rect2 = ArtScale.source(GameArt.CIVIC, 5)
 	if health.current <= 0:
-		draw_texture_rect_region(TEXTURE, Rect2(-16, -8, 32, 8), Rect2(0, 70, 32, 8), Color("8299a8"))
-		draw_rect(Rect2(-7, -9, 10, 3), Color("304356"))
+		source.position.y += source.size.y * 0.84
+		source.size.y *= 0.16
+		draw_texture_rect_region(GameArt.CIVIC, Rect2(-30, -10, 60, 10), source, Color("8299a8"))
 		return
-	var offset: Vector2 = Vector2(1 if int(effects.elapsed * 40) % 2 == 0 else -1, 0) if effects.shake > 0 else Vector2.ZERO
-	draw_set_transform(offset)
-	draw_texture(TEXTURE, Vector2(-16, -78))
-	var pink: Color = Color("ff66bb") if fmod(effects.elapsed, 1.0) < 0.6 else Color("713457")
-	for point: Vector2 in [Vector2(-1, -77), Vector2(-14, -55), Vector2(11, -55)]:
-		draw_rect(Rect2(point, Vector2(3, 2)), pink)
-	draw_set_transform(Vector2.ZERO)
+	var frame: Rect2 = ArtScale.grounded(source, 72)
+	ArtScale.footing(self, frame)
+	draw_texture_rect_region(GameArt.CIVIC, frame, source)
+	if defense_warning > 0:
+		draw_arc(Vector2(0, -36), 27, 0, TAU, 32, Color("ffce75", 0.8), 2)

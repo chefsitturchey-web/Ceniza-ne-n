@@ -96,6 +96,8 @@ func resume_game() -> void:
 	presenter.publish()
 
 func _process(delta: float) -> void:
+	if interaction.story != null and (interaction.story.novel.opened or interaction.story.novel.closed_frame == Engine.get_process_frames()): return
+	if interaction.story != null and (interaction.story.journal.opened or interaction.story.journal.closed_frame == Engine.get_process_frames()): return
 	if experience != null and experience.panel.opened: return
 	if briefing != null and (briefing.opened or briefing.closed_frame == Engine.get_process_frames()):
 		return
