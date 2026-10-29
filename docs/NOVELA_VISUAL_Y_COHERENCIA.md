@@ -9,13 +9,13 @@
 
 ## Dirección visual
 
-La referencia `docs/diseñoejemplo.jpg` se pudo abrir desde el disco. Su lenguaje es manga de tinta: contorno negro variable, sombras duras, trama fina en ropa y metal, rostro angular y extremidades mecánicas muy detalladas. Los retratos nuevos trasladan esos rasgos a color, con sombras por planos y acentos cian/ámbar. Los personajes son originales del proyecto; la referencia orienta el acabado, sin reproducir su personaje.
+La referencia `docs/references/diseñoejemplo.jpg` se pudo abrir desde el disco. Su lenguaje es manga de tinta: contorno negro variable, sombras duras, trama fina en ropa y metal, rostro angular y extremidades mecánicas muy detalladas. Los retratos nuevos trasladan esos rasgos a color, con sombras por planos y acentos cian/ámbar. Los personajes son originales del proyecto; la referencia orienta el acabado, sin reproducir su personaje.
 
 El reparto ilustrado incluye Portador, Mara, Ivo, Vera, Nox, ECO, el Prefecto y MADRE CERO. Hay foco en quien habla, movimiento suave, texto progresivo y fundidos. La opción de destellos reducidos reduce también el movimiento de los retratos. No hay voces grabadas ni sincronización labial.
 
 Las estructuras del mundo mantienen pixel art lateral: acero gris oscuro, cobre oxidado, luz cian y ámbar, tornillos, tuberías y bases industriales. El núcleo tiene tres diseños distintos. Las torretas separan pedestal y cabeza móvil; una unión mecánica cubre el pivote. Murallas estrechas y edificios comparten el plano del suelo. El refugio se desplazó para evitar superponerlo con la torreta derecha.
 
-Los atlas tienen transparencia y límites medidos con `tools/measure_art.py`. Sus recortes se guardan en `data/art_bounds.gd` y `.json`. La fortaleza y los edificios civiles usan cortes de fila explícitos porque la generación no produjo filas de idéntica altura. No sustituirlos por divisiones uniformes. Las texturas anteriores se conservan, aunque las nuevas sustituyen su uso en estas estructuras.
+Los atlas tienen transparencia y límites medidos con `tools/art/measure_art.py`. Sus recortes se guardan en `data/art_bounds.gd` y `.json`. La fortaleza y los edificios civiles usan cortes de fila explícitos porque la generación no produjo filas de idéntica altura. No sustituirlos por divisiones uniformes. Las texturas anteriores se conservan, aunque las nuevas sustituyen su uso en estas estructuras.
 
 ## Especificaciones para nuevos recursos
 

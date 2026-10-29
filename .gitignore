@@ -4,3 +4,5 @@ exports/
 validation*.log
 __pycache__/
 *.pyc
+/build/*
+!/build/.gdignore

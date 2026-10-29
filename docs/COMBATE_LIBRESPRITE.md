@@ -22,8 +22,8 @@ Abre los siete `.ase` de `assets/combat/illustrated/sources/`. Sus capas son **P
 Las hojas originales seleccionadas y sus prompts están en `assets/combat/illustrated/references/` y `assets/combat/illustrated/prompts.json`. La base visual se generó con la herramienta integrada `image_gen`; la separación de contornos, registro, muestreo, respiración secundaria, limpieza y exportación se ejecutan dentro de LibreSprite. Python realiza mediciones de lectura, prepara documentos vacíos y metadatos.
 
 ```powershell
-python tools/build_illustrated_combat.py
-python tools/live_combat_board.py --directions
+python tools/art/build_illustrated_combat.py
+python tools/art/live_combat_board.py --directions
 ```
 
 El constructor se detiene si detecta retoques manuales posteriores en un ASE. Las fuentes y scripts procedurales anteriores se conservan en `assets/combat/native/` como referencia histórica; el juego carga las ilustradas.

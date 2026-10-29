@@ -12,7 +12,7 @@
     "view": "side",
     "created_at": "2026-10-29T00:11:37.676519+00:00"
   },
-  "pipeline": "Native PixelLab pose clips; outfit pixel edits and two-layer ASE documents rendered by tools/libresprite_units.js inside LibreSprite; full-frame PNG sheets exported by LibreSprite.",
+  "pipeline": "Native PixelLab pose clips; outfit pixel edits and two-layer ASE documents rendered by tools/art/libresprite_units.js inside LibreSprite; full-frame PNG sheets exported by LibreSprite.",
   "roles": [
     "ranger",
     "guardian",

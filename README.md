@@ -178,7 +178,7 @@ La guía detallada de esta versión está en [INICIO.md](INICIO.md).
 | Siete tipos de enemigo; nueve variantes animadas con fuentes de LibreSprite | Ampliación del catálogo y revisión artística | Enemigos y equipo restantes del GDD |
 | Experiencia, armas, pasivas y evoluciones; menús, guardado y accesibilidad | Producción musical final; audio de trabajo integrado | Remapeo completo de controles y perfiles iniciales |
 
-El alcance completo está en el [documento de diseño (GDD)](CENIZA_NEON_GDD.docx).
+El alcance completo está en el [documento de diseño (GDD)](docs/design/CENIZA_NEON_GDD.docx).
 
 ## Desarrollo
 
@@ -193,9 +193,13 @@ ui/          HUD, panel de pausa, tema y fuentes
 data/        Recursos .tres de enemigos, estructuras, oleadas y ciclos
 levels/      Cinco distritos, arenas de jefe y galerías de práctica
 assets/      Sprites, fuentes de LibreSprite, retratos, fondos, iconos y audio
-tools/       Scripts para generar e integrar arte
+tools/art/   Arte y animación de LibreSprite; bocetos antiguos en legacy/
+tools/audio/ Generación, preparación y conversión de audio
+tools/integrations/ Adaptadores de servicios externos
+tools/maintenance/ Validación y limpieza reproducibles
 tests/       Pruebas automatizadas y simulaciones
-docs/        Arquitectura, guía de arte, registro de recursos y medios del README
+docs/        Índice de guías; GDD en design/, referencias en references/
+build/       Salidas locales regenerables; no se publica en Git
 ```
 
 ### Pruebas
@@ -207,11 +211,13 @@ godot --headless --path . --script res://tests/run_all.gd
 
 `run_all.gd` ejecuta **40 suites**, incluyendo tácticas de los cinco jefes, personajes, novela visual, fortificaciones, movilidad, campaña, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
 
-En una consola de PowerShell dedicada a las pruebas, configura primero el perfil aislado:
+En Windows, el comando recomendado importa el proyecto, usa un perfil aislado y guarda todos los registros en `build/validation/latest/`:
 
 ```powershell
-$env:APPDATA = Join-Path (Get-Location) '.godot/validation-user'
+.\tools\maintenance\validate.ps1 -GodotPath "RUTA\Godot_console.exe"
 ```
+
+`summary.json` resume los resultados y `suites/` contiene un registro por prueba y variante; se reutilizan los nombres en cada ejecución. Para borrar registros antiguos y cachés de Python: `./tools/maintenance/clean_generated.ps1`. Añade `-Validation` para borrar también las salidas y perfiles de pruebas de `build/validation/`. [Mapa del proyecto y limpieza](docs/ORGANIZACION.md), [índice de documentación](docs/README.md).
 
 Para una revisión visual rápida, abre una escena y pulsa **F6**:
 
@@ -243,7 +249,7 @@ Las fuentes editables están en `assets/units/animated/sources/`. [Edición y re
 - [Equipo y evoluciones](docs/MODULOS_Y_EVOLUCIONES.md)
 - [Siluetas mecánicas y presentación de enemigos](docs/SILUETAS_MECANICAS.md)
 - [Pulido jugable, torretas articuladas y animación de arena](docs/PULIDO_JUGABLE.md)
-- [Documento de diseño (GDD)](CENIZA_NEON_GDD.docx)
+- [Documento de diseño (GDD)](docs/design/CENIZA_NEON_GDD.docx)
 
 ### Añadir contenido
 
@@ -262,7 +268,7 @@ Con apoyo de asistentes de IA (Claude y Codex) para programación, herramientas 
 ## Créditos y licencias
 
 - **Motor:** [Godot Engine](https://godotengine.org) (licencia MIT).
-- **Sonidos:** Kenney, Sci-fi Sounds 1.0, CC0; licencia incluida en `assets/audio/sfx/`. Música sintética original de trabajo, reproducible con `tools/generar_musica.py`.
+- **Sonidos:** Kenney, Sci-fi Sounds 1.0, CC0; licencia incluida en `assets/audio/sfx/`. Música sintética original de trabajo, reproducible con `tools/audio/generar_musica.py`.
 - **Fuentes:** Micro 5 y Silkscreen, bajo [SIL Open Font License](assets/fonts/) (licencias incluidas).
 - **Arte generado:** OpenAI Image Generation (retratos manga y nuevos atlas industriales), PixelLab (según sus [términos de servicio](https://pixellab.ai/termsofservice)) y Stable Diffusion 1.5 (CreativeML OpenRAIL-M) con un LoRA de pixel art. Detalle por recurso en [docs/ASSET_SOURCES.csv](docs/ASSET_SOURCES.csv).
 

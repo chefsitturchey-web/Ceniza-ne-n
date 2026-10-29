@@ -41,16 +41,16 @@ Se descartó del montaje el gran efecto lateral de los autómatas que aparecía 
 
 La base visual y las poses se crearon con **OpenAI `image_gen` integrado**, usando retratos y arte industrial del proyecto como referencias. Se consultaron las capacidades del MCP PixelLab; no se utilizó para estas nuevas poses. Los prompts seleccionados y la corrección de transparencia están en [`assets/combat/illustrated/prompts.json`](../assets/combat/illustrated/prompts.json).
 
-`tools/build_illustrated_combat.py` mide el alfa sin modificar las imágenes de entrada. Identifica filas y contornos conectados, incluidos los casos en que una espada cruza el rectángulo de la fila vecina. Prepara los documentos vacíos, etiquetas y tiempos.
+`tools/art/build_illustrated_combat.py` mide el alfa sin modificar las imágenes de entrada. Identifica filas y contornos conectados, incluidos los casos en que una espada cruza el rectángulo de la fila vecina. Prepara los documentos vacíos, etiquetas y tiempos.
 
-`tools/libresprite_illustrated_combat.js` carga las pinturas en **LibreSprite**, conserva los contornos propios de cada pose, registra los apoyos y evita centrar el cuerpo sobre una espada larga. Elimina mates semitransparentes y motas lejanas, realiza el muestreo de píxeles, añade respiración secundaria y efectos pequeños, y guarda los ASE. LibreSprite exporta los PNG de juego. Los fotogramas se reproducen completos en Godot.
+`tools/art/libresprite_illustrated_combat.js` carga las pinturas en **LibreSprite**, conserva los contornos propios de cada pose, registra los apoyos y evita centrar el cuerpo sobre una espada larga. Elimina mates semitransparentes y motas lejanas, realiza el muestreo de píxeles, añade respiración secundaria y efectos pequeños, y guarda los ASE. LibreSprite exporta los PNG de juego. Los fotogramas se reproducen completos en Godot.
 
 Las capas editables son **Pose completa**, **Retoques** y **Luz y efectos**. Los SHA de los ASE en `provenance.json` impiden que una reconstrucción habitual sobrescriba retoques posteriores. `--overwrite-edits` permite reemplazarlos expresamente. Las entradas originales quedan en `references/`; Godot utiliza los PNG exportados, no esas hojas de trabajo.
 
 ```powershell
-python tools/build_illustrated_combat.py
-python tools/build_illustrated_combat.py --actors portador portador_cenital
-python tools/live_combat_board.py --directions
+python tools/art/build_illustrated_combat.py
+python tools/art/build_illustrated_combat.py --actors portador portador_cenital
+python tools/art/live_combat_board.py --directions
 ```
 
 Para exportar manualmente un ASE ya editado, usa ocho columnas. Anchura de hoja: 1536 píxeles para el Portador y 2560 para los jefes. Conserva las dimensiones y el orden de etiquetas.

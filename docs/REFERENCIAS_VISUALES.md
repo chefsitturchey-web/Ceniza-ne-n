@@ -2,8 +2,8 @@
 
 Las imágenes aportadas durante el desarrollo se conservan como referencia:
 
-- [Referencia de tinta manga](diseñoejemplo.jpg): orienta el contorno, las sombras y el detalle mecánico de los retratos a color. La imagen de referencia no se utiliza como personaje del juego.
-- [Captura anterior de las estructuras](<Captura de pantalla 2026-10-28 135300.png>): documenta los problemas de escala, superposición y estilos que motivaron la revisión industrial.
+- [Referencia de tinta manga](references/diseñoejemplo.jpg): orienta el contorno, las sombras y el detalle mecánico de los retratos a color. La imagen de referencia no se utiliza como personaje del juego.
+- [Captura anterior de las estructuras](<references/Captura de pantalla 2026-10-28 135300.png>): documenta los problemas de escala, superposición y estilos que motivaron la revisión industrial.
 
 Las capturas actuales del README proceden del juego y de sus escenas de práctica:
 

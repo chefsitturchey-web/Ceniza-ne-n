@@ -11,7 +11,7 @@ import subprocess
 import zlib
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 WORK = ROOT / '.godot/unit-art'
 OUTPUT = ROOT / 'assets/units/animated'
 ROLES = ['ranger', 'guardian', 'technician', 'medic', 'builder', 'collector', 'civilian', 'artillero', 'saboteador']
@@ -82,6 +82,7 @@ def main():
     parser.add_argument('--libresprite', default='D:/descargas/libresprite-development-windows-x86_64/libresprite.exe')
     parser.add_argument('--native', action='store_true', help='Import freshly downloaded MCP clips instead of the editable pose reference')
     args = parser.parse_args()
+    WORK.mkdir(parents=True, exist_ok=True)
     OUTPUT.mkdir(parents=True, exist_ok=True)
     sources = OUTPUT / 'sources'
     sources.mkdir(exist_ok=True)
@@ -102,7 +103,7 @@ def main():
     if not canonical: empty_document(WORK / 'pose-reference-blank.ase', DEFINITIONS)
     settings = {'roles': ROLES, 'entries': entries, 'work': WORK.as_posix(), 'output': OUTPUT.as_posix(), 'canonical': canonical}
     script = WORK / 'build-unit-sprites.js'
-    script.write_text('var BUILD = ' + json.dumps(settings) + ';\n' + (ROOT / 'tools/libresprite_units.js').read_text(), encoding='utf-8')
+    script.write_text('var BUILD = ' + json.dumps(settings) + ';\n' + (ROOT / 'tools/art/libresprite_units.js').read_text(), encoding='utf-8')
     run = subprocess.run([args.libresprite, '--batch', '--script', str(script)], cwd=ROOT,
                          capture_output=True, timeout=180)
     (WORK / 'libresprite-build.log').write_bytes(run.stdout + run.stderr)
@@ -125,7 +126,7 @@ def main():
     (OUTPUT / 'layout.json').write_text(json.dumps(layout, indent=2), encoding='utf-8')
     if not canonical:
         (OUTPUT / 'provenance.json').write_text(json.dumps({'character': state['character'], 'pipeline':
-            'Native PixelLab pose clips; outfit pixel edits and two-layer ASE documents rendered by tools/libresprite_units.js inside LibreSprite; full-frame PNG sheets exported by LibreSprite.',
+            'Native PixelLab pose clips; outfit pixel edits and two-layer ASE documents rendered by tools/art/libresprite_units.js inside LibreSprite; full-frame PNG sheets exported by LibreSprite.',
             'roles': ROLES, 'frames_per_role': cursor}, indent=2), encoding='utf-8')
 
 

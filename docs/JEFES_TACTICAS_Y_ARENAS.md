@@ -44,7 +44,7 @@ Se conservan vida y multiplicadores previos de los cinco jefes. La dificultad au
 | --- | --- |
 | ![Prefecto y columnas corporativas](media/prefecto_actual.png) | ![Madre Cero y servidores](media/madre_cero_actual.png) |
 
-`assets/expedition/arena/encounter_machines_v1.png` es un atlas original RGBA de 1536 × 1024: intercambiador de fundición, bombeo/sonar, columna corporativa y núcleo de servidores. Se generó mediante la herramienta nativa de imágenes y se copió al proyecto sin alterar sus píxeles. `tools/measure_art.py` solo lee alfa y escribe metadatos de recorte; nunca modifica imágenes. Las regiones separan las cuatro máquinas y excluyen margen transparente.
+`assets/expedition/arena/encounter_machines_v1.png` es un atlas original RGBA de 1536 × 1024: intercambiador de fundición, bombeo/sonar, columna corporativa y núcleo de servidores. Se generó mediante la herramienta nativa de imágenes y se copió al proyecto sin alterar sus píxeles. `tools/art/measure_art.py` solo lee alfa y escribe metadatos de recorte; nunca modifica imágenes. Las regiones separan las cuatro máquinas y excluyen margen transparente.
 
 Cada recinto usa su maquinaria, paleta, señales y movimiento: vapor y válvulas, corrientes y sonar, paños corporativos o pulsos de datos. Las coberturas y los relés sustituyen las figuras grises antiguas por sprites detallados. El Coro tiene un perímetro nuevo de doce vértices. **Los actores actuales utilizan secuencias completas dibujadas y exportadas desde LibreSprite**, con cuerpo, armas y efectos por capas; las ilustraciones anteriores quedan como alternativa del Inspector. [Fuentes, dimensiones y galería](COMBATE_LIBRESPRITE.md).
 

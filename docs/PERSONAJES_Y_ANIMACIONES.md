@@ -32,12 +32,12 @@ Los archivos editables están en `assets/units/animated/sources/`. Abre cualquie
 Para reconstruir los atlas desde esa referencia:
 
 ```powershell
-python tools/build_unit_sprites.py --libresprite "D:/descargas/libresprite-development-windows-x86_64/libresprite.exe"
+python tools/art/build_unit_sprites.py --libresprite "D:/descargas/libresprite-development-windows-x86_64/libresprite.exe"
 ```
 
-La reconstrucción reemplaza los `.ase` de profesión y sus PNG derivados; conserva aparte cualquier retoque manual que quieras mantener. Python prepara documentos vacíos y metadatos. **El muestreo, el dibujo de píxeles, los cambios de atuendo y el guardado se ejecutan dentro de LibreSprite**, en `tools/libresprite_units.js`. La exportación de las hojas también la hace LibreSprite.
+La reconstrucción reemplaza los `.ase` de profesión y sus PNG derivados; conserva aparte cualquier retoque manual que quieras mantener. Python prepara documentos vacíos y metadatos. **El muestreo, el dibujo de píxeles, los cambios de atuendo y el guardado se ejecutan dentro de LibreSprite**, en `tools/art/libresprite_units.js`. La exportación de las hojas también la hace LibreSprite.
 
-`tools/queue_unit_clips.py` documenta la preparación inicial de clips mediante el MCP ya configurado. Es una operación externa que puede consumir generaciones; no hace falta ejecutarla para jugar, editar los `.ase` o reconstruir. Los enlaces temporales, descargas y respuestas quedan en `.godot/`; no se guardan credenciales en el proyecto. Procedencia del personaje: `assets/units/animated/provenance.json` y `docs/ASSET_SOURCES.csv`.
+`tools/integrations/queue_unit_clips.py` documenta la preparación inicial de clips mediante el MCP ya configurado. Es una operación externa que puede consumir generaciones; no hace falta ejecutarla para jugar, editar los `.ase` o reconstruir. Los enlaces temporales, descargas y respuestas quedan en `.godot/`; no se guardan credenciales en el proyecto. Procedencia del personaje: `assets/units/animated/provenance.json` y `docs/ASSET_SOURCES.csv`.
 
 ## Comprobaciones
 

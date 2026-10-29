@@ -1,6 +1,6 @@
 """Recorta el paquete CC0 de Kenney para que las acciones no dejen colas de 5 s.
 
-Uso: python tools/preparar_sonidos.py [ruta/al/sci-fi_sounds.zip]
+Uso: python tools/audio/preparar_sonidos.py [ruta/al/sci-fi_sounds.zip]
 Fuente: https://opengameart.org/content/sci-fi-sounds
 Requiere FFmpeg. Extrae y procesa solo los siete clips utilizados.
 """
@@ -9,7 +9,7 @@ import subprocess
 import sys
 import zipfile
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 CLIPS = {
     "slash": ("forceField_000.ogg", .28),
     "shot": ("laserSmall_000.ogg", .24),

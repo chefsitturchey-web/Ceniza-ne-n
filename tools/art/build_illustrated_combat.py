@@ -191,7 +191,7 @@ def main():
               layer_names=['Pose completa', 'Retoques', 'Luz y efectos'])
         script = WORK/f'assemble-{actor}.js'
         script.write_text('var BUILD = '+json.dumps(settings)+';\n'+
-                          (ROOT/'tools/libresprite_illustrated_combat.js').read_text(encoding='utf-8'), encoding='utf-8')
+                          (ROOT/'tools/art/libresprite_illustrated_combat.js').read_text(encoding='utf-8'), encoding='utf-8')
         run = subprocess.run([args.libresprite, '--batch', '--script', str(script)],
                              cwd=ROOT, capture_output=True, timeout=600)
         log = (run.stdout+run.stderr).decode('utf-8', errors='replace')
@@ -220,7 +220,7 @@ def main():
         (OUT/'provenance.json').write_text(json.dumps({'tool': 'LibreSprite',
             'visual_base': 'OpenAI image_gen, manga identity references and original action key poses',
             'pipeline': 'Read-only alpha measurement; native LibreSprite registration, eight-pose textured hip/knee/foot meshes, counter-swing, breathing, effects and ASE/PNG export.',
-            'source': 'tools/libresprite_illustrated_combat.js', 'sources_sha256': hashes,
+            'source': 'tools/art/libresprite_illustrated_combat.js', 'sources_sha256': hashes,
             'external_raster_inputs': sorted('references/'+p.name for p in (OUT/'references').glob('*.png')),
             'timeline_frames_per_actor': cursor, 'unique_source_poses': {a:v['key_poses'] for a,v in layout['actors'].items()},
             'note': 'Timeline holds and secondary poses reuse artwork. 256 timeline frames are NOT 256 independently painted poses.'}, indent=2)+'\n')

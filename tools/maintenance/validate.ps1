@@ -1,0 +1,39 @@
+param(
+    [string]$GodotPath = $env:GODOT_BIN,
+    [ValidatePattern('^[a-zA-Z0-9_]+$')][string]$Suite = 'run_all',
+    [switch]$ImportOnly
+)
+$ErrorActionPreference = 'Stop'
+$projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
+if (-not $GodotPath) {
+    foreach ($name in @('godot', 'godot4', 'godot_console')) {
+        $command = Get-Command $name -ErrorAction SilentlyContinue
+        if ($command) { $GodotPath = $command.Source; break }
+    }
+}
+if (-not $GodotPath -or -not (Test-Path -LiteralPath $GodotPath -PathType Leaf)) {
+    throw 'Indica -GodotPath con el ejecutable de consola, o configura GODOT_BIN.'
+}
+$GodotPath = (Resolve-Path -LiteralPath $GodotPath).Path
+$outputRoot = Join-Path $projectRoot 'build/validation/latest'
+$profileRoot = Join-Path $projectRoot 'build/validation/user-data'
+New-Item -ItemType Directory -Path $outputRoot, $profileRoot -Force | Out-Null
+$previousAppData = $env:APPDATA
+try {
+    $env:APPDATA = $profileRoot
+    $importOutput = Join-Path $outputRoot 'import-console.log'
+    & $GodotPath --headless --path $projectRoot --editor --import --quit --log-file (Join-Path $outputRoot 'import.log') *> $importOutput
+    if ($LASTEXITCODE -ne 0 -or (Select-String -LiteralPath $importOutput -Pattern 'SCRIPT ERROR:|Parse Error:' -Quiet)) {
+        throw "Fallo de importacion. Revisa $importOutput"
+    }
+    if ($ImportOnly) { Write-Output "Importacion completada: $outputRoot"; return }
+    $script = "res://tests/$Suite.gd"
+    if (-not (Test-Path -LiteralPath (Join-Path $projectRoot "tests/$Suite.gd"))) { throw "Suite inexistente: $Suite" }
+    $consoleOutput = Join-Path $outputRoot "$Suite-console.log"
+    & $GodotPath --headless --path $projectRoot --script $script --log-file (Join-Path $outputRoot "$Suite.log") *> $consoleOutput
+    Get-Content -LiteralPath $consoleOutput -Tail 5
+    if ($LASTEXITCODE -ne 0) { throw "Validacion fallida. Revisa $consoleOutput" }
+    Write-Output "Registros centralizados: $outputRoot"
+} finally {
+    $env:APPDATA = $previousAppData
+}

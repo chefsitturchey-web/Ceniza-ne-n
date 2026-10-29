@@ -1,4 +1,4 @@
-﻿"""Convierte los MP3 entregados por el generador externo a OGG para Godot.
+"""Convierte los MP3 entregados por el generador externo a OGG para Godot.
 
 Recorta solo el silencio de ataque del encoder (entre 5 y 50 ms) y escribe el
 .import con el bucle ya configurado. No cambia velocidad, tono, mezcla ni nivel.
@@ -15,7 +15,7 @@ import sys
 import numpy as np
 import soundfile as sf
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
+ROOT = pathlib.Path(__file__).resolve().parents[2]
 SRC = ROOT / "musica"
 DST = ROOT / "assets" / "audio" / "music"
 FLOOR = 10 ** (-55 / 20.0)

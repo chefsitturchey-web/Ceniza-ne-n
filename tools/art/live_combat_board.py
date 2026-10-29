@@ -26,9 +26,9 @@ def main():
     if painted.exists():
         settings['painted'] = json.loads(painted.read_text())['actors']
         settings['project_root'] = ROOT.as_posix()
-    sources = '\n'.join((ROOT / 'tools' / name).read_text(encoding='utf-8')
+    sources = '\n'.join((ROOT / 'tools/art' / name).read_text(encoding='utf-8')
                         for name in ['libresprite_combat.js', 'libresprite_projection.js'])
-    driver = (ROOT / 'tools/libresprite_live_board.js').read_text(encoding='utf-8')
+    driver = (ROOT / 'tools/art/libresprite_live_board.js').read_text(encoding='utf-8')
     script = work / f'live_{stamp}.js'
     script.write_text('var LIVE = ' + json.dumps(settings) + ';\n' + sources + '\n' + driver, encoding='utf-8')
     log = open(work / f'live_{stamp}.log', 'wb')

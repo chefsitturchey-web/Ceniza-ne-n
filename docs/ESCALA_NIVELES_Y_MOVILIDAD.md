@@ -38,7 +38,7 @@ El MCP anterior era **PixelLab**, registrado en la configuración de Claude. No 
 
 Se generaron trece PNG nativos: tres núcleos, tres muros, tres pedestales, tres cabezales y una plataforma. `FORTRESS_ASSET_JOBS.json` registra trabajos, semillas y prompts; `ASSET_SOURCES.csv` incluye atribuciones. El MCP procesa una generación cada vez en esta cuenta; se esperó cada resultado, sin cambiar el plan ni la configuración del usuario.
 
-`tools/pixellab_mcp.py` reutiliza la configuración local al ejecutar solicitudes explícitas. No contiene credenciales ni las copia al proyecto. Los cuerpos de solicitudes y respuestas de trabajo quedaron en `.godot/`, fuera de Git. `tools/measure_art.py` lee alfa y genera metadatos; no modifica ninguna imagen. La generación de assets es una tarea de desarrollo: el juego no necesita conexión a PixelLab.
+`tools/integrations/pixellab_mcp.py` reutiliza la configuración local al ejecutar solicitudes explícitas. No contiene credenciales ni las copia al proyecto. Los cuerpos de solicitudes y respuestas de trabajo quedaron en `.godot/`, fuera de Git. `tools/art/measure_art.py` lee alfa y genera metadatos; no modifica ninguna imagen. La generación de assets es una tarea de desarrollo: el juego no necesita conexión a PixelLab.
 
 ## Referencias y diferencias
 

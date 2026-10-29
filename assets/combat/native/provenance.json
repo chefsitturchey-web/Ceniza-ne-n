@@ -1,7 +1,7 @@
 {
   "tool": "LibreSprite",
-  "source": "tools/libresprite_projection.js",
-  "helpers": "tools/libresprite_combat.js",
+  "source": "tools/art/libresprite_projection.js",
+  "helpers": "tools/art/libresprite_combat.js",
   "visual_reference": "assets/story/portraits_manga_v2.png: Portador, bottom-right portrait; visual study only.",
   "method": "Camera-specific pixel drawing and articulated poses in native LibreSprite JavaScript; empty ASE containers only are created by Python.",
   "layers": [

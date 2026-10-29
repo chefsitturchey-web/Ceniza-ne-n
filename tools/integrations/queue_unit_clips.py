@@ -13,7 +13,7 @@ import urllib.error
 import zipfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 WORK = ROOT / '.godot/unit-art'
 CHARACTER = 'bbe26193-5852-471a-a749-aa0138e7b1c9'
 CLIPS = [
@@ -31,7 +31,7 @@ def request(name, arguments):
     source = WORK / 'job-request.json'
     result = WORK / 'job-response.json'
     source.write_text(json.dumps([{'name': name, 'arguments': arguments}]), encoding='utf-8')
-    run = subprocess.run([sys.executable, str(ROOT / 'tools/pixellab_mcp.py'), str(source), str(result)],
+    run = subprocess.run([sys.executable, str(ROOT / 'tools/integrations/pixellab_mcp.py'), str(source), str(result)],
                          cwd=ROOT, capture_output=True, timeout=90)
     if run.returncode:
         raise RuntimeError(run.stderr.decode('utf-8', errors='replace')[-800:])

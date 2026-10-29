@@ -30,7 +30,7 @@ Se utilizó la **herramienta integrada de generación de imágenes**, siguiendo 
 | `assets/expedition/arena/depot_props_v2.png` | Estación eléctrica, grúa, bomba y carga |
 | `assets/background/periphery_alive_v2.png` | Ciudad industrial lateral y canal |
 
-`tools/measure_art.py` mide el alfa y genera recortes; no modifica las imágenes. El atlas del jefe usa celdas explícitas porque las piezas generadas tienen anchuras diferentes. `ArenaLayout` mantiene el contorno físico y visual compartido.
+`tools/art/measure_art.py` mide el alfa y genera recortes; no modifica las imágenes. El atlas del jefe usa celdas explícitas porque las piezas generadas tienen anchuras diferentes. `ArenaLayout` mantiene el contorno físico y visual compartido.
 
 Prompts visuales finales:
 

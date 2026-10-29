@@ -11,7 +11,7 @@ import subprocess
 import zlib
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 WORK = ROOT / '.godot/combat-art'
 OUT = ROOT / 'assets/combat/native'
 ACTORS = ['portador', 'portador_cenital', 'recaudador', 'caldera', 'coro', 'prefecto', 'madre']
@@ -89,7 +89,7 @@ def main():
         blank(WORK / f'{actor}-blank.ase', size, clips)
     settings = {'actors': args.actors, 'entries': entries, 'work': WORK.as_posix(), 'output': OUT.as_posix()}
     script = WORK / 'render-combat.js'
-    script.write_text('var BUILD = ' + json.dumps(settings) + ';\n' + (ROOT / 'tools/libresprite_combat.js').read_text(encoding='utf-8') + '\n' + (ROOT / 'tools/libresprite_projection.js').read_text(encoding='utf-8'), encoding='utf-8')
+    script.write_text('var BUILD = ' + json.dumps(settings) + ';\n' + (ROOT / 'tools/art/libresprite_combat.js').read_text(encoding='utf-8') + '\n' + (ROOT / 'tools/art/libresprite_projection.js').read_text(encoding='utf-8'), encoding='utf-8')
     process = subprocess.run([args.libresprite, '--batch', '--script', str(script)], cwd=ROOT, capture_output=True, timeout=600)
     (WORK / 'render.log').write_bytes(process.stdout + process.stderr)
     transcript = (process.stdout + process.stderr).decode('utf-8', errors='replace')
@@ -134,8 +134,8 @@ def main():
         print(f'LibreSprite: {actor}, {size}x{size}, {cursor} frames, {len(clips)} clips', flush=True)
         source_hashes[actor] = hashlib.sha256(source.read_bytes()).hexdigest()
     (OUT / 'layout.json').write_text(json.dumps(layout, indent=2) + '\n', encoding='utf-8')
-    provenance_path.write_text(json.dumps({'tool': 'LibreSprite', 'source': 'tools/libresprite_projection.js',
-        'helpers': 'tools/libresprite_combat.js',
+    provenance_path.write_text(json.dumps({'tool': 'LibreSprite', 'source': 'tools/art/libresprite_projection.js',
+        'helpers': 'tools/art/libresprite_combat.js',
         'visual_reference': 'assets/story/portraits_manga_v2.png: Portador, bottom-right portrait; visual study only.',
         'method': 'Camera-specific pixel drawing and articulated poses in native LibreSprite JavaScript; empty ASE containers only are created by Python.',
         'layers': ['body', 'weapons and mechanisms', 'pixel effects'], 'actors': ACTORS,

@@ -1,7 +1,7 @@
 """Call the user's configured PixelLab MCP without copying authentication into the project.
 
 Requests and responses belong in .godot/, which Git ignores. No credentials are printed.
-Usage: python tools/pixellab_mcp.py request.json response.json
+Usage: python tools/integrations/pixellab_mcp.py request.json response.json
 """
 import json
 import re

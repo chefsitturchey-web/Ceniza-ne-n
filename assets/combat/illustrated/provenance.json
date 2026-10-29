@@ -2,7 +2,7 @@
   "tool": "LibreSprite",
   "visual_base": "OpenAI image_gen, manga identity references and original action key poses",
   "pipeline": "Read-only alpha measurement; native LibreSprite registration, eight-pose textured hip/knee/foot meshes, counter-swing, breathing, effects and ASE/PNG export.",
-  "source": "tools/libresprite_illustrated_combat.js",
+  "source": "tools/art/libresprite_illustrated_combat.js",
   "sources_sha256": {
     "portador_cenital": "f9705d1ac373ddbecb488e05f7dcb3cbd8de8047816d58abd78ae16b99e413e6",
     "portador": "8081c4debf29a285009fa0ce34ff54425643fc978d5992949d481c45d3f87915",
