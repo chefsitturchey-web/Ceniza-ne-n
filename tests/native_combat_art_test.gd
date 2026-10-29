@@ -21,7 +21,7 @@ func run_checks() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args()
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://.godot/combat-art"))
 	var layout: Dictionary = CombatSpriteLibrary.data()
-	verify(layout.actors.size() == 6 and layout.animations.size() == 40, "Seis actores y cuarenta secuencias por actor")
+	verify(layout.actors.size() == 7 and layout.animations.size() == 40, "Siete variantes y cuarenta secuencias por variante")
 	for id: String in layout.actors:
 		verify(FileAccess.file_exists("res://assets/combat/native/sources/%s.ase" % id), "Fuente editable de LibreSprite: " + id)
 		var frames: SpriteFrames = CombatSpriteLibrary.frames(id)
@@ -38,12 +38,24 @@ func run_checks() -> void:
 			verify(hashes.size() >= 3, "Tres o más poses distintas: %s/%s" % [id, key])
 		verify(not frames.get_animation_loop(&"death_south") and not frames.get_animation_loop(&"attack_south"), "Muerte y ataque no se repiten: " + id)
 	var provenance: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/combat/native/provenance.json"))
+	for id: String in layout.actors:
+		verify(layout.actors[id].camera == ("lateral" if id == "portador" else "cenital"), "Proyección declarada para la cámara: " + id)
+	var body: Array = layout.actors.portador.idle_body_bounds
+	var height: float = body[3] - body[1]
+	var ally: Image = UnitSpriteLibrary.frames("guardian").get_frame_texture(&"reposo", 0).get_image()
+	verify(height >= 32 and height <= 36 and height <= ally.get_used_rect().size.y * 1.2, "El cuerpo del Portador respeta la escala de los aliados")
+	verify(body[3] == layout.actors.portador.anchor[1], "Las botas apoyan en el suelo sin hundirse")
 	verify(provenance.external_raster_inputs.is_empty() and provenance.tool == "LibreSprite", "Este bloque dibuja los píxeles en LibreSprite sin ilustraciones generadas de entrada")
 	var studio: Control = load("res://levels/story/combat_animation_preview.tscn").instantiate()
 	root.add_child(studio)
 	await process_frame
 	verify(studio.actors.size() == 6, "Galería F6 presenta los seis personajes")
 	await picture("galeria_caminar")
+	studio.change_camera(1)
+	verify(studio.guardian.visible and studio.actors[0].sprite_frames == CombatSpriteLibrary.frames("portador"), "Comparación lateral con aliado real")
+	verify(studio.actors[0].scale == Vector2.ONE and studio.guardian.scale == Vector2.ONE, "Comparación sin ampliar al protagonista")
+	await picture("escala_portador_aliado")
+	studio.change_camera(0)
 	studio.state_choice.select(3)
 	studio.play_all()
 	await create_timer(0.12).timeout
@@ -69,6 +81,7 @@ func run_checks() -> void:
 		visual.pose_boss(arena.boss)
 		if index not in [2, 4]: verify(visual.sprite.frame > initial and visual.state_name == "windup", "Preparación sigue el aviso real: %d" % index)
 		var player: TopdownPlayer = arena.player
+		verify(player.combat_visual.actor_id == "portador_cenital", "La arena utiliza el Portador cenital: %d" % index)
 		player.facing = Vector2.UP
 		player.velocity = Vector2.UP * 100
 		player.update_visual()
@@ -123,6 +136,8 @@ func run_checks() -> void:
 	world.story.present_dialogue = false
 	world.session.set_process(false)
 	verify(world.player.combat_visual != null and not world.player.visual.sprite.visible, "La colonia también utiliza el Portador de LibreSprite")
+	verify(world.player.combat_visual.actor_id == "portador", "La colonia conserva su perspectiva lateral")
+	await picture("portador_colonia")
 	world.free()
 	await process_frame
 	print("Arte de combate LibreSprite: %d comprobaciones; %d fallos" % [checks, failures])

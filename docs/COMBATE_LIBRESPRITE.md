@@ -1,65 +1,70 @@
 # Portador y cinco jefes en LibreSprite
 
-## Qué se cambió
+## Cámara, identidad y escala
 
-Los seis actores de combate usan **fotogramas completos dibujados y exportados desde LibreSprite**. Cada actor tiene **256 fotogramas**, distribuidos en diez secuencias y cuatro direcciones: sur, este, norte y oeste. En total hay **1536 fotogramas**. El Portador también utiliza su sprite nuevo en la colonia.
+El Portador tiene **dos dibujos propios**: lateral para la colonia y cenital para las arenas. Se estudió su retrato real en la esquina inferior derecha de `assets/story/portraits_manga_v2.png`: cabello negro, rostro visible, abrigo marrón gastado, bufanda oscura, correas, colgante e implante cian pequeño. El sprite anterior llevaba casco y visor y no representaba ese diseño.
 
-El dibujo es procedural original: `tools/libresprite_combat.js` traza píxeles, polígonos, luces, costuras, remaches, rejillas, herrajes y articulaciones mediante la API JavaScript nativa de LibreSprite. En este conjunto no hay imágenes generadas por IA como entrada. Se dibujan cuerpo, arma, mecanismos y efectos en cada celda; el renderizado ocurre dentro del editor. No se afirma que estos sprites se hayan dibujado manualmente con ratón.
+Su cuerpo lateral mide **35 píxeles**, frente a los 31 del guardián en reposo. Ambos se muestran a escala **1:1** y apoyan en el mismo suelo. El lienzo de 96 píxeles incluye margen transparente para armas y efectos.
 
-![Galería de los seis personajes](media/combat_libresprite.png)
+![Portador y guardián a la misma escala](media/combat_escala.png)
 
-## Fuentes y dimensiones
+Los jefes muestran cubiertas y volúmenes desde arriba: orugas y compuertas del Recaudador; tapa circular, chimeneas y tuberías de Caldera; disco sonar y antenas del Coro; hombros, casco, capa y armas del Prefecto; corona radial completa y seis brazos de cable de la Madre. Las direcciones cenitales se hornean en los fotogramas. La luz superior del sprite gira con la dirección horneada.
 
-Las fuentes están en **`assets/combat/native/sources/`**. Ábrelas con LibreSprite; pulsa reproducir y selecciona las etiquetas de la línea de tiempo.
+![Galería cenital](media/combat_libresprite.png)
 
-| Archivo editable | Lienzo por fotograma | Anclaje en píxeles |
-| --- | --- | --- |
-| `portador.ase` | 96 × 96 | 48, 72: apoyo de los pies |
-| `recaudador.ase` | 128 × 128 | 64, 64 |
-| `caldera.ase` | 128 × 128 | 64, 64 |
-| `coro.ase` | 128 × 128 | 64, 64 |
-| `prefecto.ase` | 160 × 160 | 80, 96 |
-| `madre.ase` | 128 × 128 | 64, 64 |
+## Fuentes y animaciones
 
-El tamaño del lienzo incluye espacio transparente para espadas, brazos y efectos; no indica la altura física del personaje. El cuerpo del Portador mide aproximadamente 40 píxeles. El Prefecto tiene un lienzo mayor para que su espada y escudo no se recorten; se dibuja a escala 1:1 en el combate. La galería amplía al Portador al doble para observarlo.
+Los seis personajes tienen **siete variantes**, **256 fotogramas por variante**, **40 etiquetas por variante** y **1792 fotogramas en total**. Cada ASE contiene tres capas: cuerpo y apoyo, armas y mecanismos, efectos dibujados.
 
-Cada documento contiene tres capas editables: **Cuerpo y apoyo**, **Armas y mecanismos** y **Efectos dibujados**. Las etiquetas son `idle`, `walk`, `windup`, `attack`, `shoot`, `charge`, `exposed`, `hurt`, `death`, `dodge`, con sufijos de dirección. Son 40 etiquetas por actor; algunas son de previsualización y no corresponden a una habilidad disponible en la IA de todos los jefes.
+| Fuente en `assets/combat/native/sources/` | Lienzo | Anclaje | Cámara |
+| --- | --- | --- | --- |
+| `portador.ase` | 96 × 96 | 48, 73; pies | Lateral |
+| `portador_cenital.ase` | 96 × 96 | 48, 48 | Cenital |
+| `recaudador.ase` | 128 × 128 | 64, 64 | Cenital |
+| `caldera.ase` | 128 × 128 | 64, 64 | Cenital |
+| `coro.ase` | 128 × 128 | 64, 64 | Cenital |
+| `prefecto.ase` | 160 × 160 | 80, 80 | Cenital |
+| `madre.ase` | 128 × 128 | 64, 64 | Cenital |
 
-## Probar
+Las etiquetas son `idle`, `walk`, `windup`, `attack`, `shoot`, `charge`, `exposed`, `hurt`, `death`, `dodge`, con sufijos `south`, `east`, `north`, `west`. Algunas sirven para previsualización y no son habilidades disponibles en la IA de todos los jefes.
 
-1. Abre **`levels/story/combat_animation_preview.tscn`** y pulsa **F6**. Cambia secuencia y dirección para ver los seis actores.
-2. Con el juego abierto, pulsa **F1 → Jefes → Entrar**. Puedes comparar fase, vulnerabilidad, ataque y muerte con el laboratorio.
-3. Muévete con WASD y ataca con J. La espada cambia de pose junto al brazo y el torso. El antiguo arco y rayo dibujado de ataque queda desactivado con los sprites nuevos.
+La caminata avanza por distancia recorrida. El golpe tiene preparación, brazo y espada articulados y un único impacto; esquivar cancela un ataque en preparación. Las poses del jefe siguen su estado real. Las reglas de dificultad y las arenas se documentan en [Jefes, tácticas y arenas](JEFES_TACTICAS_Y_ARENAS.md).
 
-La caminata avanza por distancia recorrida: los redibujados sin movimiento no inventan pasos. La zancada del Portador es de 80 unidades de mundo por ciclo, para que los pies no cambien de fotograma a la velocidad de renderizado. Preparación y golpe se sincronizan con el tiempo de ataque; el daño se emite una sola vez después del primer cuarto de la animación. Esquivar cancela un golpe en preparación y un impacto interrumpe la acción.
+## Ver y probar
 
-Los jefes conservan sus reglas de combate. Sus imágenes anteriores permanecen como alternativa: en el Inspector, desactiva **Native Combat Art** del actor para recuperar la representación anterior. La representación nueva se ocupa de las poses y la anterior se mantiene oculta. El núcleo expuesto, las salvas y los avisos siguen ligados al estado real del jefe. Las muertes tienen secuencia propia y fragmentos pequeños; no se obtiene la caída girando una ilustración entera.
+1. Abre `levels/story/combat_animation_preview.tscn` y pulsa **F6**. Selecciona **Cenital · combate** o **Lateral · colonia + aliado**. Cambia dirección y secuencia. La galería utiliza la misma escala para todos.
+2. En el juego, pulsa **F1 → Jefes → Entrar**. Muévete con WASD y ataca con J para comprobar el dibujo con la cámara real.
+3. Abre los ASE con LibreSprite para editar capas, celdas y etiquetas.
 
-Este bloque cambia arte y presentación del combate; las arenas y la progresión táctica se documentan en [Jefes, tácticas y arenas](JEFES_TACTICAS_Y_ARENAS.md). La dificultad y el acabado artístico siguen necesitando valoración en partidas reales.
+Para abrir una mesa visible de trabajo en LibreSprite:
 
-## Editar y exportar
+```powershell
+python tools/live_combat_board.py
+```
 
-Detén el juego antes de cambiar los archivos. Edita las celdas o capas en LibreSprite y conserva el orden, dimensiones y etiquetas de la línea de tiempo. Exporta la hoja en filas, con ocho columnas, sobre el PNG del mismo nombre en `assets/combat/native/`. Si cambias la cantidad u orden de fotogramas, actualiza también `layout.json`.
+El editor muestra progresivamente una lámina con las siete variantes, un guardián real y el retrato manga del Portador. Cada ejecución crea un documento distinto en `.godot/live-art/` y conserva las fuentes editadas. La actualización utiliza la API de LibreSprite y revela filas del dibujo preparado; no es dibujo manual con ratón ni una transmisión continua de cada cambio del código. El retrato y el guardián se copian únicamente a la lámina de comparación, nunca a los nuevos sprites.
 
-Ejemplo de exportación de una fuente ya editada:
+## Dibujar y exportar
+
+`tools/libresprite_projection.js` contiene los diseños según la cámara y utiliza las primitivas de `tools/libresprite_combat.js`. Los píxeles, poses y exportaciones se producen en LibreSprite mediante JavaScript nativo. Python prepara los ASE vacíos, etiquetas y metadatos. No se usan imágenes generadas como entrada del renderizador de sprites.
+
+Edita las celdas conservando dimensiones, orden y etiquetas. Exporta en filas de ocho columnas al PNG correspondiente. Para exportar una fuente editada:
 
 ```powershell
 & 'D:/descargas/libresprite-development-windows-x86_64/libresprite.exe' --batch assets/combat/native/sources/portador.ase --sheet-type rows --sheet-width 768 --sheet assets/combat/native/portador.png
 ```
 
-Para regenerar desde el código de dibujo original:
+Para reconstruir desde el código de dibujo:
 
 ```powershell
 python tools/build_combat_sprites.py
-python tools/build_combat_sprites.py --actors portador prefecto
+python tools/build_combat_sprites.py --actors portador portador_cenital prefecto
 ```
 
-Python solo prepara documentos ASE vacíos, etiquetas y metadatos. **LibreSprite** dibuja los píxeles y exporta las hojas. El constructor exige una marca de finalización por actor para detectar errores del motor de scripts aunque el ejecutable termine con código 0. Las huellas de las fuentes están en `provenance.json`: si detecta cambios manuales posteriores, se detiene para conservarlos. `--overwrite-edits` permite una regeneración explícita que reemplaza esos cambios; exportar tu ASE editado no requiere ese argumento.
+El constructor exige una marca de finalización y medidas del cuerpo por actor para detectar fallos del motor de scripts aunque el ejecutable termine con código 0. Las huellas en `provenance.json` protegen las fuentes editadas manualmente. `--overwrite-edits` reemplaza esos cambios de forma explícita. Exportar un ASE editado no requiere ese argumento.
 
-Se verificó una reconstrucción nativa con PNG idénticos byte a byte. Cachés, documentos vacíos y registros de trabajo permanecen en `.godot/combat-art/`; no se incluyen en Git.
+## Validación
 
-## Validación y referencias
+`tests/native_combat_art_test.gd`: **2167 comprobaciones**, sin recortes ni celdas vacías, al menos tres poses distintas por etiqueta, fuentes editables, cámaras, apoyo de pies, proporción con un aliado, galería a escala real, preparación del ataque, dirección, cancelación, daño y muerte. Se capturan la colonia y el combate para inspección visual con `-- --capture`. La batería general contiene **38 suites**. Cachés y registros quedan fuera de Git.
 
-`tests/native_combat_art_test.gd`: **1851 comprobaciones**, incluyendo márgenes sin recortes, poses distintas, fuentes editables, caché de fotogramas, galería F6, pasos por distancia, anticipación sin daño temprano, dirección del golpe, cancelación por esquiva, impacto y muerte. La batería general incluye **38 suites**.
-
-Se consultaron la [API oficial de scripts de LibreSprite](https://github.com/LibreSprite/LibreSprite/blob/master/SCRIPTING.md), sus [opciones oficiales de exportación](https://github.com/LibreSprite/LibreSprite/blob/master/src/app/app_options.cpp) y la [aclaración de sus mantenedores sobre JavaScript y las diferencias con Aseprite](https://github.com/LibreSprite/LibreSprite/issues/360). Los scripts de Aseprite no se asumieron compatibles.
+Referencias de la herramienta: [API oficial de scripts](https://github.com/LibreSprite/LibreSprite/blob/master/SCRIPTING.md), [opciones de exportación](https://github.com/LibreSprite/LibreSprite/blob/master/src/app/app_options.cpp) y [diferencias con Aseprite](https://github.com/LibreSprite/LibreSprite/issues/360).

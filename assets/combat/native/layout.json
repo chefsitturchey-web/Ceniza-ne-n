@@ -503,7 +503,28 @@
       "cell": 96,
       "anchor": [
         48,
-        72
+        73
+      ],
+      "camera": "lateral",
+      "idle_body_bounds": [
+        40,
+        38,
+        56,
+        73
+      ]
+    },
+    "portador_cenital": {
+      "cell": 96,
+      "anchor": [
+        48,
+        48
+      ],
+      "camera": "cenital",
+      "idle_body_bounds": [
+        36,
+        30,
+        61,
+        64
       ]
     },
     "recaudador": {
@@ -511,6 +532,13 @@
       "anchor": [
         64,
         64
+      ],
+      "camera": "cenital",
+      "idle_body_bounds": [
+        21,
+        29,
+        108,
+        100
       ]
     },
     "caldera": {
@@ -518,6 +546,13 @@
       "anchor": [
         64,
         64
+      ],
+      "camera": "cenital",
+      "idle_body_bounds": [
+        19,
+        13,
+        111,
+        116
       ]
     },
     "coro": {
@@ -525,13 +560,27 @@
       "anchor": [
         64,
         64
+      ],
+      "camera": "cenital",
+      "idle_body_bounds": [
+        19,
+        13,
+        111,
+        116
       ]
     },
     "prefecto": {
       "cell": 160,
       "anchor": [
         80,
-        96
+        80
+      ],
+      "camera": "cenital",
+      "idle_body_bounds": [
+        60,
+        51,
+        100,
+        103
       ]
     },
     "madre": {
@@ -539,6 +588,13 @@
       "anchor": [
         64,
         64
+      ],
+      "camera": "cenital",
+      "idle_body_bounds": [
+        15,
+        14,
+        114,
+        115
       ]
     }
   }

@@ -1,10 +1,13 @@
 extends Control
-const IDS: Array[String] = ["portador", "recaudador", "caldera", "coro", "prefecto", "madre"]
+const IDS: Array[String] = ["portador_cenital", "recaudador", "caldera", "coro", "prefecto", "madre"]
 const STATES: Array[String] = ["idle", "walk", "windup", "attack", "shoot", "charge", "exposed", "hurt", "death", "dodge"]
 const DIRECTIONS: Array[String] = ["south", "east", "north", "west"]
 var actors: Array[AnimatedSprite2D] = []
 var state_choice: OptionButton
 var direction_choice: OptionButton
+var camera_choice: OptionButton
+var hero_label: Label
+var guardian: AnimatedSprite2D
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -15,11 +18,12 @@ func _ready() -> void:
 	backdrop.size = Vector2(640, 360)
 	backdrop.color = Color("0b1322")
 	add_child(backdrop)
-	var title: Label = Label.new()
-	title.text = "LIBRESPRITE · COMBATE"
-	title.position = Vector2(12, 12)
-	title.add_theme_color_override("font_color", Color("47dacb"))
-	add_child(title)
+	camera_choice = OptionButton.new()
+	camera_choice.position = Vector2(12, 8)
+	camera_choice.size.x = 220
+	camera_choice.add_item("Cenital · combate")
+	camera_choice.add_item("Lateral · colonia + aliado")
+	add_child(camera_choice)
 	state_choice = OptionButton.new()
 	state_choice.position = Vector2(245, 8)
 	state_choice.size.x = 165
@@ -45,16 +49,33 @@ func _ready() -> void:
 		add_child(card)
 		var sprite: AnimatedSprite2D = AnimatedSprite2D.new()
 		sprite.sprite_frames = CombatSpriteLibrary.frames(IDS[index])
-		sprite.scale = Vector2.ONE * (2 if index == 0 else 1)
-		sprite.position = Vector2(x + 102, y + (105 if index == 0 else (75 if index == 4 else 66))) + CombatSpriteLibrary.offset_for(IDS[index]) * sprite.scale
+		sprite.scale = Vector2.ONE
+		sprite.position = Vector2(x + 102, y + 68) + CombatSpriteLibrary.offset_for(IDS[index])
 		add_child(sprite)
 		actors.append(sprite)
 		var label: Label = Label.new()
-		label.text = IDS[index].to_upper() + " · %d px" % int(CombatSpriteLibrary.data().actors[IDS[index]].cell)
+		label.text = "PORTADOR · CENITAL" if index == 0 else IDS[index].to_upper() + " · 1:1"
 		label.position = Vector2(x + 8, y + 127)
 		add_child(label)
+		if index == 0: hero_label = label
+	guardian = AnimatedSprite2D.new()
+	guardian.sprite_frames = UnitSpriteLibrary.frames("guardian")
+	guardian.position = Vector2(163, 115) + UnitSpriteLibrary.OFFSET
+	guardian.visible = false
+	guardian.play(&"reposo")
+	add_child(guardian)
+	camera_choice.item_selected.connect(change_camera)
 	state_choice.item_selected.connect(func(_index: int) -> void: play_all())
 	direction_choice.item_selected.connect(func(_index: int) -> void: play_all())
+	play_all()
+
+func change_camera(index: int) -> void:
+	camera_choice.select(index)
+	var id: String = "portador" if index == 1 else "portador_cenital"
+	actors[0].sprite_frames = CombatSpriteLibrary.frames(id)
+	actors[0].position = Vector2(110, 115) + CombatSpriteLibrary.offset_for(id)
+	hero_label.text = "PORTADOR + GUARDIÁN · 1:1" if index == 1 else "PORTADOR · CENITAL"
+	guardian.visible = index == 1
 	play_all()
 
 func play_all() -> void:

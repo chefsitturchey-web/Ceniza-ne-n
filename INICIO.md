@@ -4,7 +4,7 @@ Abre `project.godot` en Godot 4 y pulsa **F5**. Nueva partida inicia la campaña
 
 **Para probar libremente: pulsa F1.** El laboratorio permite entrar a los cinco jefes sin requisitos, elegir fase y equipo, activar invulnerabilidad, cámara lenta, crear unidades y preparar colonias. **F2** invulnerabilidad, **F3** congelar enemigos, **F4** colisiones y rutas. Los trucos marcan la sesión como práctica y conservan el checkpoint normal. [Guía del laboratorio](docs/LABORATORIO_DEPURACION.md).
 
-**Nuevos sprites de combate hechos en LibreSprite:** Portador y cinco jefes con preparación, ataque, pasos, daño y muerte. Para ver todas las secuencias, pulsa **F6 en `levels/story/combat_animation_preview.tscn`**. [Fuentes editables, dimensiones y exportación](docs/COMBATE_LIBRESPRITE.md).
+**Sprites revisados en LibreSprite:** Portador con el aspecto de su retrato manga y cuerpo lateral de 35 píxeles; vista cenital propia para los combates y cinco jefes dibujados según esa cámara. Pulsa **F6 en `levels/story/combat_animation_preview.tscn`** y alterna cámara para compararlo con un aliado a escala 1:1. `python tools/live_combat_board.py` abre una lámina visible en LibreSprite. [Fuentes, animaciones y exportación](docs/COMBATE_LIBRESPRITE.md).
 
 La historia se presenta con retratos manga a color, conversaciones y fundidos. **E / Enter / Espacio** avanza; **Esc** omite. En **L → Ver conversación** puedes releer escenas. Para probar todo el guion con F6, abre `levels/story/novel_preview.tscn`. [Detalles y dirección visual](docs/NOVELA_VISUAL_Y_COHERENCIA.md).
 

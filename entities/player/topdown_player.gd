@@ -76,6 +76,7 @@ func _ready() -> void:
 	if native_combat_art:
 		combat_visual = CombatFlipbook.new()
 		combat_visual.actor = self
+		combat_visual.actor_id = "portador_cenital"
 		add_child(combat_visual)
 	update_visual()
 
@@ -205,7 +206,7 @@ func update_visual() -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.4))
+	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.75))
 	draw_circle(Vector2.ZERO, 11, Color(0, 0, 0, 0.4))
 	draw_set_transform(Vector2.ZERO)
 	if combat_visual == null and slash_remaining > 0 and health > 0:
