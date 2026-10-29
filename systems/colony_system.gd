@@ -5,6 +5,8 @@ signal worker_added(worker: ColonyWorker)
 signal notice_requested(message: String)
 
 const BURY_DURATION: float = 3.0
+## Distancia hacia el núcleo respecto de la torreta usada como escondite.
+const HIDE_INSET: float = 24.0
 
 @export var builder_data: WorkerData
 @export var collector_data: WorkerData
@@ -42,7 +44,9 @@ func update_workers(delta: float) -> void:
 		var previous_x: float = worker.x
 		if worker.role == "collector":
 			var gather_destination: float = worker.side * worker.data.gather_distance if cycle.phase == "DÍA" and worker.cargo == 0 else worker.side * worker.data.home_distance
-			if unsafe_at(gather_destination): gather_destination = worker.side * worker.data.home_distance
+			# De noche se repliega tras la torreta más cercana; así no vuelve al núcleo.
+			if cycle.phase != "DÍA": gather_destination = safe_spot(worker.x)
+			if unsafe_at(gather_destination): gather_destination = safe_spot(worker.x)
 			worker.x = move_toward(worker.x, gather_destination, worker.data.speed * delta)
 			if absf(worker.x - gather_destination) < GameRules.GATHER_ARRIVAL_DISTANCE:
 				if absf(gather_destination) > GameRules.COLLECTOR_OUTSIDE_THRESHOLD:
@@ -100,7 +104,7 @@ func update_workers(delta: float) -> void:
 				if not reserved:
 					worker.job = site_index
 					break
-		var destination: float = worker.side * worker.data.home_distance
+		var destination: float = safe_spot(worker.x)
 		if worker.job >= 0:
 			destination = sites[worker.job].x
 		worker.x = move_toward(worker.x, destination, worker.data.speed * delta)
@@ -120,9 +124,25 @@ func update_workers(delta: float) -> void:
 
 func _damage_from_enemies(worker: ColonyWorker, delta: float) -> void:
 	for enemy: Node2D in get_tree().get_nodes_in_group(GameRules.ENEMIES):
-		if absf(enemy.position.x - worker.x) < GameRules.UNSAFE_RANGE:
+		if absf(enemy.position.x - worker.x) < GameRules.WORKER_DANGER_RANGE:
 			worker.apply_dps(GameRules.WORKER_DANGER_DPS, delta)
 			break
+
+## Escondite nocturno: detrás de la torreta más cercana, 24 px hacia el núcleo.
+## Sin torretas en pie, la base (x = 0) cumple la misma función.
+func safe_spot(x: float) -> float:
+	var best: ConstructionSite = null
+	var best_distance: float = INF
+	for site: ConstructionSite in sites:
+		if site.data == null or site.data.damage <= 0 or site.hp <= 0:
+			continue
+		var distance: float = absf(site.x - x)
+		if distance < best_distance:
+			best_distance = distance
+			best = site
+	if best == null:
+		return 0.0
+	return best.x - signf(best.x) * HIDE_INSET
 
 func unsafe_at(x: float) -> bool:
 	if civic != null and cycle.phase != "DÍA" and absf(x) > civic.frontier(signf(x)): return true
