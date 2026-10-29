@@ -8,19 +8,30 @@ signal notice_requested(message: String)
 
 const TARGET_RANGE: float = 42.0
 const TARGET_BASE: int = -500
+## Horizontal jitter applied to each prop anchor, so props land on a random
+## position every run while keeping the fixed count per zone.
+const JITTER: float = 80.0
 
 var bank: ResourceBank
 var props: Array[ScavengeProp] = []
+var rng: RandomNumberGenerator
 
 func setup(zone: ZoneData, bank: ResourceBank) -> void:
 	self.bank = bank
 	if zone.props.is_empty():
 		return
+	rng = RandomNumberGenerator.new()
+	rng.randomize()
 	for index: int in range(zone.prop_spots.size()):
+		var spot: Vector2 = zone.prop_spots[index]
 		var prop: ScavengeProp = ScavengeProp.new()
 		prop.data = zone.props[index % zone.props.size()]
 		add_child(prop)
-		prop.position = zone.prop_spots[index]
+		# Anchors are fixed reachability points; the jitter band (spot.x +- JITTER)
+		# must stay clear of higher-priority POI ranges checked earlier in
+		# InteractionSystem.interaction_target(). The +550 anchor was moved to +660
+		# because the railway station (+560, range 55 -> [505, 615]) shadowed it.
+		prop.position = Vector2(spot.x + rng.randf_range(-JITTER, JITTER), GameRules.FLOOR_Y)
 		props.append(prop)
 
 func target_at(x: float) -> int:

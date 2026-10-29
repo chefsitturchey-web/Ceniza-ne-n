@@ -7,5 +7,6 @@
 [ext_resource type="Resource" path="res://data/props/spool.tres" id="spool"]
 [resource]
 script = ExtResource("1")
-prop_spots = [Vector2(-600, 260), Vector2(-1050, 260), Vector2(550, 260), Vector2(950, 260)]
+# Anchor moved from x=550 to 660: the station (+560, range 55) shadowed the prop.
+prop_spots = [Vector2(-600, 260), Vector2(-1050, 260), Vector2(660, 260), Vector2(950, 260)]
 props = Array[ExtResource("prop_script")]([ExtResource("car"), ExtResource("battery"), ExtResource("crate"), ExtResource("spool")])

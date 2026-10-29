@@ -23,5 +23,6 @@ turret_offset = 220.0
 background_path = "res://assets/background/foundry.png"
 accent = Color(1, 0.55, 0.22, 1)
 waves = Array[ExtResource("4")]([ExtResource("early"), ExtResource("2"), ExtResource("3")])
-prop_spots = [Vector2(-1350, 260), Vector2(-1050, 260), Vector2(-600, 260), Vector2(550, 260), Vector2(950, 260)]
+# Anchor moved from x=550 to 660: the station (+560, range 55) shadowed the prop.
+prop_spots = [Vector2(-1350, 260), Vector2(-1050, 260), Vector2(-600, 260), Vector2(660, 260), Vector2(950, 260)]
 props = Array[ExtResource("prop_script")]([ExtResource("antenna"), ExtResource("crate"), ExtResource("battery"), ExtResource("spool"), ExtResource("car")])
