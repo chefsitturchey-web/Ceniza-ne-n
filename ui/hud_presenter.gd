@@ -104,7 +104,12 @@ func publish() -> void:
 	var context_key: bool = true
 	var context_screen: Vector2 = Vector2.ZERO
 	var target: int = interaction.interaction_target()
-	if target <= -500 and interaction.scavenge != null:
+	if target <= -600 and interaction.trap_system != null:
+		var detail: Dictionary = interaction.trap_system.describe(target)
+		context = detail.text
+		context_cost = detail.cost
+		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -55)
+	elif target <= -500 and interaction.scavenge != null:
 		var detail: Dictionary = interaction.scavenge.describe(target)
 		context = detail.text
 		context_cost = detail.cost

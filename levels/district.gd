@@ -34,6 +34,8 @@ var mobility: MobilitySystem
 var corpse_system: CorpseSystem
 var gravedigger: Gravedigger
 var scavenge: ScavengeSystem
+var trap_system: TrapSystem
+var pest_system: PestSystem
 
 func _ready() -> void:
 	player.combat_enabled = false
@@ -203,6 +205,17 @@ func _ready() -> void:
 	add_child(scavenge)
 	interaction.scavenge = scavenge
 	scavenge.notice_requested.connect(presenter.show_notice)
+	trap_system = TrapSystem.new()
+	trap_system.setup(bank)
+	add_child(trap_system)
+	trap_system.notice_requested.connect(presenter.show_notice)
+	interaction.trap_system = trap_system
+	pest_system = PestSystem.new()
+	pest_system.setup(corpse_system, construction, trap_system)
+	add_child(pest_system)
+	pest_system.notice_requested.connect(presenter.show_notice)
+	session.pest_system = pest_system
+	session.trap_system = trap_system
 	for portal: EnemyRepeater in civic.gates + expedition.repeaters:
 		portal.defense_requested.connect(civic.defend_portal)
 	var arriving: bool = not CampaignRoute.pending.is_empty()

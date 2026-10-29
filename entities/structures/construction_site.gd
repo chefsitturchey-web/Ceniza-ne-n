@@ -20,6 +20,7 @@ var upgrade_pending: bool = false
 var viewer: Player
 var payment_fraction: float = 0
 var powered: bool = true
+var shorted: bool = false
 var core: ColonyCore
 
 func visual_height() -> float:
@@ -91,7 +92,10 @@ func update_overload(left_active: bool, right_active: bool) -> void:
 	queue_redraw()
 
 func _process(delta: float) -> void:
-	modulate = Color.WHITE if powered else Color(0.5, 0.56, 0.63)
+	if shorted:
+		modulate = Color(0.5, 0.28, 0.4)
+	else:
+		modulate = Color.WHITE if powered else Color(0.5, 0.56, 0.63)
 	recoil = maxf(0.0, recoil - delta)
 	weld_timer -= delta
 	if ordered and weld_timer <= 0.0:

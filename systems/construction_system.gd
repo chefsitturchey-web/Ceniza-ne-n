@@ -54,6 +54,9 @@ func order_site(site: ConstructionSite) -> bool:
 	return true
 
 func toggle_power(site: ConstructionSite) -> bool:
+	if site.shorted:
+		notice_requested.emit("Cortocircuito: repara antes")
+		return false
 	if site.kind != &"turret" or site.hp <= 0 or site.ordered: return false
 	if not site.powered and bank.energy_used() + site.data.energy > bank.available_capacity():
 		notice_requested.emit("Falta energía para reactivar")
@@ -61,6 +64,14 @@ func toggle_power(site: ConstructionSite) -> bool:
 	site.powered = not site.powered
 	bank.changed.emit(bank.scrap, bank.energy_used(), bank.available_capacity())
 	notice_requested.emit("Torreta activa" if site.powered else "Energía de torreta liberada")
+	return true
+
+func repair_short(site: ConstructionSite) -> bool:
+	if not site.shorted:
+		return false
+	site.shorted = false
+	site.powered = true
+	notice_requested.emit("Máquina reparada")
 	return true
 
 func damage_site(index: int, amount: int) -> void:
