@@ -902,7 +902,8 @@
         "base",
         "attack",
         "dodge"
-      ]
+      ],
+      "locomotion": "native_joint_mesh_8"
     },
     "portador": {
       "cell": 192,
@@ -931,7 +932,8 @@
         "base",
         "attack",
         "dodge"
-      ]
+      ],
+      "locomotion": "native_joint_mesh_8"
     },
     "prefecto": {
       "cell": 320,
@@ -959,7 +961,8 @@
       "pose_sheets": [
         "base",
         "attack"
-      ]
+      ],
+      "locomotion": "native_joint_mesh_8"
     },
     "madre": {
       "cell": 320,
@@ -986,7 +989,8 @@
       ],
       "pose_sheets": [
         "base"
-      ]
+      ],
+      "locomotion": "native_joint_mesh_8"
     },
     "recaudador": {
       "cell": 320,
@@ -994,7 +998,7 @@
         160,
         196
       ],
-      "render_scale": 0.5,
+      "render_scale": 0.65,
       "camera": "three_quarter",
       "texture": "res://assets/combat/illustrated/recaudador.png",
       "source": "res://assets/combat/illustrated/sources/recaudador.ase",
@@ -1013,7 +1017,8 @@
       ],
       "pose_sheets": [
         "base"
-      ]
+      ],
+      "locomotion": "painted_chassis"
     },
     "caldera": {
       "cell": 320,
@@ -1021,7 +1026,7 @@
         160,
         196
       ],
-      "render_scale": 0.5,
+      "render_scale": 0.65,
       "camera": "three_quarter",
       "texture": "res://assets/combat/illustrated/caldera.png",
       "source": "res://assets/combat/illustrated/sources/caldera.ase",
@@ -1040,7 +1045,8 @@
       ],
       "pose_sheets": [
         "base"
-      ]
+      ],
+      "locomotion": "painted_chassis"
     },
     "coro": {
       "cell": 320,
@@ -1048,7 +1054,7 @@
         160,
         196
       ],
-      "render_scale": 0.5,
+      "render_scale": 0.65,
       "camera": "three_quarter",
       "texture": "res://assets/combat/illustrated/coro.png",
       "source": "res://assets/combat/illustrated/sources/coro.ase",
@@ -1067,7 +1073,8 @@
       ],
       "pose_sheets": [
         "base"
-      ]
+      ],
+      "locomotion": "painted_chassis"
     }
   }
 }

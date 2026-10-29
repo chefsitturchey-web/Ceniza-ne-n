@@ -1,13 +1,13 @@
 {
   "tool": "LibreSprite",
   "visual_base": "OpenAI image_gen, manga identity references and original action key poses",
-  "pipeline": "Read-only alpha measurement; native LibreSprite sampling, registration, secondary breathing, effects and ASE/PNG export.",
+  "pipeline": "Read-only alpha measurement; native LibreSprite registration, eight-pose textured hip/knee/foot meshes, counter-swing, breathing, effects and ASE/PNG export.",
   "source": "tools/libresprite_illustrated_combat.js",
   "sources_sha256": {
-    "portador_cenital": "a20ef8f568083b86eb6a2f06c9de06d16081134c518081be1393f0a044f78a10",
-    "portador": "414740080024f67927e34f38235a60bd652c21203d5c337c61551e9ebd21ed8b",
-    "prefecto": "ef9d2e3d8a56efa1665ad53b2f7589165e9f26935a63890d0497f498ec03fc0b",
-    "madre": "0e22cd547b1e17fb4cac4647bcb7f9e5a956ddb448293cfbf175dff2316febac",
+    "portador_cenital": "f9705d1ac373ddbecb488e05f7dcb3cbd8de8047816d58abd78ae16b99e413e6",
+    "portador": "8081c4debf29a285009fa0ce34ff54425643fc978d5992949d481c45d3f87915",
+    "prefecto": "c55d1f92b2006d51dfeb6e1e9a6310193f195954a09ce372c4b8263e2c0cde21",
+    "madre": "ae2379884286df3942b9f6984d40ee995fb423d9a6480c45ea3987a858863557",
     "recaudador": "d3414b45c803e907472a1e2a89f7979189dccb93ed76f9f927e351aec35b91d4",
     "caldera": "8f4abb0cbf680e2a3a3c726e9d29ae84481ce0fb806f7feb026ffb05eade9965",
     "coro": "44b3f49cdbffa128e930dfd57000b0d8cb813ee004b14ef80d3cdea3917d9894"

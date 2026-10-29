@@ -83,6 +83,10 @@ function drawPose(body,fx,e){
     var row=['south','east','north','west'].indexOf(e.direction),pose=e.pose;
     var hero=BUILD.actor.indexOf('portador')===0;
     var mechanical=['recaudador','caldera','coro'].indexOf(BUILD.actor)>=0;
+    // Locomotion uses ONE registered painted body, not eight unrelated AI bodies.
+    // Native textured joint meshes supply contact/down/pass/up on alternate legs.
+    var jointWalk=e.state==='walk'&&!mechanical;
+    if(jointWalk)pose=0;
     // Reject the generated side-firing smear: it turns toward screen-right even
     // in the front/back rows. Keep the correctly oriented braced/follow-through
     // mechanism and use the encounter's real directional projectile/telegraph.
@@ -107,6 +111,7 @@ function drawPose(body,fx,e){
         }
         pixel(body,x,y,color);
     }
+    if(jointWalk)walkRig(body,e);
     // Secondary effects live on their own editable layer; they never replace a weapon.
     if(e.state==='walk'||e.state==='charge'){
         if(e.frame===1||e.frame===5){
@@ -119,6 +124,63 @@ function drawPose(body,fx,e){
         var at=ANCHOR[1]-HEIGHT*.78;
         pixel(fx,ANCHOR[0]+12,at+e.frame%3,[130,204,219,180]);
     }
+}
+function texturedTriangle(out,src,a,b,c,aa,bb,cc){
+    var den=(bb[1]-cc[1])*(aa[0]-cc[0])+(cc[0]-bb[0])*(aa[1]-cc[1]);
+    if(Math.abs(den)<.01)return;
+    var left=Math.max(1,Math.floor(Math.min(aa[0],bb[0],cc[0]))),right=Math.min(SIZE-2,Math.ceil(Math.max(aa[0],bb[0],cc[0])));
+    var top=Math.max(1,Math.floor(Math.min(aa[1],bb[1],cc[1]))),bottom=Math.min(SIZE-2,Math.ceil(Math.max(aa[1],bb[1],cc[1])));
+    for(var y=top;y<=bottom;y++)for(var x=left;x<=right;x++){
+        var u=((bb[1]-cc[1])*(x-cc[0])+(cc[0]-bb[0])*(y-cc[1]))/den;
+        var v=((cc[1]-aa[1])*(x-cc[0])+(aa[0]-cc[0])*(y-cc[1]))/den,w=1-u-v;
+        if(u<-.001||v<-.001||w<-.001)continue;
+        var sx=Math.round(u*a[0]+v*b[0]+w*c[0]),sy=Math.round(u*a[1]+v*b[1]+w*c[1]);
+        if(sx<0||sy<0||sx>=SIZE||sy>=SIZE)continue;
+        var p=(sy*SIZE+sx)*4;if(!src[p+3])continue;
+        pixel(out,x,y,[src[p],src[p+1],src[p+2],src[p+3]]);
+    }
+}
+function walkRig(body,e){
+    var src=new Uint8Array(body),out=new Uint8Array(body.length),cx=ANCHOR[0],ground=ANCHOR[1];
+    var side=e.direction==='east'||e.direction==='west',sign=e.direction==='west'?-1:1;
+    var phase=e.frame*Math.PI/4,bob=Math.round(Math.cos(phase*2)*HEIGHT*.012);
+    var hip=Math.round(ground-HEIGHT*.34),knee=Math.round(ground-HEIGHT*.16);
+    // Head, clothing seams and proportions are identical throughout the cycle.
+    // Arms counter-swing; loose coat/hair trails by one eighth of the cycle.
+    for(var y=0;y<hip;y++)for(var x=0;x<SIZE;x++){
+        var p=(y*SIZE+x)*4;if(!src[p+3])continue;
+        var arm=Math.max(0,Math.min(1,(Math.abs(x-cx)/HEIGHT-.16)*12));
+        arm*=Math.max(0,1-Math.abs((y-(ground-HEIGHT*.47))/(HEIGHT*.22)));
+        var sway=Math.sin(phase+(x<cx?Math.PI:0))*HEIGHT*.025*arm;
+        pixel(out,x+Math.round(sway),y+bob,[src[p],src[p+1],src[p+2],255]);
+    }
+    // A held sword and the outer coat are NOT legs. Keep them out of the knee
+    // mesh; otherwise the Prefect's blade bends like a third shin when walking.
+    for(var y=hip;y<SIZE;y++)for(var x=0;x<SIZE;x++){
+        var p=(y*SIZE+x)*4;if(!src[p+3])continue;
+        var lower=Math.min(1,(y-hip)/(ground-hip));
+        var limit=HEIGHT*(side?.24:.20-.04*lower);
+        var blade=BUILD.actor==='prefecto'&&src[p]>src[p+1]*1.35&&src[p]>src[p+2]*1.15;
+        if(Math.abs(x-cx)>limit||blade){
+            var hem=blade?0:Math.round(Math.sin(phase-Math.PI/4)*lower*HEIGHT*.012);
+            pixel(out,x+hem,y+Math.round(bob*(1-lower)),[src[p],src[p+1],src[p+2],255]);src[p+3]=0;
+        }
+    }
+    for(var leg=0;leg<2;leg++){
+        var phi=phase+leg*Math.PI,step=Math.cos(phi),lift=Math.max(0,Math.sin(phi));
+        var footX=side?step*HEIGHT*.16*sign:step*HEIGHT*.025;
+        var footY=(side?0:step*HEIGHT*.035)-lift*HEIGHT*.065;
+        var kneeX=footX*.48+(side?lift*HEIGHT*.035*sign:0),kneeY=-lift*HEIGHT*.035;
+        var left=leg===0?1:cx,right=leg===0?cx:SIZE-2;
+        var ys=[hip,knee,ground+2],dx=[0,kneeX,footX],dy=[bob,kneeY,footY];
+        for(var band=0;band<2;band++){
+            var a=[left,ys[band]],b=[right,ys[band]],c=[right,ys[band+1]],d=[left,ys[band+1]];
+            var aa=[left+dx[band],ys[band]+dy[band]],bb=[right+dx[band],ys[band]+dy[band]];
+            var cc=[right+dx[band+1],ys[band+1]+dy[band+1]],dd=[left+dx[band+1],ys[band+1]+dy[band+1]];
+            texturedTriangle(out,src,a,b,c,aa,bb,cc);texturedTriangle(out,src,a,c,d,aa,cc,dd);
+        }
+    }
+    body.set(out);
 }
 function assemble(){
     for(var key in BUILD.sheets){

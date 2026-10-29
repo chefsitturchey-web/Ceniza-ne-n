@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
-  <img alt="Pruebas: 38 suites" src="https://img.shields.io/badge/tests-38%20suites-47dacb">
+  <img alt="Pruebas: 39 suites" src="https://img.shields.io/badge/tests-39%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -32,6 +32,8 @@
 Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y final](docs/HISTORIA_Y_CAMPANA.md). En la colonia el Portador dirige y sus tropas combaten; J funciona en arenas. Las cuatro horas siguen siendo una meta pendiente de ampliar y medir.
 
 **Laboratorio con F1:** acceso directo a los cinco jefes, fases, equipo, invulnerabilidad, cámara lenta, colisiones/rutas y creación de unidades. Permite volver a la escena original; las intervenciones de colonia quedan como práctica sin sobrescribir el checkpoint. [Controles y guía](docs/LABORATORIO_DEPURACION.md).
+
+**Combates con más presión:** robots un 30 % mayores, barridos de mayor alcance, ataques secundarios simultáneos, erupciones, ondas de sonar y cortes eléctricos. Los impactos tienen escombros, humo y temblor breve; las ventanas de núcleo expuesto cancelan las trampas pendientes. La marcha del Portador, Prefecto y Madre utiliza ocho fases articuladas en LibreSprite, conservando el dibujo aprobado. [Cambios y cómo probarlos](docs/EFECTOS_Y_PRESION_JEFES.md).
 
 **Arte de combate ilustrado:** el Portador y los cinco jefes recuperan sus diseños manga con poses de marcha, estocada, reacción y caída; el Portador tiene además volteretas propias en ambas cámaras. La base se generó con `image_gen` y se registró, ajustó y exportó en LibreSprite. Son 416 poses de entrada y 1792 fotogramas de línea de tiempo con pausas y reutilización. La galería F6 incluye **Giro**, detalle con **1–6** y conjunto con **0**. [Diseños, tamaños, prompts y fuentes editables](docs/ARTE_COMBATE_ILUSTRADO.md).
 

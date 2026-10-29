@@ -6,6 +6,7 @@ signal fired(origin: Vector2, direction: Vector2)
 signal cue_requested(id: String)
 signal phase_changed(number: int)
 signal hit_feedback(blocked: bool)
+signal ground_impact(point: Vector2, radius: float, strength: float)
 enum State { APPROACH, CLAW_WINDUP, CLAW, VOLLEY_WINDUP, VOLLEY, CHARGE_WINDUP, CHARGE, STUNNED, RECOVER, DEAD }
 ## Around 20 exposed windows at base damage; target 3-5 minutes with flank hits.
 @export var max_health: int = 10000
@@ -79,6 +80,9 @@ func build_visual() -> void:
 func is_core_exposed() -> bool:
 	return state == State.STUNNED
 
+func melee_reach() -> float:
+	return 108.0 if self is ElPrefecto else 118.0
+
 func hit_multiplier(origin: Vector2) -> float:
 	var front: bool = facing.dot((origin - global_position).normalized()) > 0.45
 	return 2.0 if core_exposed else (0.0 if front else 0.25)
@@ -138,7 +142,7 @@ func _physics_process(delta: float) -> void:
 				change_state(State.CLAW, 0.35)
 		State.CLAW:
 			var sweep: Vector2 = facing.rotated(lerpf(-1.1, 1.1, clampf(1 - timer / 0.35, 0, 1)))
-			if difference.length() < 88 and sweep.dot(difference.normalized()) > 0.82:
+			if difference.length() < melee_reach() and sweep.dot(difference.normalized()) > 0.82:
 				target.take_damage(20, difference.normalized() * 180)
 			if timer <= 0:
 				next_pattern = -1
@@ -165,7 +169,7 @@ func _physics_process(delta: float) -> void:
 			velocity = charge_direction * (360 if phase == 1 else 440)
 			var hit: KinematicCollision2D = move_and_collide(velocity * delta)
 			var closest: Vector2 = Geometry2D.get_closest_point_to_segment(target.global_position, before, global_position)
-			if closest.distance_to(target.global_position) < 41:
+			if closest.distance_to(target.global_position) < 52:
 				target.take_damage(32, charge_direction * 310)
 			if hit != null:
 				stun()
@@ -274,7 +278,7 @@ func update_puppet(delta: float) -> void:
 	shield.position.y = move_toward(shield.position.y, 47 if core_exposed else 37, delta * 50)
 	puppet.modulate = Color("ffaaa0") if phase == 2 else Color.WHITE
 	smoke_timer -= delta
-	if smoke_timer <= 0 and (phase == 2 or core_exposed or state == State.CHARGE_WINDUP):
+	if not native_combat_art and smoke_timer <= 0 and (phase == 2 or core_exposed or state == State.CHARGE_WINDUP):
 		smoke_timer = 0.16
 		effects.emit_pixels(global_position, 2, Color("89939e"), true)
 		if state == State.CHARGE_WINDUP or core_exposed:
@@ -285,13 +289,14 @@ func _draw() -> void:
 	if state == State.DEAD:
 		return
 	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.65))
-	var radius: float = 45
+	var radius: float = 58 if native_combat_art else 45
 	var support: Vector2 = Vector2(0, 8)
 	if combat_visual != null and combat_visual.actor_id in ["prefecto", "madre"]:
 		radius = 22 if combat_visual.actor_id == "prefecto" else 26
 		support = Vector2(0, 2)
 	draw_circle(support, radius, Color(0, 0, 0, 0.4))
 	draw_set_transform(Vector2.ZERO)
+	if native_combat_art: return # Warnings and textured strikes live in the arena layers.
 	if core_exposed:
 		draw_circle(Vector2.ZERO, 26 + sin(elapsed * 12) * 3, Color(1, 0.55, 0.15, 0.18))
 	if state == State.CHARGE_WINDUP:

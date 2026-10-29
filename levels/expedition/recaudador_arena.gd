@@ -41,6 +41,7 @@ var boss_status: Label
 var phase_notice: Label
 var phase_notice_time: float = 0.0
 var dynamics: EncounterDynamics
+var combat_effects: BossCombatEffects
 
 func configure(source: Player, index: int = 0) -> void:
 	configured = true
@@ -125,6 +126,10 @@ func _ready() -> void:
 	world.add_child(camera)
 	camera.make_current()
 	camera.reset_smoothing()
+	combat_effects = BossCombatEffects.new()
+	combat_effects.arena = self
+	world.add_child(combat_effects)
+	boss.ground_impact.connect(combat_effects.impact)
 	build_lighting()
 	build_hud()
 	add_child(options)
@@ -367,6 +372,8 @@ func spawn_bullet(origin: Vector2, direction: Vector2) -> void:
 	bullet.position = origin
 	bullet.velocity = direction * (190 if boss.phase == 2 else 155)
 	bullet.boundary = ArenaLayout.boundary(zone_index)
+	bullet.theme_index = zone_index
+	bullet.combat_effects = combat_effects
 	world.add_child(bullet)
 
 func on_damage() -> void:
@@ -378,6 +385,8 @@ func finish(victory: bool) -> void:
 	if ending or completed:
 		return
 	ending = true
+	combat_effects.enabled = false
+	combat_effects.clear_attacks()
 	dynamics.clear_encounter()
 	boss.clear_hazards()
 	sound.play_cue("destroy" if victory else "alarm")

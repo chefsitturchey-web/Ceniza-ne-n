@@ -1,5 +1,11 @@
 class_name MadreCero
 extends Recaudador
+var cast_recovery: float = 0
+
+func casting_time() -> float:
+	var remaining: float = INF
+	for mark: Dictionary in marks: remaining = minf(remaining, mark.time)
+	return remaining
 ## El enlace se abre protegiendo infraestructura, no golpeando un escudo inmóvil.
 var relays: Array[NetworkRelay] = []
 var marks: Array[Dictionary] = []
@@ -65,6 +71,7 @@ func overload_relays() -> bool:
 func _physics_process(delta: float) -> void:
 	if health <= 0 or target == null or target.health <= 0: return
 	elapsed += delta
+	cast_recovery = maxf(0, cast_recovery - delta)
 	tactics.observe(target, delta)
 	guard_time = maxf(0, guard_time - delta)
 	guard_cooldown = maxf(0, guard_cooldown - delta)
@@ -72,7 +79,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("overload"): overload_relays()
 	facing = (target.global_position - global_position).normalized()
 	var destination: Vector2 = Vector2(320, 215) + Vector2.from_angle(elapsed * 0.3) * 85
-	velocity = tactics.steer(self, destination, 45)
+	velocity = Vector2.ZERO if cast_recovery > 0 or casting_time() < 0.65 else tactics.steer(self, destination, 62 if phase == 2 else 45)
 	move_and_slide()
 	if exposure > 0:
 		exposure = maxf(0, exposure - delta)
@@ -92,13 +99,15 @@ func _physics_process(delta: float) -> void:
 			marks.append({"position": point, "time": 1.5, "relay": index})
 			if phase == 2 and index >= 0: marks.append({"position": tactics.predicted(target).clamp(Vector2(90, 75), Vector2(550, 405)), "time": 1.3, "relay": -1})
 			pulse_index += 1
-			pulse = 2.1 if phase == 2 else 3.0
+			pulse = 1.8 if phase == 2 else 2.6
 			cue_requested.emit("alarm")
 	for index: int in range(marks.size() - 1, -1, -1):
 		marks[index].time -= delta
 		if marks[index].time > 0: continue
 		var mark: Dictionary = marks[index]
-		if mark.position.distance_to(target.global_position) < 34: target.take_damage(18)
+		cast_recovery = 0.35
+		ground_impact.emit(mark.position, 42, 3.0)
+		if mark.position.distance_to(target.global_position) < 42: target.take_damage(18)
 		if mark.relay >= 0:
 			var damage: int = 0 if guard_time > 0 else (14 if support_units > 0 else 24)
 			relays[mark.relay].health = maxi(0, relays[mark.relay].health - damage)

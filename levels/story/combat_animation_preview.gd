@@ -65,7 +65,7 @@ func _ready() -> void:
 		var sprite: AnimatedSprite2D = AnimatedSprite2D.new()
 		sprite.sprite_frames = CombatSpriteLibrary.frames(IDS[index])
 		sprite.scale = Vector2.ONE * CombatSpriteLibrary.scale_for(IDS[index])
-		sprite.position = Vector2(x + 102, y + 90) + CombatSpriteLibrary.offset_for(IDS[index]) * sprite.scale
+		sprite.position = Vector2(x + 102, y + (103 if index in [1, 2, 3] else 90)) + CombatSpriteLibrary.offset_for(IDS[index]) * sprite.scale
 		add_child(sprite)
 		actors.append(sprite)
 		var label: Label = Label.new()
@@ -119,7 +119,8 @@ func _process(delta: float) -> void:
 		focus_sprite.sprite_frames = source.sprite_frames
 		focus_sprite.animation = source.animation
 		focus_sprite.frame = source.frame
-		focus_sprite.scale = Vector2.ONE * CombatSpriteLibrary.scale_for(id) * (4 if focus_index == 0 else 3)
+		var magnification: float = 4.0 if focus_index == 0 else (2.3 if focus_index in [1, 2, 3] else 3.0)
+		focus_sprite.scale = Vector2.ONE * CombatSpriteLibrary.scale_for(id) * magnification
 		focus_sprite.position = Vector2(320, 290) + CombatSpriteLibrary.offset_for(id) * focus_sprite.scale
 	if turn_preview == null or not turn_preview.button_pressed: return
 	turn_clock += delta

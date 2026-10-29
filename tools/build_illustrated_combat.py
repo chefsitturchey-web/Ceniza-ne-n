@@ -207,23 +207,24 @@ def main():
         if export.returncode: raise RuntimeError(f'Native export failed: {actor}')
         exported = json.loads((WORK/f'{actor}-export.json').read_text())
         assert len(exported['frames']) == cursor and len(exported['meta']['frameTags']) == len(clips)
-        layout['actors'][actor] = {'cell': size, 'anchor': anchor, 'render_scale': 0.5,
+        layout['actors'][actor] = {'cell': size, 'anchor': anchor, 'render_scale': 0.65 if actor in ['recaudador', 'caldera', 'coro'] else 0.5,
                                    'camera': 'lateral' if actor == 'portador' else 'three_quarter',
                                    'texture': f'res://assets/combat/illustrated/{actor}.png',
                                    'source': f'res://assets/combat/illustrated/sources/{actor}.ase',
                                    'idle_body_bounds': json.loads(bounds[1]),
                                    'key_poses': 48+16*(len(sheets)-1), 'directions': DIRECTIONS,
-                                   'pose_sheets': list(sheets)}
+                                   'pose_sheets': list(sheets),
+                                   'locomotion': 'native_joint_mesh_8' if actor not in ['recaudador', 'caldera', 'coro'] else 'painted_chassis'}
         hashes[actor] = hashlib.sha256(source.read_bytes()).hexdigest()
         layout_path.write_text(json.dumps(layout, indent=2)+'\n')
         (OUT/'provenance.json').write_text(json.dumps({'tool': 'LibreSprite',
             'visual_base': 'OpenAI image_gen, manga identity references and original action key poses',
-            'pipeline': 'Read-only alpha measurement; native LibreSprite sampling, registration, secondary breathing, effects and ASE/PNG export.',
+            'pipeline': 'Read-only alpha measurement; native LibreSprite registration, eight-pose textured hip/knee/foot meshes, counter-swing, breathing, effects and ASE/PNG export.',
             'source': 'tools/libresprite_illustrated_combat.js', 'sources_sha256': hashes,
             'external_raster_inputs': sorted('references/'+p.name for p in (OUT/'references').glob('*.png')),
             'timeline_frames_per_actor': cursor, 'unique_source_poses': {a:v['key_poses'] for a,v in layout['actors'].items()},
             'note': 'Timeline holds and secondary poses reuse artwork. 256 timeline frames are NOT 256 independently painted poses.'}, indent=2)+'\n')
-        print(f'{actor}: {layout["actors"][actor]["key_poses"]} painted poses; {cursor} timeline frames; scale 0.5', flush=True)
+        print(f'{actor}: {layout["actors"][actor]["key_poses"]} painted poses; {cursor} timeline frames; scale {layout["actors"][actor]["render_scale"]}', flush=True)
 
 
 if __name__ == '__main__':

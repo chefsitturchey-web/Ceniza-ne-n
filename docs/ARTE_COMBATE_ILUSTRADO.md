@@ -22,13 +22,16 @@ Las cuatro vistas están pintadas por separado: frente, perfil derecho, espalda 
 | --- | --- | --- | --- |
 | Portador lateral y superior | 192 × 192 | 0,5 | 32–35 px |
 | Prefecto | 320 × 320 | 0,5 | 58 px con equipo |
-| Recaudador, Caldera, Coro y Madre | 320 × 320 | 0,5 | 66–72 px con equipo |
+| Recaudador, Caldera y Coro | 320 × 320 | 0,65 | 88–92 px con equipo |
+| Madre | 320 × 320 | 0,5 | 72 px con equipo |
 
 El lienzo incluye márgenes para armas, cables, halo y poses caídas. Los anclajes de `layout.json` registran el apoyo y se aplican a la escala del dibujo. La galería respeta el tamaño de mundo; el modo de detalle amplía únicamente la previsualización. Las sombras del Prefecto y Madre tienen tamaño propio. Los fragmentos de derrota usan la escala y posición reales del sprite.
 
 ## Movimiento y ataque
 
-La marcha utiliza contactos y pasos intermedios con piernas, brazos y ropa en poses distintas. El ciclo sigue la distancia recorrida: 64 unidades en la colonia y 56 en la arena. Los cambios de dirección seleccionan la vista correspondiente sin girar una imagen completa.
+La marcha de los humanoides se construye ahora sobre un único dibujo registrado por dirección: una malla de cadera, rodilla y pie produce ocho fases con apoyos alternos, elevación del pie, balanceo contrario de brazos y movimiento secundario del abrigo. No intercala reposo ni cambia de cabeza, proporciones o equipamiento entre pasos. La espada del Prefecto queda fuera de la deformación de las piernas. Las mallas se dibujan y exportan en LibreSprite; Godot reproduce los fotogramas completos.
+
+El ciclo sigue la distancia recorrida: 64 unidades para el Portador en la colonia y 56 en la arena; 76 para el Prefecto y 92 para Madre Cero, evitando su antigua cadencia excesiva de 40 unidades. Los guardias conservan la orientación visible del escudo y revierten el paso al retroceder. Una banda de tolerancia evita cambios de vista rápidos al moverse en diagonal. Madre Cero se detiene brevemente para preparar y ejecutar sus lanzamientos.
 
 La espada tiene preparación, extensión e impacto, y recuperación con pausas de duración variable. El impacto se mantiene sincronizado con el daño tras la preparación de 0,075 segundos; los 0,3 segundos totales del golpe conservan la regla existente. La reacción al daño y la esquiva interrumpen la acción según las mismas reglas del juego.
 
@@ -58,6 +61,6 @@ F6 en `levels/story/combat_animation_preview.tscn`: secuencias, cámaras, direcc
 
 `tests/native_combat_art_test.gd` comprueba márgenes, fotogramas de marcha, siluetas de piernas, tamaño relativo al guardián, rostro frente/nuca, extensión y dirección del filo pintado, tiempos de preparación, galería, daño, cancelación y muerte. Las capturas de las cuatro vistas y el detalle complementan las comprobaciones automáticas.
 
-Validación del bloque: **38 suites sin fallos** y **2220 comprobaciones de arte e integración sin fallos**, también ejecutadas con renderizado gráfico. Los registros y las capturas de trabajo permanecen en `.godot/` y archivos de validación ignorados por Git.
+La suite de arte mantiene **2220 comprobaciones**; `boss_pressure_test.gd` añade **224 comprobaciones** de estabilidad de la cabeza durante la marcha, ocho fases diferentes, ataques simultáneos, geometría de daño, accesibilidad y limpieza. Las capturas de trabajo permanecen en `.godot/` y los registros de validación están ignorados por Git. [Efectos y presión de combate](EFECTOS_Y_PRESION_JEFES.md).
 
 Referencias estudiadas: [SLYNYRD: animación superior](https://www.slynyrd.com/blog/2025/3/24/pixelblog-55-top-down-character-animation), [ataques a tres cuartos](https://www.slynyrd.com/blog/2025/5/23/pixelblog-56-top-down-character-attack-animation), [animación mediante esqueletos de PixelLab](https://www.pixellab.ai/docs/tools/animate-with-skeleton) y [API oficial de LibreSprite](https://github.com/LibreSprite/LibreSprite/blob/master/SCRIPTING.md). Sus ejemplos sirven de estudio; las imágenes del proyecto se generaron con sus propias referencias.

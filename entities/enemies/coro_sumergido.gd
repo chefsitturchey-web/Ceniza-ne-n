@@ -121,7 +121,8 @@ func _physics_process(delta: float) -> void:
 		mark.time -= delta
 		if mark.time <= 0 and not mark.hit:
 			mark.hit = true
-			if target.global_position.distance_to(mark.position) < 25:
+			ground_impact.emit(mark.position, 32, 2.4)
+			if target.global_position.distance_to(mark.position) < 32:
 				target.take_damage(22)
 		if mark.time < -0.3: marks.remove_at(index)
 	update_puppet(delta)
@@ -135,4 +136,6 @@ func status_text() -> String:
 	return "NÚCLEO EXPUESTO: %ds para atacar" % ceili(exposure_left) if core_exposed else "ENLACES %d/3: rompe las antenas y esquiva los pulsos" % active_links()
 
 func _draw() -> void:
-	if health > 0: draw_circle(Vector2(0, 10), 47, Color(0, 0, 0, 0.4))
+	if health > 0:
+		draw_set_transform(Vector2(0, 3), 0, Vector2(1, 0.55))
+		draw_circle(Vector2.ZERO, 60, Color(0, 0, 0, 0.4))

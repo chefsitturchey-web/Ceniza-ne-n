@@ -28,7 +28,7 @@ func _physics_process(delta: float) -> void:
 			facing = difference.normalized()
 			var tangent: Vector2 = facing.orthogonal() * (1 if next_pattern % 2 == 0 else -1)
 			var destination: Vector2 = target.global_position - facing * 120 + tangent * 90
-			velocity = tactics.steer(self, destination, 125 if phase == 2 else 90)
+			velocity = tactics.steer(self, destination, 155 if phase == 2 else 110)
 			move_and_slide()
 			if timer <= 0:
 				last_decision = tactics.choose({"volley": 10.0 if tactics.clear_shot(self, target.global_position) and difference.length() > 150 else 3.0, "thrust": 9.0 if difference.length() > 95 else 5.0, "sweep": 14.0 if difference.length() < 100 else -8.0}, 4.5)
@@ -60,14 +60,14 @@ func _physics_process(delta: float) -> void:
 			velocity = charge_direction * 460
 			move_and_slide()
 			var nearest: Vector2 = Geometry2D.get_closest_point_to_segment(target.global_position, before, global_position)
-			if nearest.distance_to(target.global_position) < 40: target.take_damage(24, charge_direction * 160)
+			if nearest.distance_to(target.global_position) < 46: target.take_damage(24, charge_direction * 160)
 			if timer <= 0 or get_slide_collision_count() > 0:
 				change_state(State.CLAW_WINDUP, 0.7)
 		State.CLAW_WINDUP:
 			# El barrido queda fijado al comenzar su aviso, también si esquivas detrás.
 			if timer <= 0: change_state(State.CLAW, 0.3)
 		State.CLAW:
-			if difference.length() < 90 and facing.dot(difference.normalized()) > -0.2: target.take_damage(20, difference.normalized() * 100)
+			if difference.length() < melee_reach() and facing.dot(difference.normalized()) > -0.2: target.take_damage(20, difference.normalized() * 100)
 			if timer <= 0:
 				charges_left -= 1
 				if charges_left > 0:
@@ -79,7 +79,7 @@ func _physics_process(delta: float) -> void:
 		State.RECOVER:
 			if timer <= 0:
 				next_pattern += 1
-				change_state(State.APPROACH, 2.0)
+				change_state(State.APPROACH, 1.25)
 	update_puppet(delta)
 
 func update_puppet(_delta: float) -> void:

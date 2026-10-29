@@ -95,7 +95,7 @@ func _physics_process(delta: float) -> void:
 		State.CHARGE:
 			velocity = charge_direction * (390 if phase == 2 else 330)
 			move_and_slide()
-			if global_position.distance_to(target.global_position) < 55:
+			if global_position.distance_to(target.global_position) < 64:
 				target.take_damage(22, charge_direction * 150)
 			if timer <= 0 or get_slide_collision_count() > 0:
 				effects.emit_pixels(global_position, 15, Color("ffce75"))
@@ -124,4 +124,5 @@ func status_text() -> String:
 
 func _draw() -> void:
 	if health > 0:
-		draw_circle(Vector2(0, 24), 46, Color(0, 0, 0, 0.4))
+		draw_set_transform(Vector2(0, 4), 0, Vector2(1, 0.55))
+		draw_circle(Vector2.ZERO, 60, Color(0, 0, 0, 0.4))
