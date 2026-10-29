@@ -189,6 +189,7 @@ func _ready() -> void:
 	session.initialize()
 	sound.district = self
 	add_child(sound)
+	session.finished_changed.connect(func(victory: bool) -> void: sound.play_outcome(victory))
 	presenter.publish()
 	if GamePreferences.current().briefing_requested or arriving:
 		GamePreferences.current().briefing_requested = false

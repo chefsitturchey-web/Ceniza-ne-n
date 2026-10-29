@@ -11,11 +11,14 @@ const CUES: Dictionary = {
 	"upgrade": preload("res://assets/audio/sfx/upgrade.ogg"),
 	"destroy": preload("res://assets/audio/sfx/destroy.ogg")
 }
-const MUSIC: Array[AudioStream] = [preload("res://assets/audio/music/ruinas.ogg"), preload("res://assets/audio/music/asedio.ogg")]
 const VOICES: int = 12
 var district: Node2D
 var voices: Array[AudioStreamPlayer] = []
 var music: Array[AudioStreamPlayer] = []
+var warning_player: AudioStreamPlayer = AudioStreamPlayer.new()
+var outcome: AudioStreamPlayer = AudioStreamPlayer.new()
+var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var band: int = -1
 var cooldowns: Dictionary = {}
 var elapsed: float = 0.0
 var muted: bool:
@@ -33,19 +36,20 @@ func _ready() -> void:
 		voice.process_mode = Node.PROCESS_MODE_PAUSABLE
 		add_child(voice)
 		voices.append(voice)
-	for stream: AudioStream in MUSIC:
-		if not music_enabled:
-			break
-		var layer_player: AudioStreamPlayer = AudioStreamPlayer.new()
-		layer_player.stream = stream
-		layer_player.bus = &"Music"
-		layer_player.volume_db = -60
-		add_child(layer_player)
-		music.append(layer_player)
-	# Ambos stems empiezan en el mismo frame y tienen idéntica duración y tempo.
-	for layer_player: AudioStreamPlayer in music:
-		if playback_enabled:
-			layer_player.play()
+	rng.seed = get_instance_id() * 2654435761 + Time.get_ticks_usec()
+	for player: AudioStreamPlayer in [warning_player, outcome]:
+		player.bus = &"Music"
+		player.volume_db = -60.0
+		player.process_mode = Node.PROCESS_MODE_ALWAYS
+		add_child(player)
+	if music_enabled:
+		# Sin distrito no hay colonia: el audio corresponde a una arena de jefe.
+		_add_music_player(MusicLibrary.boss_for(rng) if district == null else MusicLibrary.day_for(district.zone.id, rng))
+		if district != null:
+			_add_music_player(MusicLibrary.NIGHT)
+		for track: AudioStreamPlayer in music:
+			if playback_enabled:
+				track.play()
 	if district == null:
 		return
 	district.player.state_changed.connect(_player_state)
@@ -89,8 +93,38 @@ func play_cue(id: String, gain_db: float = 0.0) -> void:
 			voice.play()
 			return
 
+func _add_music_player(stream: AudioStream) -> void:
+	var layer: AudioStreamPlayer = AudioStreamPlayer.new()
+	layer.stream = stream
+	layer.bus = &"Music"
+	layer.volume_db = -60.0
+	add_child(layer)
+	music.append(layer)
+
+func play_warning() -> void:
+	if not playback_enabled or muted or warning_player.playing:
+		return
+	warning_player.stream = MusicLibrary.WARNING
+	warning_player.volume_db = -10.0
+	warning_player.play()
+
+func play_outcome(victory: bool) -> void:
+	for player: AudioStreamPlayer in music:
+		player.stop()
+		player.volume_db = -60.0
+	if not playback_enabled or muted:
+		return
+	outcome.stream = MusicLibrary.VICTORY if victory else MusicLibrary.DEFEAT
+	outcome.volume_db = -8.0
+	outcome.play()
+
 func _process(delta: float) -> void:
 	elapsed += delta
+	if music.size() == 1:
+		# Arena de jefe: un solo tema, sin mezcla por fases.
+		var single_db: float = -18.0 if get_tree().paused else -12.0
+		music[0].volume_db = move_toward(music[0].volume_db, -60.0 if muted else single_db, delta * 12.0)
+		return
 	if music.size() != 2:
 		return
 	var intensity: float = 1.0
@@ -100,5 +134,19 @@ func _process(delta: float) -> void:
 		intensity = 1.0
 	var quiet: bool = get_tree().paused or (district != null and district.session.finished)
 	var base_db: float = -24.0 if quiet else -12.0
-	music[0].volume_db = move_toward(music[0].volume_db, -60.0 if muted else base_db, delta * 20.0)
-	music[1].volume_db = move_toward(music[1].volume_db, -60.0 if muted or intensity == 0 else base_db - 5.0 + intensity * 5.0, delta * 20.0)
+	# Cruce por fase: un tema audible a la vez, sin exigir duraciones iguales.
+	var day_db: float = -60.0
+	var night_db: float = -60.0
+	if intensity < 0.05:
+		day_db = base_db
+	elif intensity < 0.95:
+		day_db = -18.0
+		night_db = -17.0
+	else:
+		night_db = base_db
+	var current_band: int = 0 if intensity < 0.05 else (1 if intensity < 0.95 else 2)
+	if current_band == 1 and band == 0:
+		play_warning()
+	band = current_band
+	music[0].volume_db = move_toward(music[0].volume_db, -60.0 if muted else day_db, delta * 20.0)
+	music[1].volume_db = move_toward(music[1].volume_db, -60.0 if muted else night_db, delta * 20.0)

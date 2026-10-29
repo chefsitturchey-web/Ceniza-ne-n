@@ -108,8 +108,12 @@ func run_checks() -> void:
 	verify(AudioServer.get_bus_index("Music") >= 0 and AudioServer.get_bus_index("SFX") >= 0, "Buses de mezcla separados")
 	for cue: AudioStream in GameSound.CUES.values():
 		verify(cue.get_length() > 0 and cue.get_length() < 1.2, "Efecto breve y decodificable, sin colas largas")
-	verify(absf(GameSound.MUSIC[0].get_length() - GameSound.MUSIC[1].get_length()) < 0.01, "Stems de igual duración")
-	verify((GameSound.MUSIC[0] as AudioStreamOggVorbis).loop and (GameSound.MUSIC[1] as AudioStreamOggVorbis).loop, "Música en bucle")
+	verify(MusicLibrary.DAY.size() == 5 and (MusicLibrary.DAY["periphery"] as Array).size() > 0, "Un tema diurno por distrito")
+	verify(MusicLibrary.BOSS.size() >= 5, "Bolsa de jefes con variantes aleatorias")
+	var theme: AudioStream = MusicLibrary.day_for("foundry", RandomNumberGenerator.new())
+	verify((theme as AudioStreamOggVorbis).loop and theme.get_length() > 20.0, "Tema de distrito en bucle y decodificable")
+	verify((MusicLibrary.MENU as AudioStreamOggVorbis).loop and (MusicLibrary.NIGHT as AudioStreamOggVorbis).loop, "Menú y noche en bucle")
+	verify(not (MusicLibrary.VICTORY as AudioStreamOggVorbis).loop and not (MusicLibrary.DEFEAT as AudioStreamOggVorbis).loop, "Cierres sin bucle")
 	if "--capture" in OS.get_cmdline_user_args():
 		world.cycle.phase = "NOCHE"
 		world.view.light = DistrictView.LIGHTING["NOCHE"].duplicate()
