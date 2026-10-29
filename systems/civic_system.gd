@@ -11,6 +11,7 @@ var tools: Array[int] = [0, 0, 0, 0, 0, 0]
 var camp_stock: Array[int] = [2, 2]
 var villagers: Array[Dictionary] = []
 var people: Array[PersonVisual] = []
+var employment_hint: Label
 var walls: Array[ConstructionSite] = []
 var gates: Array[EnemyRepeater] = []
 var elapsed: float = 0
@@ -117,11 +118,12 @@ func describe(target: int) -> Dictionary:
 		var index: int = -320 - target
 		if district.core.tier < int(FortressRules.ROLES[ROLES[index]]):
 			return {"text": NAMES[index] + ": requiere núcleo Nv.%d" % int(FortressRules.ROLES[ROLES[index]]), "cost": -1, "locked": true}
-		return {"text": NAMES[index] + " · herramientas %d" % tools[index], "cost": COSTS[index]}
+		var waiting: String = employment_block(index)
+		return {"text": NAMES[index] + " · disponibles %d" % tools[index] + (" · " + waiting if not waiting.is_empty() else ""), "cost": COSTS[index]}
 	return {"text": "Reclutar superviviente · %d disponibles" % camp_stock[-300 - target], "cost": 5}
 
 func interact(target: int) -> bool:
-	if district.cycle.phase != "DÍA":
+	if district.cycle.phase != "DÍA" and not (target <= -320 and target > -326):
 		district.presenter.show_notice("Organiza la colonia durante el día")
 		return false
 	if target == -360:
@@ -150,6 +152,8 @@ func interact(target: int) -> bool:
 			return false
 		if tools[index] >= 4 or not district.bank.spend(COSTS[index]): return false
 		tools[index] += 1
+		var blocked: String = employment_block(index)
+		district.presenter.show_notice(NAMES[index] + (": " + blocked if not blocked.is_empty() else " preparado: un superviviente irá a recogerlo"))
 	elif target in [-300, -301]:
 		var index: int = -300 - target
 		if camp_stock[index] <= 0 or population() >= capacity or not district.bank.spend(5): return false
@@ -160,6 +164,8 @@ func interact(target: int) -> bool:
 	return true
 
 func assign(index: int, role_index: int) -> bool:
+	if index < 0 or index >= villagers.size() or role_index < 0 or role_index >= tools.size(): return false
+	if tools[role_index] <= 0 or not role_ready(role_index): return false
 	var role: String = ROLES[role_index]
 	if role in ["builder", "collector"]:
 		district.colony.add_worker(StringName(role))
@@ -190,6 +196,8 @@ func tick(delta: float) -> void:
 	if district.cycle.day != camp_day:
 		camp_day = district.cycle.day
 		for index: int in range(2): camp_stock[index] = mini(2, camp_stock[index] + 1)
+	var reserved: Array[int] = [0, 0, 0, 0, 0, 0]
+	var reserved_posts: Dictionary = {}
 	for index: int in range(villagers.size() - 1, -1, -1):
 		var citizen: Dictionary = villagers[index]
 		var recovery: float = float(citizen.get("recover", 0))
@@ -200,16 +208,30 @@ func tick(delta: float) -> void:
 		if float(citizen.get("rise", 0)) > 0:
 			citizen.rise = maxf(0, float(citizen.rise) - delta)
 			continue
-		var destination: float = citizen.side * maxf(40, frontier(citizen.side) - 60) if district.cycle.phase != "DÍA" else 0
+		var destination: float = -600 + (index % 5 - 2) * 15
 		var role_index: int = -1
-		if district.cycle.phase == "DÍA":
-			for candidate: int in range(tools.size()):
-				if tools[candidate] > 0 and role_ready(candidate):
-					role_index = candidate
-					destination = RACK_X[candidate]
-					break
+		var nearest: float = INF
+		for candidate: int in range(tools.size()):
+			if tools[candidate] <= reserved[candidate] or not role_ready(candidate): continue
+			if district.cycle.phase != "DÍA" and (absf(RACK_X[candidate]) > frontier(-1) or district.colony.unsafe_at(RACK_X[candidate])): continue
+			var post: String = post_for(candidate)
+			if not post.is_empty() and free_posts(candidate) <= int(reserved_posts.get(post, 0)): continue
+			var distance: float = absf(float(citizen.x) - RACK_X[candidate])
+			if distance < nearest:
+				nearest = distance
+				role_index = candidate
+		if role_index >= 0:
+			destination = RACK_X[role_index]
+			reserved[role_index] += 1
+			var post: String = post_for(role_index)
+			if not post.is_empty(): reserved_posts[post] = int(reserved_posts.get(post, 0)) + 1
+		elif district.cycle.phase != "DÍA": destination = citizen.side * maxf(40, frontier(citizen.side) - 60) + (index % 3 - 1) * 12
 		citizen.x = move_toward(citizen.x, destination, delta * 65)
-		if role_index >= 0 and absf(citizen.x - destination) < 12: assign(index, role_index)
+		if role_index >= 0 and absf(citizen.x - destination) < 12:
+			if assign(index, role_index):
+				reserved[role_index] -= 1
+				var post: String = post_for(role_index)
+				if not post.is_empty(): reserved_posts[post] = int(reserved_posts[post]) - 1
 	sync_people(delta)
 	queue_redraw()
 
@@ -232,13 +254,55 @@ func sync_people(delta: float) -> void:
 		else:
 			var direction: float = signf(displacement) if absf(displacement) > 0.01 else (-1 if person.sprite.flip_h else 1)
 			person.update_person(delta, absf(displacement), false, direction, false, false, false, district.cycle.phase != "DÍA")
+	update_employment_hint()
+
+func update_employment_hint() -> void:
+	if employment_hint == null:
+		employment_hint = Label.new()
+		employment_hint.position = Vector2(-710, GameRules.FLOOR_Y - 118)
+		employment_hint.z_index = 5
+		employment_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		employment_hint.add_theme_font_override("font", ThemeDB.fallback_font)
+		employment_hint.add_theme_font_size_override("font_size", 12)
+		employment_hint.add_theme_color_override("font_color", Color("ffce75"))
+		employment_hint.add_theme_color_override("font_outline_color", Color("0b1322"))
+		employment_hint.add_theme_constant_override("outline_size", 4)
+		add_child(employment_hint)
+	employment_hint.visible = absf(district.player.position.x + 600) < 170 and tools.any(func(stock: int) -> bool: return stock > 0)
+	if not employment_hint.visible: return
+	if villagers.is_empty():
+		employment_hint.text = "Recluta supervivientes en los campamentos"
+		return
+	for index: int in range(tools.size()):
+		if tools[index] > 0:
+			var blocked: String = employment_block(index)
+			if not blocked.is_empty():
+				employment_hint.text = NAMES[index] + ": " + blocked
+				return
+	employment_hint.text = "Recogiendo herramientas · %d sin profesión" % villagers.size()
 
 func role_ready(index: int) -> bool:
-	if index < 2: return true
-	var id: String = ["barracks", "barracks", "generator", "medical"][index - 2]
+	return district.core.tier >= int(FortressRules.ROLES[ROLES[index]]) and (index < 2 or free_posts(index) > 0)
+
+func post_for(index: int) -> String:
+	return "" if index < 2 else ["barracks", "barracks", "generator", "medical"][index - 2]
+
+func free_posts(index: int) -> int:
+	var result: int = 0
 	for site: ExpansionOutpost in district.expansion.sites:
-		if site.spec.id == id and site.hp > 0 and site.staff_count() < site.staff_capacity(): return true
-	return false
+		if site.spec.id == post_for(index) and site.hp > 0: result += maxi(0, site.staff_capacity() - site.staff_count())
+	return result
+
+func employment_block(index: int) -> String:
+	if district.core.tier < int(FortressRules.ROLES[ROLES[index]]): return "Mejora el núcleo a Nv.%d" % int(FortressRules.ROLES[ROLES[index]])
+	if district.cycle.phase != "DÍA" and absf(RACK_X[index]) > frontier(-1): return "Amplía las murallas hasta el taller"
+	if index < 2: return ""
+	if free_posts(index) > 0: return ""
+	var built: bool = false
+	for site: ExpansionOutpost in district.expansion.sites:
+		if site.spec.id == post_for(index) and site.hp > 0: built = true
+	var title: String = {"barracks": "cuartel", "generator": "generador", "medical": "puesto médico"}[post_for(index)]
+	return title.capitalize() + " lleno" if built else "Construye un " + title
 
 func jobs() -> Array[Node2D]:
 	var result: Array[Node2D] = []

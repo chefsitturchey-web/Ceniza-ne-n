@@ -10,7 +10,7 @@ Con **F5**, los trabajadores caminan, construyen, recuperan chatarra y transport
 
 Los aliados de campo y esos dos enemigos usaban una sola ilustración grande: el código movía pequeños recortes del torso y las piernas. Los civiles usaban otro dibujo único con un rebote. Ahora se reproducen fotogramas completos mediante `AnimatedSprite2D`. Los trabajadores comparten este sistema con su propio equipo.
 
-Hay nueve diseños: tirador, guardián, técnico, médica, constructor, recuperador, superviviente, artillero y saboteador. Cada archivo contiene **72 fotogramas**, con reposo, marcha, daño, caída, cansancio, disparo, trabajo, transporte de carga, incorporación y protección. Huir reutiliza la marcha a una cadencia mayor. El juego selecciona las acciones que corresponden a cada profesión; la galería permite inspeccionar todo el material.
+Hay nueve diseños: tirador, guardián, técnico, médica, constructor, recuperador, superviviente, artillero y saboteador. Cada archivo contiene **72 fotogramas**, con reposo, marcha, daño, caída, cansancio, disparo, trabajo, transporte de carga, incorporación y protección. Huir reutiliza la marcha con su propia cadencia. El juego selecciona las acciones que corresponden a cada profesión; la galería permite inspeccionar todo el material.
 
 Las poses de anatomía parten de un personaje original y siete clips nativos de PixelLab. Comparten esa base para mantener proporciones; los atuendos, cascos, telas, mochilas, herramientas y armas se editan como píxeles en LibreSprite. No son nueve generaciones independientes de anatomía. El arma del tirador, el escudo, las cruces médicas y los equipos industriales distinguen cada función. La ropa tiene movimiento secundario durante la marcha.
 
@@ -41,6 +41,6 @@ La reconstrucción reemplaza los `.ase` de profesión y sus PNG derivados; conse
 
 ## Comprobaciones
 
-`tests/unit_animation_test.gd` comprueba poses distintas, movimiento de piernas, apoyo al suelo en todos los fotogramas, prioridad de estados, recuperación, ausencia de reinicio en la caída, paso de soldado a superviviente, validación del guardado y galería. La batería `tests/run_all.gd` contiene **34 suites**, incluidas las simulaciones de las cinco zonas. Las capturas quedan fuera de Git.
+`tests/unit_animation_test.gd` comprueba poses distintas, movimiento de piernas, apoyo al suelo en todos los fotogramas, prioridad de estados, recuperación, ausencia de reinicio en la caída, paso de soldado a superviviente, validación del guardado y galería. La batería `tests/run_all.gd` contiene **35 suites**, incluidas las simulaciones de las cinco zonas. Las capturas quedan fuera de Git.
 
 Referencias de herramientas: [LibreSprite](https://github.com/LibreSprite/LibreSprite), [formato ASE](https://github.com/aseprite/aseprite/blob/main/docs/ase-file-specs.md).

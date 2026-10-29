@@ -29,4 +29,4 @@ Las conversaciones desarrollan el guion de los cinco capítulos existentes; no a
 
 ## Validación
 
-`tests/visual_novel_test.gd` comprueba pausa, foco, entrada de controles, fundidos, repetición desde el diario, escenas vistas, las 30 escenas sin desbordamiento de texto, ausencia de recompensas duplicadas, viaje al jefe, despedida, conservación del punto de llegada y galería F6. `tests/fortress_progression_test.gd` comprueba niveles, desbloqueos y anclaje de las estructuras. `tests/run_all.gd` ejecuta las 34 suites del proyecto. Las capturas y registros quedan fuera de Git.
+`tests/visual_novel_test.gd` comprueba pausa, foco, entrada de controles, fundidos, repetición desde el diario, escenas vistas, las 30 escenas sin desbordamiento de texto, ausencia de recompensas duplicadas, viaje al jefe, despedida, conservación del punto de llegada y galería F6. `tests/fortress_progression_test.gd` comprueba niveles, desbloqueos y anclaje de las estructuras. `tests/run_all.gd` ejecuta las 35 suites del proyecto. Las capturas y registros quedan fuera de Git.

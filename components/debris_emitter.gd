@@ -66,7 +66,7 @@ func emit_pixels(origin: Vector2, count: int, color: Color, smoke: bool = false)
 			piece.lifetime = 0.7
 		piece.queue_redraw()
 
-func emit_fragments(origin: Vector2, texture: Texture2D, count: int, mirrored: bool = false, shatter: bool = false) -> void:
+func emit_fragments(origin: Vector2, texture: Texture2D, count: int, mirrored: bool = false, shatter: bool = false, source_scale: Vector2 = Vector2.ONE, source_rotation: float = 0.0) -> void:
 	if not GamePreferences.current().particles:
 		return
 	if texture == null:
@@ -80,13 +80,15 @@ func emit_fragments(origin: Vector2, texture: Texture2D, count: int, mirrored: b
 	for index: int in range(mini(count, LIMIT - live_count)):
 		var region_size: Vector2 = (extent / Vector2(4, 2)).floor() if shatter else Vector2(3, 3)
 		var source: Vector2 = Vector2(index % 4, floorf(index * 0.25)) * region_size if shatter else Vector2(rng.randf_range(0, extent.x - 3), rng.randf_range(0, extent.y - 3)).floor()
-		var offset: Vector2 = source + region_size / 2.0 - Vector2(extent.x / 2.0, extent.y)
+		var anchor: Vector2 = extent * 0.5 if planar else Vector2(extent.x / 2.0, extent.y)
+		var offset: Vector2 = source + region_size / 2.0 - anchor
 		if mirrored:
 			offset.x = -offset.x
-		var piece: Pixel = _create(origin + offset)
+		var piece: Pixel = _create(origin + (offset * source_scale).rotated(source_rotation))
 		piece.texture = texture
 		piece.region = Rect2(source, region_size)
-		piece.size = region_size
+		piece.size = region_size * source_scale.abs()
+		piece.rotation = source_rotation
 		piece.mirrored = mirrored
 		piece.spin = rng.randf_range(-3, 3)
 		piece.queue_redraw()

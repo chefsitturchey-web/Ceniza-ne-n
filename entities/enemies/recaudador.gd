@@ -30,7 +30,9 @@ var tracks: Array[Sprite2D] = []
 var claws: Array[Sprite2D] = []
 var core: Sprite2D
 var shield: Sprite2D
-var hatch: Polygon2D
+var turbine: Sprite2D
+var track_distance: float = 0
+var hatch: Sprite2D
 var effects: DebrisEmitter = DebrisEmitter.new()
 
 func _ready() -> void:
@@ -49,19 +51,20 @@ func _ready() -> void:
 	add_child(effects)
 
 func build_visual() -> void:
-	hatch = Polygon2D.new()
+	hatch = Sprite2D.new()
 	for side: int in [-1, 1]:
 		tracks.append(piece("tread", Vector2(side * 34, 0)))
 	piece("body", Vector2.ZERO)
 	core = piece("core", Vector2.ZERO)
-	hatch.polygon = PackedVector2Array([Vector2(-11, -11), Vector2(11, -11), Vector2(11, 11), Vector2(-11, 11)])
-	hatch.color = Color("233542")
+	hatch.texture = DepotArt.reactor_shutter()
+	hatch.scale = Vector2(25, 23) / hatch.texture.get_size()
 	puppet.add_child(hatch)
 	for side: int in [-1, 1]:
 		var claw: Sprite2D = piece("claw", Vector2(side * 45, 23))
 		claw.flip_h = side < 0
 		claws.append(claw)
 	shield = piece("shield", Vector2(0, 37))
+	turbine = piece("fan", Vector2(0, -20))
 
 func is_core_exposed() -> bool:
 	return state == State.STUNNED
@@ -87,7 +90,10 @@ func status_text() -> String:
 
 func piece(asset: String, offset: Vector2) -> Sprite2D:
 	var sprite: Sprite2D = Sprite2D.new()
-	sprite.texture = load("res://assets/expedition/boss/%s.png" % asset) as Texture2D
+	var index: int = {"body": 0, "tread": 1, "claw": 2, "shield": 3, "core": 4, "fan": 5}[asset]
+	sprite.texture = DepotArt.part(index)
+	var extent: Vector2 = {"body": Vector2(70, 64), "tread": Vector2(23, 77), "claw": Vector2(25, 52), "shield": Vector2(87, 33), "core": Vector2(23, 23), "fan": Vector2(17, 17)}[asset]
+	sprite.scale = extent / sprite.texture.get_size()
 	sprite.position = offset
 	puppet.add_child(sprite)
 	pieces.append(sprite)
@@ -209,7 +215,7 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 		change_state(State.DEAD, 0)
 		clear_hazards()
 		for sprite: Sprite2D in pieces:
-			effects.emit_fragments(sprite.global_position, sprite.texture, 8, sprite.flip_h, true)
+			effects.emit_fragments(sprite.global_position, sprite.texture, 8, sprite.flip_h, true, sprite.global_scale, sprite.global_rotation)
 		puppet.hide()
 		effects.emit_pixels(global_position, 16, Color("89939e"), true)
 		set_collision_layer_value(3, false)
@@ -218,8 +224,10 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 
 func update_puppet(delta: float) -> void:
 	puppet.rotation = facing.angle() - PI / 2
+	track_distance += velocity.length() * delta
 	for index: int in range(tracks.size()):
-		tracks[index].position.y = roundf(sin(elapsed * 40 + index * PI) * 2) if velocity.length() > 1 or state == State.CHARGE_WINDUP else 0.0
+		tracks[index].position.y = roundf(sin(track_distance * 0.3 + index * PI)) if velocity.length() > 1 else 0.0
+	if turbine != null: turbine.rotation += delta * (9.0 if phase == 2 else 4.0)
 	for index: int in range(claws.size()):
 		claws[index].rotation = sin(elapsed * 3 + index * PI) * 0.15
 		claws[index].position.y = 23
@@ -228,6 +236,10 @@ func update_puppet(delta: float) -> void:
 		claws[0].rotation = -0.9
 	elif state == State.CLAW:
 		claws[0].rotation = lerpf(1.2, -0.9, timer / 0.35)
+		claws[0].position.y = 23 + sin(clampf(1 - timer / 0.35, 0, 1) * PI) * 16
+	if state == State.VOLLEY:
+		puppet.position = Vector2(0, -maxf(0, 1 - shot_timer / 0.12) * 2)
+	else: puppet.position = Vector2.ZERO
 	hatch.position.x = move_toward(hatch.position.x, 23 if core_exposed else 0, delta * 100)
 	core.visible = core_exposed
 	core.modulate = Color(1.2, 0.9, 0.5) if GamePreferences.current().reduced_flashes else Color(1.4, 0.9 + sin(elapsed * 12) * 0.3, 0.5)

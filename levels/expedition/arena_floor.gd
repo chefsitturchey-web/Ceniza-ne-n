@@ -23,6 +23,7 @@ var dust: CPUParticles2D
 
 func _ready() -> void:
 	_add_dust()
+	if theme_id == "periphery": add_child(DepotArenaVisual.new())
 
 func _process(delta: float) -> void:
 	if theme_id == "foundry" and int(light_time * 8) != int((light_time + delta) * 8): queue_redraw()
@@ -39,6 +40,7 @@ func _process(delta: float) -> void:
 		(alarm as PointLight2D).energy = 0.25 + 0.15 * sin(light_time * 2.0)
 
 func _draw() -> void:
+	if theme_id == "periphery": return
 	rng.seed = SEED
 	_draw_tiles()
 	_draw_rails()
@@ -71,6 +73,15 @@ func _draw() -> void:
 		for y: int in [80, 400]:
 			draw_rect(Rect2(x - 5, y - 2, 10, 4), AMBER)
 	if theme_id == "foundry": _draw_foundry_basin()
+	if theme_id in ["flooded", "citadel"]:
+		var boundary: PackedVector2Array = ArenaLayout.boundary(2 if theme_id == "flooded" else 3)
+		for index: int in range(boundary.size()):
+			var a: Vector2 = boundary[index]
+			var b: Vector2 = boundary[(index + 1) % boundary.size()]
+			draw_colored_polygon(PackedVector2Array([a, b, Vector2(320, 240) + (b - Vector2(320, 240)) * 4, Vector2(320, 240) + (a - Vector2(320, 240)) * 4]), Color("081822"))
+		boundary.append(boundary[0])
+		draw_polyline(boundary, Color("304356"), 10)
+		draw_polyline(boundary, Color("8299a8"), 1)
 	if theme_id == "network":
 		for index: int in range(12):
 			var a: Vector2 = Vector2(320, 240) + Vector2(cos(index * TAU / 12) * 285, sin(index * TAU / 12) * 215)

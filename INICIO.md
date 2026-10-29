@@ -33,6 +33,8 @@ En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora,
 6. F ordena a los soldados del frente atacar la entrada más cercana. Los portales avisan y generan defensores al perder vida. Otra F retira la escuadra. Esos refuerzos no dan botín: no se puede ganar experiencia infinita provocando una puerta.
 7. Recoge los datos que dejan los enemigos. Cada nivel pausa el juego y ofrece armas, pasivas o implantes con iconos. Hay dos ranuras de módulo y cuatro pasivas; evoluciona con nivel 5, catalizador y núcleo. La clínica permite consultar y equipar lo que ya obtuviste.
 
+Si una persona no recoge una herramienta, consulta el aviso sobre el taller: indica la instalación o plaza que falta. Las herramientas reservadas no se pierden. De noche pueden recogerlas si el taller queda dentro de las murallas y está a salvo. [Recogida, animaciones y nuevo depósito del jefe](docs/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
+
 ## Historia, operaciones y tren
 
 **L abre el diario.** La ruta es Periferia → Fundición → Barrio inundado → Ciudadela → Núcleo de la red. Mara, Ivo, Vera, Nox y ECO revelan por qué las máquinas siguen ejecutando una emergencia que nunca terminó.

@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
-  <img alt="Pruebas: 34 suites" src="https://img.shields.io/badge/tests-34%20suites-47dacb">
+  <img alt="Pruebas: 35 suites" src="https://img.shields.io/badge/tests-35%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -72,7 +72,7 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/media/jefe.gif" alt="Arena del Recaudador"><br>
+      <img src="docs/media/recaudador_actual.png" alt="Depósito ferroviario y Recaudador con piezas animadas"><br>
       <b>El Recaudador.</b> Primer jefe, en arena cenital: escudo frontal, abanicos de fichas, garrazo y una embestida que, si choca, deja su núcleo expuesto. Segunda fase al 50 %.
     </td>
     <td width="50%">
@@ -105,6 +105,7 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 - **Equipo automático:** dos ranuras, dron, Tesla y disco orbital; cinco niveles, pasivas y tres evoluciones mediante núcleos de enlace. [Cómo equiparlos y evolucionarlos](docs/MODULOS_Y_EVOLUCIONES.md).
 - **Audio por fases:** música original de trabajo por capas y efectos CC0 de combate. M silencia el audio; mezcla separada de música y efectos.
 - **Presentación:** pixel art lateral en la colonia, arenas cenitales, agua con reflejos, parallax y novela visual con ilustraciones manga a color.
+- **Distrito vivo:** chimeneas con humo, trenes y extractores en el fondo; el primer jefe protege un depósito poligonal junto al canal, con grúa, bombas y maquinaria animada. [Taller, pasos y depósito](docs/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
 
 ## Cómo jugar
 
@@ -194,7 +195,7 @@ godot --headless --path . --editor --import --quit
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta **34 suites**, incluyendo personajes, novela visual, fortificaciones, movilidad, campaña, jefes, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
+`run_all.gd` ejecuta **35 suites**, incluyendo personajes, novela visual, fortificaciones, movilidad, campaña, jefes, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
 
 En una consola de PowerShell dedicada a las pruebas, configura primero el perfil aislado:
 
@@ -224,6 +225,7 @@ Las fuentes editables están en `assets/units/animated/sources/`. [Edición y re
 - [Guía de arte y paleta](docs/GUIA_ARTE.md)
 - [Novela visual manga y coherencia de estructuras](docs/NOVELA_VISUAL_Y_COHERENCIA.md)
 - [Personajes animados y edición en LibreSprite](docs/PERSONAJES_Y_ANIMACIONES.md)
+- [Recogida de herramientas, cadencia y depósito del primer jefe](docs/DEPOSITO_Y_VIDA_DEL_DISTRITO.md)
 - [Referencias visuales y capturas actuales](docs/REFERENCIAS_VISUALES.md)
 - [Guía de la versión actual](INICIO.md)
 - [Revisión, mejoras neuronales, audio y recursos pendientes](docs/REVISION_Y_AUDIO.md)

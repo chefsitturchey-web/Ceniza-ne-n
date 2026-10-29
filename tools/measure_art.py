@@ -12,9 +12,14 @@ ATLASES = {'assets/units/field_atlas_v3.png': (4, 2),
            'assets/structures/coherent_walls_v3.png': (3, 1),
            'assets/structures/coherent_civic_v4.png': (3, 2),
            'assets/story/portraits_manga_v2.png': (3, 2),
-           'assets/story/antagonists_manga_v2.png': (2, 1)}
+           'assets/story/antagonists_manga_v2.png': (2, 1),
+           'assets/expedition/boss/collector_parts_v2.png': (3, 2),
+           'assets/expedition/arena/depot_props_v2.png': (2, 2)}
 ROW_CUTS = {'assets/structures/coherent_fortress_v3.png': [0, 404, 653, 894, 1085],
             'assets/structures/coherent_civic_v4.png': [0, 565, 1024]}
+CELLS = {'assets/expedition/boss/collector_parts_v2.png':
+         [(0, 0, 768, 650), (780, 0, 1110, 650), (1140, 0, 1536, 650),
+          (0, 655, 768, 1024), (790, 655, 1130, 1024), (1160, 655, 1536, 1024)]}
 
 
 def main_component_bounds(alpha):
@@ -61,6 +66,7 @@ def main():
             if path in ROW_CUTS:
                 cuts = ROW_CUTS[path]
                 top, bottom = cuts[index // columns:index // columns + 2]
+            if path in CELLS: left, top, right, bottom = CELLS[path][index]
             alpha = image.getchannel('A').crop((left, top, right, bottom))
             bounds = main_component_bounds(alpha)
             if not bounds:

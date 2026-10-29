@@ -11,6 +11,8 @@ var exhausted: bool = false
 var current: StringName = &"reposo"
 var effects: DebrisEmitter
 var sweat_left: float = 0
+var gait_distance: float = 0
+var motion_left: float = 0
 
 func setup_person(role: String, existing: AnimatedSprite2D = null) -> void:
 	unit_role = role
@@ -47,6 +49,9 @@ func choose(animation: StringName, rate: float = 1.0) -> void:
 func update_person(delta: float, distance: float, working: bool, direction: float, action: bool = false, dead: bool = false, carrying: bool = false, fleeing: bool = false) -> void:
 	if sprite == null: return
 	var moving: bool = distance > 0.01 and distance < 100
+	if moving: motion_left = 0.1
+	elif delta > 0: motion_left = maxf(0, motion_left - delta)
+	var locomotion: bool = moving or motion_left > 0
 	sprite.flip_h = direction < 0
 	hurt_left = maxf(0, hurt_left - delta)
 	action_left = maxf(0, action_left - delta)
@@ -68,8 +73,15 @@ func update_person(delta: float, distance: float, working: bool, direction: floa
 		choose(&"dano")
 	elif action_left > 0 or working:
 		choose(&"disparar" if unit_role in ["ranger", "artillero", "saboteador"] else (&"proteger" if unit_role == "guardian" else &"reparar"))
-	elif moving:
-		choose(&"huir" if fleeing else (&"cargar" if carrying else &"caminar"), 0.85 if exhausted else 1.0)
+	elif locomotion:
+		choose(&"huir" if fleeing else (&"cargar" if carrying else &"caminar"))
+		# Cada ciclo recorre una zancada real. Un render sin tick físico no reinicia el paso.
+		if delta > 0 and moving: gait_distance += distance
+		var stride: float = 22.0 if carrying else (32.0 if fleeing else 28.0)
+		var count: int = sprite.sprite_frames.get_frame_count(current)
+		var progress: float = fposmod(gait_distance / stride * count, count)
+		sprite.set_frame_and_progress(int(progress), fposmod(progress, 1))
+		sprite.pause()
 	elif exhausted:
 		choose(&"cansancio")
 	else:

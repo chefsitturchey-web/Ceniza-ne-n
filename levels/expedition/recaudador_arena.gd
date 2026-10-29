@@ -104,16 +104,13 @@ func _ready() -> void:
 	camera.limit_top = 0
 	camera.limit_right = 640
 	camera.limit_bottom = 480
-	if zone_index == 0:
-		player.add_child(camera)
-	else:
-		# Las franjas y enlaces necesitan verse completos antes de elegir una ruta segura.
-		camera.position_smoothing_enabled = false
-		camera.zoom = Vector2(0.75, 0.75)
-		camera.limit_left = -107
-		camera.limit_right = 747
-		camera.position = Vector2(320, 240)
-		world.add_child(camera)
+	# Vista completa: bordes, coberturas y señales permanecen visibles en cada jefe.
+	camera.position_smoothing_enabled = false
+	camera.zoom = Vector2(0.7, 0.7) if zone_index == 0 else Vector2(0.75, 0.75)
+	camera.limit_left = -107
+	camera.limit_right = 747
+	camera.position = Vector2(320, 240)
+	world.add_child(camera)
 	camera.make_current()
 	camera.reset_smoothing()
 	build_lighting()
@@ -162,23 +159,13 @@ func wall(center: Vector2, extent: Vector2) -> StaticBody2D:
 	return body
 
 func build_geometry() -> void:
-	if zone_index in [1, 3, 4]:
-		var boundary: Array[Vector2] = [Vector2(140, 24), Vector2(500, 24), Vector2(616, 140), Vector2(616, 340), Vector2(500, 456), Vector2(140, 456), Vector2(24, 340), Vector2(24, 140)]
-		if zone_index == 3:
-			boundary = [Vector2(96, 24), Vector2(544, 24), Vector2(616, 100), Vector2(616, 380), Vector2(544, 456), Vector2(96, 456), Vector2(24, 380), Vector2(24, 100)]
-		elif zone_index == 4:
-			boundary.clear()
-			for index: int in range(12): boundary.append(Vector2(320, 240) + Vector2(cos(index * TAU / 12) * 285, sin(index * TAU / 12) * 215))
-		for index: int in range(boundary.size()):
-			var a: Vector2 = boundary[index]
-			var b: Vector2 = boundary[(index + 1) % boundary.size()]
-			var edge: StaticBody2D = wall((a + b) * 0.5, Vector2(a.distance_to(b), 14))
-			edge.rotation = (b - a).angle()
-	else:
-		wall(Vector2(320, 6), Vector2(640, 12))
-		wall(Vector2(320, 474), Vector2(640, 12))
-		wall(Vector2(6, 240), Vector2(12, 480))
-		wall(Vector2(634, 240), Vector2(12, 480))
+	var boundary: PackedVector2Array = ArenaLayout.boundary(zone_index)
+	for index: int in range(boundary.size()):
+		var a: Vector2 = boundary[index]
+		var b: Vector2 = boundary[(index + 1) % boundary.size()]
+		var edge: StaticBody2D = wall((a + b) * 0.5, Vector2(a.distance_to(b), 14))
+		edge.name = "Boundary%d" % index
+		edge.rotation = (b - a).angle()
 	var positions: Array[Vector2] = [Vector2(180, 160), Vector2(460, 160), Vector2(180, 320), Vector2(460, 320), Vector2(85, 245), Vector2(555, 245)]
 	var assets: Array[String] = ["pillar_top", "pillar_top", "crate_top", "crate_top", "barrel_top", "barrel_top"]
 	if zone_index == 1:
@@ -192,11 +179,16 @@ func build_geometry() -> void:
 		assets = ["pillar_top", "pillar_top", "crate_top", "barrel_top", "barrel_top"]
 	for index: int in range(positions.size()):
 		var texture: Texture2D = load("res://assets/expedition/arena/%s.png" % assets[index]) as Texture2D
-		var body: StaticBody2D = wall(positions[index], texture.get_size())
+		var extent: Vector2 = texture.get_size()
+		if zone_index == 0:
+			texture = DepotArt.prop(0 if index < 2 else (3 if index < 4 else 2))
+			extent = Vector2(34, 34) if index < 2 else Vector2(32, 28)
+		var body: StaticBody2D = wall(positions[index], extent)
 		body.reparent(actors)
 		body.name = "Cover%d" % index
 		var sprite: Sprite2D = Sprite2D.new()
 		sprite.texture = texture
+		sprite.scale = extent / texture.get_size()
 		body.add_child(sprite)
 
 func build_lighting() -> void:
@@ -344,6 +336,7 @@ func spawn_bullet(origin: Vector2, direction: Vector2) -> void:
 	var bullet: RecaudadorBullet = RecaudadorBullet.new()
 	bullet.position = origin
 	bullet.velocity = direction * (190 if boss.phase == 2 else 155)
+	bullet.boundary = ArenaLayout.boundary(zone_index)
 	world.add_child(bullet)
 
 func on_damage() -> void:
