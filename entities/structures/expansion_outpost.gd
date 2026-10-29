@@ -2,7 +2,7 @@ class_name ExpansionOutpost
 extends Node2D
 
 const MAX_HEALTH: int = 180
-const ART: Texture2D = preload("res://assets/structures/industrial_atlas_v2.png")
+const ART: Texture2D = preload("res://assets/world/structures/industrial_atlas_v2.png")
 var spec: Dictionary
 var expansion: ExpansionSystem
 var hp: int = 0

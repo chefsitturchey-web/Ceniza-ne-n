@@ -7,8 +7,8 @@ var opening: float = 0.0
 const DARK: Color = Color("0b1322")
 const STEEL: Color = Color("304356")
 const EDGE: Color = Color("8299a8")
-const CHOIR_ART: Texture2D = preload("res://assets/expedition/boss/choir_v2.png")
-const CALDERA_ART: Texture2D = preload("res://assets/expedition/boss/caldera_v2.png")
+const CHOIR_ART: Texture2D = preload("res://assets/world/expedition/boss/choir_v2.png")
+const CALDERA_ART: Texture2D = preload("res://assets/world/expedition/boss/caldera_v2.png")
 
 func _process(delta: float) -> void:
 	if not is_instance_valid(actor) or actor.health <= 0:

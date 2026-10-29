@@ -71,7 +71,7 @@ func run_checks() -> void:
 				# This measures the coloured edge; shaded steel can be longer.
 				verify(count > 2 and aligned and length >= height * 0.10, "El filo pintado del impacto apunta hacia su dirección: %s/%s" % [id, direction])
 			verify(frames.get_frame_duration(&"windup_south", 5) > frames.get_frame_duration(&"windup_south", 0), "La preparación tiene pausas de peso distintas: " + id)
-	var provenance: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/combat/illustrated/provenance.json"))
+	var provenance: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/combat/provenance.json"))
 	for id: String in layout.actors:
 		verify(layout.actors[id].camera == ("lateral" if id == "portador" else "three_quarter"), "Proyección declarada para la cámara: " + id)
 		if layout.actors[id].has("key_poses"):

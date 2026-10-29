@@ -5,8 +5,7 @@ Ejecutar desde la raíz del proyecto. Godot no importa esta carpeta.
 | Carpeta | Uso |
 | --- | --- |
 | `art/` | Montaje, edición nativa y exportación de sprites con LibreSprite; medición de anclajes y galería de trabajo |
-| `art/legacy/` | Generadores de los bocetos originales, conservados para reproducir el arte de respaldo |
-| `audio/` | Música sintética original, preparación de sonidos CC0 e importación de música externa |
+| `audio/` | Preparación de sonidos CC0 e importación de la música actual |
 | `integrations/` | Puente del MCP PixelLab, descarga de poses e importador de animaciones |
 | `maintenance/` | Ejecución de pruebas y limpieza de archivos generados |
 
@@ -20,7 +19,7 @@ python tools/art/live_combat_board.py --help
 ./tools/maintenance/clean_generated.ps1
 ```
 
-Los generadores de arte necesitan LibreSprite; `--libresprite` permite indicar su ubicación. Los ASE editables y sus metadatos están dentro de `assets/`, junto a los PNG de juego. Los trabajos intermedios continúan en `.godot/`; no se mezclan con los dibujos aprobados. `build_unit_sprites.py` utiliza normalmente `assets/units/animated/sources/pose_reference.ase`, sin depender de una descarga nueva.
+Los generadores de arte necesitan LibreSprite; `--libresprite` permite indicar su ubicación. Los ASE editables y sus metadatos están dentro de `assets/`, junto a los PNG de juego. Los trabajos intermedios continúan en `.godot/`; no se mezclan con los dibujos aprobados. `build_unit_sprites.py` utiliza normalmente `assets/characters/units/sources/pose_reference.ase`, sin depender de una descarga nueva.
 
 Las integraciones externas solo son necesarias al generar recursos nuevos. El juego y sus pruebas funcionan sin conexión a esas cuentas. `pixellab_mcp.py` utiliza la configuración local del usuario; no se deben copiar credenciales al repositorio.
 

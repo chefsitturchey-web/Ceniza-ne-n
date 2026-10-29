@@ -20,8 +20,8 @@ func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	InputSetup.configure_input()
 	get_tree().paused = false
-	if ResourceLoader.exists("res://assets/menu/ruinas_menu.png"):
-		illustration = load("res://assets/menu/ruinas_menu.png") as Texture2D
+	if ResourceLoader.exists("res://assets/ui/menu/ruinas_menu.png"):
+		illustration = load("res://assets/ui/menu/ruinas_menu.png") as Texture2D
 	var content: VBoxContainer = VBoxContainer.new()
 	content.position = Vector2(38, 23)
 	content.size = Vector2(300, 310)

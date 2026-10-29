@@ -67,5 +67,5 @@ static func scene(index: int, section: String) -> Dictionary:
 		if section != "ending": lines.append({"speaker": "portador", "text": ANSWERS[index]})
 		elif index == 4: lines.append({"speaker": "portador", "text": "Mañana habrá trabajo. Esta noche, la luz se queda."})
 	var background: String = CampaignRoute.zone(index).background_path
-	if background.is_empty(): background = "res://assets/menu/ruinas_menu.png"
+	if background.is_empty(): background = "res://assets/ui/menu/ruinas_menu.png"
 	return {"id": "%d:%s" % [index, section], "title": chapter.title, "subtitle": TITLES[section], "background": background, "lines": lines}

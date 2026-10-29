@@ -2,9 +2,9 @@ class_name RailwayStation
 extends Node2D
 
 signal arrived
-const STATION: Texture2D = preload("res://assets/expedition/station.png")
-const TRAIN: Texture2D = preload("res://assets/expedition/train.png")
-const WHEEL: Texture2D = preload("res://assets/expedition/wheel.png")
+const STATION: Texture2D = preload("res://assets/world/expedition/station.png")
+const TRAIN: Texture2D = preload("res://assets/world/expedition/train.png")
+const WHEEL: Texture2D = preload("res://assets/world/expedition/wheel.png")
 var unlocked: bool = false
 var train_arrived: bool = false
 var train_x: float = 560.0

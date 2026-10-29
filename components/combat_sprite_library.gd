@@ -6,22 +6,33 @@ static var cache: Dictionary = {}
 
 static func data() -> Dictionary:
 	if layout.is_empty():
-		layout = JSON.parse_string(FileAccess.get_file_as_string("res://assets/combat/native/layout.json"))
-		var painted_path: String = "res://assets/combat/illustrated/layout.json"
-		if FileAccess.file_exists(painted_path):
-			var painted: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(painted_path))
-			layout.actors.merge(painted.actors, true)
-			layout.animations.merge(painted.animations, true)
+		layout = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/combat/layout.json"))
 	return layout
 
 static func scale_for(id: String) -> float:
 	return float(data().actors[id].get("render_scale", 1.0))
 
 static func sheet_path(id: String) -> String:
-	return data().actors[id].get("texture", "res://assets/combat/native/%s.png" % id)
+	return data().actors[id].texture
 
 static func source_path(id: String) -> String:
-	return data().actors[id].get("source", "res://assets/combat/native/sources/%s.ase" % id)
+	return data().actors[id].source
+
+static func player_frames() -> SpriteFrames:
+	if cache.has("player_compatibility"): return cache.player_compatibility
+	var source: SpriteFrames = frames("portador")
+	var result: SpriteFrames = SpriteFrames.new()
+	result.remove_animation(&"default")
+	var names: Dictionary = {"reposo": "idle_east", "correr": "walk_east", "ataque": "attack_east", "esquiva": "dodge_east", "muerte": "death_east"}
+	for name: String in names:
+		var clip: String = names[name]
+		result.add_animation(name)
+		result.set_animation_loop(name, source.get_animation_loop(clip))
+		result.set_animation_speed(name, source.get_animation_speed(clip))
+		for frame: int in source.get_frame_count(clip):
+			result.add_frame(name, source.get_frame_texture(clip, frame), source.get_frame_duration(clip, frame))
+	cache.player_compatibility = result
+	return result
 
 static func offset_for(id: String) -> Vector2:
 	var actor: Dictionary = data().actors[id]

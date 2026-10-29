@@ -8,26 +8,25 @@ var player: Player
 var zone: ZoneData:
 	set(value):
 		zone = value
-		district_background = load(zone.background_path) as Texture2D if zone != null and not zone.background_path.is_empty() else null
+		district_background = load(zone.background_path) as Texture2D if zone != null and not zone.background_path.is_empty() else DEFAULT_BACKGROUND
 		queue_redraw()
-var district_background: Texture2D
-const GROUND: Texture2D = preload("res://assets/structures/ground_strip.png")
-const BACKGROUND_FAR: Texture2D = preload("res://assets/background/background_far.png")
-const BACKGROUND_MID: Texture2D = preload("res://assets/background/background_mid.png")
+const DEFAULT_BACKGROUND: Texture2D = preload("res://assets/world/backgrounds/periphery_alive_v2.png")
+var district_background: Texture2D = DEFAULT_BACKGROUND
+const GROUND: Texture2D = preload("res://assets/world/structures/ground_strip.png")
 ## Cuánto siguen las capas a la cámara: 1 queda fija en pantalla, 0 se mueve con el mundo.
 const FAR_FOLLOW: float = 0.8
 const MID_FOLLOW: float = 0.55
 ## Decoración fija del distrito: [textura, x]. Lejos de las obras (±180, ±240) y del núcleo.
 const PROPS: Array = [
-	[preload("res://assets/props/sign.png"), -810.0], [preload("res://assets/props/car.png"), -720.0],
-	[preload("res://assets/props/crate.png"), -630.0], [preload("res://assets/props/lamp.png"), -560.0],
-	[preload("res://assets/props/scrap.png"), -470.0], [preload("res://assets/props/barrel.png"), -395.0],
-	[preload("res://assets/props/barrel.png"), -380.0], [preload("res://assets/props/lamp.png"), -330.0],
-	[preload("res://assets/props/lamp.png"), 330.0], [preload("res://assets/props/scrap.png"), 420.0],
-	[preload("res://assets/props/crate.png"), 455.0], [preload("res://assets/props/lamp.png"), 775.0],
-	[preload("res://assets/props/spool.png"), 700.0], [preload("res://assets/props/sign.png"), 825.0],
+	[preload("res://assets/world/props/sign.png"), -810.0], [preload("res://assets/world/props/car.png"), -720.0],
+	[preload("res://assets/world/props/crate.png"), -630.0], [preload("res://assets/world/props/lamp.png"), -560.0],
+	[preload("res://assets/world/props/scrap.png"), -470.0], [preload("res://assets/world/props/barrel.png"), -395.0],
+	[preload("res://assets/world/props/barrel.png"), -380.0], [preload("res://assets/world/props/lamp.png"), -330.0],
+	[preload("res://assets/world/props/lamp.png"), 330.0], [preload("res://assets/world/props/scrap.png"), 420.0],
+	[preload("res://assets/world/props/crate.png"), 455.0], [preload("res://assets/world/props/lamp.png"), 775.0],
+	[preload("res://assets/world/props/spool.png"), 700.0], [preload("res://assets/world/props/sign.png"), 825.0],
 ]
-const LAMP: Texture2D = preload("res://assets/props/lamp.png")
+const LAMP: Texture2D = preload("res://assets/world/props/lamp.png")
 
 ## Luz de cada fase: cielo arriba/abajo, bruma sobre las capas lejana/media, luz del mundo y farolas.
 const LIGHTING: Dictionary = {
@@ -86,11 +85,6 @@ func _draw() -> void:
 				BackdropLife.draw_factory(self, time, top, tile_frame)
 			draw_set_transform(Vector2.ZERO)
 		_draw_haze(camera_x, light["far_haze"] * 0.25)
-	else:
-		_draw_layer(BACKGROUND_FAR, camera_x * FAR_FOLLOW)
-		_draw_haze(camera_x, light["far_haze"])
-		_draw_layer(BACKGROUND_MID, camera_x * MID_FOLLOW)
-		_draw_haze(camera_x, light["mid_haze"])
 	for index: int in range(PROPS.size()):
 		var texture: Texture2D = PROPS[index][0]
 		var size: Vector2 = texture.get_size()

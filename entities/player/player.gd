@@ -67,6 +67,12 @@ func _ready() -> void:
 	add_child(visual)
 	health_component.damaged.connect(visual.on_damage)
 	visual.bind(get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D)
+	if visual.sprite != null:
+		visual.sprite.sprite_frames = CombatSpriteLibrary.player_frames()
+		visual.sprite.scale = Vector2.ONE * CombatSpriteLibrary.scale_for("portador")
+		visual.sprite.position = CombatSpriteLibrary.offset_for("portador") * visual.sprite.scale
+		visual.rest_position = visual.sprite.position
+		visual.sprite.play(&"reposo")
 	if native_combat_art:
 		combat_visual = CombatFlipbook.new()
 		combat_visual.actor = self

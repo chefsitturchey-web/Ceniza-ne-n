@@ -7,8 +7,6 @@ signal dodged
 signal stepped(origin: Vector2)
 signal slash(origin: Vector2, direction: Vector2, amount: int, reach: float)
 
-const FRAMES: SpriteFrames = preload("res://entities/player/player_frames.tres")
-const VIEWS: Array[Texture2D] = [preload("res://assets/player/topdown/idle_south.png"), preload("res://assets/player/topdown/idle_north.png"), preload("res://assets/player/topdown/idle_east.png"), preload("res://assets/player/topdown/idle_west.png")]
 var health: int = Player.MAX_HEALTH
 var debug_invincible: bool = false
 var stamina: float = Player.MAX_STAMINA
@@ -28,20 +26,13 @@ var cooldown: float = 0.0
 var slash_remaining: float = 0.0
 var attack_anim_remaining: float = 0.0
 var step_timer: float = 0.0
-var death_elapsed: float = 0.0
 var slash_direction: Vector2 = Vector2.DOWN
 var elapsed: float = 0.0
 var dust_timer: float = 0.0
 var knockback: Vector2 = Vector2.ZERO
-var sprite: Sprite2D = Sprite2D.new()
-var runner: AnimatedSprite2D = AnimatedSprite2D.new()
 var effects: DebrisEmitter = DebrisEmitter.new()
-var stride: DirectionalStride = DirectionalStride.new()
-@export var native_combat_art: bool = true
 var combat_visual: CombatFlipbook
 var attack_pending: bool = false
-## Add correr_north / correr_south here when their frames are available.
-@export var directional_frames: SpriteFrames
 
 func copy_from(source: Player) -> void:
 	health = source.health
@@ -64,20 +55,12 @@ func _ready() -> void:
 	shape.radius = 8
 	collider.shape = shape
 	add_child(collider)
-	add_child(sprite)
-	add_child(runner)
-	add_child(stride)
-	stride.position.y = -16
-	sprite.position.y = -16
-	runner.position.y = -20
-	runner.sprite_frames = FRAMES
 	effects.planar = true
 	add_child(effects)
-	if native_combat_art:
-		combat_visual = CombatFlipbook.new()
-		combat_visual.actor = self
-		combat_visual.actor_id = "portador_cenital"
-		add_child(combat_visual)
+	combat_visual = CombatFlipbook.new()
+	combat_visual.actor = self
+	combat_visual.actor_id = "portador_cenital"
+	add_child(combat_visual)
 	update_visual()
 
 func _physics_process(delta: float) -> void:
@@ -155,62 +138,11 @@ func take_damage(amount: int, impulse: Vector2 = Vector2.ZERO) -> void:
 		update_visual()
 		died.emit()
 
-func _process(delta: float) -> void:
-	if combat_visual != null: return
-	if health > 0:
-		return
-	death_elapsed += delta
-	runner.hide()
-	stride.hide()
-	sprite.show()
-	sprite.rotation = minf(1, death_elapsed / 0.4) * PI * 0.45
-	sprite.scale.y = 1.0 - minf(1, death_elapsed / 0.5) * 0.35
-	modulate.a = clampf(1 - death_elapsed / 1.4, 0.15, 1)
-
 func update_visual() -> void:
-	if combat_visual != null:
-		runner.hide()
-		stride.hide()
-		sprite.hide()
-		combat_visual.pose_player()
-		queue_redraw()
-		return
-	var horizontal: bool = absf(facing.x) > absf(facing.y)
-	var moving: bool = velocity.length() > 10
-	var index: int = (2 if facing.x > 0 else 3) if horizontal else (0 if facing.y > 0 else 1)
-	var animation: StringName = &"correr_south" if facing.y > 0 else &"correr_north"
-	var has_vertical: bool = directional_frames != null and directional_frames.has_animation(animation)
-	var attacking: bool = attack_anim_remaining > 0 and dodge_remaining <= 0
-	runner.visible = health > 0 and (horizontal or (moving and has_vertical))
-	stride.visible = health > 0 and not horizontal and not has_vertical and dodge_remaining <= 0
-	sprite.visible = not runner.visible and not stride.visible
-	sprite.texture = VIEWS[index]
-	sprite.position.y = -16 + (roundf(sin(elapsed * 15)) if moving else 0.0)
-	if runner.visible:
-		runner.sprite_frames = FRAMES if horizontal else directional_frames
-		runner.flip_h = horizontal and facing.x < 0
-		var clip: StringName = (&"ataque" if attacking else (&"correr" if moving else &"reposo")) if horizontal else animation
-		runner.speed_scale = 1.0
-		if clip == &"ataque":
-			var length: float = 0
-			for frame: int in range(FRAMES.get_frame_count(clip)):
-				length += FRAMES.get_frame_duration(clip, frame) / FRAMES.get_animation_speed(clip)
-			runner.speed_scale = length / Player.ATTACK_ANIM_DURATION
-		runner.play(clip)
-	if stride.visible:
-		stride.pose(VIEWS[index], elapsed, moving, facing.y < 0, attack_anim_remaining / Player.ATTACK_ANIM_DURATION)
-	var roll: float = TAU * (1.0 - dodge_remaining / Player.DODGE_DURATION) if dodge_remaining > 0 else 0.0
-	sprite.rotation = roll
-	runner.rotation = roll
-	modulate.a = 0.35 if invulnerable > 0 and int(elapsed * 24) % 2 == 0 and not GamePreferences.current().reduced_flashes else 1.0
+	if combat_visual != null: combat_visual.pose_player()
 	queue_redraw()
 
 func _draw() -> void:
 	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.75))
 	draw_circle(Vector2.ZERO, 11, Color(0, 0, 0, 0.4))
 	draw_set_transform(Vector2.ZERO)
-	if combat_visual == null and slash_remaining > 0 and health > 0:
-		var angle: float = slash_direction.angle()
-		draw_arc(Vector2.ZERO, attack_range, angle - 0.85, angle + 0.85, 12, Color("ffce75"), 2)
-		var tip: Vector2 = Vector2.from_angle(angle + lerpf(0.85, -0.85, slash_remaining / Player.SLASH_DURATION))
-		draw_line(tip * 12, tip * attack_range, Color("dcf6ee"), 3)

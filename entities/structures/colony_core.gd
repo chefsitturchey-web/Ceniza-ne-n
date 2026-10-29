@@ -4,7 +4,7 @@ extends Node2D
 ## El estado del mundo se comunica con efectos, nunca con barras.
 const WORLD_BARS_ENABLED: bool = false
 
-const TEXTURE: Texture2D = preload("res://assets/structures/core_01.png")
+const TEXTURE: Texture2D = preload("res://assets/world/structures/core_01.png")
 
 var effects: StructureEffects = StructureEffects.new()
 

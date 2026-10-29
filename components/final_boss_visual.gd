@@ -1,6 +1,6 @@
 class_name FinalBossVisual
 extends Node2D
-const ART: Texture2D = preload("res://assets/expedition/boss/final_bosses_v1.png")
+const ART: Texture2D = preload("res://assets/world/expedition/boss/final_bosses_v1.png")
 var actor: Recaudador
 var index: int = 0
 

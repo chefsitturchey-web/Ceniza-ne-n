@@ -194,7 +194,7 @@ func build_geometry() -> void:
 		positions = [Vector2(90, 240), Vector2(550, 240), Vector2(320, 65), Vector2(145, 360), Vector2(495, 360)]
 		assets = ["pillar_top", "pillar_top", "crate_top", "barrel_top", "barrel_top"]
 	for index: int in range(positions.size()):
-		var texture: Texture2D = load("res://assets/expedition/arena/%s.png" % assets[index]) as Texture2D
+		var texture: Texture2D = load("res://assets/world/expedition/arena/%s.png" % assets[index]) as Texture2D
 		var extent: Vector2 = texture.get_size()
 		if zone_index == 0:
 			texture = DepotArt.prop(0 if index < 2 else (3 if index < 4 else 2))

@@ -10,10 +10,10 @@ static var layout: Dictionary = {}
 static func frames(role: String) -> SpriteFrames:
 	if cache.has(role): return cache[role] as SpriteFrames
 	if layout.is_empty():
-		layout = JSON.parse_string(FileAccess.get_file_as_string("res://assets/units/animated/layout.json"))
+		layout = JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/units/layout.json"))
 	var result: SpriteFrames = SpriteFrames.new()
 	result.remove_animation(&"default")
-	var sheet: Texture2D = load("res://assets/units/animated/%s.png" % role)
+	var sheet: Texture2D = load("res://assets/characters/units/%s.png" % role)
 	for key: String in layout.animations:
 		var animation: Dictionary = layout.animations[key]
 		result.add_animation(key)

@@ -1,6 +1,6 @@
 class_name NetworkRelay
 extends Node2D
-const ART: Texture2D = preload("res://assets/expedition/repeater.png")
+const ART: Texture2D = preload("res://assets/world/expedition/repeater.png")
 var health: int = 120
 var elapsed: float = 0
 

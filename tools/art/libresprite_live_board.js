@@ -11,7 +11,7 @@ function onEvent(event){
         for(var layer=0;layer<3;layer++){liveCanvas.push(new Uint8Array(640*LIVE.height*4));liveTarget.push(new Uint8Array(640*LIVE.height*4));liveImages.push(liveDocument.sprite.layer(layer).cel(0).image);}
         var ids=LIVE.directions?['portador_cenital','recaudador','caldera','coro','prefecto','madre']:['portador','portador_cenital','prefecto','recaudador','caldera','coro','madre'];
         for(var slot=0;slot<(LIVE.directions?24:ids.length);slot++){
-            var id=ids[LIVE.directions?Math.floor(slot/4):slot];N=id.indexOf('portador')===0?96:(id==='prefecto'?160:128);ORIGIN=id==='prefecto'?16:0;
+            var id=ids[LIVE.directions?Math.floor(slot/4):slot];
             if(LIVE.painted&&LIVE.painted[id]){
                 var info=LIVE.painted[id],sheet=app.open(LIVE.project_root+'/'+info.texture.substr(6)).sprite.layer(0).cel(0).image;
                 var pixels=sheet.getImageData(),direction=LIVE.directions?slot%4:(slot===0?1:0),frame=direction*64+8;
@@ -24,13 +24,7 @@ function onEvent(event){
                 }
                 continue;
             }
-            var arrays=[new Uint8Array(N*N*4),new Uint8Array(N*N*4),new Uint8Array(N*N*4)];
-            renderProjection(arrays[0],arrays[1],arrays[2],{state:'walk',direction:LIVE.directions?['south','east','north','west'][slot%4]:(slot===0?'east':'south'),frame:2,count:8},id);
-            var left=(slot%4)*160+(160-N)/2,top=Math.floor(slot/4)*160+(160-N)/2;
-            for(var layer=0;layer<3;layer++)for(var y=0;y<N;y++)for(var x=0;x<N;x++){
-                var src=(y*N+x)*4,dst=((top+y)*640+left+x)*4;
-                for(var c=0;c<4;c++)liveTarget[layer][dst+c]=arrays[layer][src+c];
-            }
+            throw new Error('Missing current illustrated actor '+id);
         }
         // Actual allied guardian at the same pixel scale and foot height as the hero.
         if(!LIVE.directions)for(var y=0;y<64;y++)for(var x=0;x<64;x++){

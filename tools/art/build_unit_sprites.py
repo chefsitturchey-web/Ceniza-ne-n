@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 WORK = ROOT / '.godot/unit-art'
-OUTPUT = ROOT / 'assets/units/animated'
+OUTPUT = ROOT / 'assets/characters/units'
 ROLES = ['ranger', 'guardian', 'technician', 'medic', 'builder', 'collector', 'civilian', 'artillero', 'saboteador']
 DEFINITIONS = [('reposo', 4, 5, True), ('caminar', 8, 10, True), ('dano', 6, 16, False),
                ('caer', 7, 9, False), ('cansancio', 8, 7, True), ('disparar', 8, 20, False),

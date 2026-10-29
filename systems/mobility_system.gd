@@ -5,7 +5,7 @@ const PAD_X: float = -880
 const COST: int = 45
 const SPEED_FACTOR: float = 1.45
 const BOARD_HEIGHT: float = 13
-const ART: Texture2D = preload("res://assets/structures/fortress/cargo_board.png")
+const ART: Texture2D = preload("res://assets/world/structures/fortress/cargo_board.png")
 var district: District
 var owned: bool = false
 var mounted: bool = false

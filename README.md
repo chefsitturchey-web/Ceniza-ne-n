@@ -29,17 +29,17 @@
 
 ## El juego
 
-Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y final](docs/HISTORIA_Y_CAMPANA.md). En la colonia el Portador dirige y sus tropas combaten; J funciona en arenas. Las cuatro horas siguen siendo una meta pendiente de ampliar y medir.
+Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y final](docs/design/HISTORIA_Y_CAMPANA.md). En la colonia el Portador dirige y sus tropas combaten; J funciona en arenas. Las cuatro horas siguen siendo una meta pendiente de ampliar y medir.
 
-**Laboratorio con F1:** acceso directo a los cinco jefes, fases, equipo, invulnerabilidad, cámara lenta, colisiones/rutas y creación de unidades. Permite volver a la escena original; las intervenciones de colonia quedan como práctica sin sobrescribir el checkpoint. [Controles y guía](docs/LABORATORIO_DEPURACION.md).
+**Laboratorio con F1:** acceso directo a los cinco jefes, fases, equipo, invulnerabilidad, cámara lenta, colisiones/rutas y creación de unidades. Permite volver a la escena original; las intervenciones de colonia quedan como práctica sin sobrescribir el checkpoint. [Controles y guía](docs/interface/LABORATORIO_DEPURACION.md).
 
-**Combates con más presión:** robots un 30 % mayores, barridos de mayor alcance, ataques secundarios simultáneos, erupciones, ondas de sonar y cortes eléctricos. Los impactos tienen escombros, humo y temblor breve; las ventanas de núcleo expuesto cancelan las trampas pendientes. La marcha del Portador, Prefecto y Madre utiliza ocho fases articuladas en LibreSprite, conservando el dibujo aprobado. [Cambios y cómo probarlos](docs/EFECTOS_Y_PRESION_JEFES.md).
+**Combates con más presión:** robots un 30 % mayores, barridos de mayor alcance, ataques secundarios simultáneos, erupciones, ondas de sonar y cortes eléctricos. Los impactos tienen escombros, humo y temblor breve; las ventanas de núcleo expuesto cancelan las trampas pendientes. La marcha del Portador, Prefecto y Madre utiliza ocho fases articuladas en LibreSprite, conservando el dibujo aprobado. [Cambios y cómo probarlos](docs/gameplay/EFECTOS_Y_PRESION_JEFES.md).
 
-**Interfaz de arenas:** vida numérica y barra roja del Portador, resistencia verde y barra inferior de jefe con estela del daño, marco y emblema propios de cada zona. [Diseño y pruebas](docs/INTERFAZ_COMBATE.md).
+**Interfaz de arenas:** vida numérica y barra roja del Portador, resistencia verde y barra inferior de jefe con estela del daño, marco y emblema propios de cada zona. [Diseño y pruebas](docs/interface/INTERFAZ_COMBATE.md).
 
-**Arte de combate ilustrado:** el Portador y los cinco jefes recuperan sus diseños manga con poses de marcha, estocada, reacción y caída; el Portador tiene además volteretas propias en ambas cámaras. La base se generó con `image_gen` y se registró, ajustó y exportó en LibreSprite. Son 416 poses de entrada y 1792 fotogramas de línea de tiempo con pausas y reutilización. La galería F6 incluye **Giro**, detalle con **1–6** y conjunto con **0**. [Diseños, tamaños, prompts y fuentes editables](docs/ARTE_COMBATE_ILUSTRADO.md).
+**Arte de combate ilustrado:** el Portador y los cinco jefes recuperan sus diseños manga con poses de marcha, estocada, reacción y caída; el Portador tiene además volteretas propias en ambas cámaras. La base se generó con `image_gen` y se registró, ajustó y exportó en LibreSprite. Son 416 poses de entrada y 1792 fotogramas de línea de tiempo con pausas y reutilización. La galería F6 incluye **Giro**, detalle con **1–6** y conjunto con **0**. [Diseños, tamaños, prompts y fuentes editables](docs/art/ARTE_COMBATE_ILUSTRADO.md).
 
-El núcleo, murallas y torretas tienen tres niveles, diseños industriales coherentes y desbloqueos. Se normalizó la escala respecto al Portador y se añadió transporte eléctrico opcional. [Progresión, tamaños y movilidad](docs/ESCALA_NIVELES_Y_MOVILIDAD.md).
+El núcleo, murallas y torretas tienen tres niveles, diseños industriales coherentes y desbloqueos. Se normalizó la escala respecto al Portador y se añadió transporte eléctrico opcional. [Progresión, tamaños y movilidad](docs/gameplay/ESCALA_NIVELES_Y_MOVILIDAD.md).
 
 La historia incluye **30 conversaciones de novela visual**, ocho retratos manga a color, transiciones y repetición desde el diario. Las profesiones aliadas, civiles, Artillero y Saboteador tienen **nueve variantes con 72 fotogramas cada una**, con archivos editables de LibreSprite.
 
@@ -52,11 +52,11 @@ Tras un colapso tecnológico, una red autónoma de máquinas intenta borrar los 
 
 Para liberar un distrito destruyes sus **repetidores enemigos**, tomas el **tren blindado** y enfrentas al jefe que protege el enlace de transporte en una arena con vista cenital.
 
-La ruta jugable conecta **Periferia oxidada → Fundición → Barrio inundado → Ciudadela corporativa → Núcleo de la red** y cinco jefes distintos. Viajas conservando mejoras y habitantes; cada colonia tiene tres operaciones de historia y sus propios frentes. [Ruta, jefes y pruebas directas](docs/HISTORIA_Y_CAMPANA.md).
+La ruta jugable conecta **Periferia oxidada → Fundición → Barrio inundado → Ciudadela corporativa → Núcleo de la red** y cinco jefes distintos. Viajas conservando mejoras y habitantes; cada colonia tiene tres operaciones de historia y sus propios frentes. [Ruta, jefes y pruebas directas](docs/design/HISTORIA_Y_CAMPANA.md).
 
-Los **cinco jefes** reaccionan a distancia, trayectoria, coberturas o infraestructura mediante decisiones locales y navegación A*. Las arenas incorporan carga suspendida, refrigeración, corriente y sonar, parapeto temporal y sabotaje de relés; hay artilleros, cazadores y saboteadores con llegada anunciada y límites simultáneos. Maquinaria propia por distrito, relés detallados y avisos más legibles. [Tácticas, mecanismos y escenas para probar con F6](docs/JEFES_TACTICAS_Y_ARENAS.md).
+Los **cinco jefes** reaccionan a distancia, trayectoria, coberturas o infraestructura mediante decisiones locales y navegación A*. Las arenas incorporan carga suspendida, refrigeración, corriente y sonar, parapeto temporal y sabotaje de relés; hay artilleros, cazadores y saboteadores con llegada anunciada y límites simultáneos. Maquinaria propia por distrito, relés detallados y avisos más legibles. [Tácticas, mecanismos y escenas para probar con F6](docs/gameplay/JEFES_TACTICAS_Y_ARENAS.md).
 
-La revisión actual sigue el GDD: **campamentos → herramientas → profesiones**, construcción con trabajadores, murallas por etapas y **experiencia recogible con tres elecciones al subir de nivel**. [Revisión a fondo, referencias y pendientes](docs/REVISION_GDD_KINGDOM_SURVIVORS.md).
+La revisión actual sigue el GDD: **campamentos → herramientas → profesiones**, construcción con trabajadores, murallas por etapas y **experiencia recogible con tres elecciones al subir de nivel**. [Revisión a fondo, referencias y pendientes](docs/design/REVISION_GDD_KINGDOM_SURVIVORS.md).
 
 > *"De día, la ciudad parecía muerta. De noche, las máquinas vuelven a conectarse."*
 
@@ -104,7 +104,7 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 
 - **Dos papeles para el Portador:** dirige tropas y construcciones en la colonia; combate personalmente en las arenas con esquiva, resistencia y equipo automático.
 - **Siete tipos de enemigo:** Errante, Corredor, Blindado, Saltador, Ariete, Artillero con proyectiles interceptables y Saboteador que busca instalaciones.
-- **Colonias ampliadas:** mapas de 3200 unidades, suministros, generadores, recicladoras, cuarteles y puestos médicos. Profesiones, escuadras y expansión por murallas. [Reglas actuales y escena de práctica](docs/REVISION_GDD_KINGDOM_SURVIVORS.md).
+- **Colonias ampliadas:** mapas de 3200 unidades, suministros, generadores, recicladoras, cuarteles y puestos médicos. Profesiones, escuadras y expansión por murallas. [Reglas actuales y escena de práctica](docs/design/REVISION_GDD_KINGDOM_SURVIVORS.md).
 - **Siluetas propias:** Blindado, Saltador y Ariete usan piezas mecánicas animadas con armadura, muelles y pistón; conservan los sprites anteriores como alternativa del Inspector.
 - **Defensas articuladas:** las torretas siguen blancos y disparan con retroceso desde el cañón. Introducción sin consumir tiempo, objetivos visibles y viajes entre colonias con guardado.
 - **Colonia con profesiones:** recluta supervivientes y ofrece herramientas a trabajadores, tiradores, guardianes, técnicos y médicos. Refugios amplían la población hasta veinte.
@@ -112,10 +112,10 @@ Inspiraciones: **Kingdom Two Crowns** (defensa lateral, economía y expansión),
 - **Expediciones:** la colonia se pausa mientras luchas contra el jefe; si caes, vuelves al mismo momento para prepararte mejor.
 - **Guardado automático** al comenzar cada día (incluye repetidores destruidos y el tren).
 - **Experiencia y clínica:** recoge datos, sube de nivel y elige una mejora. La clínica permite configurar equipo y cambiar cuatro pasivas entre seis disponibles, conservando las evoluciones.
-- **Equipo automático:** dos ranuras, dron, Tesla y disco orbital; cinco niveles, pasivas y tres evoluciones mediante núcleos de enlace. [Cómo equiparlos y evolucionarlos](docs/MODULOS_Y_EVOLUCIONES.md).
+- **Equipo automático:** dos ranuras, dron, Tesla y disco orbital; cinco niveles, pasivas y tres evoluciones mediante núcleos de enlace. [Cómo equiparlos y evolucionarlos](docs/gameplay/MODULOS_Y_EVOLUCIONES.md).
 - **Audio por fases:** música original de trabajo por capas y efectos CC0 de combate. M silencia el audio; mezcla separada de música y efectos.
 - **Presentación:** pixel art lateral en la colonia, arenas cenitales, agua con reflejos, parallax y novela visual con ilustraciones manga a color.
-- **Distrito vivo:** chimeneas con humo, trenes y extractores en el fondo; el primer jefe protege un depósito poligonal junto al canal, con grúa, bombas y maquinaria animada. [Taller, pasos y depósito](docs/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
+- **Distrito vivo:** chimeneas con humo, trenes y extractores en el fondo; el primer jefe protege un depósito poligonal junto al canal, con grúa, bombas y maquinaria animada. [Taller, pasos y depósito](docs/gameplay/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
 
 ## Cómo jugar
 
@@ -193,14 +193,16 @@ ui/          HUD, panel de pausa, tema y fuentes
 data/        Recursos .tres de enemigos, estructuras, oleadas y ciclos
 levels/      Cinco distritos, arenas de jefe y galerías de práctica
 assets/      Sprites, fuentes de LibreSprite, retratos, fondos, iconos y audio
-tools/art/   Arte y animación de LibreSprite; bocetos antiguos en legacy/
-tools/audio/ Generación, preparación y conversión de audio
+tools/art/   Montaje de los sprites actuales y fuentes editables de LibreSprite
+tools/audio/ Preparación y conversión de los recursos de audio actuales
 tools/integrations/ Adaptadores de servicios externos
 tools/maintenance/ Validación y limpieza reproducibles
 tests/       Pruebas automatizadas y simulaciones
 docs/        Índice de guías; GDD en design/, referencias en references/
 build/       Salidas locales regenerables; no se publica en Git
 ```
+
+[Dónde están los sprites y sonidos](assets/README.md) · [Índice de documentación](docs/README.md). Los personajes actuales se concentran en `assets/characters/` y los escenarios en `assets/world/`. Las copias externas de ramas `Ceniza-*` ya integradas se retiraron; este es el directorio de trabajo del juego.
 
 ### Pruebas
 
@@ -227,28 +229,28 @@ Para una revisión visual rápida, abre una escena y pulsa **F6**:
 | `levels/story/novel_preview.tscn` | Las 30 conversaciones ilustradas |
 | `levels/zones/fortress_playground.tscn` | Construcciones, niveles y transporte con presupuesto de práctica |
 
-Las fuentes editables están en `assets/units/animated/sources/`. [Edición y reconstrucción sin conexión](docs/PERSONAJES_Y_ANIMACIONES.md).
+Las fuentes editables están en `assets/characters/units/sources/`. [Edición y reconstrucción sin conexión](docs/art/PERSONAJES_Y_ANIMACIONES.md).
 
 ### Flujo de trabajo
 
 - Cada tarea va en su propia rama (`feature/...`, `audio/...`, `ui/...`) y entra en `main` con Pull Request cuando las pruebas pasan sin fallos.
 - El tablero de sprints y tareas está en Notion (acceso por invitación).
-- Arte: poses con PixelLab, edición y exportación de personajes con LibreSprite, retratos manga y atlas industriales con OpenAI Image Generation; también se conservan recursos de Stable Diffusion local. Procedencia por recurso en [docs/ASSET_SOURCES.csv](docs/ASSET_SOURCES.csv).
+- Arte: poses con PixelLab, edición y exportación de personajes con LibreSprite, retratos manga y atlas industriales con OpenAI Image Generation; también se conservan recursos de Stable Diffusion local. Procedencia por recurso en [docs/art/ASSET_SOURCES.csv](docs/art/ASSET_SOURCES.csv).
 
 ### Documentación
 
-- [Arquitectura y señales](docs/ARQUITECTURA.md)
+- [Arquitectura y señales](docs/development/ARQUITECTURA.md)
 - [Guía de arte y paleta](docs/GUIA_ARTE.md)
-- [Novela visual manga y coherencia de estructuras](docs/NOVELA_VISUAL_Y_COHERENCIA.md)
-- [Personajes animados y edición en LibreSprite](docs/PERSONAJES_Y_ANIMACIONES.md)
-- [Recogida de herramientas, cadencia y depósito del primer jefe](docs/DEPOSITO_Y_VIDA_DEL_DISTRITO.md)
-- [Referencias visuales y capturas actuales](docs/REFERENCIAS_VISUALES.md)
+- [Novela visual manga y coherencia de estructuras](docs/art/NOVELA_VISUAL_Y_COHERENCIA.md)
+- [Personajes animados y edición en LibreSprite](docs/art/PERSONAJES_Y_ANIMACIONES.md)
+- [Recogida de herramientas, cadencia y depósito del primer jefe](docs/gameplay/DEPOSITO_Y_VIDA_DEL_DISTRITO.md)
+- [Referencias visuales y capturas actuales](docs/art/REFERENCIAS_VISUALES.md)
 - [Guía de la versión actual](INICIO.md)
-- [Revisión, mejoras neuronales, audio y recursos pendientes](docs/REVISION_Y_AUDIO.md)
-- [Menú ilustrado y opciones persistentes](docs/MENU_Y_OPCIONES.md)
-- [Equipo y evoluciones](docs/MODULOS_Y_EVOLUCIONES.md)
-- [Siluetas mecánicas y presentación de enemigos](docs/SILUETAS_MECANICAS.md)
-- [Pulido jugable, torretas articuladas y animación de arena](docs/PULIDO_JUGABLE.md)
+- [Revisión, mejoras neuronales, audio y recursos pendientes](docs/audio/AUDIO.md)
+- [Menú ilustrado y opciones persistentes](docs/interface/MENU_Y_OPCIONES.md)
+- [Equipo y evoluciones](docs/gameplay/MODULOS_Y_EVOLUCIONES.md)
+- [Siluetas mecánicas y presentación de enemigos](docs/art/SILUETAS_MECANICAS.md)
+- [Pulido jugable, torretas articuladas y animación de arena](docs/gameplay/EFECTOS_Y_PRESION_JEFES.md)
 - [Documento de diseño (GDD)](docs/design/CENIZA_NEON_GDD.docx)
 
 ### Añadir contenido
@@ -268,8 +270,8 @@ Con apoyo de asistentes de IA (Claude y Codex) para programación, herramientas 
 ## Créditos y licencias
 
 - **Motor:** [Godot Engine](https://godotengine.org) (licencia MIT).
-- **Sonidos:** Kenney, Sci-fi Sounds 1.0, CC0; licencia incluida en `assets/audio/sfx/`. Música sintética original de trabajo, reproducible con `tools/audio/generar_musica.py`.
-- **Fuentes:** Micro 5 y Silkscreen, bajo [SIL Open Font License](assets/fonts/) (licencias incluidas).
-- **Arte generado:** OpenAI Image Generation (retratos manga y nuevos atlas industriales), PixelLab (según sus [términos de servicio](https://pixellab.ai/termsofservice)) y Stable Diffusion 1.5 (CreativeML OpenRAIL-M) con un LoRA de pixel art. Detalle por recurso en [docs/ASSET_SOURCES.csv](docs/ASSET_SOURCES.csv).
+- **Sonidos:** Kenney, Sci-fi Sounds 1.0, CC0; licencia incluida en `assets/audio/sfx/`. El repertorio actual de música 8 bit se documenta en [Audio](docs/audio/AUDIO.md).
+- **Fuentes:** Micro 5 y Silkscreen, bajo [SIL Open Font License](assets/fonts) (licencias incluidas).
+- **Arte generado:** OpenAI Image Generation (retratos manga y nuevos atlas industriales), PixelLab (según sus [términos de servicio](https://pixellab.ai/termsofservice)) y Stable Diffusion 1.5 (CreativeML OpenRAIL-M) con un LoRA de pixel art. Detalle por recurso en [docs/art/ASSET_SOURCES.csv](docs/art/ASSET_SOURCES.csv).
 
 El código y el contenido original de Ceniza Neón son de su autor; **todos los derechos reservados** mientras no se publique una licencia. ¿Encontraste un problema o tienes una idea? Abre un [issue](https://github.com/chefsitturchey-web/Ceniza-ne-n/issues) indicando qué esperabas, qué ocurrió y cómo reproducirlo.

@@ -1,0 +1,1080 @@
+{
+  "columns": 8,
+  "animations": {
+    "idle_south": {
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "fps": 6,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 1
+    },
+    "walk_south": {
+      "frames": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "fps": 12,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 4
+    },
+    "windup_south": {
+      "frames": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "fps": 12,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        2,
+        2
+      ],
+      "min_unique_frames": 3
+    },
+    "attack_south": {
+      "frames": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "fps": 24,
+      "loop": false,
+      "timing": [
+        0.5,
+        0.5,
+        0.75,
+        0.75,
+        1,
+        1.5,
+        1.5,
+        1.5
+      ],
+      "min_unique_frames": 3
+    },
+    "shoot_south": {
+      "frames": [
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "fps": 14,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 3
+    },
+    "charge_south": {
+      "frames": [
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "fps": 16,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 4
+    },
+    "exposed_south": {
+      "frames": [
+        40,
+        41,
+        42,
+        43,
+        44,
+        45
+      ],
+      "fps": 8,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 1
+    },
+    "hurt_south": {
+      "frames": [
+        46,
+        47,
+        48,
+        49
+      ],
+      "fps": 16,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 2
+    },
+    "death_south": {
+      "frames": [
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57
+      ],
+      "fps": 10,
+      "loop": false,
+      "timing": [
+        0.6,
+        0.6,
+        0.8,
+        1,
+        1,
+        1,
+        1,
+        2
+      ],
+      "min_unique_frames": 3
+    },
+    "dodge_south": {
+      "frames": [
+        58,
+        59,
+        60,
+        61,
+        62,
+        63
+      ],
+      "fps": 24,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 3
+    },
+    "idle_east": {
+      "frames": [
+        64,
+        65,
+        66,
+        67,
+        68,
+        69
+      ],
+      "fps": 6,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 1
+    },
+    "walk_east": {
+      "frames": [
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77
+      ],
+      "fps": 12,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 4
+    },
+    "windup_east": {
+      "frames": [
+        78,
+        79,
+        80,
+        81,
+        82,
+        83
+      ],
+      "fps": 12,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        2,
+        2
+      ],
+      "min_unique_frames": 3
+    },
+    "attack_east": {
+      "frames": [
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91
+      ],
+      "fps": 24,
+      "loop": false,
+      "timing": [
+        0.5,
+        0.5,
+        0.75,
+        0.75,
+        1,
+        1.5,
+        1.5,
+        1.5
+      ],
+      "min_unique_frames": 3
+    },
+    "shoot_east": {
+      "frames": [
+        92,
+        93,
+        94,
+        95,
+        96,
+        97
+      ],
+      "fps": 14,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 3
+    },
+    "charge_east": {
+      "frames": [
+        98,
+        99,
+        100,
+        101,
+        102,
+        103
+      ],
+      "fps": 16,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 4
+    },
+    "exposed_east": {
+      "frames": [
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ],
+      "fps": 8,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 1
+    },
+    "hurt_east": {
+      "frames": [
+        110,
+        111,
+        112,
+        113
+      ],
+      "fps": 16,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 2
+    },
+    "death_east": {
+      "frames": [
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121
+      ],
+      "fps": 10,
+      "loop": false,
+      "timing": [
+        0.6,
+        0.6,
+        0.8,
+        1,
+        1,
+        1,
+        1,
+        2
+      ],
+      "min_unique_frames": 3
+    },
+    "dodge_east": {
+      "frames": [
+        122,
+        123,
+        124,
+        125,
+        126,
+        127
+      ],
+      "fps": 24,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 3
+    },
+    "idle_north": {
+      "frames": [
+        128,
+        129,
+        130,
+        131,
+        132,
+        133
+      ],
+      "fps": 6,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 1
+    },
+    "walk_north": {
+      "frames": [
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141
+      ],
+      "fps": 12,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 4
+    },
+    "windup_north": {
+      "frames": [
+        142,
+        143,
+        144,
+        145,
+        146,
+        147
+      ],
+      "fps": 12,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        2,
+        2
+      ],
+      "min_unique_frames": 3
+    },
+    "attack_north": {
+      "frames": [
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155
+      ],
+      "fps": 24,
+      "loop": false,
+      "timing": [
+        0.5,
+        0.5,
+        0.75,
+        0.75,
+        1,
+        1.5,
+        1.5,
+        1.5
+      ],
+      "min_unique_frames": 3
+    },
+    "shoot_north": {
+      "frames": [
+        156,
+        157,
+        158,
+        159,
+        160,
+        161
+      ],
+      "fps": 14,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 3
+    },
+    "charge_north": {
+      "frames": [
+        162,
+        163,
+        164,
+        165,
+        166,
+        167
+      ],
+      "fps": 16,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 4
+    },
+    "exposed_north": {
+      "frames": [
+        168,
+        169,
+        170,
+        171,
+        172,
+        173
+      ],
+      "fps": 8,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 1
+    },
+    "hurt_north": {
+      "frames": [
+        174,
+        175,
+        176,
+        177
+      ],
+      "fps": 16,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 2
+    },
+    "death_north": {
+      "frames": [
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185
+      ],
+      "fps": 10,
+      "loop": false,
+      "timing": [
+        0.6,
+        0.6,
+        0.8,
+        1,
+        1,
+        1,
+        1,
+        2
+      ],
+      "min_unique_frames": 3
+    },
+    "dodge_north": {
+      "frames": [
+        186,
+        187,
+        188,
+        189,
+        190,
+        191
+      ],
+      "fps": 24,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 3
+    },
+    "idle_west": {
+      "frames": [
+        192,
+        193,
+        194,
+        195,
+        196,
+        197
+      ],
+      "fps": 6,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 1
+    },
+    "walk_west": {
+      "frames": [
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205
+      ],
+      "fps": 12,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 4
+    },
+    "windup_west": {
+      "frames": [
+        206,
+        207,
+        208,
+        209,
+        210,
+        211
+      ],
+      "fps": 12,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        2,
+        2
+      ],
+      "min_unique_frames": 3
+    },
+    "attack_west": {
+      "frames": [
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219
+      ],
+      "fps": 24,
+      "loop": false,
+      "timing": [
+        0.5,
+        0.5,
+        0.75,
+        0.75,
+        1,
+        1.5,
+        1.5,
+        1.5
+      ],
+      "min_unique_frames": 3
+    },
+    "shoot_west": {
+      "frames": [
+        220,
+        221,
+        222,
+        223,
+        224,
+        225
+      ],
+      "fps": 14,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 3
+    },
+    "charge_west": {
+      "frames": [
+        226,
+        227,
+        228,
+        229,
+        230,
+        231
+      ],
+      "fps": 16,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 4
+    },
+    "exposed_west": {
+      "frames": [
+        232,
+        233,
+        234,
+        235,
+        236,
+        237
+      ],
+      "fps": 8,
+      "loop": true,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 1
+    },
+    "hurt_west": {
+      "frames": [
+        238,
+        239,
+        240,
+        241
+      ],
+      "fps": 16,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 2
+    },
+    "death_west": {
+      "frames": [
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249
+      ],
+      "fps": 10,
+      "loop": false,
+      "timing": [
+        0.6,
+        0.6,
+        0.8,
+        1,
+        1,
+        1,
+        1,
+        2
+      ],
+      "min_unique_frames": 3
+    },
+    "dodge_west": {
+      "frames": [
+        250,
+        251,
+        252,
+        253,
+        254,
+        255
+      ],
+      "fps": 24,
+      "loop": false,
+      "timing": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "min_unique_frames": 3
+    }
+  },
+  "actors": {
+    "portador_cenital": {
+      "cell": 192,
+      "anchor": [
+        96,
+        146
+      ],
+      "render_scale": 0.5,
+      "camera": "three_quarter",
+      "texture": "res://assets/characters/combat/portador_cenital.png",
+      "source": "res://assets/characters/combat/sources/portador_cenital.ase",
+      "idle_body_bounds": [
+        68,
+        77,
+        112,
+        146
+      ],
+      "key_poses": 80,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "pose_sheets": [
+        "base",
+        "attack",
+        "dodge"
+      ],
+      "locomotion": "native_joint_mesh_8"
+    },
+    "portador": {
+      "cell": 192,
+      "anchor": [
+        96,
+        146
+      ],
+      "render_scale": 0.5,
+      "camera": "lateral",
+      "texture": "res://assets/characters/combat/portador.png",
+      "source": "res://assets/characters/combat/sources/portador.ase",
+      "idle_body_bounds": [
+        70,
+        76,
+        115,
+        146
+      ],
+      "key_poses": 80,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "pose_sheets": [
+        "base",
+        "attack",
+        "dodge"
+      ],
+      "locomotion": "native_joint_mesh_8"
+    },
+    "prefecto": {
+      "cell": 320,
+      "anchor": [
+        160,
+        228
+      ],
+      "render_scale": 0.5,
+      "camera": "three_quarter",
+      "texture": "res://assets/characters/combat/prefecto.png",
+      "source": "res://assets/characters/combat/sources/prefecto.ase",
+      "idle_body_bounds": [
+        117,
+        112,
+        212,
+        228
+      ],
+      "key_poses": 64,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "pose_sheets": [
+        "base",
+        "attack"
+      ],
+      "locomotion": "native_joint_mesh_8"
+    },
+    "madre": {
+      "cell": 320,
+      "anchor": [
+        160,
+        196
+      ],
+      "render_scale": 0.5,
+      "camera": "three_quarter",
+      "texture": "res://assets/characters/combat/madre.png",
+      "source": "res://assets/characters/combat/sources/madre.ase",
+      "idle_body_bounds": [
+        103,
+        53,
+        211,
+        196
+      ],
+      "key_poses": 48,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "pose_sheets": [
+        "base"
+      ],
+      "locomotion": "native_joint_mesh_8"
+    },
+    "recaudador": {
+      "cell": 320,
+      "anchor": [
+        160,
+        196
+      ],
+      "render_scale": 0.65,
+      "camera": "three_quarter",
+      "texture": "res://assets/characters/combat/recaudador.png",
+      "source": "res://assets/characters/combat/sources/recaudador.ase",
+      "idle_body_bounds": [
+        74,
+        54,
+        249,
+        196
+      ],
+      "key_poses": 48,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "pose_sheets": [
+        "base"
+      ],
+      "locomotion": "painted_chassis"
+    },
+    "caldera": {
+      "cell": 320,
+      "anchor": [
+        160,
+        196
+      ],
+      "render_scale": 0.65,
+      "camera": "three_quarter",
+      "texture": "res://assets/characters/combat/caldera.png",
+      "source": "res://assets/characters/combat/sources/caldera.ase",
+      "idle_body_bounds": [
+        102,
+        61,
+        218,
+        196
+      ],
+      "key_poses": 48,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "pose_sheets": [
+        "base"
+      ],
+      "locomotion": "painted_chassis"
+    },
+    "coro": {
+      "cell": 320,
+      "anchor": [
+        160,
+        196
+      ],
+      "render_scale": 0.65,
+      "camera": "three_quarter",
+      "texture": "res://assets/characters/combat/coro.png",
+      "source": "res://assets/characters/combat/sources/coro.ase",
+      "idle_body_bounds": [
+        96,
+        60,
+        223,
+        196
+      ],
+      "key_poses": 48,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "pose_sheets": [
+        "base"
+      ],
+      "locomotion": "painted_chassis"
+    }
+  }
+}

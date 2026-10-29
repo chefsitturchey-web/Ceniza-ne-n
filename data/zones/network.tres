@@ -14,6 +14,6 @@ briefing = "Mantén dos relés activos. E repara cerca de uno; Q protege. Ataca 
 day_duration = 180.0
 wall_offset = 320.0
 turret_offset = 230.0
-background_path = "res://assets/background/network.png"
+background_path = "res://assets/world/backgrounds/network.png"
 accent = Color(0.28, 0.85, 0.8, 1)
 waves = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4")])

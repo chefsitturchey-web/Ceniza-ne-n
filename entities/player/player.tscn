@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://bue30evic2pob"]
 
 [ext_resource type="Script" uid="uid://bfvnr58nk61vj" path="res://entities/player/player.gd" id="1"]
-[ext_resource type="SpriteFrames" path="res://entities/player/player_frames.tres" id="2"]
 
 [sub_resource type="RectangleShape2D" id="BodyShape"]
 size = Vector2(16, 30)
@@ -28,6 +27,3 @@ position_smoothing_speed = 6.0
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
 position = Vector2(0, -20)
-sprite_frames = ExtResource("2")
-animation = &"reposo"
-autoplay = "reposo"

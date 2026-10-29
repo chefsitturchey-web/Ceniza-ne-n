@@ -1,8 +1,8 @@
 class_name DepotArt
 extends RefCounted
-const PARTS: Texture2D = preload("res://assets/expedition/boss/collector_parts_v2.png")
-const PROPS: Texture2D = preload("res://assets/expedition/arena/depot_props_v2.png")
-const MACHINES: Texture2D = preload("res://assets/expedition/arena/encounter_machines_v1.png")
+const PARTS: Texture2D = preload("res://assets/world/expedition/boss/collector_parts_v2.png")
+const PROPS: Texture2D = preload("res://assets/world/expedition/arena/depot_props_v2.png")
+const MACHINES: Texture2D = preload("res://assets/world/expedition/arena/encounter_machines_v1.png")
 static var parts: Dictionary = {}
 static var props: Dictionary = {}
 static var shutter: AtlasTexture

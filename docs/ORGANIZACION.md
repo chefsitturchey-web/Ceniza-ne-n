@@ -20,7 +20,15 @@ La raíz contiene las entradas del proyecto: `project.godot`, el bus de audio, R
 
 Las imágenes aportadas como referencia están en `docs/references/`; las capturas de entregas documentadas, en `docs/media/`. `docs/GUIA_ARTE.md` conserva los ajustes del usuario. El [índice](README.md) permite encontrar las guías por tema.
 
-Los recursos de `assets/unidades/`, `assets/units/`, combate nativo y combate ilustrado no son duplicados que se puedan borrar indiscriminadamente: todavía existen referencias, animaciones originales y rutas de respaldo. Se mantienen sus nombres para conservar esas dependencias y los identificadores de Godot.
+Los personajes actuales están en `assets/characters/` y el escenario en `assets/world/`. Se retiraron las dependencias ocultas que cargaban los sprites anteriores del jugador y trabajadores; sus carpetas y el paquete geométrico de combate se eliminaron. [Mapa de recursos](../assets/README.md).
+
+La documentación está agrupada en `design/`, `gameplay/`, `art/`, `interface/`, `audio/` y `development/`. Se consolidaron siete informes de entregas anteriores o repetidos. La arquitectura se actualizó y seis capturas sin enlaces se retiraron.
+
+## Carpetas Ceniza fuera del proyecto
+
+`Ceniza-enemigos`, `Ceniza-estacion`, `Ceniza-fuente`, `Ceniza-hud`, `Ceniza-jefe` y `Ceniza-refactor` eran copias de trabajo de ramas Git. Se comprobó que sus commits ya estaban integrados y que no contenían cambios pendientes de contenido. Se retiraron con `git worktree remove`, conservando las ramas y su historial. En Refactor solo había diferencias de formato en archivos de importación; se normalizó su índice antes de retirarlo.
+
+`Ceniza-efectos`, `Ceniza-guardado` y `Ceniza-vida` estaban vacías y también se retiraron. El único directorio de trabajo de este repositorio es ahora `Dark Doom`.
 
 Los archivos `.import` guardan ajustes de importación y los `.gd.uid` conservan identificadores de scripts. Se mantienen junto a su recurso. La caché regenerable está dentro de `.godot/`, que Git ignora.
 

@@ -3,7 +3,7 @@ extends Node2D
 ## Tres operaciones persistentes por distrito; el objetivo del HUD se deriva del mundo.
 const RESCUE_X: float = -760
 const RELAY_X: float = 1080
-const TRAIN: Texture2D = preload("res://assets/expedition/train.png")
+const TRAIN: Texture2D = preload("res://assets/world/expedition/train.png")
 var district: District
 var completed: Array[bool] = [false, false, false]
 var relay_ordered: bool = false

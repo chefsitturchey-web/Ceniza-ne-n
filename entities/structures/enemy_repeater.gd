@@ -5,7 +5,7 @@ signal destroyed
 signal defense_requested(portal: EnemyRepeater)
 var defense_warning: float = 0
 var defense_pending: int = 0
-const TEXTURE: Texture2D = preload("res://assets/expedition/repeater.png")
+const TEXTURE: Texture2D = preload("res://assets/world/expedition/repeater.png")
 var health: HealthComponent = HealthComponent.new()
 var effects: StructureEffects = StructureEffects.new()
 var hurtbox: HurtboxComponent = HurtboxComponent.new()

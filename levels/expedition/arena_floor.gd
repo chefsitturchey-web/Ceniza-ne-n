@@ -3,8 +3,8 @@ extends Node2D
 ## Suelo de la arena del Recaudador: baldosas, bordes y detalles de ambiente dibujados una sola vez.
 ## Los detalles usan una semilla fija para que la arena se vea igual en cada visita.
 
-const FLOOR: Texture2D = preload("res://assets/expedition/arena/floor.png")
-const EDGE: Texture2D = preload("res://assets/expedition/arena/edge.png")
+const FLOOR: Texture2D = preload("res://assets/world/expedition/arena/floor.png")
+const EDGE: Texture2D = preload("res://assets/world/expedition/arena/edge.png")
 const SIZE: Vector2 = Vector2(640, 480)
 const SEED: int = 1907
 

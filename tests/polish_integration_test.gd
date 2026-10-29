@@ -160,7 +160,7 @@ func run_checks() -> void:
 	arena.player.elapsed = 0.1
 	arena.player.update_visual()
 	var foot: int = arena.player.combat_visual.sprite.frame
-	verify(arena.player.combat_visual.current == &"walk_north" and not arena.player.sprite.visible, "Carrera norte usa la secuencia nativa")
+	verify(arena.player.combat_visual.current == &"walk_north" and arena.player.find_children("*", "AnimatedSprite2D", true, false).size() == 1, "Carrera norte usa solo la secuencia actual, sin sprites ocultos anteriores")
 	arena.player.elapsed = 0.35
 	arena.player.position.y -= 12
 	arena.player.update_visual()

@@ -1,0 +1,249 @@
+[
+  {
+    "asset": "assets/world/structures/fortress/core_1.png",
+    "tool": "create_image_pixflux",
+    "job_id": "d7f8a72a-4a8f-49d6-82ad-ec4249b8047e",
+    "seed": 1729,
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level ONE colony command core: a modest repaired steel utility cabin, central cyan vertical reactor visible behind window, one sloping corrugated roof, small amber lantern, cable conduits, welded scrap foundations. Simple functional shelter about 65px high and 100px wide.",
+      "width": 144,
+      "height": 112,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1729
+    },
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level ONE colony command core: a modest repaired steel utility cabin, central cyan vertical reactor visible behind window, one sloping corrugated roof, small amber lantern, cable conduits, welded scrap foundations. Simple functional shelter about 65px high and 100px wide."
+  },
+  {
+    "asset": "assets/world/structures/fortress/core_2.png",
+    "tool": "create_image_pixflux",
+    "job_id": "703aab21-58e3-4f9b-b325-8bdb715476d7",
+    "seed": 1730,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level TWO colony command core: same steel utility cabin upgraded to fortified brick and steel power station, same central cyan vertical reactor window and sloping roof identity, reinforced corner columns, side generator cabinet, copper pipes, antenna, amber lamp, cyan circuit trim. About 80px tall 120px wide, readable detailed silhouette.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level TWO colony command core: same steel utility cabin upgraded to fortified brick and steel power station, same central cyan vertical reactor window and sloping roof identity, reinforced corner columns, side generator cabinet, copper pipes, antenna, amber lamp, cyan circuit trim. About 80px tall 120px wide, readable detailed silhouette.",
+      "width": 144,
+      "height": 112,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1730
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/core_3.png",
+    "tool": "create_image_pixflux",
+    "job_id": "f7b43ec6-5a41-4be7-b898-ad9c3825d7b6",
+    "seed": 1731,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level THREE colony command core: same steel power station evolved into armored command keep, same central cyan reactor and sloping roof identity, three stacked reactor windows, reinforced bronze buttresses, high radio mast, compact side power units, layered roof and catwalk, thick exposed pipes. About 100px tall 135px wide. Intricate but legible.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level THREE colony command core: same steel power station evolved into armored command keep, same central cyan reactor and sloping roof identity, three stacked reactor windows, reinforced bronze buttresses, high radio mast, compact side power units, layered roof and catwalk, thick exposed pipes. About 100px tall 135px wide. Intricate but legible.",
+      "width": 144,
+      "height": 112,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1731
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/wall_1.png",
+    "tool": "create_image_pixflux",
+    "job_id": "c7795d0f-459c-48c4-a733-09981e2570c9",
+    "seed": 1732,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level ONE defensive wall: narrow rough barricade, two timber posts with patched scrap metal plate, improvised diagonal braces, steel spikes angled out to right, rust bolts, small cyan lamp. Narrow about 26px wide and 43px high, complete vertical side silhouette.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level ONE defensive wall: narrow rough barricade, two timber posts with patched scrap metal plate, improvised diagonal braces, steel spikes angled out to right, rust bolts, small cyan lamp. Narrow about 26px wide and 43px high, complete vertical side silhouette.",
+      "width": 64,
+      "height": 96,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1732
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/wall_2.png",
+    "tool": "create_image_pixflux",
+    "job_id": "04336a94-a690-4a90-9689-cf6298b75f56",
+    "seed": 1733,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level TWO defensive wall: narrow reinforced steel barrier sharing two-post silhouette of a scrap barricade, welded heavy plates, triangular buttress, bronze diagonal braces, upper battlements and steel spikes facing right, small cyan lamp. About 32px wide and 57px high.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level TWO defensive wall: narrow reinforced steel barrier sharing two-post silhouette of a scrap barricade, welded heavy plates, triangular buttress, bronze diagonal braces, upper battlements and steel spikes facing right, small cyan lamp. About 32px wide and 57px high.",
+      "width": 64,
+      "height": 96,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1733
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/wall_3.png",
+    "tool": "create_image_pixflux",
+    "job_id": "36f13631-9218-4fce-a864-7c377eb304ed",
+    "seed": 1734,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level THREE defensive wall: tall narrow armored fortification evolved from two-post steel barricade, thick bronze and navy steel plate layers, concrete footings, heavy rivets, cyan energy seam, angular crenellations, right-facing steel spikes. About 40px wide and 72px high.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level THREE defensive wall: tall narrow armored fortification evolved from two-post steel barricade, thick bronze and navy steel plate layers, concrete footings, heavy rivets, cyan energy seam, angular crenellations, right-facing steel spikes. About 40px wide and 72px high.",
+      "width": 64,
+      "height": 96,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1734
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/turret_base_1.png",
+    "tool": "create_image_pixflux",
+    "job_id": "7fa2b3e3-a1b7-4aa3-9d48-a5b50fc1095b",
+    "seed": 1735,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level ONE turret pedestal ONLY, without gun or barrel: low welded tripod and square steel pivot mounting box, rough bolted panels, copper cable and small cyan status light, solid industrial support on ground. About 28px wide and 30px high.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level ONE turret pedestal ONLY, without gun or barrel: low welded tripod and square steel pivot mounting box, rough bolted panels, copper cable and small cyan status light, solid industrial support on ground. About 28px wide and 30px high.",
+      "width": 64,
+      "height": 80,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1735
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/turret_base_2.png",
+    "tool": "create_image_pixflux",
+    "job_id": "2df8a612-d0c4-4548-8735-07ef2e315189",
+    "seed": 1736,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level TWO turret pedestal ONLY, without gun or barrel: reinforced square pivot mounting box on a broad armored column, steel ribs and bronze braces, stacked vent panels, cyan status lamp, heavy ground feet. Same industrial family as welded tripod. About 34px wide and 42px high.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level TWO turret pedestal ONLY, without gun or barrel: reinforced square pivot mounting box on a broad armored column, steel ribs and bronze braces, stacked vent panels, cyan status lamp, heavy ground feet. Same industrial family as welded tripod. About 34px wide and 42px high.",
+      "width": 64,
+      "height": 80,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1736
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/turret_base_3.png",
+    "tool": "create_image_pixflux",
+    "job_id": "76b5de76-bb20-4c8e-9106-ce287fd83081",
+    "seed": 1737,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level THREE turret pedestal ONLY, without gun or barrel: heavy compact armored watchtower mounting base, stacked steel and bronze plates, rectangular upper pivot platform, rivets, cyan reactor strip, four thick braced ground feet. Same industrial family. About 40px wide and 52px high.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level THREE turret pedestal ONLY, without gun or barrel: heavy compact armored watchtower mounting base, stacked steel and bronze plates, rectangular upper pivot platform, rivets, cyan reactor strip, four thick braced ground feet. Same industrial family. About 40px wide and 52px high.",
+      "width": 64,
+      "height": 80,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1737
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/turret_head_1.png",
+    "tool": "create_image_pixflux",
+    "job_id": "fd47085e-b292-4827-9b43-a2394f6be7f0",
+    "seed": 1738,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level ONE turret rotating gun head ONLY, detached, horizontal facing right: compact steel breech at left connected to one long rifle barrel at right, rust bolts and copper ammo feed, small cyan visor. Whole head about 46px wide 16px tall, no pedestal no ground.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level ONE turret rotating gun head ONLY, detached, horizontal facing right: compact steel breech at left connected to one long rifle barrel at right, rust bolts and copper ammo feed, small cyan visor. Whole head about 46px wide 16px tall, no pedestal no ground.",
+      "width": 80,
+      "height": 40,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1738
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/turret_head_2.png",
+    "tool": "create_image_pixflux",
+    "job_id": "8dc7a281-1add-4381-a800-2253ad5c36bf",
+    "seed": 1739,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level TWO turret rotating gun head ONLY, detached, horizontal facing right: compact armored twin-barrel autocannon, breech and circular hinge on left, two long gun barrels to right, bronze cooling fins, cyan aiming lens, copper ammunition feed. About 53px wide 22px tall. No pedestal no ground.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level TWO turret rotating gun head ONLY, detached, horizontal facing right: compact armored twin-barrel autocannon, breech and circular hinge on left, two long gun barrels to right, bronze cooling fins, cyan aiming lens, copper ammunition feed. About 53px wide 22px tall. No pedestal no ground.",
+      "width": 80,
+      "height": 40,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1739
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/turret_head_3.png",
+    "tool": "create_image_pixflux",
+    "job_id": "1d2ab941-28ed-4e64-bcc1-29fbeb8dc4e5",
+    "seed": 1740,
+    "prompt": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level THREE turret rotating gun head ONLY, detached, horizontal facing right: advanced heavy rail cannon, armored breech and circular hinge on left, long double magnetic rails extending right, bronze heatsinks and bright cyan coil between rails, weathered gray steel. About 60px wide 26px tall, no pedestal no ground.",
+    "parameters": {
+      "description": "Original CENIZA NEON side scrolling game. Flat side elevation, no isometric view, isolated complete sprite transparent background, grounded feet aligned, no text, no labels, no ground tile. Detailed crisp pixel art, dark charcoal navy outlines, weathered gray steel, rust bronze rivets, muted cyan light and amber lamps, consistent industrial post apocalypse design. Human reference height 35px, doors about 38px tall. Level THREE turret rotating gun head ONLY, detached, horizontal facing right: advanced heavy rail cannon, armored breech and circular hinge on left, long double magnetic rails extending right, bronze heatsinks and bright cyan coil between rails, weathered gray steel. About 60px wide 26px tall, no pedestal no ground.",
+      "width": 80,
+      "height": 40,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 1740
+    }
+  },
+  {
+    "asset": "assets/world/structures/fortress/cargo_board.png",
+    "tool": "create_image_pixflux",
+    "job_id": "5af5f67b-ba9d-4a7a-b2f7-a51c6ce8d9e3",
+    "seed": 2810,
+    "prompt": "Original CENIZA NEON electric cargo hoverboard for a side scrolling cyberpunk strategy game, complete isolated low horizontal platform facing right, no rider no people no legs no text no background. Weathered gray steel and rust bronze deck, angular nose pointing right, four compact cyan antigravity thrusters underneath, amber battery lamp, bolts and cables, thin readable silhouette. Detailed crisp pixel art selective dark navy outline, same industrial style as a fortified colony power station. Platform about 50 pixels wide and 12 pixels high, centered on transparent canvas. Flat side view, no isometric perspective.",
+    "parameters": {
+      "description": "Original CENIZA NEON electric cargo hoverboard for a side scrolling cyberpunk strategy game, complete isolated low horizontal platform facing right, no rider no people no legs no text no background. Weathered gray steel and rust bronze deck, angular nose pointing right, four compact cyan antigravity thrusters underneath, amber battery lamp, bolts and cables, thin readable silhouette. Detailed crisp pixel art selective dark navy outline, same industrial style as a fortified colony power station. Platform about 50 pixels wide and 12 pixels high, centered on transparent canvas. Flat side view, no isometric perspective.",
+      "width": 64,
+      "height": 32,
+      "no_background": true,
+      "view": "side",
+      "direction": "east",
+      "outline": "selective outline",
+      "shading": "detailed shading",
+      "detail": "highly detailed",
+      "seed": 2810
+    }
+  }
+]

@@ -1,7 +1,7 @@
 class_name BackdropLife
 extends RefCounted
 ## Anclajes medidos sobre periphery_alive_v2.png; humo, ventiladores y vía comparten el dibujo.
-const TRAIN: Texture2D = preload("res://assets/expedition/train.png")
+const TRAIN: Texture2D = preload("res://assets/world/expedition/train.png")
 static var fan: AtlasTexture
 
 static func draw_factory(canvas: CanvasItem, time: float, top: float, frame: Transform2D = Transform2D.IDENTITY) -> void:

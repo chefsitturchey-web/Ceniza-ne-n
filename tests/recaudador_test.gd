@@ -113,7 +113,7 @@ func run_checks() -> void:
 	player.facing = Vector2.UP
 	player.velocity = Vector2.UP * player.speed
 	player.update_visual()
-	verify(player.combat_visual.current == &"walk_north" and not player.runner.visible, "Carrera norte usa fotogramas completos de LibreSprite")
+	verify(player.combat_visual.current == &"walk_north" and player.find_children("*", "AnimatedSprite2D", true, false).size() == 1, "Carrera norte usa un solo sprite actual de LibreSprite, sin corredores ocultos")
 	player.facing = Vector2.LEFT
 	player.update_visual()
 	verify(player.combat_visual.current == &"walk_west" and not player.combat_visual.sprite.flip_h, "Carrera oeste usa su secuencia exportada completa")

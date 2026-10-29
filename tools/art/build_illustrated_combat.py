@@ -11,10 +11,10 @@ import subprocess
 from pathlib import Path
 from collections import deque
 from PIL import Image
-from build_combat_sprites import ROOT, blank, STATES, DIRECTIONS, ACTORS
+from ase_document import ROOT, blank, STATES, DIRECTIONS, ACTORS
 
 WORK = ROOT / '.godot/combat-v2'
-OUT = ROOT / 'assets/combat/illustrated'
+OUT = ROOT / 'assets/characters/combat'
 MIN_FRAMES = {'idle': 1, 'walk': 4, 'windup': 3, 'attack': 3, 'shoot': 3,
               'charge': 4, 'exposed': 1, 'hurt': 2, 'death': 3, 'dodge': 3}
 POSES = {'idle': [0]*6, 'walk': [1, 1, 2, 0, 3, 3, 4, 0],
@@ -209,8 +209,8 @@ def main():
         assert len(exported['frames']) == cursor and len(exported['meta']['frameTags']) == len(clips)
         layout['actors'][actor] = {'cell': size, 'anchor': anchor, 'render_scale': 0.65 if actor in ['recaudador', 'caldera', 'coro'] else 0.5,
                                    'camera': 'lateral' if actor == 'portador' else 'three_quarter',
-                                   'texture': f'res://assets/combat/illustrated/{actor}.png',
-                                   'source': f'res://assets/combat/illustrated/sources/{actor}.ase',
+                                   'texture': f'res://assets/characters/combat/{actor}.png',
+                                   'source': f'res://assets/characters/combat/sources/{actor}.ase',
                                    'idle_body_bounds': json.loads(bounds[1]),
                                    'key_poses': 48+16*(len(sheets)-1), 'directions': DIRECTIONS,
                                    'pose_sheets': list(sheets),

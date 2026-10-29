@@ -1,5 +1,5 @@
 {
-  "res://assets/units/field_atlas_v3.png": [
+  "res://assets/characters/units/field_atlas_v3.png": [
     [
       20,
       43,
@@ -49,7 +49,7 @@
       367
     ]
   ],
-  "res://assets/structures/civic_atlas_v3.png": [
+  "res://assets/world/structures/civic_atlas_v3.png": [
     [
       33,
       82,
@@ -75,7 +75,7 @@
       438
     ]
   ],
-  "res://assets/structures/industrial_atlas_v2.png": [
+  "res://assets/world/structures/industrial_atlas_v2.png": [
     [
       20,
       24,
@@ -101,7 +101,7 @@
       443
     ]
   ],
-  "res://assets/structures/coherent_fortress_v3.png": [
+  "res://assets/world/structures/coherent_fortress_v3.png": [
     [
       36,
       99,
@@ -175,7 +175,7 @@
       158
     ]
   ],
-  "res://assets/structures/coherent_walls_v3.png": [
+  "res://assets/world/structures/coherent_walls_v3.png": [
     [
       94,
       242,
@@ -195,7 +195,7 @@
       829
     ]
   ],
-  "res://assets/structures/coherent_civic_v4.png": [
+  "res://assets/world/structures/coherent_civic_v4.png": [
     [
       9,
       112,
@@ -233,7 +233,7 @@
       423
     ]
   ],
-  "res://assets/story/portraits_manga_v2.png": [
+  "res://assets/characters/portraits/portraits_manga_v2.png": [
     [
       3,
       0,
@@ -271,7 +271,7 @@
       512
     ]
   ],
-  "res://assets/story/antagonists_manga_v2.png": [
+  "res://assets/characters/portraits/antagonists_manga_v2.png": [
     [
       0,
       6,
@@ -285,7 +285,7 @@
       724
     ]
   ],
-  "res://assets/expedition/boss/collector_parts_v2.png": [
+  "res://assets/world/expedition/boss/collector_parts_v2.png": [
     [
       68,
       14,
@@ -323,7 +323,7 @@
       307
     ]
   ],
-  "res://assets/expedition/arena/depot_props_v2.png": [
+  "res://assets/world/expedition/arena/depot_props_v2.png": [
     [
       18,
       14,
@@ -349,7 +349,7 @@
       421
     ]
   ],
-  "res://assets/expedition/arena/encounter_machines_v1.png": [
+  "res://assets/world/expedition/arena/encounter_machines_v1.png": [
     [
       118,
       4,
@@ -375,7 +375,7 @@
       509
     ]
   ],
-  "res://assets/structures/fortress/cargo_board.png": [
+  "res://assets/world/structures/fortress/cargo_board.png": [
     [
       7,
       8,
@@ -383,7 +383,7 @@
       19
     ]
   ],
-  "res://assets/structures/fortress/core_1.png": [
+  "res://assets/world/structures/fortress/core_1.png": [
     [
       2,
       6,
@@ -391,7 +391,7 @@
       102
     ]
   ],
-  "res://assets/structures/fortress/core_2.png": [
+  "res://assets/world/structures/fortress/core_2.png": [
     [
       3,
       11,
@@ -399,7 +399,7 @@
       85
     ]
   ],
-  "res://assets/structures/fortress/core_3.png": [
+  "res://assets/world/structures/fortress/core_3.png": [
     [
       5,
       10,
@@ -407,7 +407,7 @@
       92
     ]
   ],
-  "res://assets/structures/fortress/turret_base_1.png": [
+  "res://assets/world/structures/fortress/turret_base_1.png": [
     [
       8,
       2,
@@ -415,7 +415,7 @@
       76
     ]
   ],
-  "res://assets/structures/fortress/turret_base_2.png": [
+  "res://assets/world/structures/fortress/turret_base_2.png": [
     [
       10,
       5,
@@ -423,7 +423,7 @@
       72
     ]
   ],
-  "res://assets/structures/fortress/turret_base_3.png": [
+  "res://assets/world/structures/fortress/turret_base_3.png": [
     [
       8,
       4,
@@ -431,7 +431,7 @@
       72
     ]
   ],
-  "res://assets/structures/fortress/turret_head_1.png": [
+  "res://assets/world/structures/fortress/turret_head_1.png": [
     [
       2,
       2,
@@ -439,7 +439,7 @@
       36
     ]
   ],
-  "res://assets/structures/fortress/turret_head_2.png": [
+  "res://assets/world/structures/fortress/turret_head_2.png": [
     [
       3,
       5,
@@ -447,7 +447,7 @@
       31
     ]
   ],
-  "res://assets/structures/fortress/turret_head_3.png": [
+  "res://assets/world/structures/fortress/turret_head_3.png": [
     [
       0,
       5,
@@ -455,7 +455,7 @@
       33
     ]
   ],
-  "res://assets/structures/fortress/wall_1.png": [
+  "res://assets/world/structures/fortress/wall_1.png": [
     [
       2,
       8,
@@ -463,7 +463,7 @@
       80
     ]
   ],
-  "res://assets/structures/fortress/wall_2.png": [
+  "res://assets/world/structures/fortress/wall_2.png": [
     [
       5,
       7,
@@ -471,7 +471,7 @@
       82
     ]
   ],
-  "res://assets/structures/fortress/wall_3.png": [
+  "res://assets/world/structures/fortress/wall_3.png": [
     [
       4,
       3,

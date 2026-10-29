@@ -1,35 +1,33 @@
 # Documentación de CENIZA NEÓN
 
-Empieza por [INICIO](../INICIO.md) para jugar o por [Organización](ORGANIZACION.md) para localizar archivos y limpiar resultados de pruebas.
+- [Inicio para jugar](../INICIO.md).
+- [Organización, limpieza y carpetas antiguas](ORGANIZACION.md).
+- [Dónde están los sprites y sonidos](../assets/README.md).
 
-## Diseño y mecánicas
+## Diseño y campaña
 
-- [Documento de diseño original](design/CENIZA_NEON_GDD.docx).
-- [Revisión de Kingdom y Vampire Survivors](REVISION_GDD_KINGDOM_SURVIVORS.md).
-- [Historia y campaña](HISTORIA_Y_CAMPANA.md), [campaña y jefes](CAMPANA_Y_JEFES.md).
-- [Construcción, niveles y movilidad](ESCALA_NIVELES_Y_MOVILIDAD.md).
-- [Comandante y portales](COMANDANTE_Y_PORTALES.md), [depósito y profesiones](DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
-- [Expansión y unidades](EXPANSION_Y_UNIDADES.md), [módulos y evoluciones](MODULOS_Y_EVOLUCIONES.md).
+[Documento de diseño](design/CENIZA_NEON_GDD.docx) · [Historia y campaña actual](design/HISTORIA_Y_CAMPANA.md) · [Reglas inspiradas en Kingdom y Vampire Survivors](design/REVISION_GDD_KINGDOM_SURVIVORS.md)
 
-## Combate e interfaz
+## Mecánicas
 
-- [Tácticas y arenas](JEFES_TACTICAS_Y_ARENAS.md).
-- [Marcha, efectos y presión de los jefes](EFECTOS_Y_PRESION_JEFES.md).
-- [Barras de vida y marcos de combate](INTERFAZ_COMBATE.md).
-- [Laboratorio F1](LABORATORIO_DEPURACION.md), [menú y opciones](MENU_Y_OPCIONES.md).
-- [Pulido jugable](PULIDO_JUGABLE.md).
+- [Construcción, niveles y movilidad](gameplay/ESCALA_NIVELES_Y_MOVILIDAD.md).
+- [Comandante, unidades y portales](gameplay/COMANDANTE_Y_PORTALES.md).
+- [Trabajadores, profesiones y depósito](gameplay/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
+- [Armas, pasivas y evoluciones](gameplay/MODULOS_Y_EVOLUCIONES.md).
+- [Tácticas y arenas](gameplay/JEFES_TACTICAS_Y_ARENAS.md).
+- [Marcha, impactos y presión de los jefes](gameplay/EFECTOS_Y_PRESION_JEFES.md).
 
-## Arte y audio
+## Arte
 
-- [Portador y jefes ilustrados](ARTE_COMBATE_ILUSTRADO.md), [pipeline nativo de combate](COMBATE_LIBRESPRITE.md).
-- [Personajes y animaciones](PERSONAJES_Y_ANIMACIONES.md), [animaciones del Errante](ANIMACIONES_ERRANTE.md).
-- [Novela visual](NOVELA_VISUAL_Y_COHERENCIA.md), [guía de arte del usuario](GUIA_ARTE.md).
-- [Referencias visuales](REFERENCIAS_VISUALES.md), [siluetas mecánicas](SILUETAS_MECANICAS.md).
-- [Procedencia y licencias](ASSET_SOURCES.csv), [trabajos de estructuras](FORTRESS_ASSET_JOBS.json).
-- [Revisión y audio](REVISION_Y_AUDIO.md), [prueba de música 8 bit](PRUEBA_AUDIO_8BIT.md).
+- [Portador y jefes: diseño y pipeline vigente](art/ARTE_COMBATE_ILUSTRADO.md).
+- [Aliados y animaciones de enemigos](art/PERSONAJES_Y_ANIMACIONES.md).
+- [Novela visual y retratos](art/NOVELA_VISUAL_Y_COHERENCIA.md).
+- [Siluetas mecánicas del asedio](art/SILUETAS_MECANICAS.md).
+- [Referencias visuales](art/REFERENCIAS_VISUALES.md), [procedencia y licencias](art/ASSET_SOURCES.csv), [trabajos de estructuras](art/FORTRESS_ASSET_JOBS.json).
+- [Guía de arte del usuario](GUIA_ARTE.md).
 
-## Desarrollo
+## Interfaz, sonido y desarrollo
 
-- [Organización, registros y limpieza](ORGANIZACION.md).
-- [Herramientas y comandos](../tools/README.md).
-- [Arquitectura inicial](ARQUITECTURA.md): describe la primera fase; los módulos posteriores se documentan en sus guías.
+[Vida y marcos de combate](interface/INTERFAZ_COMBATE.md) · [Menús y opciones](interface/MENU_Y_OPCIONES.md) · [Laboratorio F1](interface/LABORATORIO_DEPURACION.md) · [Audio](audio/AUDIO.md) · [Arquitectura actual](development/ARQUITECTURA.md) · [Herramientas](../tools/README.md)
+
+Se eliminaron los informes antiguos sobre tres distritos, módulos sustituidos y sprites anteriores. Sus reglas actuales se encuentran en las guías de arriba; el historial de Git conserva las versiones anteriores.

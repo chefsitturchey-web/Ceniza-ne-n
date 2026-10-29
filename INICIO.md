@@ -2,15 +2,15 @@
 
 Abre `project.godot` en Godot 4 y pulsa **F5**. Nueva partida inicia la campaña; Continuar recupera tu colonia y operaciones. Hay guardado al amanecer y al completar operaciones. Perder el núcleo permite recuperar el último guardado. La campaña tiene cinco capítulos y un final; **la meta de cuatro horas aún necesita más contenido y pruebas de duración**.
 
-**Para probar libremente: pulsa F1.** El laboratorio permite entrar a los cinco jefes sin requisitos, elegir fase y equipo, activar invulnerabilidad, cámara lenta, crear unidades y preparar colonias. **F2** invulnerabilidad, **F3** congelar enemigos, **F4** colisiones y rutas. Los trucos marcan la sesión como práctica y conservan el checkpoint normal. [Guía del laboratorio](docs/LABORATORIO_DEPURACION.md).
+**Para probar libremente: pulsa F1.** El laboratorio permite entrar a los cinco jefes sin requisitos, elegir fase y equipo, activar invulnerabilidad, cámara lenta, crear unidades y preparar colonias. **F2** invulnerabilidad, **F3** congelar enemigos, **F4** colisiones y rutas. Los trucos marcan la sesión como práctica y conservan el checkpoint normal. [Guía del laboratorio](docs/interface/LABORATORIO_DEPURACION.md).
 
-**Nuevo arte ilustrado y animado:** Portador y jefes basados en sus retratos manga, con materiales detallados y poses completas. El Portador conserva unos 35 píxeles de altura de mundo y tiene marcha, estocada, reacción, voltereta y caída para ambas cámaras. Pulsa **F6 en `levels/story/combat_animation_preview.tscn`**; activa **Giro**, pulsa **1–6** para detalle y **0** para volver al conjunto. Alterna cámara para compararlo con el guardián. [Fuentes de LibreSprite, prompts y diseño](docs/ARTE_COMBATE_ILUSTRADO.md).
+**Nuevo arte ilustrado y animado:** Portador y jefes basados en sus retratos manga, con materiales detallados y poses completas. El Portador conserva unos 35 píxeles de altura de mundo y tiene marcha, estocada, reacción, voltereta y caída para ambas cámaras. Pulsa **F6 en `levels/story/combat_animation_preview.tscn`**; activa **Giro**, pulsa **1–6** para detalle y **0** para volver al conjunto. Alterna cámara para compararlo con el guardián. [Fuentes de LibreSprite, prompts y diseño](docs/art/ARTE_COMBATE_ILUSTRADO.md).
 
-La historia se presenta con retratos manga a color, conversaciones y fundidos. **E / Enter / Espacio** avanza; **Esc** omite. En **L → Ver conversación** puedes releer escenas. Para probar todo el guion con F6, abre `levels/story/novel_preview.tscn`. [Detalles y dirección visual](docs/NOVELA_VISUAL_Y_COHERENCIA.md).
+La historia se presenta con retratos manga a color, conversaciones y fundidos. **E / Enter / Espacio** avanza; **Esc** omite. En **L → Ver conversación** puedes releer escenas. Para probar todo el guion con F6, abre `levels/story/novel_preview.tscn`. [Detalles y dirección visual](docs/art/NOVELA_VISUAL_Y_COHERENCIA.md).
 
 ## Controles
 
-Para revisar las animaciones de aliados y profesiones, abre `levels/story/unit_animation_preview.tscn` y pulsa **F6**. [Guía de personajes y archivos de LibreSprite](docs/PERSONAJES_Y_ANIMACIONES.md).
+Para revisar las animaciones de aliados y profesiones, abre `levels/story/unit_animation_preview.tscn` y pulsa **F6**. [Guía de personajes y archivos de LibreSprite](docs/art/PERSONAJES_Y_ANIMACIONES.md).
 
 | Acción | Teclado | Mando Xbox |
 |---|---|---|
@@ -27,7 +27,7 @@ Para revisar las animaciones de aliados y profesiones, abre `levels/story/unit_a
 
 En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora, recoge datos, esquiva y activa sobrecargas. Sus armas personales funcionan contra los jefes; los módulos equipados también transmiten una bonificación de daño a los soldados.
 
-En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y trayectoria; observa los avisos y sus ventanas de recuperación. **E** cerca de las consolas cian activa carga, refrigeración, interferencia o parapeto, según el recinto. En Madre Cero, E repara relés y Q los protege. Los refuerzos pueden recibir daño de tu hoja y módulos. [Los cinco jefes, mecanismos y escenas para probar con F6](docs/JEFES_TACTICAS_Y_ARENAS.md).
+En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y trayectoria; observa los avisos y sus ventanas de recuperación. **E** cerca de las consolas cian activa carga, refrigeración, interferencia o parapeto, según el recinto. En Madre Cero, E repara relés y Q los protege. Los refuerzos pueden recibir daño de tu hoja y módulos. [Los cinco jefes, mecanismos y escenas para probar con F6](docs/gameplay/JEFES_TACTICAS_Y_ARENAS.md).
 
 ## Primeros pasos
 
@@ -39,7 +39,7 @@ En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y 
 6. F ordena a los soldados del frente atacar la entrada más cercana. Los portales avisan y generan defensores al perder vida. Otra F retira la escuadra. Esos refuerzos no dan botín: no se puede ganar experiencia infinita provocando una puerta.
 7. Recoge los datos que dejan los enemigos. Cada nivel pausa el juego y ofrece armas, pasivas o implantes con iconos. Hay dos ranuras de módulo y cuatro pasivas; evoluciona con nivel 5, catalizador y núcleo. La clínica permite consultar y equipar lo que ya obtuviste.
 
-Si una persona no recoge una herramienta, consulta el aviso sobre el taller: indica la instalación o plaza que falta. Las herramientas reservadas no se pierden. De noche pueden recogerlas si el taller queda dentro de las murallas y está a salvo. [Recogida, animaciones y nuevo depósito del jefe](docs/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
+Si una persona no recoge una herramienta, consulta el aviso sobre el taller: indica la instalación o plaza que falta. Las herramientas reservadas no se pierden. De noche pueden recogerlas si el taller queda dentro de las murallas y está a salvo. [Recogida, animaciones y nuevo depósito del jefe](docs/gameplay/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
 
 ## Historia, operaciones y tren
 
@@ -61,7 +61,7 @@ Las arenas permiten movimiento en ocho direcciones y combate personal. Si pierde
 
 ## Transporte opcional
 
-Con núcleo de nivel 2 puedes comprar una plataforma eléctrica por 45 junto al taller de x=-880. E compra o monta; V sube y baja cerca de ella. Aumenta la velocidad de viaje un 45 %. Detente en el núcleo o en ese taller para recargar la batería. Queda aparcada al bajar y viaja contigo en tren. Contra los jefes vas a pie. [Niveles, medidas, desbloqueos y pruebas](docs/ESCALA_NIVELES_Y_MOVILIDAD.md).
+Con núcleo de nivel 2 puedes comprar una plataforma eléctrica por 45 junto al taller de x=-880. E compra o monta; V sube y baja cerca de ella. Aumenta la velocidad de viaje un 45 %. Detente en el núcleo o en ese taller para recargar la batería. Queda aparcada al bajar y viaja contigo en tren. Contra los jefes vas a pie. [Niveles, medidas, desbloqueos y pruebas](docs/gameplay/ESCALA_NIVELES_Y_MOVILIDAD.md).
 
 ## Pruebas rápidas en Godot
 
@@ -71,4 +71,4 @@ Con núcleo de nivel 2 puedes comprar una plataforma eléctrica por 45 junto al 
 - Laboratorio con presupuesto de práctica: `levels/zones/expansion_playground.tscn`. Esa escena no guarda sobre tu partida.
 - Batería automática: `godot --headless --path . --script res://tests/run_all.gd` (sustituye `godot` por tu ejecutable de consola).
 
-Se conservan los tiempos de 180 s de día, 20 de aviso y 90 de noche. [Historia, objetivos, arte y estado real de duración](docs/HISTORIA_Y_CAMPANA.md). [Reglas de comandante y estudio de Kingdom Two Crowns](docs/COMANDANTE_Y_PORTALES.md).
+Se conservan los tiempos de 180 s de día, 20 de aviso y 90 de noche. [Historia, objetivos, arte y estado real de duración](docs/design/HISTORIA_Y_CAMPANA.md). [Reglas de comandante y estudio de Kingdom Two Crowns](docs/gameplay/COMANDANTE_Y_PORTALES.md).

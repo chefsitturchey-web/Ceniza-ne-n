@@ -2,8 +2,8 @@ class_name NovelPanel
 extends CanvasLayer
 ## Modal con dueño de pausa; el texto no avanza el reloj ni ejecuta acciones del mundo.
 signal finished(scene_id: String)
-const PORTRAITS: Texture2D = preload("res://assets/story/portraits_manga_v2.png")
-const ANTAGONISTS: Texture2D = preload("res://assets/story/antagonists_manga_v2.png")
+const PORTRAITS: Texture2D = preload("res://assets/characters/portraits/portraits_manga_v2.png")
+const ANTAGONISTS: Texture2D = preload("res://assets/characters/portraits/antagonists_manga_v2.png")
 const CAST: Array[String] = ["mara", "ivo", "vera", "nox", "eco", "portador"]
 var opened: bool = false
 var closed_frame: int = -1

@@ -5,21 +5,21 @@ from collections import deque
 from PIL import Image, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[2]
-ATLASES = {'assets/units/field_atlas_v3.png': (4, 2),
-           'assets/structures/civic_atlas_v3.png': (2, 2),
-           'assets/structures/industrial_atlas_v2.png': (2, 2),
-           'assets/structures/coherent_fortress_v3.png': (3, 4),
-           'assets/structures/coherent_walls_v3.png': (3, 1),
-           'assets/structures/coherent_civic_v4.png': (3, 2),
-           'assets/story/portraits_manga_v2.png': (3, 2),
-           'assets/story/antagonists_manga_v2.png': (2, 1),
-           'assets/expedition/boss/collector_parts_v2.png': (3, 2),
-           'assets/expedition/arena/depot_props_v2.png': (2, 2),
-           'assets/expedition/arena/encounter_machines_v1.png': (2, 2)}
-ROW_CUTS = {'assets/structures/coherent_fortress_v3.png': [0, 404, 653, 894, 1085],
-            'assets/structures/coherent_civic_v4.png': [0, 565, 1024],
-            'assets/expedition/arena/encounter_machines_v1.png': [0, 479, 1024]}
-CELLS = {'assets/expedition/boss/collector_parts_v2.png':
+ATLASES = {'assets/characters/units/field_atlas_v3.png': (4, 2),
+           'assets/world/structures/civic_atlas_v3.png': (2, 2),
+           'assets/world/structures/industrial_atlas_v2.png': (2, 2),
+           'assets/world/structures/coherent_fortress_v3.png': (3, 4),
+           'assets/world/structures/coherent_walls_v3.png': (3, 1),
+           'assets/world/structures/coherent_civic_v4.png': (3, 2),
+           'assets/characters/portraits/portraits_manga_v2.png': (3, 2),
+           'assets/characters/portraits/antagonists_manga_v2.png': (2, 1),
+           'assets/world/expedition/boss/collector_parts_v2.png': (3, 2),
+           'assets/world/expedition/arena/depot_props_v2.png': (2, 2),
+           'assets/world/expedition/arena/encounter_machines_v1.png': (2, 2)}
+ROW_CUTS = {'assets/world/structures/coherent_fortress_v3.png': [0, 404, 653, 894, 1085],
+            'assets/world/structures/coherent_civic_v4.png': [0, 565, 1024],
+            'assets/world/expedition/arena/encounter_machines_v1.png': [0, 479, 1024]}
+CELLS = {'assets/world/expedition/boss/collector_parts_v2.png':
          [(0, 0, 768, 650), (780, 0, 1110, 650), (1140, 0, 1536, 650),
           (0, 655, 768, 1024), (790, 655, 1130, 1024), (1160, 655, 1536, 1024)]}
 
@@ -56,7 +56,7 @@ def main_component_bounds(alpha):
 def main():
     sources = dict(ATLASES)
     sources.update({str(p.relative_to(ROOT)).replace('\\', '/'): (1, 1)
-                    for p in (ROOT / 'assets/structures/fortress').glob('*.png')})
+                    for p in (ROOT / 'assets/world/structures/fortress').glob('*.png')})
     result = {}
     for path, (columns, rows) in sources.items():
         image = Image.open(ROOT / path).convert('RGBA')

@@ -3,8 +3,8 @@ extends RefCounted
 const CORE_HEIGHTS: Array[float] = [72, 88, 106]
 const WALL_HEIGHTS: Array[float] = [40, 54, 68]
 const TURRET_HEIGHTS: Array[float] = [30, 40, 50]
-const FAMILY: Texture2D = preload("res://assets/structures/coherent_fortress_v3.png")
-const WALLS: Texture2D = preload("res://assets/structures/coherent_walls_v3.png")
+const FAMILY: Texture2D = preload("res://assets/world/structures/coherent_fortress_v3.png")
+const WALLS: Texture2D = preload("res://assets/world/structures/coherent_walls_v3.png")
 static var atlas_cache: Dictionary = {}
 
 
