@@ -30,8 +30,14 @@ var tracks: Array[Sprite2D] = []
 var claws: Array[Sprite2D] = []
 var core: Sprite2D
 var shield: Sprite2D
-var hatch: Polygon2D
+var turbine: Sprite2D
+var track_distance: float = 0
+var hatch: Sprite2D
 var effects: DebrisEmitter = DebrisEmitter.new()
+var tactics: BossTactics = BossTactics.new()
+var last_decision: String = ""
+@export var native_combat_art: bool = true
+var combat_visual: CombatFlipbook
 
 func _ready() -> void:
 	health = max_health
@@ -45,23 +51,30 @@ func _ready() -> void:
 	add_child(collider)
 	add_child(puppet)
 	build_visual()
+	if native_combat_art:
+		combat_visual = CombatFlipbook.new()
+		combat_visual.actor = self
+		combat_visual.actor_id = "caldera" if self is SantaCaldera else ("coro" if self is CoroSumergido else ("prefecto" if self is ElPrefecto else ("madre" if self is MadreCero else "recaudador")))
+		add_child(combat_visual)
+		puppet.hide()
 	effects.planar = true
 	add_child(effects)
 
 func build_visual() -> void:
-	hatch = Polygon2D.new()
+	hatch = Sprite2D.new()
 	for side: int in [-1, 1]:
 		tracks.append(piece("tread", Vector2(side * 34, 0)))
 	piece("body", Vector2.ZERO)
 	core = piece("core", Vector2.ZERO)
-	hatch.polygon = PackedVector2Array([Vector2(-11, -11), Vector2(11, -11), Vector2(11, 11), Vector2(-11, 11)])
-	hatch.color = Color("233542")
+	hatch.texture = DepotArt.reactor_shutter()
+	hatch.scale = Vector2(25, 23) / hatch.texture.get_size()
 	puppet.add_child(hatch)
 	for side: int in [-1, 1]:
 		var claw: Sprite2D = piece("claw", Vector2(side * 45, 23))
 		claw.flip_h = side < 0
 		claws.append(claw)
 	shield = piece("shield", Vector2(0, 37))
+	turbine = piece("fan", Vector2(0, -20))
 
 func is_core_exposed() -> bool:
 	return state == State.STUNNED
@@ -87,7 +100,10 @@ func status_text() -> String:
 
 func piece(asset: String, offset: Vector2) -> Sprite2D:
 	var sprite: Sprite2D = Sprite2D.new()
-	sprite.texture = load("res://assets/expedition/boss/%s.png" % asset) as Texture2D
+	var index: int = {"body": 0, "tread": 1, "claw": 2, "shield": 3, "core": 4, "fan": 5}[asset]
+	sprite.texture = DepotArt.part(index)
+	var extent: Vector2 = {"body": Vector2(70, 64), "tread": Vector2(23, 77), "claw": Vector2(25, 52), "shield": Vector2(87, 33), "core": Vector2(23, 23), "fan": Vector2(17, 17)}[asset]
+	sprite.scale = extent / sprite.texture.get_size()
 	sprite.position = offset
 	puppet.add_child(sprite)
 	pieces.append(sprite)
@@ -106,16 +122,17 @@ func _physics_process(delta: float) -> void:
 	if state == State.DEAD or target == null or target.health <= 0:
 		return
 	elapsed += delta
+	tactics.observe(target, delta)
 	timer -= delta
 	var difference: Vector2 = target.global_position - global_position
 	if state in [State.APPROACH, State.VOLLEY_WINDUP, State.VOLLEY, State.RECOVER]:
 		facing = Vector2.from_angle(rotate_toward(facing.angle(), difference.angle(), (1.5 if phase == 1 else 2.0) * delta))
 	match state:
 		State.APPROACH:
-			velocity = difference.normalized() * (65 if phase == 1 else 85) if difference.length() > 65 else Vector2.ZERO
+			velocity = tactics.steer(self, target.global_position, 65 if phase == 1 else 85) if difference.length() > 65 else Vector2.ZERO
 			move_and_slide()
 			if timer <= 0 or difference.length() < 72:
-				change_state(State.CLAW_WINDUP, 0.4)
+				choose_attack(difference.length())
 		State.CLAW_WINDUP:
 			if timer <= 0:
 				change_state(State.CLAW, 0.35)
@@ -124,7 +141,7 @@ func _physics_process(delta: float) -> void:
 			if difference.length() < 88 and sweep.dot(difference.normalized()) > 0.82:
 				target.take_damage(20, difference.normalized() * 180)
 			if timer <= 0:
-				next_pattern = 1
+				next_pattern = -1
 				change_state(State.RECOVER, 0.9)
 		State.VOLLEY_WINDUP:
 			if timer <= 0:
@@ -138,7 +155,7 @@ func _physics_process(delta: float) -> void:
 				volleys += 1
 				shot_timer = 0.55
 			if timer <= 0:
-				next_pattern = 2
+				next_pattern = -1
 				change_state(State.RECOVER, 0.8)
 		State.CHARGE_WINDUP:
 			if timer <= 0:
@@ -164,14 +181,27 @@ func _physics_process(delta: float) -> void:
 				elif next_pattern == 2:
 					charges_left = 2 if phase == 2 else 1
 					begin_charge()
+				elif next_pattern == -1:
+					choose_attack(difference.length())
 				else:
 					change_state(State.APPROACH, 2.5)
 	update_puppet(delta)
 
 func begin_charge() -> void:
-	charge_direction = (target.global_position - global_position).normalized()
+	charge_direction = (tactics.predicted(target, 0.25) - global_position).normalized()
 	facing = charge_direction
 	change_state(State.CHARGE_WINDUP, 0.8)
+
+func choose_attack(distance: float) -> void:
+	var visible: bool = tactics.clear_shot(self, target.global_position)
+	last_decision = tactics.choose({"claw": 12.0 if distance < 90 else -5.0, "volley": 7.0 if visible else -3.0, "charge": 9.0 if distance > 130 or not visible else 2.0}, 3.5)
+	match last_decision:
+		"claw": change_state(State.CLAW_WINDUP, 0.65)
+		"volley": change_state(State.VOLLEY_WINDUP, 0.8)
+		"charge":
+			charges_left = 2 if phase == 2 else 1
+			begin_charge()
+		_: change_state(State.APPROACH, 0.6)
 
 func finish_charge() -> void:
 	charges_left -= 1
@@ -201,6 +231,7 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 	hit_feedback.emit(damage == 0)
 	effects.emit_pixels(global_position + (origin - global_position).normalized() * 28, 5, Color("ffce75"))
 	health = maxi(0, health - damage)
+	if damage > 0 and combat_visual != null: combat_visual.pulse_hurt()
 	if phase == 1 and health <= max_health * 0.5:
 		phase = 2
 		phase_changed.emit(phase)
@@ -208,8 +239,11 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 	if health == 0:
 		change_state(State.DEAD, 0)
 		clear_hazards()
-		for sprite: Sprite2D in pieces:
-			effects.emit_fragments(sprite.global_position, sprite.texture, 8, sprite.flip_h, true)
+		if combat_visual != null:
+			effects.emit_fragments(global_position, combat_visual.texture(), 16)
+		else:
+			for sprite: Sprite2D in pieces:
+				effects.emit_fragments(sprite.global_position, sprite.texture, 8, sprite.flip_h, true, sprite.global_scale, sprite.global_rotation)
 		puppet.hide()
 		effects.emit_pixels(global_position, 16, Color("89939e"), true)
 		set_collision_layer_value(3, false)
@@ -218,8 +252,10 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 
 func update_puppet(delta: float) -> void:
 	puppet.rotation = facing.angle() - PI / 2
+	track_distance += velocity.length() * delta
 	for index: int in range(tracks.size()):
-		tracks[index].position.y = roundf(sin(elapsed * 40 + index * PI) * 2) if velocity.length() > 1 or state == State.CHARGE_WINDUP else 0.0
+		tracks[index].position.y = roundf(sin(track_distance * 0.3 + index * PI)) if velocity.length() > 1 else 0.0
+	if turbine != null: turbine.rotation += delta * (9.0 if phase == 2 else 4.0)
 	for index: int in range(claws.size()):
 		claws[index].rotation = sin(elapsed * 3 + index * PI) * 0.15
 		claws[index].position.y = 23
@@ -228,6 +264,10 @@ func update_puppet(delta: float) -> void:
 		claws[0].rotation = -0.9
 	elif state == State.CLAW:
 		claws[0].rotation = lerpf(1.2, -0.9, timer / 0.35)
+		claws[0].position.y = 23 + sin(clampf(1 - timer / 0.35, 0, 1) * PI) * 16
+	if state == State.VOLLEY:
+		puppet.position = Vector2(0, -maxf(0, 1 - shot_timer / 0.12) * 2)
+	else: puppet.position = Vector2.ZERO
 	hatch.position.x = move_toward(hatch.position.x, 23 if core_exposed else 0, delta * 100)
 	core.visible = core_exposed
 	core.modulate = Color(1.2, 0.9, 0.5) if GamePreferences.current().reduced_flashes else Color(1.4, 0.9 + sin(elapsed * 12) * 0.3, 0.5)
@@ -245,7 +285,12 @@ func _draw() -> void:
 	if state == State.DEAD:
 		return
 	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.65))
-	draw_circle(Vector2(0, 8), 45, Color(0, 0, 0, 0.4))
+	var radius: float = 45
+	var support: Vector2 = Vector2(0, 8)
+	if combat_visual != null and combat_visual.actor_id in ["prefecto", "madre"]:
+		radius = 22 if combat_visual.actor_id == "prefecto" else 26
+		support = Vector2(0, 2)
+	draw_circle(support, radius, Color(0, 0, 0, 0.4))
 	draw_set_transform(Vector2.ZERO)
 	if core_exposed:
 		draw_circle(Vector2.ZERO, 26 + sin(elapsed * 12) * 3, Color(1, 0.55, 0.15, 0.18))

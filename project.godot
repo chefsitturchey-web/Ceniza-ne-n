@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.7")
 [autoload]
 
 Preferences="*res://systems/game_preferences.gd"
+DebugTools="*res://systems/game_debug.gd"
 
 [debug]
 

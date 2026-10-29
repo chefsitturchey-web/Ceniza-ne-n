@@ -226,10 +226,17 @@ func fire_tesla(target: Node2D) -> void:
 func update_arena(delta: float) -> void:
 	for id: String in equipped:
 		timers[id] = maxf(0.0, float(timers[id]) - delta)
-		var distance: float = actor.global_position.distance_to(boss.global_position)
+		var victim: Node2D = boss
+		# Los módulos ayudan con escoltas cercanas; pertenecen solo a esta arena.
+		for child: Node in boss.get_parent().get_children():
+			if child is EncounterSentinel and child.health > 0 and not child.is_queued_for_deletion():
+				if actor.global_position.distance_to(child.global_position) < minf(140, actor.global_position.distance_to(victim.global_position)):
+					var sight: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(actor.global_position, child.global_position, 1)
+					if get_world_2d().direct_space_state.intersect_ray(sight).is_empty(): victim = child
+		var distance: float = actor.global_position.distance_to(victim.global_position)
 		if timers[id] > 0 or distance > range_for(id) + 29:
 			continue
-		var ray: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(actor.global_position, boss.global_position, 1)
+		var ray: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(actor.global_position, victim.global_position, 1)
 		if not get_world_2d().direct_space_state.intersect_ray(ray).is_empty():
 			continue
 		var damage: int = damage_for(id)
@@ -239,9 +246,9 @@ func update_arena(delta: float) -> void:
 				damage = roundi(damage * 1.65)
 		elif id == "tesla" and evolved.tesla:
 			damage = roundi(damage * 1.4)
-		boss.receive_hit(actor.global_position, damage)
+		victim.receive_hit(actor.global_position, damage)
 		var muzzle: Vector2 = drone_origin(0) if id == "drone" else actor.global_position + Vector2(0, -20)
-		flashes.append({"from": muzzle, "to": boss.global_position, "time": 0.12, "electric": id == "tesla"})
+		flashes.append({"from": muzzle, "to": victim.global_position, "time": 0.12, "electric": id == "tesla"})
 		fired.emit()
 		timers[id] = definition(id).interval * (1.0 - int(actor.get("drone_rank")) * 0.1) if id == "drone" else definition(id).interval
 

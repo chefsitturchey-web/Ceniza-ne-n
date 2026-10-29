@@ -11,11 +11,13 @@ var director: SiegeDirector
 var day: int = 1
 var phase: String = "DÍA"
 var phase_remaining: float = 0.0
+var debug_frozen: bool = false
 
 func initialize() -> void:
 	phase_remaining = config.day_duration
 
 func update_phase(delta: float) -> void:
+	if debug_frozen: return
 	phase_remaining = maxf(0.0, phase_remaining - delta)
 	if phase == "NOCHE":
 		director.tick(delta)

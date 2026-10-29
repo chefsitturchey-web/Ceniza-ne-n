@@ -112,6 +112,7 @@ func close_panel() -> void:
 	closed.emit()
 
 func _input(event: InputEvent) -> void:
+	if GamePreferences.current().debug_input_blocked(): return
 	if opened and (event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel")) and not event.is_echo():
 		close_panel()
 		get_viewport().set_input_as_handled()

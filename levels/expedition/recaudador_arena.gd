@@ -4,6 +4,9 @@ extends CanvasLayer
 signal resolved(victory: bool)
 signal continued
 signal menu_requested
+signal practice_exit_requested
+signal practice_retry_requested
+var debug_practice: bool = false
 
 const DAMAGE_EDGES: Script = preload("res://ui/damage_edges.gd")
 const THEME: Theme = preload("res://ui/theme.tres")
@@ -37,6 +40,7 @@ var zone: ZoneData
 var boss_status: Label
 var phase_notice: Label
 var phase_notice_time: float = 0.0
+var dynamics: EncounterDynamics
 
 func configure(source: Player, index: int = 0) -> void:
 	configured = true
@@ -69,6 +73,9 @@ func _ready() -> void:
 	floor_node.set_script(preload("res://levels/expedition/arena_floor.gd"))
 	floor_node.set("theme_id", zone.id)
 	world.add_child(floor_node)
+	var atmosphere: EncounterScenery = EncounterScenery.new()
+	atmosphere.arena = self
+	world.add_child(atmosphere)
 	var telegraphs: EncounterTelegraphs = EncounterTelegraphs.new()
 	telegraphs.boss = boss
 	world.add_child(telegraphs)
@@ -85,6 +92,11 @@ func _ready() -> void:
 	if boss is MadreCero:
 		(boss as MadreCero).support_units = support_units
 		(boss as MadreCero).install_relays(actors)
+	dynamics = EncounterDynamics.new()
+	dynamics.arena = self
+	world.add_child(dynamics)
+	world.move_child(dynamics, actors.get_index())
+	dynamics.configure_paths()
 	modules.actor = player
 	modules.boss = boss
 	modules.planar = true
@@ -95,25 +107,22 @@ func _ready() -> void:
 	player.died.connect(func() -> void: finish(false))
 	boss.died.connect(func() -> void: finish(true))
 	boss.fired.connect(spawn_bullet)
-	boss.phase_changed.connect(func(_phase: int) -> void:
+	boss.phase_changed.connect(func(number: int) -> void:
 		phase_notice_time = 1.8
-		phase_notice.text = "SEGUNDA FASE")
+		phase_notice.text = "SEGUNDA FASE" if number == 2 else "PRIMERA FASE")
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 5
 	camera.limit_left = 0
 	camera.limit_top = 0
 	camera.limit_right = 640
 	camera.limit_bottom = 480
-	if zone_index == 0:
-		player.add_child(camera)
-	else:
-		# Las franjas y enlaces necesitan verse completos antes de elegir una ruta segura.
-		camera.position_smoothing_enabled = false
-		camera.zoom = Vector2(0.75, 0.75)
-		camera.limit_left = -107
-		camera.limit_right = 747
-		camera.position = Vector2(320, 240)
-		world.add_child(camera)
+	# Vista completa: bordes, coberturas y señales permanecen visibles en cada jefe.
+	camera.position_smoothing_enabled = false
+	camera.zoom = Vector2(0.7, 0.7) if zone_index == 0 else Vector2(0.75, 0.75)
+	camera.limit_left = -107
+	camera.limit_right = 747
+	camera.position = Vector2(320, 240)
+	world.add_child(camera)
 	camera.make_current()
 	camera.reset_smoothing()
 	build_lighting()
@@ -162,23 +171,13 @@ func wall(center: Vector2, extent: Vector2) -> StaticBody2D:
 	return body
 
 func build_geometry() -> void:
-	if zone_index in [1, 3, 4]:
-		var boundary: Array[Vector2] = [Vector2(140, 24), Vector2(500, 24), Vector2(616, 140), Vector2(616, 340), Vector2(500, 456), Vector2(140, 456), Vector2(24, 340), Vector2(24, 140)]
-		if zone_index == 3:
-			boundary = [Vector2(96, 24), Vector2(544, 24), Vector2(616, 100), Vector2(616, 380), Vector2(544, 456), Vector2(96, 456), Vector2(24, 380), Vector2(24, 100)]
-		elif zone_index == 4:
-			boundary.clear()
-			for index: int in range(12): boundary.append(Vector2(320, 240) + Vector2(cos(index * TAU / 12) * 285, sin(index * TAU / 12) * 215))
-		for index: int in range(boundary.size()):
-			var a: Vector2 = boundary[index]
-			var b: Vector2 = boundary[(index + 1) % boundary.size()]
-			var edge: StaticBody2D = wall((a + b) * 0.5, Vector2(a.distance_to(b), 14))
-			edge.rotation = (b - a).angle()
-	else:
-		wall(Vector2(320, 6), Vector2(640, 12))
-		wall(Vector2(320, 474), Vector2(640, 12))
-		wall(Vector2(6, 240), Vector2(12, 480))
-		wall(Vector2(634, 240), Vector2(12, 480))
+	var boundary: PackedVector2Array = ArenaLayout.boundary(zone_index)
+	for index: int in range(boundary.size()):
+		var a: Vector2 = boundary[index]
+		var b: Vector2 = boundary[(index + 1) % boundary.size()]
+		var edge: StaticBody2D = wall((a + b) * 0.5, Vector2(a.distance_to(b), 14))
+		edge.name = "Boundary%d" % index
+		edge.rotation = (b - a).angle()
 	var positions: Array[Vector2] = [Vector2(180, 160), Vector2(460, 160), Vector2(180, 320), Vector2(460, 320), Vector2(85, 245), Vector2(555, 245)]
 	var assets: Array[String] = ["pillar_top", "pillar_top", "crate_top", "crate_top", "barrel_top", "barrel_top"]
 	if zone_index == 1:
@@ -192,11 +191,19 @@ func build_geometry() -> void:
 		assets = ["pillar_top", "pillar_top", "crate_top", "barrel_top", "barrel_top"]
 	for index: int in range(positions.size()):
 		var texture: Texture2D = load("res://assets/expedition/arena/%s.png" % assets[index]) as Texture2D
-		var body: StaticBody2D = wall(positions[index], texture.get_size())
+		var extent: Vector2 = texture.get_size()
+		if zone_index == 0:
+			texture = DepotArt.prop(0 if index < 2 else (3 if index < 4 else 2))
+			extent = Vector2(34, 34) if index < 2 else Vector2(32, 28)
+		else:
+			texture = DepotArt.prop(0 if assets[index] == "pillar_top" else (3 if assets[index] == "crate_top" else 2))
+			extent = Vector2(34, 34) if assets[index] == "pillar_top" else Vector2(32, 28)
+		var body: StaticBody2D = wall(positions[index], extent)
 		body.reparent(actors)
 		body.name = "Cover%d" % index
 		var sprite: Sprite2D = Sprite2D.new()
 		sprite.texture = texture
+		sprite.scale = extent / texture.get_size()
 		body.add_child(sprite)
 
 func build_lighting() -> void:
@@ -249,9 +256,14 @@ func build_hud() -> void:
 	damage_edges.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(damage_edges)
 	damage_edges.set_state({"health": player.health})
-	label(zone.boss_title, Rect2(110, 325, 420, 14))
-	boss_status = label(zone.briefing, Rect2(8, 15, 624, 28))
-	boss_status.add_theme_font_size_override("font_size", 10)
+	var boss_title: Label = label(zone.boss_title, Rect2(110, 324, 420, 18))
+	boss_title.add_theme_font_override("font", ThemeDB.fallback_font)
+	boss_title.add_theme_font_size_override("font_size", 13)
+	boss_status = label(zone.briefing, Rect2(8, 9, 624, 44))
+	boss_status.add_theme_font_override("font", ThemeDB.fallback_font)
+	boss_status.add_theme_font_size_override("font_size", 14)
+	boss_status.add_theme_constant_override("outline_size", 4)
+	boss_status.add_theme_color_override("font_outline_color", Color("08111c"))
 	boss_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	phase_notice = label("", Rect2(80, 60, 480, 22), true)
 	phase_notice.add_theme_color_override("font_color", Color("dd6482"))
@@ -291,12 +303,13 @@ func build_hud() -> void:
 	settings.pressed.connect(options.open_panel)
 	rows.add_child(settings)
 	exit_button = Button.new()
-	exit_button.text = "Menú principal"
+	exit_button.text = "Volver a mi escena" if debug_practice else "Menú principal"
 	exit_button.pressed.connect(return_to_menu)
 	rows.add_child(exit_button)
 	pause_panel.hide()
 
 func _input(event: InputEvent) -> void:
+	if GamePreferences.current().debug_input_blocked(): return
 	if options.opened or options.closed_frame == Engine.get_process_frames():
 		return
 	if event.is_action_pressed("pause") and not event.is_echo() and not ending and not completed:
@@ -321,6 +334,9 @@ func toggle_pause() -> void:
 		pause_panel.get_child(0).get_child(1).grab_focus()
 
 func return_to_menu() -> void:
+	if debug_practice:
+		practice_exit_requested.emit()
+		return
 	get_tree().paused = false
 	if configured:
 		menu_requested.emit()
@@ -330,8 +346,15 @@ func return_to_menu() -> void:
 func strike(origin: Vector2, direction: Vector2, amount: int, reach: float) -> void:
 	if ending:
 		return
-	if boss.strike_attachments(origin, direction, amount, reach):
-		return
+	boss.strike_attachments(origin, direction, amount, reach)
+	for index: int in range(dynamics.sentinels.size()):
+		if not is_instance_valid(dynamics.sentinels[index]): continue
+		var sentinel: EncounterSentinel = dynamics.sentinels[index]
+		if sentinel.health <= 0: continue
+		var separation: Vector2 = sentinel.global_position - origin
+		if separation.length() > reach + 12 or direction.dot(separation.normalized()) < cos(0.85): continue
+		var sight: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(origin, sentinel.global_position, 1)
+		if world.get_world_2d().direct_space_state.intersect_ray(sight).is_empty(): sentinel.receive_hit(origin, amount)
 	var offset: Vector2 = boss.global_position - origin
 	if ending or offset.length() > reach + 29 or direction.dot(offset.normalized()) < cos(0.85):
 		return
@@ -344,6 +367,7 @@ func spawn_bullet(origin: Vector2, direction: Vector2) -> void:
 	var bullet: RecaudadorBullet = RecaudadorBullet.new()
 	bullet.position = origin
 	bullet.velocity = direction * (190 if boss.phase == 2 else 155)
+	bullet.boundary = ArenaLayout.boundary(zone_index)
 	world.add_child(bullet)
 
 func on_damage() -> void:
@@ -355,6 +379,7 @@ func finish(victory: bool) -> void:
 	if ending or completed:
 		return
 	ending = true
+	dynamics.clear_encounter()
 	boss.clear_hazards()
 	sound.play_cue("destroy" if victory else "alarm")
 	ending_victory = victory
@@ -390,6 +415,9 @@ func _process(delta: float) -> void:
 					show_standalone_defeat()
 
 func retry_arena() -> void:
+	if debug_practice:
+		practice_retry_requested.emit()
+		return
 	get_tree().paused = false
 	var scenes: Array[String] = ["res://levels/expedition/recaudador_arena.tscn", "res://levels/expedition/caldera_arena.tscn", "res://levels/expedition/choir_arena.tscn", "res://levels/expedition/prefect_arena.tscn", "res://levels/expedition/mother_arena.tscn"]
 	get_tree().change_scene_to_file(scenes[zone_index])
@@ -408,7 +436,7 @@ func show_standalone_defeat() -> void:
 	add_child(retry)
 	var menu: Button = Button.new()
 	menu.theme = THEME
-	menu.text = "Menú principal"
+	menu.text = "Volver a mi escena" if debug_practice else "Menú principal"
 	menu.position = Vector2(245, 235)
 	menu.size = Vector2(150, 25)
 	menu.pressed.connect(return_to_menu)
@@ -439,7 +467,7 @@ func show_completed(next_zone: String = "") -> void:
 	label("Ruta disponible completada." if next_zone.is_empty() else "Siguiente destino: " + next_zone + ". Equipo y tripulación conservados.", Rect2(40, 178, 560, 16))
 	var button: Button = Button.new()
 	button.theme = THEME
-	button.text = "Volver al menú" if next_zone.is_empty() else "Viajar a " + next_zone
+	button.text = ("Volver a mi escena" if debug_practice else "Volver al menú") if next_zone.is_empty() else "Viajar a " + next_zone
 	button.position = Vector2(210, 200)
 	button.size = Vector2(220, 28)
 	button.pressed.connect(func() -> void:

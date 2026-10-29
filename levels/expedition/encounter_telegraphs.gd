@@ -44,7 +44,13 @@ func _draw() -> void:
 			if relay.health > 0:
 				draw_line(choir.position, relay.global_position, Color("dd6482", 0.45), 2)
 		for wave: Dictionary in choir.waves:
-			draw_arc(choir.position, wave.radius, 0, TAU, 80, Color("dd6482", 0.85), 2)
+			var origin: Vector2 = wave.get("origin", choir.position)
+			var gap: float = float(wave.get("gap", -PI))
+			draw_arc(origin, wave.radius, gap + 0.3, gap + TAU - 0.3, 80, Color("dd6482", 0.85), 2)
+			if wave.has("gap"):
+				for side: int in [-1, 1]:
+					var point: Vector2 = origin + Vector2.from_angle(gap + side * 0.3) * wave.radius
+					draw_circle(point, 3, Color("47dacb"))
 		for mark: Dictionary in choir.marks:
 			draw_circle(mark.position, 25, Color("dd6482", 0.5 if mark.time <= 0 else 0.12))
 			draw_arc(mark.position, 25, 0, TAU, 24, Color("ffce75") if mark.time > 0 else Color("dd6482"), 1)
