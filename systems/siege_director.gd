@@ -30,6 +30,9 @@ func tick(delta: float) -> void:
 		spawn_remaining = wave.cadence
 
 func is_cleared() -> bool:
+	# Sin asedio iniciado aún (día previo a la primera noche) no hay enemigos: zona despejada.
+	if wave == null:
+		return true
 	return spawn_count >= wave.enemies.size() and get_tree().get_nodes_in_group(GameRules.ENEMIES).is_empty()
 
 func spawn_enemy(side: float, data: EnemyData, number: int = 1, elite: bool = false) -> SiegeEnemy:
