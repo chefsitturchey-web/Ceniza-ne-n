@@ -55,7 +55,7 @@ El laboratorio se habilita en Godot y compilaciones de depuración. En una expor
 
 `systems/game_debug.gd` es el autoload `DebugTools`; `ui/debug_panel.gd` construye las cuatro páginas y `ui/debug_geometry.gd` dibuja geometría de depuración en las coordenadas de la cámara. Las comprobaciones de entrada modal impiden que Esc cierre también una novela, opciones o pausa que estuvieran debajo.
 
-`tests/debug_tools_test.gd` verifica **113 comprobaciones**: entrada de teclado real, pausa, los cinco jefes, retorno y audio, vulnerabilidad, conjuntos de equipo, conservación de mejoras neuronales, recursos, edificios, niveles, creación de unidades, protección byte a byte del checkpoint, informes y apertura de una colonia nueva. Incluida en las **37 suites** de `tests/run_all.gd`.
+`tests/debug_tools_test.gd` verifica **113 comprobaciones**: entrada de teclado real, pausa, los cinco jefes, retorno y audio, vulnerabilidad, conjuntos de equipo, conservación de mejoras neuronales, recursos, edificios, niveles, creación de unidades, protección byte a byte del checkpoint, informes y apertura de una colonia nueva. Incluida en las **38 suites** de `tests/run_all.gd`.
 
 ```powershell
 godot --headless --path . --script res://tests/debug_tools_test.gd

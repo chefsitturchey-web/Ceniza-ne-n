@@ -36,6 +36,8 @@ var hatch: Sprite2D
 var effects: DebrisEmitter = DebrisEmitter.new()
 var tactics: BossTactics = BossTactics.new()
 var last_decision: String = ""
+@export var native_combat_art: bool = true
+var combat_visual: CombatFlipbook
 
 func _ready() -> void:
 	health = max_health
@@ -49,6 +51,12 @@ func _ready() -> void:
 	add_child(collider)
 	add_child(puppet)
 	build_visual()
+	if native_combat_art:
+		combat_visual = CombatFlipbook.new()
+		combat_visual.actor = self
+		combat_visual.actor_id = "caldera" if self is SantaCaldera else ("coro" if self is CoroSumergido else ("prefecto" if self is ElPrefecto else ("madre" if self is MadreCero else "recaudador")))
+		add_child(combat_visual)
+		puppet.hide()
 	effects.planar = true
 	add_child(effects)
 
@@ -223,6 +231,7 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 	hit_feedback.emit(damage == 0)
 	effects.emit_pixels(global_position + (origin - global_position).normalized() * 28, 5, Color("ffce75"))
 	health = maxi(0, health - damage)
+	if damage > 0 and combat_visual != null: combat_visual.pulse_hurt()
 	if phase == 1 and health <= max_health * 0.5:
 		phase = 2
 		phase_changed.emit(phase)
@@ -230,8 +239,11 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 	if health == 0:
 		change_state(State.DEAD, 0)
 		clear_hazards()
-		for sprite: Sprite2D in pieces:
-			effects.emit_fragments(sprite.global_position, sprite.texture, 8, sprite.flip_h, true, sprite.global_scale, sprite.global_rotation)
+		if combat_visual != null:
+			effects.emit_fragments(global_position, combat_visual.texture(), 16)
+		else:
+			for sprite: Sprite2D in pieces:
+				effects.emit_fragments(sprite.global_position, sprite.texture, 8, sprite.flip_h, true, sprite.global_scale, sprite.global_rotation)
 		puppet.hide()
 		effects.emit_pixels(global_position, 16, Color("89939e"), true)
 		set_collision_layer_value(3, false)

@@ -1,0 +1,93 @@
+class_name CombatFlipbook
+extends Node2D
+var actor: Node2D
+var actor_id: String = "portador"
+var sprite: AnimatedSprite2D = AnimatedSprite2D.new()
+var current: StringName = &""
+var clip_clock: float = 0
+var travel: float = 0
+var last_position: Vector2
+var hurt_left: float = 0
+var state_duration: float = 1
+var previous_state: int = -1
+var state_name: String = "idle"
+
+func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	sprite.sprite_frames = CombatSpriteLibrary.frames(actor_id)
+	sprite.position = CombatSpriteLibrary.offset_for(actor_id)
+	add_child(sprite)
+	last_position = actor.global_position
+	set_pose("idle", Vector2.DOWN)
+
+func _process(delta: float) -> void:
+	clip_clock += delta
+	hurt_left = maxf(0, hurt_left - delta)
+	if actor is Recaudador: pose_boss(actor)
+	else: pose_player()
+
+func set_pose(state: String, facing: Vector2, progress: float = -1) -> void:
+	var clip: StringName = StringName(state + "_" + CombatSpriteLibrary.direction(facing))
+	if current != clip:
+		current = clip
+		clip_clock = 0
+	state_name = state
+	var count: int = sprite.sprite_frames.get_frame_count(clip)
+	var frame: int
+	if progress >= 0: frame = mini(count - 1, int(clampf(progress, 0, 1) * count))
+	elif sprite.sprite_frames.get_animation_loop(clip): frame = int(clip_clock * sprite.sprite_frames.get_animation_speed(clip)) % count
+	else: frame = mini(count - 1, int(clip_clock * sprite.sprite_frames.get_animation_speed(clip)))
+	sprite.animation = clip
+	sprite.pause()
+	sprite.frame = frame
+	sprite.rotation = 0
+	sprite.flip_h = false
+	sprite.scale = Vector2.ONE
+
+func record_travel() -> void:
+	var distance: float = actor.global_position.distance_to(last_position)
+	if distance < 90: travel += distance
+	last_position = actor.global_position
+
+func pose_player() -> void:
+	record_travel()
+	var side: bool = actor is Player
+	var facing: Vector2 = Vector2(actor.facing, 0) if side else actor.facing
+	var health: int = actor.health
+	var moving: bool = actor.velocity.length() > 10
+	var remaining: float = actor.attack_anim_remaining
+	var dodge: float = actor.dodge_remaining
+	position.y = actor.mobility.rider_offset() if side and actor.riding else 0.0
+	if health <= 0: set_pose("death", facing)
+	elif dodge > 0: set_pose("dodge", facing, 1 - dodge / Player.DODGE_DURATION)
+	elif hurt_left > 0: set_pose("hurt", facing, 1 - hurt_left / 0.18)
+	elif remaining > 0:
+		var aim: Vector2 = Vector2(actor.attack_facing, 0) if side else actor.slash_direction
+		var ratio: float = clampf(1 - remaining / Player.ATTACK_ANIM_DURATION, 0, 1)
+		if ratio < 0.25: set_pose("windup", aim, ratio / 0.25)
+		else: set_pose("attack", aim, (ratio - 0.25) / 0.75)
+	elif moving and not (side and actor.riding): set_pose("walk", facing, fposmod(travel / 80, 1))
+	else: set_pose("exposed" if actor.stamina < 30 else "idle", facing)
+
+func pose_boss(boss: Recaudador) -> void:
+	record_travel()
+	if previous_state != boss.state:
+		previous_state = boss.state
+		state_duration = maxf(0.01, boss.timer)
+	var direction: Vector2 = boss.facing
+	if boss.state == Recaudador.State.DEAD: set_pose("death", direction)
+	elif boss.core_exposed: set_pose("exposed", direction)
+	elif hurt_left > 0: set_pose("hurt", direction, 1 - hurt_left / 0.18)
+	else:
+		match boss.state:
+			Recaudador.State.CLAW_WINDUP, Recaudador.State.CHARGE_WINDUP, Recaudador.State.VOLLEY_WINDUP:
+				set_pose("windup", boss.charge_direction if boss.state == Recaudador.State.CHARGE_WINDUP else direction, 1 - boss.timer / state_duration)
+			Recaudador.State.CLAW: set_pose("attack", direction, 1 - boss.timer / state_duration)
+			Recaudador.State.VOLLEY: set_pose("shoot", direction, 1 - clampf(boss.shot_timer / 0.55, 0, 1))
+			Recaudador.State.CHARGE: set_pose("charge", boss.charge_direction)
+			_: set_pose("walk" if boss.velocity.length() > 2 else "idle", direction, fposmod(travel / 40, 1) if boss.velocity.length() > 2 else -1)
+
+func pulse_hurt() -> void: hurt_left = 0.18
+
+func texture() -> Texture2D:
+	return sprite.sprite_frames.get_frame_texture(current, sprite.frame)

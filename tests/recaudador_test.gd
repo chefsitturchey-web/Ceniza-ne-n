@@ -113,10 +113,10 @@ func run_checks() -> void:
 	player.facing = Vector2.UP
 	player.velocity = Vector2.UP * player.speed
 	player.update_visual()
-	verify(player.sprite.texture == TopdownPlayer.VIEWS[1] and not player.runner.visible, "Carrera norte usa vista preparada para animacion")
+	verify(player.combat_visual.current == &"walk_north" and not player.runner.visible, "Carrera norte usa fotogramas completos de LibreSprite")
 	player.facing = Vector2.LEFT
 	player.update_visual()
-	verify(player.runner.visible and player.runner.animation == &"correr" and player.runner.flip_h, "Carrera oeste reutiliza animacion lateral")
+	verify(player.combat_visual.current == &"walk_west" and not player.combat_visual.sprite.flip_h, "Carrera oeste usa su secuencia exportada completa")
 	var bullet: RecaudadorBullet = RecaudadorBullet.new()
 	bullet.position = Vector2(140, 160)
 	bullet.velocity = Vector2(200, 0)

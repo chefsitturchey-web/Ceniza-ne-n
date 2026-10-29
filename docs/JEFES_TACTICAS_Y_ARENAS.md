@@ -46,11 +46,11 @@ Se conservan vida y multiplicadores previos de los cinco jefes. La dificultad au
 
 `assets/expedition/arena/encounter_machines_v1.png` es un atlas original RGBA de 1536 × 1024: intercambiador de fundición, bombeo/sonar, columna corporativa y núcleo de servidores. Se generó mediante la herramienta nativa de imágenes y se copió al proyecto sin alterar sus píxeles. `tools/measure_art.py` solo lee alfa y escribe metadatos de recorte; nunca modifica imágenes. Las regiones separan las cuatro máquinas y excluyen margen transparente.
 
-Cada recinto usa su maquinaria, paleta, señales y movimiento: vapor y válvulas, corrientes y sonar, paños corporativos o pulsos de datos. Las coberturas y los relés sustituyen las figuras grises antiguas por sprites detallados. El Coro tiene un perímetro nuevo de doce vértices. Capas adicionales animan compuertas, sensores, arma del Prefecto y placas de Madre Cero sobre sus ilustraciones existentes. Estas capas no sustituyen las ilustraciones completas por animaciones de fotogramas nuevas.
+Cada recinto usa su maquinaria, paleta, señales y movimiento: vapor y válvulas, corrientes y sonar, paños corporativos o pulsos de datos. Las coberturas y los relés sustituyen las figuras grises antiguas por sprites detallados. El Coro tiene un perímetro nuevo de doce vértices. **Los actores actuales utilizan secuencias completas dibujadas y exportadas desde LibreSprite**, con cuerpo, armas y efectos por capas; las ilustraciones anteriores quedan como alternativa del Inspector. [Fuentes, dimensiones y galería](COMBATE_LIBRESPRITE.md).
 
 Los avisos superiores y nombres de jefe usan una fuente de lectura mayor; el texto de mecanismo usa contorno oscuro. Efectos de ambiente respetan pausa y la preferencia de partículas; no se añaden flashes intensos.
 
-Especificación para futuros recursos: maquinaria original industrial, acero azul oscuro, cobre oxidado, ámbar y cian contenidos; vista elevada consistente, contorno selectivo, tornillos, rejillas, tuberías y desgaste; silueta clara al reducir, apoyo físico visible, fondo alfa real. Variantes de cada distrito deben compartir materiales y escala. Las futuras animaciones completas deberán separar torso, extremidades, escudo y arma para cada jefe.
+Especificación para futuros recursos: maquinaria original industrial, acero azul oscuro, cobre oxidado, ámbar y cian contenidos; vista elevada consistente, contorno selectivo, tornillos, rejillas, tuberías y desgaste; silueta clara al reducir, apoyo físico visible, fondo alfa real. Variantes de cada distrito deben compartir materiales y escala. Las nuevas fuentes de LibreSprite ya separan cuerpo, armas/mecanismos y efectos en capas editables.
 
 ## Herramientas investigadas
 
@@ -58,7 +58,7 @@ La búsqueda en el catálogo de plugins no devolvió una integración pertinente
 
 ## Validación
 
-`tests/boss_tactics_test.gd` pasa **118 comprobaciones** sobre decisiones contextuales, memoria, límites de anticipación, navegación física alrededor de un pilar, llegadas, daño manual y automático, recompensas únicas, mecanismos, corriente, abertura de ondas, sabotaje, pausa y limpieza. `--capture` guarda capturas de los cinco recintos en `.godot/tactics/`. Se incorpora a las **37 suites** de `tests/run_all.gd`, junto a las pruebas existentes de campaña, jefes y progresión. Los registros y las capturas de validación no se incluyen en Git; las imágenes seleccionadas en `docs/media/` documentan el estado del juego.
+`tests/boss_tactics_test.gd` pasa **118 comprobaciones** sobre decisiones contextuales, memoria, límites de anticipación, navegación física alrededor de un pilar, llegadas, daño manual y automático, recompensas únicas, mecanismos, corriente, abertura de ondas, sabotaje, pausa y limpieza. `--capture` guarda capturas de los cinco recintos en `.godot/tactics/`. Se incorpora a las **38 suites** de `tests/run_all.gd`, junto a las pruebas existentes de campaña, jefes y progresión. Los registros y las capturas de validación no se incluyen en Git; las imágenes seleccionadas en `docs/media/` documentan el estado del juego.
 
 ```powershell
 godot --headless --path . --script res://tests/boss_tactics_test.gd

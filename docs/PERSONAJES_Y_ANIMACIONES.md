@@ -41,6 +41,6 @@ La reconstrucción reemplaza los `.ase` de profesión y sus PNG derivados; conse
 
 ## Comprobaciones
 
-`tests/unit_animation_test.gd` comprueba poses distintas, movimiento de piernas, apoyo al suelo en todos los fotogramas, prioridad de estados, recuperación, ausencia de reinicio en la caída, paso de soldado a superviviente, validación del guardado y galería. La batería `tests/run_all.gd` contiene **37 suites**, incluidas las simulaciones de las cinco zonas. Las capturas quedan fuera de Git.
+`tests/unit_animation_test.gd` comprueba poses distintas, movimiento de piernas, apoyo al suelo en todos los fotogramas, prioridad de estados, recuperación, ausencia de reinicio en la caída, paso de soldado a superviviente, validación del guardado y galería. La batería `tests/run_all.gd` contiene **38 suites**, incluidas las simulaciones de las cinco zonas. Las capturas quedan fuera de Git.
 
 Referencias de herramientas: [LibreSprite](https://github.com/LibreSprite/LibreSprite), [formato ASE](https://github.com/aseprite/aseprite/blob/main/docs/ase-file-specs.md).

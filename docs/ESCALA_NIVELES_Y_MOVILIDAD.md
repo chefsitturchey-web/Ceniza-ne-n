@@ -50,7 +50,7 @@ Kingdom Two Crowns combina más etapas y tecnologías como piedra y hierro; no s
 
 ## Pruebas y revisión visual
 
-`tests/fortress_progression_test.gd`: 48 comprobaciones sobre requisitos, pagos, trabajo y recorrido, límites, mejoras efectivas, obras en curso, migración, entrada mantenida, práctica F6 y regiones de arte. `tests/mobility_test.gd`: 22 sobre compra, velocidad, animación, batería, aparcamiento, guardado, viaje y combate a pie. La batería general incluye 37 suites y simulaciones desde cero en las cinco zonas, comprando también la mejora del núcleo.
+`tests/fortress_progression_test.gd`: 48 comprobaciones sobre requisitos, pagos, trabajo y recorrido, límites, mejoras efectivas, obras en curso, migración, entrada mantenida, práctica F6 y regiones de arte. `tests/mobility_test.gd`: 22 sobre compra, velocidad, animación, batería, aparcamiento, guardado, viaje y combate a pie. La batería general incluye 38 suites y simulaciones desde cero en las cinco zonas, comprando también la mejora del núcleo.
 
 Las capturas OpenGL de niveles 1–3 y plataforma se guardan en `.godot/fortress/` al ejecutar las suites con `-- --capture`. La suite GDD permite revisar las nuevas escalas de soldados y edificios. Se usan perfiles de prueba separados de la partida del usuario. Siguen pendientes pruebas humanas de equilibrio y de duración de campaña.
 

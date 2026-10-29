@@ -1,0 +1,28 @@
+{
+  "tool": "LibreSprite",
+  "source": "tools/libresprite_combat.js",
+  "method": "Original pixel drawing and articulated poses in native LibreSprite JavaScript; empty ASE containers only are created by Python.",
+  "layers": [
+    "body",
+    "weapons and mechanisms",
+    "pixel effects"
+  ],
+  "actors": [
+    "portador",
+    "recaudador",
+    "caldera",
+    "coro",
+    "prefecto",
+    "madre"
+  ],
+  "frames_per_actor": 256,
+  "external_raster_inputs": [],
+  "sources_sha256": {
+    "portador": "0472f5f663133306d2706dd63416e2e49d5c1400203e41fb68c26d8bad29ea42",
+    "recaudador": "ceffad8c1f1777f2c811e26e1f172d06f8d47c675cef5c04ee6c0c2a7215342b",
+    "caldera": "3c6f2c39e9ef1e861847529ae7c7bde714fb5086739b67daabdb2b982a617de6",
+    "coro": "2d728d2ba90465c23d5a9165c4dced67a7f1bdcd165e135c452a7492f4c7b49a",
+    "prefecto": "9e1e2f0a081ffcf8b5f9ff8dbc41e6e10f3ad2affa542d08b4f6af33dc6d1ed3",
+    "madre": "7b3fc5f23b7a293fced48083838b359b52bd8eda140085558f570df1233a6f45"
+  }
+}
