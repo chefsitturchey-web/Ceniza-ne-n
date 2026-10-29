@@ -31,7 +31,7 @@ def chunk(kind, content):
     return struct.pack('<IH', len(content) + 6, kind) + content
 
 
-def blank(path, size, clips, height=None):
+def blank(path, size, clips, height=None, layer_names=None):
     height = size if height is None else height
     tags = struct.pack('<H8x', len(clips))
     cursor, durations = 0, []
@@ -40,7 +40,7 @@ def blank(path, size, clips, height=None):
         cursor += count
         durations.extend([round(1000 / fps)] * count)
     layers = b''.join(chunk(0x2004, struct.pack('<HHHHHHB3x', 3, 0, 0, 0, 0, 0, 255) + string(name))
-                      for name in ['Cuerpo y apoyo', 'Armas y mecanismos', 'Efectos dibujados'])
+                      for name in (layer_names or ['Cuerpo y apoyo', 'Armas y mecanismos', 'Efectos dibujados']))
     empty = zlib.compress(bytes(size * height * 4))
     cels = b''.join(chunk(0x2005, struct.pack('<HhhBH7xHH', i, 0, 0, 255, 2, size, height) + empty) for i in range(3))
     frames = []

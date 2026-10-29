@@ -33,7 +33,7 @@ Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y f
 
 **Laboratorio con F1:** acceso directo a los cinco jefes, fases, equipo, invulnerabilidad, cámara lenta, colisiones/rutas y creación de unidades. Permite volver a la escena original; las intervenciones de colonia quedan como práctica sin sobrescribir el checkpoint. [Controles y guía](docs/LABORATORIO_DEPURACION.md).
 
-**Arte de combate en LibreSprite:** el Portador y los cinco jefes utilizan 1792 fotogramas en siete variantes, con frente, espalda y perfiles dibujados por separado. La vista superior a tres cuartos mantiene los cuerpos erguidos al cambiar de dirección. El Portador conserva su retrato manga como referencia y un cuerpo lateral de 35 píxeles. La galería F6 incluye **Giro** para revisar las cuatro vistas. [Comparación con aliados, referencias y archivos editables](docs/COMBATE_LIBRESPRITE.md).
+**Arte de combate ilustrado:** el Portador y los cinco jefes recuperan sus diseños manga con poses de marcha, estocada, reacción y caída; el Portador tiene además volteretas propias en ambas cámaras. La base se generó con `image_gen` y se registró, ajustó y exportó en LibreSprite. Son 416 poses de entrada y 1792 fotogramas de línea de tiempo con pausas y reutilización. La galería F6 incluye **Giro**, detalle con **1–6** y conjunto con **0**. [Diseños, tamaños, prompts y fuentes editables](docs/ARTE_COMBATE_ILUSTRADO.md).
 
 El núcleo, murallas y torretas tienen tres niveles, diseños industriales coherentes y desbloqueos. Se normalizó la escala respecto al Portador y se añadió transporte eléctrico opcional. [Progresión, tamaños y movilidad](docs/ESCALA_NIVELES_Y_MOVILIDAD.md).
 

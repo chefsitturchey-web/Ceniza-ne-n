@@ -23,10 +23,10 @@ func run_checks() -> void:
 	var layout: Dictionary = CombatSpriteLibrary.data()
 	verify(layout.actors.size() == 7 and layout.animations.size() == 40, "Siete variantes y cuarenta secuencias por variante")
 	for id: String in layout.actors:
-		verify(FileAccess.file_exists("res://assets/combat/native/sources/%s.ase" % id), "Fuente editable de LibreSprite: " + id)
+		verify(FileAccess.file_exists(CombatSpriteLibrary.source_path(id)), "Fuente editable de LibreSprite: " + id)
 		var frames: SpriteFrames = CombatSpriteLibrary.frames(id)
 		verify(frames == CombatSpriteLibrary.frames(id), "Caché compartida: " + id)
-		var sheet: Image = load("res://assets/combat/native/%s.png" % id).get_image()
+		var sheet: Image = load(CombatSpriteLibrary.sheet_path(id)).get_image()
 		var size: int = layout.actors[id].cell
 		for key: String in layout.animations:
 			var hashes: Dictionary = {}
@@ -35,38 +35,71 @@ func run_checks() -> void:
 				hashes[hash(image.get_data())] = true
 				var used: Rect2i = image.get_used_rect()
 				verify(used.has_area() and used.position.x > 0 and used.position.y > 0 and used.end.x < size and used.end.y < size, "Sin recortes ni celdas vacías: %s/%s/%d" % [id, key, index])
-			verify(hashes.size() >= 3, "Tres o más poses distintas: %s/%s" % [id, key])
+			verify(hashes.size() >= int(layout.animations[key].get("min_unique_frames", 3)), "Fotogramas distintos según las poses reales: %s/%s" % [id, key])
 		verify(not frames.get_animation_loop(&"death_south") and not frames.get_animation_loop(&"attack_south"), "Muerte y ataque no se repiten: " + id)
-	var provenance: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/combat/native/provenance.json"))
+		if id in ["portador", "portador_cenital", "prefecto"]:
+			var info: Dictionary = layout.actors[id]
+			var height: float = info.idle_body_bounds[3] - info.idle_body_bounds[1]
+			for direction: String in ["south", "east", "north", "west"]:
+				var leg_masks: Dictionary = {}
+				for index: int in layout.animations["walk_" + direction].frames:
+					var image: Image = sheet.get_region(Rect2i(index % 8 * size, index / 8 * size, size, size))
+					var mask: PackedByteArray = PackedByteArray()
+					for y: int in range(int(info.anchor[1] - height * 0.30), int(info.anchor[1])):
+						for x: int in size: mask.append(1 if image.get_pixel(x, y).a > 0.5 else 0)
+					leg_masks[hash(mask)] = true
+				verify(leg_masks.size() >= 3, "La silueta de piernas cambia durante el paso: %s/%s" % [id, direction])
+				var first_hit: int = layout.animations["attack_" + direction].frames[0]
+				var strike: Image = sheet.get_region(Rect2i(first_hit % 8 * size, first_hit / 8 * size, size, size))
+				var centre: Vector2 = Vector2.ZERO
+				var minimum: Vector2 = Vector2.ONE * size
+				var maximum: Vector2 = Vector2.ZERO
+				var count: int = 0
+				for y: int in size:
+					for x: int in size:
+						var c: Color = strike.get_pixel(x, y)
+						var edge: bool = c.r > 0.6 and c.g < 0.38 and c.b < 0.4 if id == "prefecto" else c.g > 0.4 and c.b > 0.4 and c.r < c.g * 0.8
+						if c.a > 0.5 and edge:
+							centre += Vector2(x, y)
+							minimum = minimum.min(Vector2(x, y))
+							maximum = maximum.max(Vector2(x, y))
+							count += 1
+				centre /= maxf(1, count)
+				# A front thrust is foreshortened; its blade need not pass the boots.
+				var aligned: bool = centre.x > info.anchor[0] + 8 if direction == "east" else centre.x < info.anchor[0] - 8 if direction == "west" else centre.y < info.anchor[1] - height * 0.60 if direction == "north" else centre.y > info.anchor[1] - height * 0.50
+				var length: float = (maximum - minimum).x if direction in ["east", "west"] else (maximum - minimum).y
+				# This measures the coloured edge; shaded steel can be longer.
+				verify(count > 2 and aligned and length >= height * 0.10, "El filo pintado del impacto apunta hacia su dirección: %s/%s" % [id, direction])
+			verify(frames.get_frame_duration(&"windup_south", 5) > frames.get_frame_duration(&"windup_south", 0), "La preparación tiene pausas de peso distintas: " + id)
+	var provenance: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/combat/illustrated/provenance.json"))
 	for id: String in layout.actors:
 		verify(layout.actors[id].camera == ("lateral" if id == "portador" else "three_quarter"), "Proyección declarada para la cámara: " + id)
-		var views: Dictionary = layout.actors[id].orientation_landmarks
-		verify(views.size() == 4, "Cuatro vistas dibujadas por separado: " + id)
-		for direction: String in views:
-			verify(views[direction].head[1] < views[direction].feet[1], "Cabeza sobre los pies al mirar " + direction + ": " + id)
-		if id in ["recaudador", "caldera", "coro"]:
-			verify(views.east.front[0] > views.west.front[0] and views.south.front[1] > views.north.front[1], "El frente apunta en la dirección correcta: " + id)
+		if layout.actors[id].has("key_poses"):
+			verify(layout.actors[id].key_poses >= 48 and layout.actors[id].directions.size() == 4, "Poses pintadas en cuatro vistas: " + id)
+		else:
+			verify(layout.actors[id].orientation_landmarks.size() == 4, "Cuatro vistas del recurso anterior: " + id)
 		if id.begins_with("portador"):
-			var sheet: Image = load("res://assets/combat/native/%s.png" % id).get_image()
+			var sheet: Image = load(CombatSpriteLibrary.sheet_path(id)).get_image()
 			var cell: int = layout.actors[id].cell
+			var skin: Dictionary = {}
 			for direction: String in ["south", "east", "north", "west"]:
 				var index: int = layout.animations["idle_" + direction].frames[0]
 				var image: Image = sheet.get_region(Rect2i(index % 8 * cell, index / 8 * cell, cell, cell))
+				var bounds: Rect2i = image.get_used_rect()
+				verify(bounds.size.y * CombatSpriteLibrary.scale_for(id) >= 30 and bounds.size.y * CombatSpriteLibrary.scale_for(id) <= 37, "Cuerpo erguido de tamaño coherente: %s/%s" % [id, direction])
 				var count: int = 0
-				var total_y: float = 0
-				for y: int in cell:
-					for x: int in cell:
-						var color: Color = image.get_pixel(x, y)
-						if color.a > 0.5 and color.to_html(false) in ["151c25", "26313d"]:
-							count += 1
-							total_y += y
-				verify(count >= 20 and total_y / maxf(1, count) < layout.actors[id].anchor[1] - 20, "El cabello real del PNG permanece arriba: %s/%s" % [id, direction])
+				for y: int in range(bounds.position.y, bounds.position.y + int(bounds.size.y * 0.25)):
+					for x: int in range(bounds.position.x, bounds.end.x):
+						var c: Color = image.get_pixel(x, y)
+						if c.a > 0.5 and c.r > c.g * 1.12 and c.g > c.b * 1.08 and c.r > 0.25 and c.r - c.b > 0.08: count += 1
+				skin[direction] = count
+			verify(skin.south > skin.north + 3, "Rostro humano visible de frente y nuca al mirar al norte: " + id)
 	var body: Array = layout.actors.portador.idle_body_bounds
-	var height: float = body[3] - body[1]
+	var height: float = (body[3] - body[1]) * CombatSpriteLibrary.scale_for("portador")
 	var ally: Image = UnitSpriteLibrary.frames("guardian").get_frame_texture(&"reposo", 0).get_image()
 	verify(height >= 32 and height <= 36 and height <= ally.get_used_rect().size.y * 1.2, "El cuerpo del Portador respeta la escala de los aliados")
 	verify(body[3] == layout.actors.portador.anchor[1], "Las botas apoyan en el suelo sin hundirse")
-	verify(provenance.external_raster_inputs.is_empty() and provenance.tool == "LibreSprite", "Este bloque dibuja los píxeles en LibreSprite sin ilustraciones generadas de entrada")
+	verify(not provenance.external_raster_inputs.is_empty() and provenance.tool == "LibreSprite", "Poses pintadas registradas y exportadas en LibreSprite con procedencia explícita")
 	var studio: Control = load("res://levels/story/combat_animation_preview.tscn").instantiate()
 	root.add_child(studio)
 	await process_frame
@@ -75,11 +108,18 @@ func run_checks() -> void:
 		var sprite: AnimatedSprite2D = studio.actors[index]
 		var image: Image = sprite.sprite_frames.get_frame_texture(sprite.animation, sprite.frame).get_image()
 		var used: Rect2i = image.get_used_rect()
-		var top: float = sprite.position.y - image.get_height() / 2.0 + used.position.y
-		var bottom: float = top + used.size.y
+		var top: float = sprite.position.y + (used.position.y - image.get_height() / 2.0) * sprite.scale.y
+		var bottom: float = top + used.size.y * sprite.scale.y
 		var card_top: float = 47 + (index / 3) * 153
 		verify(top >= card_top and bottom < card_top + 127, "Silueta dentro de su tarjeta sin tapar el texto: %d" % index)
 	await picture("galeria_caminar")
+	studio.show_detail(0)
+	verify(studio.focus_sprite.visible and studio.focus_sprite.sprite_frames == studio.actors[0].sprite_frames, "Detalle amplía las poses reales sin sustituirlas")
+	await picture("detalle_portador")
+	studio.show_detail(4)
+	await picture("detalle_prefecto")
+	studio.show_detail(-1)
+	verify(not studio.focus_sprite.visible and studio.focus_index == -1, "Volver a conjunto restaura las escalas del mundo")
 	for direction: int in range(1, 4):
 		studio.direction_choice.select(direction)
 		studio.play_all()
@@ -94,7 +134,7 @@ func run_checks() -> void:
 	studio.play_all()
 	studio.change_camera(1)
 	verify(studio.guardian.visible and studio.actors[0].sprite_frames == CombatSpriteLibrary.frames("portador"), "Comparación lateral con aliado real")
-	verify(studio.actors[0].scale == Vector2.ONE and studio.guardian.scale == Vector2.ONE, "Comparación sin ampliar al protagonista")
+	verify(studio.actors[0].scale.x == CombatSpriteLibrary.scale_for("portador") and studio.guardian.scale == Vector2.ONE, "Comparación con tamaños de mundo correctos")
 	await picture("escala_portador_aliado")
 	studio.change_camera(0)
 	studio.state_choice.select(3)
@@ -178,6 +218,11 @@ func run_checks() -> void:
 	world.session.set_process(false)
 	verify(world.player.combat_visual != null and not world.player.visual.sprite.visible, "La colonia también utiliza el Portador de LibreSprite")
 	verify(world.player.combat_visual.actor_id == "portador", "La colonia conserva su perspectiva lateral")
+	# Separate the player from the initial crowd for an unambiguous art capture.
+	if capture:
+		world.player.position.x = -180
+		world.player.set_physics_process(false)
+		world.player.combat_visual.set_pose("idle", Vector2.RIGHT)
 	await picture("portador_colonia")
 	world.free()
 	await process_frame

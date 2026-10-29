@@ -1,0 +1,40 @@
+{
+  "tool": "LibreSprite",
+  "visual_base": "OpenAI image_gen, manga identity references and original action key poses",
+  "pipeline": "Read-only alpha measurement; native LibreSprite sampling, registration, secondary breathing, effects and ASE/PNG export.",
+  "source": "tools/libresprite_illustrated_combat.js",
+  "sources_sha256": {
+    "portador_cenital": "a20ef8f568083b86eb6a2f06c9de06d16081134c518081be1393f0a044f78a10",
+    "portador": "414740080024f67927e34f38235a60bd652c21203d5c337c61551e9ebd21ed8b",
+    "prefecto": "ef9d2e3d8a56efa1665ad53b2f7589165e9f26935a63890d0497f498ec03fc0b",
+    "madre": "0e22cd547b1e17fb4cac4647bcb7f9e5a956ddb448293cfbf175dff2316febac",
+    "recaudador": "d3414b45c803e907472a1e2a89f7979189dccb93ed76f9f927e351aec35b91d4",
+    "caldera": "8f4abb0cbf680e2a3a3c726e9d29ae84481ce0fb806f7feb026ffb05eade9965",
+    "coro": "44b3f49cdbffa128e930dfd57000b0d8cb813ee004b14ef80d3cdea3917d9894"
+  },
+  "external_raster_inputs": [
+    "references/caldera.png",
+    "references/coro.png",
+    "references/madre.png",
+    "references/portador.png",
+    "references/portador_attack.png",
+    "references/portador_cenital.png",
+    "references/portador_cenital_attack.png",
+    "references/portador_cenital_dodge.png",
+    "references/portador_dodge.png",
+    "references/prefecto.png",
+    "references/prefecto_attack.png",
+    "references/recaudador.png"
+  ],
+  "timeline_frames_per_actor": 256,
+  "unique_source_poses": {
+    "portador_cenital": 80,
+    "portador": 80,
+    "prefecto": 64,
+    "madre": 48,
+    "recaudador": 48,
+    "caldera": 48,
+    "coro": 48
+  },
+  "note": "Timeline holds and secondary poses reuse artwork. 256 timeline frames are NOT 256 independently painted poses."
+}

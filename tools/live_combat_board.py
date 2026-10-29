@@ -22,6 +22,10 @@ def main():
     settings = {'file': filename.as_posix(), 'portrait': (ROOT / 'assets/story/portraits_manga_v2.png').as_posix(),
                 'guardian': (ROOT / 'assets/units/animated/guardian.png').as_posix(),
                 'height': 960 if args.directions else 320, 'directions': args.directions}
+    painted = ROOT / 'assets/combat/illustrated/layout.json'
+    if painted.exists():
+        settings['painted'] = json.loads(painted.read_text())['actors']
+        settings['project_root'] = ROOT.as_posix()
     sources = '\n'.join((ROOT / 'tools' / name).read_text(encoding='utf-8')
                         for name in ['libresprite_combat.js', 'libresprite_projection.js'])
     driver = (ROOT / 'tools/libresprite_live_board.js').read_text(encoding='utf-8')

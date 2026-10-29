@@ -12,6 +12,18 @@ function onEvent(event){
         var ids=LIVE.directions?['portador_cenital','recaudador','caldera','coro','prefecto','madre']:['portador','portador_cenital','prefecto','recaudador','caldera','coro','madre'];
         for(var slot=0;slot<(LIVE.directions?24:ids.length);slot++){
             var id=ids[LIVE.directions?Math.floor(slot/4):slot];N=id.indexOf('portador')===0?96:(id==='prefecto'?160:128);ORIGIN=id==='prefecto'?16:0;
+            if(LIVE.painted&&LIVE.painted[id]){
+                var info=LIVE.painted[id],sheet=app.open(LIVE.project_root+'/'+info.texture.substr(6)).sprite.layer(0).cel(0).image;
+                var pixels=sheet.getImageData(),direction=LIVE.directions?slot%4:(slot===0?1:0),frame=direction*64+8;
+                var scale=info.render_scale,extent=Math.round(info.cell*scale);
+                var left=(slot%4)*160+(160-extent)/2,top=Math.floor(slot/4)*160+(160-extent)/2;
+                for(var y=0;y<extent;y++)for(var x=0;x<extent;x++){
+                    var sx=(frame%8)*info.cell+Math.floor(x/scale),sy=Math.floor(frame/8)*info.cell+Math.floor(y/scale);
+                    var src=(sy*sheet.width+sx)*4,dst=((top+y)*640+left+x)*4;
+                    for(var c=0;c<4;c++)liveTarget[0][dst+c]=pixels[src+c];
+                }
+                continue;
+            }
             var arrays=[new Uint8Array(N*N*4),new Uint8Array(N*N*4),new Uint8Array(N*N*4)];
             renderProjection(arrays[0],arrays[1],arrays[2],{state:'walk',direction:LIVE.directions?['south','east','north','west'][slot%4]:(slot===0?'east':'south'),frame:2,count:8},id);
             var left=(slot%4)*160+(160-N)/2,top=Math.floor(slot/4)*160+(160-N)/2;
@@ -41,6 +53,6 @@ function onEvent(event){
         }
         liveDocument.sprite.commit();liveRow+=6;
         if(liveRow<LIVE.height)app.yield();
-        else {liveDocument.sprite.saveAs(LIVE.file);console.log('LIVE_BOARD_COMPLETE '+LIVE.file);}
+        else {liveDocument.sprite.saveAs(LIVE.file);app.open(LIVE.file);console.log('LIVE_BOARD_COMPLETE '+LIVE.file);}
     }
 }

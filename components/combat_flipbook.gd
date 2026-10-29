@@ -15,7 +15,7 @@ var state_name: String = "idle"
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sprite.sprite_frames = CombatSpriteLibrary.frames(actor_id)
-	sprite.position = CombatSpriteLibrary.offset_for(actor_id)
+	sprite.position = CombatSpriteLibrary.offset_for(actor_id) * CombatSpriteLibrary.scale_for(actor_id)
 	add_child(sprite)
 	last_position = actor.global_position
 	set_pose("idle", Vector2.DOWN)
@@ -33,16 +33,23 @@ func set_pose(state: String, facing: Vector2, progress: float = -1) -> void:
 		clip_clock = 0
 	state_name = state
 	var count: int = sprite.sprite_frames.get_frame_count(clip)
-	var frame: int
-	if progress >= 0: frame = mini(count - 1, int(clampf(progress, 0, 1) * count))
-	elif sprite.sprite_frames.get_animation_loop(clip): frame = int(clip_clock * sprite.sprite_frames.get_animation_speed(clip)) % count
-	else: frame = mini(count - 1, int(clip_clock * sprite.sprite_frames.get_animation_speed(clip)))
+	var duration: float = 0
+	for index: int in count: duration += sprite.sprite_frames.get_frame_duration(clip, index)
+	var cursor: float = clampf(progress, 0, 1) * duration if progress >= 0 else clip_clock * sprite.sprite_frames.get_animation_speed(clip)
+	if progress < 0 and sprite.sprite_frames.get_animation_loop(clip): cursor = fposmod(cursor, duration)
+	var frame: int = count - 1
+	var elapsed: float = 0
+	for index: int in count:
+		elapsed += sprite.sprite_frames.get_frame_duration(clip, index)
+		if cursor < elapsed:
+			frame = index
+			break
 	sprite.animation = clip
 	sprite.pause()
 	sprite.frame = frame
 	sprite.rotation = 0
 	sprite.flip_h = false
-	sprite.scale = Vector2.ONE
+	sprite.scale = Vector2.ONE * CombatSpriteLibrary.scale_for(actor_id)
 
 func record_travel() -> void:
 	var distance: float = actor.global_position.distance_to(last_position)
@@ -66,7 +73,7 @@ func pose_player() -> void:
 		var ratio: float = clampf(1 - remaining / Player.ATTACK_ANIM_DURATION, 0, 1)
 		if ratio < 0.25: set_pose("windup", aim, ratio / 0.25)
 		else: set_pose("attack", aim, (ratio - 0.25) / 0.75)
-	elif moving and not (side and actor.riding): set_pose("walk", facing, fposmod(travel / 80, 1))
+	elif moving and not (side and actor.riding): set_pose("walk", facing, fposmod(travel / (64.0 if side else 56.0), 1))
 	else: set_pose("exposed" if actor.stamina < 30 else "idle", facing)
 
 func pose_boss(boss: Recaudador) -> void:

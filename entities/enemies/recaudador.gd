@@ -240,7 +240,7 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 		change_state(State.DEAD, 0)
 		clear_hazards()
 		if combat_visual != null:
-			effects.emit_fragments(global_position, combat_visual.texture(), 16)
+			effects.emit_fragments(combat_visual.sprite.global_position, combat_visual.texture(), 16, false, false, combat_visual.sprite.global_scale)
 		else:
 			for sprite: Sprite2D in pieces:
 				effects.emit_fragments(sprite.global_position, sprite.texture, 8, sprite.flip_h, true, sprite.global_scale, sprite.global_rotation)
