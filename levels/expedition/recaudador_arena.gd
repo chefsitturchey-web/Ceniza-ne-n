@@ -37,6 +37,7 @@ var zone: ZoneData
 var boss_status: Label
 var phase_notice: Label
 var phase_notice_time: float = 0.0
+var dynamics: EncounterDynamics
 
 func configure(source: Player, index: int = 0) -> void:
 	configured = true
@@ -69,6 +70,9 @@ func _ready() -> void:
 	floor_node.set_script(preload("res://levels/expedition/arena_floor.gd"))
 	floor_node.set("theme_id", zone.id)
 	world.add_child(floor_node)
+	var atmosphere: EncounterScenery = EncounterScenery.new()
+	atmosphere.arena = self
+	world.add_child(atmosphere)
 	var telegraphs: EncounterTelegraphs = EncounterTelegraphs.new()
 	telegraphs.boss = boss
 	world.add_child(telegraphs)
@@ -85,6 +89,11 @@ func _ready() -> void:
 	if boss is MadreCero:
 		(boss as MadreCero).support_units = support_units
 		(boss as MadreCero).install_relays(actors)
+	dynamics = EncounterDynamics.new()
+	dynamics.arena = self
+	world.add_child(dynamics)
+	world.move_child(dynamics, actors.get_index())
+	dynamics.configure_paths()
 	modules.actor = player
 	modules.boss = boss
 	modules.planar = true
@@ -183,6 +192,9 @@ func build_geometry() -> void:
 		if zone_index == 0:
 			texture = DepotArt.prop(0 if index < 2 else (3 if index < 4 else 2))
 			extent = Vector2(34, 34) if index < 2 else Vector2(32, 28)
+		else:
+			texture = DepotArt.prop(0 if assets[index] == "pillar_top" else (3 if assets[index] == "crate_top" else 2))
+			extent = Vector2(34, 34) if assets[index] == "pillar_top" else Vector2(32, 28)
 		var body: StaticBody2D = wall(positions[index], extent)
 		body.reparent(actors)
 		body.name = "Cover%d" % index
@@ -241,9 +253,14 @@ func build_hud() -> void:
 	damage_edges.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(damage_edges)
 	damage_edges.set_state({"health": player.health})
-	label(zone.boss_title, Rect2(110, 325, 420, 14))
-	boss_status = label(zone.briefing, Rect2(8, 15, 624, 28))
-	boss_status.add_theme_font_size_override("font_size", 10)
+	var boss_title: Label = label(zone.boss_title, Rect2(110, 324, 420, 18))
+	boss_title.add_theme_font_override("font", ThemeDB.fallback_font)
+	boss_title.add_theme_font_size_override("font_size", 13)
+	boss_status = label(zone.briefing, Rect2(8, 9, 624, 44))
+	boss_status.add_theme_font_override("font", ThemeDB.fallback_font)
+	boss_status.add_theme_font_size_override("font_size", 14)
+	boss_status.add_theme_constant_override("outline_size", 4)
+	boss_status.add_theme_color_override("font_outline_color", Color("08111c"))
 	boss_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	phase_notice = label("", Rect2(80, 60, 480, 22), true)
 	phase_notice.add_theme_color_override("font_color", Color("dd6482"))
@@ -322,8 +339,15 @@ func return_to_menu() -> void:
 func strike(origin: Vector2, direction: Vector2, amount: int, reach: float) -> void:
 	if ending:
 		return
-	if boss.strike_attachments(origin, direction, amount, reach):
-		return
+	boss.strike_attachments(origin, direction, amount, reach)
+	for index: int in range(dynamics.sentinels.size()):
+		if not is_instance_valid(dynamics.sentinels[index]): continue
+		var sentinel: EncounterSentinel = dynamics.sentinels[index]
+		if sentinel.health <= 0: continue
+		var separation: Vector2 = sentinel.global_position - origin
+		if separation.length() > reach + 12 or direction.dot(separation.normalized()) < cos(0.85): continue
+		var sight: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(origin, sentinel.global_position, 1)
+		if world.get_world_2d().direct_space_state.intersect_ray(sight).is_empty(): sentinel.receive_hit(origin, amount)
 	var offset: Vector2 = boss.global_position - origin
 	if ending or offset.length() > reach + 29 or direction.dot(offset.normalized()) < cos(0.85):
 		return
@@ -348,6 +372,7 @@ func finish(victory: bool) -> void:
 	if ending or completed:
 		return
 	ending = true
+	dynamics.clear_encounter()
 	boss.clear_hazards()
 	sound.play_cue("destroy" if victory else "alarm")
 	ending_victory = victory

@@ -2,9 +2,15 @@ class_name DepotArt
 extends RefCounted
 const PARTS: Texture2D = preload("res://assets/expedition/boss/collector_parts_v2.png")
 const PROPS: Texture2D = preload("res://assets/expedition/arena/depot_props_v2.png")
+const MACHINES: Texture2D = preload("res://assets/expedition/arena/encounter_machines_v1.png")
 static var parts: Dictionary = {}
 static var props: Dictionary = {}
 static var shutter: AtlasTexture
+static var machines: Dictionary = {}
+
+static func machine(index: int) -> Texture2D:
+	if not machines.has(index): machines[index] = ArtScale.atlas(MACHINES, index)
+	return machines[index] as Texture2D
 
 static func reactor_shutter() -> Texture2D:
 	if shutter == null:

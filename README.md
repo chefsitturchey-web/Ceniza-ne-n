@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
-  <img alt="Pruebas: 35 suites" src="https://img.shields.io/badge/tests-35%20suites-47dacb">
+  <img alt="Pruebas: 36 suites" src="https://img.shields.io/badge/tests-36%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -45,6 +45,8 @@ Tras un colapso tecnológico, una red autónoma de máquinas intenta borrar los 
 Para liberar un distrito destruyes sus **repetidores enemigos**, tomas el **tren blindado** y enfrentas al jefe que protege el enlace de transporte en una arena con vista cenital.
 
 La ruta jugable conecta **Periferia oxidada → Fundición → Barrio inundado → Ciudadela corporativa → Núcleo de la red** y cinco jefes distintos. Viajas conservando mejoras y habitantes; cada colonia tiene tres operaciones de historia y sus propios frentes. [Ruta, jefes y pruebas directas](docs/HISTORIA_Y_CAMPANA.md).
+
+Los **cinco jefes** reaccionan a distancia, trayectoria, coberturas o infraestructura mediante decisiones locales y navegación A*. Las arenas incorporan carga suspendida, refrigeración, corriente y sonar, parapeto temporal y sabotaje de relés; hay artilleros, cazadores y saboteadores con llegada anunciada y límites simultáneos. Maquinaria propia por distrito, relés detallados y avisos más legibles. [Tácticas, mecanismos y escenas para probar con F6](docs/JEFES_TACTICAS_Y_ARENAS.md).
 
 La revisión actual sigue el GDD: **campamentos → herramientas → profesiones**, construcción con trabajadores, murallas por etapas y **experiencia recogible con tres elecciones al subir de nivel**. [Revisión a fondo, referencias y pendientes](docs/REVISION_GDD_KINGDOM_SURVIVORS.md).
 
@@ -195,7 +197,7 @@ godot --headless --path . --editor --import --quit
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta **35 suites**, incluyendo personajes, novela visual, fortificaciones, movilidad, campaña, jefes, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
+`run_all.gd` ejecuta **36 suites**, incluyendo tácticas de los cinco jefes, personajes, novela visual, fortificaciones, movilidad, campaña, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
 
 En una consola de PowerShell dedicada a las pruebas, configura primero el perfil aislado:
 

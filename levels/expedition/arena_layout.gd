@@ -10,4 +10,6 @@ static func boundary(index: int) -> PackedVector2Array:
 		return points
 	if index == 3:
 		return PackedVector2Array([Vector2(96, 24), Vector2(544, 24), Vector2(616, 100), Vector2(616, 380), Vector2(544, 456), Vector2(96, 456), Vector2(24, 380), Vector2(24, 100)])
+	if index == 2:
+		return PackedVector2Array([Vector2(180, 24), Vector2(460, 24), Vector2(520, 80), Vector2(600, 120), Vector2(600, 330), Vector2(540, 410), Vector2(450, 456), Vector2(190, 456), Vector2(100, 410), Vector2(40, 330), Vector2(40, 120), Vector2(120, 80)])
 	return PackedVector2Array([Vector2(140, 24), Vector2(500, 24), Vector2(616, 140), Vector2(616, 340), Vector2(500, 456), Vector2(140, 456), Vector2(24, 340), Vector2(24, 140)])

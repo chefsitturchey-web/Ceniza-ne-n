@@ -12,6 +12,7 @@ const VIEWS: Array[Texture2D] = [preload("res://assets/player/topdown/idle_south
 var health: int = Player.MAX_HEALTH
 var stamina: float = Player.MAX_STAMINA
 var speed: float = 220.0
+var terrain_speed_factor: float = 1.0
 var attack_damage: int = 50
 var attack_range: float = 42.0
 var attack_cooldown: float = 0.4
@@ -90,7 +91,7 @@ func _physics_process(delta: float) -> void:
 		velocity = dodge_direction * Player.DODGE_SPEED
 		dodge_remaining = maxf(0, dodge_remaining - delta)
 	else:
-		velocity = direction * speed + knockback
+		velocity = direction * speed * terrain_speed_factor + knockback
 	knockback = knockback.move_toward(Vector2.ZERO, 900 * delta)
 	move_and_slide()
 	step_timer = maxf(0, step_timer - delta)

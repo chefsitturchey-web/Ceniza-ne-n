@@ -351,6 +351,32 @@ const REGIONS: Dictionary = {
       421
     ]
   ],
+  "res://assets/expedition/arena/encounter_machines_v1.png": [
+    [
+      118,
+      4,
+      627,
+      469
+    ],
+    [
+      845,
+      6,
+      622,
+      470
+    ],
+    [
+      85,
+      479,
+      593,
+      522
+    ],
+    [
+      821,
+      498,
+      640,
+      509
+    ]
+  ],
   "res://assets/structures/fortress/cargo_board.png": [
     [
       7,

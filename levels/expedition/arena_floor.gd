@@ -41,10 +41,10 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	if theme_id == "periphery": return
-	rng.seed = SEED
+	rng.seed = SEED + theme_id.hash()
 	_draw_tiles()
 	_draw_rails()
-	_draw_toll_circle()
+	if theme_id == "citadel": _draw_toll_circle()
 	_draw_decals()
 	_draw_cables()
 	_draw_debris()

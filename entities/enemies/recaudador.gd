@@ -34,6 +34,8 @@ var turbine: Sprite2D
 var track_distance: float = 0
 var hatch: Sprite2D
 var effects: DebrisEmitter = DebrisEmitter.new()
+var tactics: BossTactics = BossTactics.new()
+var last_decision: String = ""
 
 func _ready() -> void:
 	health = max_health
@@ -112,16 +114,17 @@ func _physics_process(delta: float) -> void:
 	if state == State.DEAD or target == null or target.health <= 0:
 		return
 	elapsed += delta
+	tactics.observe(target, delta)
 	timer -= delta
 	var difference: Vector2 = target.global_position - global_position
 	if state in [State.APPROACH, State.VOLLEY_WINDUP, State.VOLLEY, State.RECOVER]:
 		facing = Vector2.from_angle(rotate_toward(facing.angle(), difference.angle(), (1.5 if phase == 1 else 2.0) * delta))
 	match state:
 		State.APPROACH:
-			velocity = difference.normalized() * (65 if phase == 1 else 85) if difference.length() > 65 else Vector2.ZERO
+			velocity = tactics.steer(self, target.global_position, 65 if phase == 1 else 85) if difference.length() > 65 else Vector2.ZERO
 			move_and_slide()
 			if timer <= 0 or difference.length() < 72:
-				change_state(State.CLAW_WINDUP, 0.4)
+				choose_attack(difference.length())
 		State.CLAW_WINDUP:
 			if timer <= 0:
 				change_state(State.CLAW, 0.35)
@@ -130,7 +133,7 @@ func _physics_process(delta: float) -> void:
 			if difference.length() < 88 and sweep.dot(difference.normalized()) > 0.82:
 				target.take_damage(20, difference.normalized() * 180)
 			if timer <= 0:
-				next_pattern = 1
+				next_pattern = -1
 				change_state(State.RECOVER, 0.9)
 		State.VOLLEY_WINDUP:
 			if timer <= 0:
@@ -144,7 +147,7 @@ func _physics_process(delta: float) -> void:
 				volleys += 1
 				shot_timer = 0.55
 			if timer <= 0:
-				next_pattern = 2
+				next_pattern = -1
 				change_state(State.RECOVER, 0.8)
 		State.CHARGE_WINDUP:
 			if timer <= 0:
@@ -170,14 +173,27 @@ func _physics_process(delta: float) -> void:
 				elif next_pattern == 2:
 					charges_left = 2 if phase == 2 else 1
 					begin_charge()
+				elif next_pattern == -1:
+					choose_attack(difference.length())
 				else:
 					change_state(State.APPROACH, 2.5)
 	update_puppet(delta)
 
 func begin_charge() -> void:
-	charge_direction = (target.global_position - global_position).normalized()
+	charge_direction = (tactics.predicted(target, 0.25) - global_position).normalized()
 	facing = charge_direction
 	change_state(State.CHARGE_WINDUP, 0.8)
+
+func choose_attack(distance: float) -> void:
+	var visible: bool = tactics.clear_shot(self, target.global_position)
+	last_decision = tactics.choose({"claw": 12.0 if distance < 90 else -5.0, "volley": 7.0 if visible else -3.0, "charge": 9.0 if distance > 130 or not visible else 2.0}, 3.5)
+	match last_decision:
+		"claw": change_state(State.CLAW_WINDUP, 0.65)
+		"volley": change_state(State.VOLLEY_WINDUP, 0.8)
+		"charge":
+			charges_left = 2 if phase == 2 else 1
+			begin_charge()
+		_: change_state(State.APPROACH, 0.6)
 
 func finish_charge() -> void:
 	charges_left -= 1

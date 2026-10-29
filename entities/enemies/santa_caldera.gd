@@ -24,8 +24,10 @@ func clear_hazards() -> void:
 func hit_multiplier(_origin: Vector2) -> float:
 	return 2.0 if core_exposed else 0.35
 
-func prepare_heat() -> void:
+func prepare_heat(adaptive: bool = false) -> void:
 	heat_areas.clear()
+	if adaptive:
+		pattern = 0 if absf(tactics.observed_velocity.x) > absf(tactics.observed_velocity.y) else 1
 	if pattern % 2 == 0:
 		for x: float in [95.0, 290.0, 485.0]:
 			heat_areas.append(Rect2(x, 70, 70 if phase == 1 else 90, 360))
@@ -39,15 +41,24 @@ func _physics_process(delta: float) -> void:
 	if health <= 0 or target == null or target.health <= 0:
 		return
 	elapsed += delta
+	tactics.observe(target, delta)
 	timer -= delta
 	facing = (target.global_position - global_position).normalized()
 	match state:
 		State.APPROACH:
 			var offset: Vector2 = Vector2.from_angle(elapsed * 0.35 + pattern) * 130
 			var destination: Vector2 = (target.global_position + offset).clamp(Vector2(90, 95), Vector2(550, 385))
-			velocity = (destination - global_position).normalized() * (85 if phase == 2 else 65)
+			velocity = tactics.steer(self, destination, 85 if phase == 2 else 65)
 			move_and_slide()
-			if timer <= 0: prepare_heat()
+			if timer <= 0:
+				last_decision = tactics.choose({"heat": 9.0 + tactics.stationary_time, "charge": 12.0 if facing.dot(tactics.observed_velocity.normalized()) < -0.5 else 5.0, "volley": 10.0 if global_position.distance_to(target.global_position) > 210 else 4.0}, 7)
+				match last_decision:
+					"charge":
+						charges_left = 2 if phase == 2 else 1
+						charge_direction = (tactics.predicted(target) - global_position).normalized()
+						change_state(State.CHARGE_WINDUP, 1.1)
+					"volley": change_state(State.VOLLEY_WINDUP, 0.9)
+					_: prepare_heat(true)
 		State.CLAW_WINDUP:
 			if timer <= 0:
 				heat_tick = 0

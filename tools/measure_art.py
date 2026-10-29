@@ -14,9 +14,11 @@ ATLASES = {'assets/units/field_atlas_v3.png': (4, 2),
            'assets/story/portraits_manga_v2.png': (3, 2),
            'assets/story/antagonists_manga_v2.png': (2, 1),
            'assets/expedition/boss/collector_parts_v2.png': (3, 2),
-           'assets/expedition/arena/depot_props_v2.png': (2, 2)}
+           'assets/expedition/arena/depot_props_v2.png': (2, 2),
+           'assets/expedition/arena/encounter_machines_v1.png': (2, 2)}
 ROW_CUTS = {'assets/structures/coherent_fortress_v3.png': [0, 404, 653, 894, 1085],
-            'assets/structures/coherent_civic_v4.png': [0, 565, 1024]}
+            'assets/structures/coherent_civic_v4.png': [0, 565, 1024],
+            'assets/expedition/arena/encounter_machines_v1.png': [0, 479, 1024]}
 CELLS = {'assets/expedition/boss/collector_parts_v2.png':
          [(0, 0, 768, 650), (780, 0, 1110, 650), (1140, 0, 1536, 650),
           (0, 655, 768, 1024), (790, 655, 1130, 1024), (1160, 655, 1536, 1024)]}
