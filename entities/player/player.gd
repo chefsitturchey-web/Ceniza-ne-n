@@ -55,6 +55,8 @@ var neural_damage: int = 0
 var neural_regen: float = 0.0
 var modules: ModuleSystem
 var step_timer: float = 0.0
+var poison_dps: float = 0.0
+var _poison_accum: float = 0.0
 
 func _ready() -> void:
 	health_component.maximum = MAX_HEALTH
@@ -103,6 +105,7 @@ func _physics_process(delta: float) -> void:
 	attack_anim_remaining = maxf(0.0, attack_anim_remaining - delta)
 	invulnerable = maxf(0.0, invulnerable - delta)
 	stamina = minf(MAX_STAMINA, stamina + (STAMINA_REGEN + neural_regen) * delta)
+	_apply_poison(delta)
 	if respawn_remaining > 0.0:
 		respawn_remaining = maxf(0.0, respawn_remaining - delta)
 		if respawn_remaining == 0.0:
@@ -154,6 +157,28 @@ func take_damage(amount: int) -> void:
 		velocity = Vector2.ZERO
 		dodge_remaining = 0.0
 	refresh_state()
+
+func set_poison(dps: float) -> void:
+	poison_dps = maxf(0.0, dps)
+	_update_poison_tint()
+
+func _apply_poison(delta: float) -> void:
+	if poison_dps <= 0.0 or health <= 0:
+		return
+	_poison_accum += poison_dps * delta
+	var ticks: int = floori(_poison_accum)
+	if ticks <= 0:
+		return
+	_poison_accum -= float(ticks)
+	health_component.take_damage(ticks)
+	if health <= 0:
+		respawn_remaining = RESPAWN_DURATION
+		velocity = Vector2.ZERO
+		dodge_remaining = 0.0
+
+func _update_poison_tint() -> void:
+	if visual != null and visual.sprite != null:
+		visual.sprite.modulate = Color(0.62, 1.0, 0.62, 1.0) if poison_dps > 0.0 else Color.WHITE
 
 func attack() -> void:
 	if not combat_enabled: return

@@ -31,6 +31,8 @@ var experience: ExperienceSystem
 var civic: CivicSystem
 var story: StoryDirector
 var mobility: MobilitySystem
+var corpse_system: CorpseSystem
+var gravedigger: Gravedigger
 
 func _ready() -> void:
 	player.combat_enabled = false
@@ -183,6 +185,18 @@ func _ready() -> void:
 	mobility.setup(self)
 	add_child(mobility)
 	interaction.mobility = mobility
+	corpse_system = CorpseSystem.new()
+	corpse_system.setup(cycle, player, director)
+	add_child(corpse_system)
+	gravedigger = Gravedigger.new()
+	gravedigger.corpse_system = corpse_system
+	gravedigger.director = director
+	gravedigger.cycle = cycle
+	gravedigger.core = core
+	gravedigger.position = Vector2(0, GameRules.FLOOR_Y)
+	add_child(gravedigger)
+	corpse_system.gravedigger = gravedigger
+	session.corpse_system = corpse_system
 	for portal: EnemyRepeater in civic.gates + expedition.repeaters:
 		portal.defense_requested.connect(civic.defend_portal)
 	var arriving: bool = not CampaignRoute.pending.is_empty()

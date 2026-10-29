@@ -11,6 +11,7 @@ var shot: float = 0
 var beam_to: Vector2
 var visual: FieldUnitVisual
 var dismissed: bool = false
+var corpse_spawned: bool = false
 
 func _ready() -> void:
 	add_to_group(GameRules.ALLIES)
@@ -27,6 +28,11 @@ func take_damage(amount: int) -> void:
 	queue_redraw()
 	if hp == 0:
 		remove_from_group(GameRules.ALLIES)
+		if not corpse_spawned:
+			corpse_spawned = true
+			var world: District = home.expansion.district as District
+			if world != null and world.corpse_system != null:
+				world.corpse_system.spawn(global_position, &"ally", world.cycle.day)
 		demobilize()
 
 func demobilize() -> void:

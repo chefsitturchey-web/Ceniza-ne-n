@@ -20,6 +20,7 @@ var right_arrow: Control
 var left_count: int = 0
 var right_count: int = 0
 var objective: Label
+var poison_label: Label
 var result_actions: HBoxContainer
 var result_was_visible: bool = false
 var pause_was_visible: bool = false
@@ -32,6 +33,11 @@ func _ready() -> void:
 	objective.position = Vector2(10, 10)
 	objective.size = Vector2(620, 20)
 	objective.add_theme_color_override("font_color", Color("8299a8"))
+	poison_label = _label($Gameplay)
+	poison_label.position = Vector2(10, 33)
+	poison_label.add_theme_color_override("font_color", Color("7dd84f"))
+	poison_label.text = "ENVENENADO"
+	poison_label.hide()
 	var resources: HBoxContainer = HBoxContainer.new()
 	resources.position = Vector2(10, 337)
 	resources.add_theme_constant_override("separation", 6)
@@ -112,6 +118,7 @@ func _icon(parent: Node, key: String) -> TextureRect:
 
 func display_dashboard(data: Dictionary) -> void:
 	objective.text = data.get("objective", "")
+	poison_label.visible = data.get("poisoned", false)
 	var result_visible: bool = data.get("finished", false)
 	result_actions.visible = result_visible
 	if result_visible and not result_was_visible:

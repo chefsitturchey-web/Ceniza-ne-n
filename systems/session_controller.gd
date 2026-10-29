@@ -27,6 +27,7 @@ var terrain: ZoneHazards
 var expansion: ExpansionSystem
 var experience: ExperienceSystem
 var civic: CivicSystem
+var corpse_system: CorpseSystem
 
 func initialize() -> void:
 	var transfer: Dictionary = CampaignRoute.take(zone_index)
@@ -131,6 +132,8 @@ func _process(delta: float) -> void:
 	if finished:
 		return
 	colony.update_workers(delta)
+	if corpse_system != null:
+		corpse_system.tick(delta)
 	if civic != null and Input.is_action_just_pressed("escort"):
 		civic.advance_side = 0 if civic.advance_side != 0 else (-1 if player.position.x < 0 else 1)
 		presenter.show_notice("Escolta: retirada" if civic.advance_side == 0 else "Escolta: atacar entrada del frente")

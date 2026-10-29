@@ -203,5 +203,6 @@ func publish() -> void:
 		"population": session.civic.population() if session.civic != null else colony.workers.size(), "population_max": session.civic.capacity if session.civic != null else GameRules.POPULATION,
 		"health": player.health, "stamina": int(player.stamina), "core": core.health, "core_max": core.health_component.maximum,
 		"left": left_count, "right": right_count,
-		"overload_left": overload.overload_status(true), "overload_right": overload.overload_status(false)
+		"overload_left": overload.overload_status(true), "overload_right": overload.overload_status(false),
+		"poisoned": player.poison_dps > 0.0
 	})
