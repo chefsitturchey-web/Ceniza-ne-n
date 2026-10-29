@@ -59,7 +59,7 @@ func _ready() -> void:
 	confirm.cancel_button_text = "Volver"
 	confirm.confirmed.connect(func() -> void: _launch(true))
 	add_child(confirm)
-	music.stream = GameSound.MUSIC[0]
+	music.stream = MusicLibrary.MENU
 	music.bus = &"Music"
 	music.volume_db = -18
 	add_child(music)

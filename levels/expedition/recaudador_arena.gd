@@ -122,7 +122,6 @@ func _ready() -> void:
 	options.closed.connect(func() -> void:
 		if pause_panel.visible:
 			pause_panel.get_child(0).get_child(1).grab_focus())
-	sound.music_enabled = not configured
 	add_child(sound)
 	modules.fired.connect(func() -> void: sound.play_cue("shot", -5))
 	player.dodged.connect(func() -> void: sound.play_cue("dodge"))
