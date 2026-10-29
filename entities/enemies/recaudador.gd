@@ -285,7 +285,12 @@ func _draw() -> void:
 	if state == State.DEAD:
 		return
 	draw_set_transform(Vector2.ZERO, 0, Vector2(1, 0.65))
-	draw_circle(Vector2(0, 8), 45, Color(0, 0, 0, 0.4))
+	var radius: float = 45
+	var support: Vector2 = Vector2(0, 8)
+	if combat_visual != null and combat_visual.actor_id in ["prefecto", "madre"]:
+		radius = 22 if combat_visual.actor_id == "prefecto" else 26
+		support = Vector2(0, 2)
+	draw_circle(support, radius, Color(0, 0, 0, 0.4))
 	draw_set_transform(Vector2.ZERO)
 	if core_exposed:
 		draw_circle(Vector2.ZERO, 26 + sin(elapsed * 12) * 3, Color(1, 0.55, 0.15, 0.18))

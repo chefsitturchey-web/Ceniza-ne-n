@@ -29,189 +29,249 @@ function gridVent(out,x,y,w,h,accent){
     rivet(out,x+2,y+2);rivet(out,x+w-2,y+h-2);
 }
 function pipeJoint(out,at,r,pal){dome(out,at,r,r,pal);ellipseRing(out,at,r,r,1,METAL);point(out,at[0]-1,at[1]-1,WHITE);}
-function hairHead(out,c,north,east,overhead){
-    var rx=overhead?6:4,ry=overhead?5:5;
-    dome(out,c,rx,ry,SKIN);
-    if(north){dome(out,offset(c,0,-1),rx+1,ry+1,HAIR);for(var i=-3;i<4;i+=2)line(out,offset(c,i,-3),offset(c,i-1,3),HAIR[2],1);return;}
-    var pts=overhead?[[c[0]-7,c[1]-2],[c[0]-6,c[1]-6],[c[0]-2,c[1]-8],[c[0]-3,c[1]-6],[c[0]+2,c[1]-7],[c[0]+6,c[1]-5],[c[0]+7,c[1]],[c[0]+4,c[1]-2],[c[0]+2,c[1]+3],[c[0]+1,c[1]-2],[c[0]-2,c[1]+1],[c[0]-2,c[1]-2],[c[0]-5,c[1]+3],[c[0]-5,c[1]-1]]:
-      [[c[0]-5,c[1]],[c[0]-6,c[1]-3],[c[0]-4,c[1]-6],[c[0],c[1]-7],[c[0]-1,c[1]-5],[c[0]+4,c[1]-5],[c[0]+5,c[1]-1],[c[0]+3,c[1]-2],[c[0]+1,c[1]+2],[c[0]+1,c[1]-2],[c[0]-2,c[1]],[c[0]-2,c[1]-2],[c[0]-4,c[1]+2]];
-    poly(out,pts,HAIR,false);
-    line(out,offset(c,-3,-4),offset(c,0,-5),HAIR[3],1);line(out,offset(c,1,-4),offset(c,3,-3),HAIR[2],1);
-    if(!overhead){point(out,c[0]+(east?3:-1),c[1]+1,INK);if(!east)point(out,c[0]+2,c[1]+1,INK);point(out,c[0]+1,c[1]+3,SKIN[1]);}
-    point(out,c[0]+4,c[1],CYAN);point(out,c[0]+4,c[1]+1,CYAN);point(out,c[0]+3,c[1]+2,CYAN);
-}
-function portraitHero(body,gear,fx,e){
-    var t=e.frame/Math.max(1,e.count-1),p=t*Math.PI*2,state=e.state,north=e.direction==='north',east=e.direction==='east'||e.direction==='west';
-    var walk=state==='walk'?Math.sin(p):0,death=state==='death'?t:0,roll=state==='dodge'?Math.sin(t*Math.PI):0;
-    var lean=(state==='attack'?Math.sin(t*Math.PI)*2:0)-(state==='windup'?t:0),cx=48+lean;
-    var hips=[cx,64+roll*2],chest=[cx+lean,54+roll*3+death*9],head=[chest[0]+(east?1:0),45+Math.sin(p)*.7+roll*4+death*18];
-    for(var side=-1;side<=1;side+=2){
-        var foot=[48+side*(east?2:4)+walk*side*3+death*side*5,72-Math.max(0,-walk*side)*2];
-        var knee=[hips[0]+side*3+walk*side*2,68+roll];
-        arm(body,offset(hips,side*3,0),knee,offset(foot,0,-2),3,SCARF);
-        box(body,foot[0]-2,foot[1]-2,5,3,SCARF[0]);line(body,offset(foot,-1,-2),offset(foot,2,-2),METAL[2],1);
-        point(body,knee[0],knee[1],COAT[3]);
+
+// Upright 3/4 views. Each view is drawn independently, never rotated as a bitmap.
+// Deliberate colour clusters: flesh hands and cloth elbows have no metal joints.
+function stamp(out,rows,x,y,palette,k){
+    k=k||1;
+    for(var r=0;r<rows.length;r++)for(var c=0;c<rows[r].length;c++){
+        var col=palette[rows[r].charAt(c)];if(!col)continue;
+        for(var yy=Math.round(y+r*k);yy<Math.round(y+(r+1)*k);yy++)
+            for(var xx=Math.round(x+c*k);xx<Math.round(x+(c+1)*k);xx++)point(out,xx,yy,col);
     }
-    var cloth=walk*.9+Math.sin(p)*.3;
-    poly(body,[[chest[0]-6,chest[1]-3],[chest[0]+5,chest[1]-3],[hips[0]+7+cloth,69],[hips[0]+4,70],[hips[0]+2,67],[hips[0]-1,70],[hips[0]-3,67],[hips[0]-7+cloth,70]],COAT,true);
-    poly(body,[[chest[0]-3,chest[1]-2],[chest[0]+3,chest[1]-2],[hips[0]+3,65],[hips[0]-3,65]],SCARF,false);
-    line(body,offset(chest,-5,-1),offset(hips,-4,3),COAT[4],1);line(body,offset(chest,5,-1),offset(hips,4,2),COAT[1],1);
-    for(var side=-1;side<=1;side+=2){line(body,[hips[0]+side*5,64],[hips[0]+side*6+cloth,68],COAT[0],1);point(body,hips[0]+side*5,65,COAT[4]);}
-    line(body,offset(chest,-5,-2),offset(hips,3,1),INK,2);line(body,offset(chest,-5,-2),offset(hips,3,1),COAT[3],1);
-    box(body,hips[0]-5,63,10,2,SCARF[0]);box(body,hips[0]+2,63,3,2,COAT[4]);
-    if(north){plate(body,chest[0]-5,chest[1]+1,9,9,SCARF);line(body,offset(chest,-3,2),offset(chest,-3,8),COAT[4],1);point(body,chest[0]+2,chest[1]+3,CYAN);}
-    else {ellipseRing(body,offset(chest,0,5),2,3,1,METAL);point(body,chest[0],chest[1]+6,WHITE);}
-    var aim=east?0:(north?-Math.PI/2:Math.PI/2),swing=state==='attack'?-1.7+t*3.1:(state==='windup'?-t:0);
-    var shoulder=offset(chest,5,1),elbow=offset(chest,7,5),hand=offset(chest,7,10);
-    if(state==='attack'||state==='windup'){hand=polar(shoulder,9,aim+swing*.7);elbow=polar(shoulder,5,aim+swing*.5+.3);}
-    if(death){hand=offset(chest,9,4);elbow=offset(chest,7,2);}
-    arm(gear,shoulder,elbow,hand,3,COAT);point(gear,hand[0],hand[1],SKIN[3]);
-    arm(gear,offset(chest,-5,1),offset(chest,-7,5),offset(chest,-6,10-walk),3,COAT);point(gear,chest[0]-6,chest[1]+10-walk,SKIN[3]);
-    if(state==='attack'||state==='windup')blade(gear,fx,hand,aim+swing,23,1.5,CYAN,state==='attack'&&t>.1&&t<.8);
-    else {line(body,offset(chest,-5,-5),offset(hips,5,3),INK,3);line(body,offset(chest,-5,-5),offset(hips,5,3),MID,1);line(body,offset(chest,-7,-6),offset(chest,-3,-8),COAT[4],2);}
-    hairHead(body,head,north,east,false);
-    poly(gear,[[head[0]-5,head[1]+4],[head[0],head[1]+6],[head[0]+5,head[1]+3],[head[0]+6,head[1]+6],[head[0]+2,head[1]+8],[head[0]-5,head[1]+6]],SCARF,true);
-    var tail=offset(chest,-5+cloth,6);line(gear,offset(head,-4,6),tail,SCARF[1],2);point(gear,tail[0],tail[1],SCARF[3]);
-    if(state==='hurt')for(var i=0;i<3;i++)point(fx,chest[0]+7+i,chest[1]-e.frame+i,GOLD);
-    if(state==='exposed'){line(gear,offset(chest,-4,0),offset(chest,4,1),SCARF[0],1);}
 }
-function aerialHuman(body,gear,fx,e,hero){
-    var t=e.frame/Math.max(1,e.count-1),p=t*Math.PI*2,state=e.state,c=hero?[48,48]:[64,64];
-    var walk=state==='walk'||state==='charge'?Math.sin(p):0,death=state==='death'?t:0,prepare=state==='windup'?t:0,attack=state==='attack'?Math.sin(t*Math.PI):0;
-    var k=hero?1:1.6,pal=hero?COAT:IVORY,back=hero?SCARF:BURGUNDY;
-    var lean=state==='attack'?attack*3:(state==='windup'?-prepare*2:0);
-    c=offset(c,0,lean);
-    // Cloak trails behind the shoulders; boots are foreshortened below the hips.
-    poly(body,[[c[0]-7*k,c[1]-7*k],[c[0]+7*k,c[1]-7*k],[c[0]+(10+walk)*k,c[1]-17*k],[c[0]+3*k,c[1]-15*k],[c[0],c[1]-18*k],[c[0]-4*k,c[1]-15*k],[c[0]-(9-walk)*k,c[1]-17*k]],back,true);
-    for(var side=-1;side<=1;side+=2){
-        var hip=offset(c,side*4*k,5*k),knee=offset(c,side*(5+walk*.7)*k,(9+walk*side*2)*k),foot=offset(c,side*5*k,(12+walk*side*3-death*3)*k);
-        arm(body,hip,knee,foot,3*k,METAL);plate(body,foot[0]-2*k,foot[1]-2*k,5*k,4*k,hero?SCARF:IVORY);
+var HUMAN_HEAD={
+    south:['...hhhhhh...','..hHhhhhhh..','.hHHhhhhhhh.','.hhhhhhhhhh.','.hhsfhhsshh.','.hfffffffch.','..fefsfefc..','..ffffFff...','...ssmss....','....ss......'],
+    north:['...hhhhhh...','..hHhhhhhh..','.hHHhhhhhhh.','.hHhhhhhhhh.','.hhhhhhhhhh.','.hhhhhhhhhh.','..hhhhhhhh..','..hhhhhchh..','...hsssh....','....ss......'],
+    east:['....hhhh....','..hHhhhhh...','.hHHhhhhhh..','.hhhhhhhhh..','.hhhhsfffh..','.hhhsfefsf..','..hhfffffff.','...hsfffs...','....ssmm....','....ss......'],
+    west:['....hhhh....','...hhhhhHh..','..hhhhhhHHh.','..hhhhhhhhh.','..hfffshhhh.','..fsfefshhh.','.ffffffchh..','...sfffsh...','....mmss....','....ss......']
+};
+var HELMET={
+    south:['....gg......','...gGGg.....','..aAAAAa....','.aALLLLAa...','.aALLLLAa...','.aLLLLLLAa..','.aAeeeeAAa..','..aAeceAa...','..aAllAAa...','...aAAAa....'],
+    north:['....gg......','...gGGg.....','..aAAAAa....','.aALLLLAa...','.aALLLLAa...','.aALLLLAa...','.aAALLAAa...','..aAALLAa...','..aAAllAa...','...aAAAa....'],
+    east:['....gg......','...gGGg.....','..aAAAAa....','.aALLLLAa...','.aLLLLLLAa..','.aAeeeeAAa..','..aAllllAA..','..aAllAAa...','...aAAAa....','....aaa.....'],
+    west:['......gg....','.....gGGg...','....aAAAAa..','...aALLLLAa.','..aALLLLLLAa','..aAAeeeeAa.','..AAllllAa..','...aAAllAa..','....aAAAa...','.....aaa....']
+};
+function clothLimb(out,a,b,c,width,pal){
+    line(out,a,b,INK,width+2);line(out,b,c,INK,width+1);
+    line(out,a,b,pal[2],width);line(out,b,c,pal[1],width);
+    line(out,offset(a,-1,0),offset(b,-1,0),pal[3],1);
+}
+function person(body,gear,fx,e,id){
+    var boss=id==='prefecto',hero=!boss,side=id==='portador',k=boss?1.55:1;
+    var ground=boss?[64,90]:(side?[48,72]:[48,60]);
+    var t=e.frame/Math.max(1,e.count-1),state=e.state,dir=e.direction;
+    var north=dir==='north',profile=dir==='east'||dir==='west',sign=dir==='west'?-1:1;
+    var walking=state==='walk'||state==='charge',stride=walking?[0,2,3,1,0,-2,-3,-1][e.frame%8]:0;
+    var breath=[0,0,-1,-1,0,1][e.frame%6],bounce=walking?[0,1,0,-1,0,1,0,-1][e.frame%8]:breath;
+    var dodge=state==='dodge'?Math.sin(t*Math.PI):0,death=state==='death'?t:0;
+    var hurt=state==='hurt'?-Math.sin(t*Math.PI)*2:0;
+    var cx=ground[0]+hurt,gy=ground[1],cy=gy-(24-bounce-dodge*3-death*11)*k;
+    var pal=boss?IVORY:COAT,cloth=boss?BURGUNDY:SCARF;
+    var aim=dir==='east'?0:(dir==='west'?Math.PI:(north?-Math.PI/2:Math.PI/2));
+    // Feet and trousers remain below the head for every orientation.
+    for(var s=-1;s<=1;s+=2){
+        var hip=[cx+s*(profile?1:3)*k,gy-12*k];
+        var knee=[cx+(profile?stride*s*.7:s*3)*k,gy-(7+Math.max(0,-stride*s)*.5)*k];
+        var foot=[cx+(profile?stride*s:s*3)*k,gy-Math.max(0,stride*s)*k*.6];
+        if(death)foot[0]+=s*death*6*k;
+        clothLimb(body,hip,knee,offset(foot,0,-2*k),3*k,boss?IVORY:SCARF);
+        box(body,foot[0]-2*k,foot[1]-3*k,4*k,4*k,boss?METAL[1]:SCARF[1]);
+        line(body,offset(foot,-1,-2*k),offset(foot,1,-2*k),boss?IVORY[3]:SCARF[3],k);
     }
-    dome(body,offset(c,0,2*k),8*k,11*k,pal);
-    poly(body,[[c[0]-12*k,c[1]-2*k],[c[0]-8*k,c[1]-7*k],[c[0]+8*k,c[1]-7*k],[c[0]+12*k,c[1]-2*k],[c[0]+7*k,c[1]+5*k],[c[0]-7*k,c[1]+5*k]],pal,true);
-    if(hero){line(body,offset(c,-7,-4),offset(c,4,9),SCARF[0],3);line(body,offset(c,-7,-4),offset(c,4,9),COAT[4],1);ellipseRing(body,offset(c,0,4),2,3,1,METAL);}
-    else {for(var i=0;i<3;i++)ellipseRing(body,offset(c,0,2+i*3),8*k,4*k,1,COPPER);crest(body,c[0],c[1]+6,1,GOLD);for(var side=-1;side<=1;side+=2)gridVent(body,c[0]+side*13-4,c[1]-7,8,12,GOLD);}
-    var swing=state==='attack'?-1.4+t*3.0:(state==='windup'?-prepare*1.2:.1);
-    var shoulder=offset(c,10*k,0),elbow=offset(c,(15+prepare*2)*k,(6-prepare*3)*k),hand=offset(c,(13+attack*2)*k,(13-prepare*7)*k);
-    if(state==='attack'||state==='windup')hand=polar(shoulder,12*k,Math.PI/2+swing*.8);
-    if(death){hand=offset(c,16*k,8*k);elbow=offset(c,14*k,3*k);}
-    arm(gear,shoulder,elbow,hand,4*k,pal);
-    blade(gear,fx,hand,Math.PI/2+swing,hero?23:35,hero?1.5:3,hero?CYAN:RED,state==='attack'&&t>.1&&t<.8);
-    var other=offset(c,-(14+prepare*2)*k,(10-prepare*4)*k);
-    arm(gear,offset(c,-10*k,0),offset(c,-15*k,4*k),other,4*k,pal);
-    if(!hero){
-        poly(gear,[[other[0]-11,other[1]-13],[other[0]+9,other[1]-11],[other[0]+11,other[1]+10],[other[0]-1,other[1]+17],[other[0]-12,other[1]+8]],IVORY,true);
-        seam(gear,offset(other,-8,-10),offset(other,-8,8),COPPER);crest(gear,other[0],other[1],1.6,COPPER[2]);
-        for(var i=0;i<3;i++)rivet(gear,other[0]+7,other[1]-7+i*7);
+    if(boss){
+        poly(body,[[cx-8*k,cy],[cx+8*k,cy],[cx+(11+stride*.25)*k,gy-3*k],[cx+4*k,gy-5*k],[cx,gy-2*k],[cx-4*k,gy-6*k],[cx-(10-stride*.25)*k,gy-3*k]],BURGUNDY,false);
+        for(var s=-1;s<=1;s+=2)line(body,[cx+s*7*k,cy+2*k],[cx+s*8*k,gy-5*k],BURGUNDY[3],k);
     }
-    var head=offset(c,0,-8*k+death*7+Math.sin(p)*.9);
-    if(hero){hairHead(body,head,false,false,true);poly(gear,[[head[0]-6,head[1]+5],[head[0]+6,head[1]+4],[head[0]+7,head[1]+8],[head[0]-5,head[1]+9]],SCARF,true);}
-    else {dome(body,head,8,10,IVORY);ellipseRing(body,head,7,9,1,COPPER);line(body,offset(head,0,-9),offset(head,0,5),GOLD,2);line(body,offset(head,-5,5),offset(head,5,5),INK,2);line(body,offset(head,-4,6),offset(head,4,6),CYAN,1);}
-    if(state==='exposed'){ellipseRing(fx,offset(c,0,4),5+Math.sin(p),7,1,[INK,RUST,GOLD,GOLD,WHITE]);}
-    if(state==='shoot'&&!hero){var muzzle=offset(other,0,17);bone(gear,other,muzzle,5,METAL);if(e.frame===1||e.frame===3)for(var i=-1;i<=1;i++)line(fx,muzzle,polar(muzzle,8,Math.PI/2+i*.4),GOLD,2);}
-    if(state==='hurt')for(var i=0;i<5;i++)point(fx,c[0]-12+i*5,c[1]+e.frame-7+i%2,GOLD);
-    if(state==='dodge'){ellipseRing(fx,c,13*k,17*k,1,[INK,STEEL,MID,HIGH,WHITE]);}
-}
-function legFromAbove(body,gear,c,angle,e,pal,seed){
-    var t=e.frame/Math.max(1,e.count-1),walk=e.state==='walk'||e.state==='charge'?Math.sin(t*Math.PI*2+seed):0;
-    var attack=e.state==='attack'?Math.sin(t*Math.PI):0,prep=e.state==='windup'?t:0,death=e.state==='death'?t:0;
-    var hip=polar(c,23,angle),knee=polar(c,36+walk*3,angle+walk*.06),foot=polar(c,49+attack*5-death*8,angle+.15+walk*.07-prep*.08);
-    arm(body,hip,knee,foot,7,pal);pipeJoint(gear,knee,4,METAL);plate(gear,foot[0]-4,foot[1]-3,8,7,pal);
-    cable(gear,hip,polar(c,40,angle-.13),offset(knee,2,0),COPPER,1);
-}
-function overheadMachine(body,gear,fx,e,kind){
-    var c=[64,64],t=e.frame/Math.max(1,e.count-1),p=t*Math.PI*2,state=e.state,open=state==='exposed'?1:0,windup=state==='windup'?t:0,attack=state==='attack'?Math.sin(t*Math.PI):0;
-    var pal=kind==='caldera'?COPPER:METAL,accent=kind==='coro'?CYAN:GOLD;
-    // Planar hardware: visible roofs, hub covers and bolted deck plates.
-    if(kind==='recaudador'){
-        for(var side=-1;side<=1;side+=2){
-            var x=64+side*31;
-            poly(body,[[x-10,31],[x+10,31],[x+12,38],[x+12,91],[x+8,99],[x-8,99],[x-12,92],[x-12,38]],METAL,true);
-            for(var i=0;i<11;i++){var y=35+i*5+((state==='walk'||state==='charge')?e.frame%3:0);line(body,[x-9,y],[x+9,y],INK,2);line(body,[x-8,y-1],[x+8,y-1],HIGH,1);}
-            for(var y=42;y<90;y+=14)pipeJoint(body,[x,y],5,METAL);
-        }
-        poly(body,[[42,29],[84,29],[92,39],[89,88],[78,99],[48,99],[36,88],[36,40]],METAL,true);
-        gridVent(body,45,34,38,15,GOLD);gridVent(body,43,74,17,17,GOLD);gridVent(body,68,74,17,17,GOLD);
-        dome(gear,[64,41],7,6,METAL);for(var i=0;i<7;i++)line(gear,[64,41],polar([64,41],5,p+i*Math.PI*2/7),HIGH,1);
-        dome(body,c,20,22,METAL);ellipseRing(body,c,20,22,3,COPPER);
-        dome(gear,c,9+open*3,11+open*2,[INK,RUST,GOLD,GOLD,WHITE]);
-        for(var side=-1;side<=1;side+=2){
-            var xx=64+side*(7+open*15);
-            poly(gear,[[xx-7,47],[xx+6,46],[xx+9,71],[xx+4,79],[xx-7,77]],METAL,true);
-            gridVent(gear,xx-4,52,8,17,GOLD);
-            var shoulder=[64+side*24,76],elbow=[64+side*(41+windup*2),82-windup*13],hand=[64+side*(42+attack*8),99-windup*10+attack*3];
-            arm(gear,shoulder,elbow,hand,8,METAL);pipeJoint(gear,elbow,4,COPPER);
-            bone(gear,hand,offset(hand,-5-attack*3,10),4,METAL);bone(gear,hand,offset(hand,5+attack*3,10),4,METAL);
-        }
-        poly(gear,[[23,102+open*5],[104,102+open*5],[110,111],[100,119],[28,119],[18,111]],METAL,true);
-        for(var i=0;i<10;i++)line(gear,[28+i*8,106],[24+i*8,114],i%2?GOLD:RUST,2);
+    var w=profile?5:7;
+    poly(body,[[cx-w*k,cy],[cx+w*k,cy],[cx+(w+1)*k,cy+6*k],[cx+(w-1)*k,cy+14*k],[cx+2*k,cy+15*k],[cx,cy+12*k],[cx-2*k,cy+15*k],[cx-(w-1)*k,cy+14*k],[cx-(w+1)*k,cy+6*k]],pal,false);
+    if(north){
+        // Back seam and shoulder yoke, no face or chest medallion on the back.
+        line(body,[cx-w*k,cy+2*k],[cx+w*k,cy+2*k],pal[4],k);
+        line(body,[cx,cy+3*k],[cx,cy+12*k],pal[1],k);
+        if(hero){box(body,cx-4*k,cy+5*k,8*k,6*k,COAT[1]);line(body,[cx-3*k,cy+6*k],[cx+2*k,cy+6*k],COAT[3],k);}
     }else{
-        var legs=kind==='caldera'?6:6;
-        for(var i=0;i<legs;i++)legFromAbove(body,gear,c,-Math.PI+.35+i*(Math.PI*2/legs),e,pal,i*Math.PI*.8);
-        dome(body,c,32,35,pal);ellipseRing(body,c,32,35,3,METAL);
-        for(var i=0;i<10;i++){var at=polar(c,29,i*Math.PI/5);pipeJoint(body,at,2,COPPER);}
-        if(kind==='caldera'){
-            // Boiler lid, circular flues and radial pressure piping seen from above.
-            dome(body,c,24,27,COPPER);ellipseRing(body,c,23,26,3,METAL);
-            for(var i=0;i<3;i++){
-                var at=[48+i*16,36+(i%2)*4];
-                dome(gear,at,8,7,METAL);dome(gear,at,5,4,[INK,RUST,RUST,GOLD,WHITE]);ellipseRing(gear,at,8,7,2,COPPER);
-                for(var r=-2;r<3;r+=2)line(gear,offset(at,r,-3),offset(at,r,3),INK,1);
-            }
-            gridVent(body,45,58,14,23,GOLD);gridVent(body,70,58,14,23,GOLD);
-            dome(gear,c,12,14,[INK,RUST,GOLD,GOLD,WHITE]);
-            for(var side=-1;side<=1;side+=2){
-                var at=offset(c,side*(8+open*13),3);
-                poly(gear,[[at[0]-7,at[1]-16],[at[0]+6,at[1]-16],[at[0]+9,at[1]+11],[at[0]+4,at[1]+18],[at[0]-7,at[1]+16]],COPPER,true);
-                recess(gear,at[0]-3,at[1]-10,6,19,GOLD);
-                cable(gear,[64+side*24,47],[64+side*38,67],[64+side*23,87],COPPER,3);
-                dome(gear,[64+side*20,91],6,5,METAL);for(var i=0;i<3;i++)line(gear,[64+side*20,91],polar([64+side*20,91],4,p+i*Math.PI*2/3),HIGH,1);
-            }
-            dome(gear,[64,91],6,7,METAL);line(gear,[64,91],polar([64,91],4,p*.5),RED,1);
-        }else{
-            poly(body,[[40,41],[55,31],[77,33],[91,47],[90,81],[76,97],[50,96],[36,79]],METAL,true);
-            for(var side=-1;side<=1;side+=2){gridVent(gear,64+side*23-5,48,10,30,CYAN);cable(gear,[64+side*17,88],[64+side*30,103],[64+side*33,80],COPPER,2);}
-            dome(gear,c,20,23,METAL);ellipseRing(gear,c,19,22,3,COPPER);dome(gear,c,14,16,[INK,STEEL,MID,HIGH,WHITE]);
-            arc(gear,c,12,p*.6,p*.6+4.6,CYAN,2);dome(gear,c,open?10:5,open?11:6,[INK,STEEL,RED,CYAN,WHITE]);
-            for(var side=-1;side<=1;side+=2){var at=[64+side*29,29+Math.sin(p+side)*2];arm(body,[64+side*14,43],[64+side*24,32],at,4,METAL);dome(gear,at,9,8,COPPER);ellipseRing(gear,at,8,7,2,METAL);line(gear,at,polar(at,6,p),HIGH,1);}
-            gridVent(gear,53,88,22,9,CYAN);
+        poly(body,[[cx-4*k,cy],[cx+4*k,cy],[cx+2*k,cy+10*k],[cx-2*k,cy+10*k]],cloth,false);
+        line(body,[cx-4*k,cy+k],[cx-2*k,cy+9*k],pal[4],k);
+        line(body,[cx+4*k,cy+k],[cx+2*k,cy+9*k],pal[1],k);
+        line(body,[cx-4*k,cy+2*k],[cx+3*k,cy+10*k],pal[0],2*k);
+        line(body,[cx-4*k,cy+2*k],[cx+3*k,cy+10*k],pal[3],k);
+        box(body,cx-5*k,cy+10*k,10*k,2*k,cloth[0]);box(body,cx+k,cy+10*k,2*k,2*k,COPPER[3]);
+        if(!profile){ellipseRing(body,[cx,cy+6*k],k,2*k,1,METAL);point(body,cx,cy+6*k,WHITE);}
+    }
+    // Arm swing opposes the stride. Sleeves, flesh hands, and discrete shoulders.
+    var prep=state==='windup'?t:0,attacking=state==='attack'||state==='windup';
+    var hand=[cx+(profile?sign*5:8)*k,cy+(11+(walking?-stride*.6:breath*.3))*k];
+    var shoulder=[cx+(profile?sign*3:6)*k,cy+2*k],elbow=[cx+(profile?sign*5:8)*k,cy+7*k];
+    var swing=state==='attack'?-1.3+t*2.6:-prep*1.1;
+    if(attacking){hand=polar(shoulder,10*k,aim+swing*.6);elbow=polar(shoulder,5*k,aim+swing*.4+.35);}
+    if(death){hand=offset(shoulder,10*k,7*k);elbow=offset(shoulder,6*k,5*k);}
+    var farShoulder=[cx-(profile?sign*3:6)*k,cy+2*k],farElbow=[cx-(profile?sign*4:8)*k,cy+7*k],farHand=[cx-(profile?sign*4:8)*k,cy+(11+(walking?stride*.6:0))*k];
+    clothLimb(gear,farShoulder,farElbow,farHand,3*k,pal);
+    box(gear,farHand[0]-k,farHand[1],2*k,2*k,boss?IVORY[2]:SKIN[3]);
+    clothLimb(gear,shoulder,elbow,hand,3*k,pal);
+    box(gear,hand[0]-k,hand[1],2*k,2*k,boss?IVORY[2]:SKIN[3]);
+    if(boss){
+        for(var s=-1;s<=1;s+=2){dome(gear,[cx+s*7*k,cy+2*k],4*k,3*k,IVORY);line(gear,[cx+s*7*k-3*k,cy+2*k],[cx+s*7*k+3*k,cy+2*k],COPPER[3],k);}
+        var sh=farHand;
+        poly(gear,[[sh[0]-7*k,sh[1]-7*k],[sh[0]+6*k,sh[1]-7*k],[sh[0]+6*k,sh[1]+5*k],[sh[0],sh[1]+11*k],[sh[0]-7*k,sh[1]+5*k]],north?METAL:IVORY,false);
+        if(!north){seam(gear,offset(sh,-5*k,-5*k),offset(sh,-5*k,4*k),COPPER);crest(gear,sh[0],sh[1],k,COPPER[3]);}
+    }
+    if(attacking||boss||!side){
+        var angle=attacking?aim+swing:(profile?Math.PI/2+sign*.15:Math.PI/2+.2);
+        blade(gear,fx,hand,angle,boss?30:21,boss?2:1,CYAN,state==='attack'&&t>.1&&t<.8);
+    }else{line(body,[cx-5,cy-1],[cx+4,cy+12],SCARF[0],3);line(body,[cx-6,cy-2],[cx-3,cy-4],COPPER[3],2);}
+    var hx=cx-6*k,hy=cy-10*k;
+    stamp(body,(boss?HELMET:HUMAN_HEAD)[dir],hx,hy,boss?{a:IVORY[0],A:IVORY[2],L:IVORY[3],l:IVORY[1],g:COPPER[1],G:GOLD,e:INK,c:CYAN}:{h:HAIR[1],H:HAIR[2],s:SKIN[1],f:SKIN[2],F:SKIN[3],e:HAIR[0],m:SKIN[0],c:CYAN},k);
+    if(hero){
+        poly(gear,[[cx-5*k,cy-1*k],[cx-2*k,cy+1*k],[cx+5*k,cy-1*k],[cx+5*k,cy+2*k],[cx,cy+4*k],[cx-5*k,cy+2*k]],SCARF,false);
+        line(gear,[cx-4*k,cy+2*k],[cx-(5+stride*.3)*k,cy+8*k],SCARF[2],2*k);
+    }
+    if(state==='hurt')for(var i=0;i<4;i++)point(fx,cx+10+i,cy+e.frame-i,GOLD);
+    if(state==='exposed'){point(gear,cx-5*k,cy+2*k+breath,CYAN);}
+    if(state==='shoot')point(fx,hand[0]+e.frame,hand[1]-2,GOLD);
+    LAST_HEAD=[cx+ORIGIN,hy+4*k+ORIGIN];LAST_FEET=[ground[0]+ORIGIN,gy+ORIGIN];
+}
+
+// Ground-plane orientation, followed by a fixed 3/4 camera projection.
+// Positive depth is forward; height always projects UP the screen.
+var VIEW={cx:64,cy:84,dx:0,dy:1};
+function world(x,depth,height){return [VIEW.cx+x*VIEW.dy+depth*VIEW.dx,VIEW.cy+(depth*VIEW.dy-x*VIEW.dx)*.55-height];}
+function setView(e){VIEW.dx=e.direction==='east'?1:(e.direction==='west'?-1:0);VIEW.dy=e.direction==='south'?1:(e.direction==='north'?-1:0);}
+function block3(out,x,y,z,w,d,h,pal){
+    var corners=[[x-w/2,y-d/2],[x+w/2,y-d/2],[x+w/2,y+d/2],[x-w/2,y+d/2]],faces=[];
+    for(var i=0;i<4;i++){var j=(i+1)%4,a=corners[i],b=corners[j];faces.push({at:(world(a[0],a[1],0)[1]+world(b[0],b[1],0)[1])/2,a:a,b:b});}
+    faces.sort(function(a,b){return a.at-b.at;});
+    for(var i=0;i<faces.length;i++){var f=faces[i];poly(out,[world(f.a[0],f.a[1],z),world(f.b[0],f.b[1],z),world(f.b[0],f.b[1],z+h),world(f.a[0],f.a[1],z+h)],pal,false);}
+    var roof=[];for(var i=0;i<4;i++)roof.push(world(corners[i][0],corners[i][1],z+h));poly(out,roof,pal,false);
+    for(var i=0;i<4;i++){var p=roof[i];point(out,p[0]+1,p[1]+1,pal[4]);}
+}
+function vent3(out,x,y,z,w,d,accent){
+    block3(out,x,y,z,w,d,2,METAL);
+    for(var v=-d/2+3;v<d/2-1;v+=3){line(out,world(x-w/2+2,y+v,z+3),world(x+w/2-2,y+v,z+3),INK,2);point(out,world(x-w/2+3,y+v,z+3)[0],world(x-w/2+3,y+v,z+3)[1],accent);}
+}
+function hullPanel(out,side,back,z,accent){
+    // Service panels on the face that is actually visible to the fixed camera.
+    function at(a,h){return side?world(side*22,a,h):world(a,back,z+h);}
+    var lo=side?z:0,hi=side?z+15:15;
+    poly(out,[at(-15,lo),at(15,lo),at(15,hi),at(-15,hi)],METAL,false);
+    poly(out,[at(-12,lo+3),at(12,lo+3),at(12,hi-3),at(-12,hi-3)],[INK,DEEP,STEEL,MID,HIGH],false);
+    for(var a=-10;a<12;a+=4){line(out,at(a,lo+4),at(a,hi-4),MID,2);var p=at(a,hi-3);point(out,p[0],p[1],accent);}
+    for(var a=-13;a<15;a+=26){var p=at(a,hi-1);rivet(out,p[0],p[1]);}
+}
+function cylinder(out,x,y,z,r,h,pal){
+    var c=world(x,y,z),top=world(x,y,z+h);
+    poly(out,[[c[0]-r,c[1]],[c[0]-r,top[1]],[c[0]+r,top[1]],[c[0]+r,c[1]]],pal,false);
+    dome(out,c,r,r*.5,pal);box(out,c[0]-r,top[1],r*2,h,pal[1]);
+    for(var i=-r+3;i<r-2;i+=5)line(out,[c[0]+i,top[1]+2],[c[0]+i,c[1]],i<0?pal[3]:pal[0],1);
+    dome(out,top,r,r*.5,pal);ellipseRing(out,top,r,r*.5,1,METAL);
+}
+function machineLeg(body,gear,e,a,index,front){
+    var t=e.frame/Math.max(1,e.count-1),step=(e.state==='walk'||e.state==='charge')?Math.sin(t*Math.PI*2+index*Math.PI):0;
+    var death=e.state==='death'?t:0;
+    var hip=[Math.cos(a)*20,Math.sin(a)*19,18],knee=[Math.cos(a)*34,Math.sin(a)*31+step*4,12+Math.max(0,step)*3];
+    var foot=[Math.cos(a)*(43-death*8),Math.sin(a)*42+step*5,1+Math.max(0,-step)*5];
+    var fp=world(foot[0],foot[1],0),isFront=fp[1]>=VIEW.cy;if(isFront!==front)return;
+    var p=world(hip[0],hip[1],hip[2]),q=world(knee[0],knee[1],knee[2]),r=world(foot[0],foot[1],foot[2]);
+    arm(body,p,q,r,6,METAL);pipeJoint(gear,q,3,COPPER);block3(gear,foot[0],foot[1],foot[2],9,10,3,METAL);
+}
+function machinery(body,gear,fx,e,id){
+    setView(e);var t=e.frame/Math.max(1,e.count-1),p=t*Math.PI*2,s=e.state,death=s==='death'?t:0,open=s==='exposed'?1:0;
+    var attacking=s==='attack'?Math.sin(t*Math.PI):0,prep=s==='windup'?t:0;
+    VIEW.cy=84;var i,at;
+    if(id==='recaudador'){
+        for(var side=-1;side<=1;side+=2){
+            block3(body,side*29,0,1,15,54,10,METAL);
+            for(i=-23;i<26;i+=5){var advance=(s==='walk'||s==='charge')?e.frame%3:0;line(body,world(side*29-6,i+advance,12),world(side*29+6,i+advance,12),INK,2);line(body,world(side*29-6,i+advance-1,13),world(side*29+6,i+advance-1,13),HIGH,1);}
         }
+        block3(body,0,0,8,43,43,22-death*6,METAL);
+        vent3(body,-10,-7,31-death*6,13,24,GOLD);vent3(body,11,-7,31-death*6,13,24,GOLD);
+        if(VIEW.dy)hullPanel(gear,0,VIEW.dy>0?22:-22,11-death*6,VIEW.dy>0?GOLD:CYAN);
+        else hullPanel(gear,VIEW.dx>0?-1:1,0,11-death*6,CYAN);
+        // Lifting eyes, a service hatch and separately routed power conduits.
+        for(var side=-1;side<=1;side+=2){
+            var p0=world(side*16,-15,34-death*6),p1=world(side*18,4,33-death*6),p2=world(side*14,19,30-death*6);
+            cable(gear,p0,p1,p2,COPPER,1);dome(gear,p0,3,2,METAL);point(gear,p0[0],p0[1]-1,CYAN);
+        }
+        at=world(0,12,33-death*6);dome(gear,at,12,7,COPPER);dome(gear,at,7+open*3,4+open*2,[INK,RUST,GOLD,GOLD,WHITE]);
+        for(var side=-1;side<=1;side+=2){
+            block3(gear,side*(5+open*11),12,34-death*6,8,17,3,METAL);
+            var a=world(side*20,8,21),b=world(side*(32+prep*3),18-prep*10,15),c=world(side*(32+attacking*5),34+attacking*14-prep*8,12);
+            arm(gear,a,b,c,7,METAL);pipeJoint(gear,b,4,COPPER);
+            bone(gear,c,world(side*(27+attacking*4),44+attacking*13-prep*8,10),4,METAL);
+            bone(gear,c,world(side*(37+attacking*5),44+attacking*13-prep*8,10),4,METAL);
+        }
+        block3(gear,0,26,3,48,8,9,METAL);
+        for(i=-20;i<23;i+=8)line(gear,world(i,30,5),world(i+3,30,10),GOLD,2);
+        at=world(0,-13,35-death*6);dome(gear,at,5,3,METAL);for(i=0;i<7;i++)line(gear,at,offset(at,Math.cos(p+i*Math.PI*2/7)*4,Math.sin(p+i*Math.PI*2/7)*2),HIGH,1);
+    }else{
+        var count=id==='caldera'?6:4;
+        for(i=0;i<count;i++)machineLeg(body,gear,e,i*Math.PI*2/count+.35,i,false);
+        if(id==='caldera'){
+            cylinder(body,0,0,8,25,28-death*8,COPPER);
+            for(i=-16;i<20;i+=8){var q=world(i,23,13),r=world(i,23,31-death*8);line(gear,q,r,COPPER[0],3);line(gear,offset(q,-1,0),offset(r,-1,0),COPPER[3],1);}
+            if(VIEW.dy>0){var gauge=world(0,23,24-death*8);dome(gear,gauge,5,6,METAL);dome(gear,gauge,3,4,[INK,DEEP,WHITE,WHITE,WHITE]);line(gear,gauge,offset(gauge,Math.cos(p*.3)*3,-2),RED,1);}
+            for(i=-1;i<=1;i++){
+                cylinder(gear,i*14,-11,34-death*8,5,12+(i===0?3:0),METAL);
+                at=world(i*14,-11,46+(i===0?3:0)-death*8);dome(gear,at,4,2,[INK,RUST,RUST,GOLD,WHITE]);
+                if(s==='windup'||open)for(var j=0;j<3;j++){var age=(e.frame*2+j*5)%14;dome(fx,offset(at,Math.sin(age*.5)*2,-4-age),2+age*.13,2,[rgba('536d7d',60),rgba('8299a8',100),rgba('8299a8',140),rgba('c4d2ce',90),rgba('c4d2ce',90)]);}
+            }
+            at=world(0,10,37-death*8);dome(gear,at,11,6,[INK,RUST,GOLD,GOLD,WHITE]);
+            for(var side=-1;side<=1;side+=2){block3(gear,side*(6+open*12),10,37-death*8,9,19,3,COPPER);var valve=world(side*22,9,29-death*8);dome(gear,valve,5,4,METAL);for(i=0;i<3;i++)line(gear,valve,offset(valve,Math.cos(p+i*2.09)*4,Math.sin(p+i*2.09)*3),COPPER[3],1);}
+        }else{
+            block3(body,0,0,9,38,39,15-death*5,METAL);
+            if(VIEW.dy>0){var panel=world(0,20,17-death*5);gridVent(gear,panel[0]-9,panel[1]-4,18,8,CYAN);}
+            vent3(body,-12,2,25-death*5,10,27,CYAN);vent3(body,12,2,25-death*5,10,27,CYAN);
+            at=world(0,0,34-death*7);dome(gear,at,20,12,METAL);ellipseRing(gear,at,19,11,2,COPPER);dome(gear,at,14,8,[INK,STEEL,MID,HIGH,WHITE]);
+            var sweep=world(Math.cos(p)*12,Math.sin(p)*12,35-death*7);line(gear,at,sweep,CYAN,2);dome(gear,at,open?9:4,open?5:3,[INK,STEEL,CYAN,CYAN,WHITE]);
+            for(var side=-1;side<=1;side+=2){var base=world(side*21,-13,15),joint=world(side*25,-18,35),dish=world(side*27,-18,46+Math.sin(p+side));arm(gear,base,joint,dish,4,METAL);dome(gear,dish,8,5,COPPER);ellipseRing(gear,dish,7,4,1,METAL);line(gear,dish,offset(dish,Math.cos(p)*5,Math.sin(p)*3),HIGH,1);}
+        }
+        for(i=0;i<count;i++)machineLeg(body,gear,e,i*Math.PI*2/count+.35,i,true);
     }
-    if(state==='shoot'){
-        var muzzle=[64,kind==='recaudador'?119:102];plate(gear,59,muzzle[1]-9,10,10,METAL);
-        if(e.frame===1||e.frame===3)for(var i=-1;i<=1;i++)line(fx,muzzle,polar(muzzle,6,Math.PI/2+i*.4),GOLD,2);
-    }
-    if(state==='hurt')for(var i=0;i<6;i++)point(fx,40+i*9,57+((i+e.frame)%4)*3,GOLD);
-    if(state==='death')for(var i=0;i<8;i++){var at=polar(c,20+t*20,p+i*2.4);box(fx,at[0],at[1],2,2,i%2?RUST:GOLD);}
-    if(open)ellipseRing(fx,c,17+Math.sin(p),20,1,[INK,RUST,GOLD,GOLD,WHITE]);
+    // Direction is communicated by the real front attachment, not rotating the chassis image.
+    var muzzle=world(0,id==='recaudador'?29:24,id==='recaudador'?17:23);
+    var tip=world(0,id==='recaudador'?40:35,id==='recaudador'?17:23);
+    bone(gear,muzzle,tip,5,METAL);point(gear,tip[0],tip[1],CYAN);
+    if(s==='shoot'&&(e.frame===1||e.frame===3))for(i=-1;i<=1;i++)line(fx,tip,offset(tip,VIEW.dx*8+i*2,VIEW.dy*5+i*2),GOLD,2);
+    if(s==='hurt')for(i=0;i<5;i++)point(fx,45+i*8,45+(e.frame+i)%4,GOLD);
+    if(death)for(i=0;i<7;i++){at=offset([64,64],Math.cos(i*2.4+p)*t*30,Math.sin(i*2.4+p)*t*17);box(fx,at[0],at[1],2,2,GOLD);}
+    LAST_HEAD=[64,35];LAST_FEET=[64,84];LAST_FRONT=tip;
 }
-function overheadMother(body,gear,fx,e){
-    var c=[64,64],t=e.frame/Math.max(1,e.count-1),p=t*Math.PI*2,state=e.state,open=state==='exposed'?1:0,attack=state==='attack'||state==='shoot'?Math.sin(t*Math.PI):0;
-    // Full radial crown, not a frontal arch. Segments hinge around the ground centre.
-    for(var i=0;i<12;i++){
-        var a=i*Math.PI/6+p*.035,at=polar(c,40+open*4+Math.sin(p+i)*.7,a);
-        bone(body,polar(c,21,a),at,4,COPPER);
-        var tangent=a+Math.PI/2,side=[Math.cos(tangent)*6,Math.sin(tangent)*6],along=[Math.cos(a)*9,Math.sin(a)*9];
-        poly(body,[[at[0]-side[0]-along[0],at[1]-side[1]-along[1]],[at[0]+side[0]-along[0],at[1]+side[1]-along[1]],[at[0]+side[0]+along[0],at[1]+side[1]+along[1]],[at[0]-side[0]+along[0],at[1]-side[1]+along[1]]],i%3?METAL:COPPER,true);
-        var inn=polar(c,37+open*4,a);point(body,inn[0],inn[1],CYAN);rivet(body,at[0],at[1]);
+function matriarch(body,gear,fx,e){
+    setView(e);VIEW.cy=87;
+    var t=e.frame/Math.max(1,e.count-1),p=t*Math.PI*2,s=e.state,death=s==='death'?t:0;
+    var breath=Math.sin(p),open=s==='exposed'?1:0,attack=s==='attack'||s==='shoot'?Math.sin(t*Math.PI):0;
+    var profile=e.direction==='east'||e.direction==='west',wide=profile?.65:1;
+    // A standing, robed android. The halo stays upright, with its own hinged segments.
+    var head=[64,40+breath+death*16],hips=[64,73+death*5];
+    for(var i=0;i<10;i++){
+        var a=i*Math.PI/5,at=[64+Math.cos(a)*(31+open*3)*wide,43+Math.sin(a)*24+breath];
+        bone(body,[64+Math.cos(a)*20*wide,43+Math.sin(a)*16],at,3,COPPER);
+        var dx=Math.cos(a)*5,dy=Math.sin(a)*5;
+        poly(body,[[at[0]-dx-3,at[1]-dy-3],[at[0]+dx-3,at[1]+dy-3],[at[0]+dx+3,at[1]+dy+3],[at[0]-dx+3,at[1]-dy+3]],i%3?METAL:COPPER,false);point(body,at[0],at[1],CYAN);
     }
-    for(var i=0;i<6;i++){
-        var a=i*Math.PI/3+.4,hip=polar(c,17,a),elbow=polar(c,31,a+.18+Math.sin(p+i)*.1),hand=polar(c,49+attack*7-open*6,a+.1);
-        arm(gear,hip,elbow,hand,5,METAL);cable(gear,hip,polar(c,30,a-.2),hand,COPPER,1);bone(gear,hand,polar(hand,6,a-.5),3,IVORY);bone(gear,hand,polar(hand,6,a+.5),3,IVORY);
+    for(var side=-1;side<=1;side+=2)for(var row=0;row<3;row++){
+        var a=world(side*9,0,33-row*5),b=world(side*(24+Math.sin(p+row)*2),row*8-9,36-row*8),c=world(side*(38+attack*4),row*12-12+attack*14,32-row*6+Math.sin(p+row)*2);
+        arm(gear,a,b,c,4,METAL);cable(gear,a,offset(b,0,-3),c,COPPER,1);bone(gear,c,offset(c,side*5,4),2,IVORY);
     }
-    dome(body,c,25,29,BURGUNDY);ellipseRing(body,c,24,28,2,COPPER);
-    for(var side=-1;side<=1;side+=2){gridVent(body,64+side*17-4,49,8,27,CYAN);cable(body,[64+side*9,38],[64+side*28,68],[64+side*10,89],SCARF,3);}
-    dome(gear,c,16,20,METAL);ellipseRing(gear,c,15,19,2,COPPER);dome(gear,c,open?11:7,open?15:11,[INK,STEEL,CYAN,CYAN,WHITE]);
-    for(var i=0;i<4;i++){var at=polar(c,18,p*.5+i*Math.PI/2);pipeJoint(gear,at,2,COPPER);}
-    var head=[64,43];dome(gear,head,7,8,IVORY);poly(gear,[[56,42],[57,35],[61,38],[64,32],[67,38],[71,35],[72,42]],COPPER,true);line(gear,[60,47],[68,47],RED,1);
-    for(var side=-1;side<=1;side+=2)cable(gear,[64+side*7,40],[64+side*20,50],[64+side*17,71],HAIR,3);
-    if(state==='hurt')for(var i=0;i<6;i++)point(fx,43+i*8,60+(e.frame+i)%4,GOLD);
-    if(state==='death')for(var i=0;i<9;i++){var at=polar(c,18+t*28,i*2.4+p*.1);box(fx,at[0],at[1],2,2,CYAN);}
+    poly(body,[[53,50],[75,50],[77,72],[88,94],[78,97],[69,94],[64,99],[58,94],[49,97],[40,94],[51,72]],BURGUNDY,false);
+    for(var side=-1;side<=1;side+=2){line(body,[64+side*7,67],[64+side*16,93],BURGUNDY[3],2);line(body,[64+side*8,72],[64+side*10,92],BURGUNDY[0],2);}
+    poly(body,[[55,49],[73,49],[76,60],[70,76],[58,76],[52,60]],IVORY,false);
+    for(var row=0;row<3;row++){line(body,[55,55+row*6],[63,59+row*6],COPPER[3],2);line(body,[73,55+row*6],[65,59+row*6],COPPER[1],2);}
+    var north=e.direction==='north',sign=e.direction==='west'?-1:1;
+    dome(body,head,profile?6:8,10,IVORY);line(body,offset(head,0,-9),offset(head,0,-4),COPPER[3],2);
+    if(!north){line(body,offset(head,profile?sign*2:-4,0),offset(head,profile?sign*6:4,0),INK,2);line(body,offset(head,profile?sign*3:-3,0),offset(head,profile?sign*5:3,0),RED,1);if(profile)point(body,head[0]+sign*8,head[1]+3,IVORY[3]);else line(body,offset(head,-2,6),offset(head,2,6),IVORY[0],1);}
+    else {for(var i=-1;i<=1;i++)line(body,offset(head,i*3,-5),offset(head,i*3,7),COPPER[1],1);point(body,head[0]+4,head[1]+5,CYAN);}
+    poly(gear,[[55,head[1]-7],[54,head[1]-15],[60,head[1]-10],[64,head[1]-18],[68,head[1]-10],[74,head[1]-15],[73,head[1]-7]],COPPER,false);
+    dome(gear,[64,67],open?8:4,open?10:7,[INK,STEEL,CYAN,CYAN,WHITE]);
+    if(s==='hurt')for(var i=0;i<5;i++)point(fx,46+i*9,54+(e.frame+i)%4,GOLD);
+    if(death)for(var i=0;i<9;i++)point(fx,64+Math.cos(i*2.4)*t*31,60+Math.sin(i*2.4)*t*21,CYAN);
+    LAST_HEAD=head;LAST_FEET=[64,99];
 }
+var LAST_HEAD,LAST_FEET,LAST_FRONT;
 function renderProjection(body,gear,fx,e,id){
-    if(id==='portador')portraitHero(body,gear,fx,e);
-    else if(id==='portador_cenital')aerialHuman(body,gear,fx,e,true);
-    else if(id==='prefecto')aerialHuman(body,gear,fx,e,false);
-    else if(id==='madre')overheadMother(body,gear,fx,e);
-    else overheadMachine(body,gear,fx,e,id);
+    LAST_HEAD=null;LAST_FEET=null;LAST_FRONT=null;
+    if(id.indexOf('portador')===0||id==='prefecto')person(body,gear,fx,e,id);
+    else if(id==='madre')matriarch(body,gear,fx,e);
+    else machinery(body,gear,fx,e,id);
 }

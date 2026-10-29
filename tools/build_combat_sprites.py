@@ -82,8 +82,8 @@ def main():
     for actor in ACTORS:
         hero = actor.startswith('portador')
         layout['actors'][actor] = {'cell': 96 if hero else (160 if actor == 'prefecto' else 128),
-                                  'anchor': ([48, 73] if actor == 'portador' else [48, 48]) if hero else ([80, 80] if actor == 'prefecto' else [64, 64]),
-                                  'camera': 'lateral' if actor == 'portador' else 'cenital'}
+                                  'anchor': ([48, 73] if actor == 'portador' else [48, 61]) if hero else ([80, 107] if actor == 'prefecto' else [64, 100] if actor == 'madre' else [64, 84]),
+                                  'camera': 'lateral' if actor == 'portador' else 'three_quarter'}
     for actor in args.actors:
         size = layout['actors'][actor]['cell']
         blank(WORK / f'{actor}-blank.ase', size, clips)
@@ -97,6 +97,17 @@ def main():
         raise RuntimeError('LibreSprite failed; see .godot/combat-art/render.log')
     prior_layout = json.loads((OUT / 'layout.json').read_text()) if (OUT / 'layout.json').exists() else {}
     for actor in ACTORS:
+        views = re.findall(r'Native orientation: ' + actor + r' (\w+) (\{[^\n]+\})', transcript)
+        if views:
+            if {direction for direction, _raw in views} != set(DIRECTIONS):
+                raise RuntimeError(f'Incomplete native orientations: {actor}')
+            layout['actors'][actor]['orientation_landmarks'] = {direction: json.loads(raw) for direction, raw in views}
+        elif actor in args.actors:
+            raise RuntimeError(f'Missing native orientations: {actor}')
+        elif actor in prior_layout.get('actors', {}):
+            views = prior_layout['actors'][actor].get('orientation_landmarks')
+            if views:
+                layout['actors'][actor]['orientation_landmarks'] = views
         match = re.search(r'Native body bounds: ' + actor + r' (\[[^\]]+\])', transcript)
         if match:
             layout['actors'][actor]['idle_body_bounds'] = json.loads(match[1])

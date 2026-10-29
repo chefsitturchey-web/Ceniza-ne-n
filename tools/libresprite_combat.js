@@ -53,20 +53,6 @@ function blade(out,fx,hand,angle,length,width,accent,trail){
     disk(out,hand[0],hand[1],2,2,COPPER);
     if(trail){for(var k=0;k<3;k++)arc(fx,hand,length-2-k*2,angle-.7,angle-.12,rgba(k===0?'d8fff2':'47dacb',170-k*45),1);}
 }
-function transformed(data,direction,overhead){
-    if(direction==='south')return data;
-    if(!overhead&&direction!=='west')return data;
-    var out=new Uint8Array(data.length);
-    for(var y=0;y<N;y++)for(var x=0;x<N;x++){
-        var sx=x,sy=y;
-        if(!overhead)sx=N-1-x;
-        else if(direction==='north'){sx=N-1-x;sy=N-1-y;}
-        else if(direction==='east'){sx=y;sy=N-1-x;}
-        else {sx=N-1-y;sy=x;}
-        var a=(sy*N+sx)*4,b=(y*N+x)*4;for(var c=0;c<4;c++)out[b+c]=data[a+c];
-    }
-    return out;
-}
 function build(){
     for(var a=0;a<BUILD.actors.length;a++){
         var actor=BUILD.actors[a];N=actor.indexOf('portador')===0?96:(actor==='prefecto'?160:128);ORIGIN=actor==='prefecto'?16:0;
@@ -81,10 +67,10 @@ function build(){
                 }
                 console.log('Native body bounds: '+actor+' '+JSON.stringify(bounds));
             }
-            var overhead=actor!=='portador';
-            doc.sprite.layer(0).cel(f).image.putImageData(transformed(body,entry.direction,overhead));
-            doc.sprite.layer(1).cel(f).image.putImageData(transformed(gear,entry.direction,overhead));
-            doc.sprite.layer(2).cel(f).image.putImageData(transformed(fx,entry.direction,overhead));
+            if(entry.state==='idle'&&entry.frame===0)console.log('Native orientation: '+actor+' '+entry.direction+' '+JSON.stringify({head:LAST_HEAD,feet:LAST_FEET,front:LAST_FRONT}));
+            doc.sprite.layer(0).cel(f).image.putImageData(body);
+            doc.sprite.layer(1).cel(f).image.putImageData(gear);
+            doc.sprite.layer(2).cel(f).image.putImageData(fx);
         }
         doc.sprite.saveAs(BUILD.output+'/sources/'+actor+'.ase');
         console.log('Native pixels completed: '+actor);

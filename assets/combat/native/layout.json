@@ -506,10 +506,56 @@
         73
       ],
       "camera": "lateral",
+      "orientation_landmarks": {
+        "south": {
+          "head": [
+            48,
+            42
+          ],
+          "feet": [
+            48,
+            72
+          ],
+          "front": null
+        },
+        "east": {
+          "head": [
+            48,
+            42
+          ],
+          "feet": [
+            48,
+            72
+          ],
+          "front": null
+        },
+        "north": {
+          "head": [
+            48,
+            42
+          ],
+          "feet": [
+            48,
+            72
+          ],
+          "front": null
+        },
+        "west": {
+          "head": [
+            48,
+            42
+          ],
+          "feet": [
+            48,
+            72
+          ],
+          "front": null
+        }
+      },
       "idle_body_bounds": [
         40,
         38,
-        56,
+        57,
         73
       ]
     },
@@ -517,84 +563,396 @@
       "cell": 96,
       "anchor": [
         48,
-        48
+        61
       ],
-      "camera": "cenital",
+      "camera": "three_quarter",
+      "orientation_landmarks": {
+        "south": {
+          "head": [
+            48,
+            30
+          ],
+          "feet": [
+            48,
+            60
+          ],
+          "front": null
+        },
+        "east": {
+          "head": [
+            48,
+            30
+          ],
+          "feet": [
+            48,
+            60
+          ],
+          "front": null
+        },
+        "north": {
+          "head": [
+            48,
+            30
+          ],
+          "feet": [
+            48,
+            60
+          ],
+          "front": null
+        },
+        "west": {
+          "head": [
+            48,
+            30
+          ],
+          "feet": [
+            48,
+            60
+          ],
+          "front": null
+        }
+      },
       "idle_body_bounds": [
-        36,
-        30,
-        61,
-        64
+        40,
+        26,
+        57,
+        61
       ]
     },
     "recaudador": {
       "cell": 128,
       "anchor": [
         64,
-        64
+        84
       ],
-      "camera": "cenital",
+      "camera": "three_quarter",
+      "orientation_landmarks": {
+        "south": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            64,
+            89
+          ]
+        },
+        "east": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            104,
+            67
+          ]
+        },
+        "north": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            64,
+            45
+          ]
+        },
+        "west": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            24,
+            67
+          ]
+        }
+      },
       "idle_body_bounds": [
-        21,
-        29,
-        108,
-        100
+        27,
+        40,
+        103,
+        98
       ]
     },
     "caldera": {
       "cell": 128,
       "anchor": [
         64,
-        64
+        84
       ],
-      "camera": "cenital",
+      "camera": "three_quarter",
+      "orientation_landmarks": {
+        "south": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            64,
+            80.25
+          ]
+        },
+        "east": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            99,
+            61
+          ]
+        },
+        "north": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            64,
+            41.75
+          ]
+        },
+        "west": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            29,
+            61
+          ]
+        }
+      },
       "idle_body_bounds": [
-        19,
-        13,
-        111,
-        116
+        22,
+        36,
+        108,
+        108
       ]
     },
     "coro": {
       "cell": 128,
       "anchor": [
         64,
-        64
+        84
       ],
-      "camera": "cenital",
+      "camera": "three_quarter",
+      "orientation_landmarks": {
+        "south": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            64,
+            80.25
+          ]
+        },
+        "east": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            99,
+            61
+          ]
+        },
+        "north": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            64,
+            41.75
+          ]
+        },
+        "west": {
+          "head": [
+            64,
+            35
+          ],
+          "feet": [
+            64,
+            84
+          ],
+          "front": [
+            29,
+            61
+          ]
+        }
+      },
       "idle_body_bounds": [
-        19,
-        13,
-        111,
-        116
+        22,
+        49,
+        108,
+        107
       ]
     },
     "prefecto": {
       "cell": 160,
       "anchor": [
         80,
-        80
+        107
       ],
-      "camera": "cenital",
+      "camera": "three_quarter",
+      "orientation_landmarks": {
+        "south": {
+          "head": [
+            80,
+            59.5
+          ],
+          "feet": [
+            80,
+            106
+          ],
+          "front": null
+        },
+        "east": {
+          "head": [
+            80,
+            59.5
+          ],
+          "feet": [
+            80,
+            106
+          ],
+          "front": null
+        },
+        "north": {
+          "head": [
+            80,
+            59.5
+          ],
+          "feet": [
+            80,
+            106
+          ],
+          "front": null
+        },
+        "west": {
+          "head": [
+            80,
+            59.5
+          ],
+          "feet": [
+            80,
+            106
+          ],
+          "front": null
+        }
+      },
       "idle_body_bounds": [
-        60,
-        51,
-        100,
-        103
+        64,
+        53,
+        98,
+        108
       ]
     },
     "madre": {
       "cell": 128,
       "anchor": [
         64,
-        64
+        100
       ],
-      "camera": "cenital",
+      "camera": "three_quarter",
+      "orientation_landmarks": {
+        "south": {
+          "head": [
+            64,
+            40
+          ],
+          "feet": [
+            64,
+            99
+          ],
+          "front": null
+        },
+        "east": {
+          "head": [
+            64,
+            40
+          ],
+          "feet": [
+            64,
+            99
+          ],
+          "front": null
+        },
+        "north": {
+          "head": [
+            64,
+            40
+          ],
+          "feet": [
+            64,
+            99
+          ],
+          "front": null
+        },
+        "west": {
+          "head": [
+            64,
+            40
+          ],
+          "feet": [
+            64,
+            99
+          ],
+          "front": null
+        }
+      },
       "idle_body_bounds": [
-        15,
-        14,
-        114,
-        115
+        25,
+        12,
+        104,
+        100
       ]
     }
   }

@@ -8,6 +8,8 @@ var direction_choice: OptionButton
 var camera_choice: OptionButton
 var hero_label: Label
 var guardian: AnimatedSprite2D
+var turn_preview: CheckButton
+var turn_clock: float = 0
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -21,7 +23,7 @@ func _ready() -> void:
 	camera_choice = OptionButton.new()
 	camera_choice.position = Vector2(12, 8)
 	camera_choice.size.x = 220
-	camera_choice.add_item("Cenital · combate")
+	camera_choice.add_item("Superior 3/4 · combate")
 	camera_choice.add_item("Lateral · colonia + aliado")
 	add_child(camera_choice)
 	state_choice = OptionButton.new()
@@ -35,6 +37,10 @@ func _ready() -> void:
 	direction_choice.size.x = 150
 	for label: String in ["Sur", "Este", "Norte", "Oeste"]: direction_choice.add_item(label)
 	add_child(direction_choice)
+	turn_preview = CheckButton.new()
+	turn_preview.text = "Giro"
+	turn_preview.position = Vector2(578, 8)
+	add_child(turn_preview)
 	for index: int in range(IDS.size()):
 		var x: float = 8 + (index % 3) * 210
 		var y: float = 47 + (index / 3) * 153
@@ -50,11 +56,11 @@ func _ready() -> void:
 		var sprite: AnimatedSprite2D = AnimatedSprite2D.new()
 		sprite.sprite_frames = CombatSpriteLibrary.frames(IDS[index])
 		sprite.scale = Vector2.ONE
-		sprite.position = Vector2(x + 102, y + 68) + CombatSpriteLibrary.offset_for(IDS[index])
+		sprite.position = Vector2(x + 102, y + (90 if IDS[index] == "madre" else 68)) + CombatSpriteLibrary.offset_for(IDS[index])
 		add_child(sprite)
 		actors.append(sprite)
 		var label: Label = Label.new()
-		label.text = "PORTADOR · CENITAL" if index == 0 else IDS[index].to_upper() + " · 1:1"
+		label.text = "PORTADOR · 3/4" if index == 0 else IDS[index].to_upper() + " · 1:1"
 		label.position = Vector2(x + 8, y + 127)
 		add_child(label)
 		if index == 0: hero_label = label
@@ -74,9 +80,17 @@ func change_camera(index: int) -> void:
 	var id: String = "portador" if index == 1 else "portador_cenital"
 	actors[0].sprite_frames = CombatSpriteLibrary.frames(id)
 	actors[0].position = Vector2(110, 115) + CombatSpriteLibrary.offset_for(id)
-	hero_label.text = "PORTADOR + GUARDIÁN · 1:1" if index == 1 else "PORTADOR · CENITAL"
+	hero_label.text = "PORTADOR + GUARDIÁN · 1:1" if index == 1 else "PORTADOR · 3/4"
 	guardian.visible = index == 1
 	play_all()
+
+func _process(delta: float) -> void:
+	if turn_preview == null or not turn_preview.button_pressed: return
+	turn_clock += delta
+	if turn_clock >= 0.9:
+		turn_clock = 0
+		direction_choice.select((direction_choice.selected + 1) % DIRECTIONS.size())
+		play_all()
 
 func play_all() -> void:
 	var clip: StringName = StringName(STATES[state_choice.selected] + "_" + DIRECTIONS[direction_choice.selected])

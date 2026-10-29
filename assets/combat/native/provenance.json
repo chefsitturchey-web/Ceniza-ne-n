@@ -21,12 +21,12 @@
   "frames_per_actor": 256,
   "external_raster_inputs": [],
   "sources_sha256": {
-    "portador": "1c97e8c7671dae3f3221d3f3b594ccb0fb13427bca5d9603c78351922f968dbf",
-    "recaudador": "5863c26e187ba3fa53ec1a1fa1c3324237e1d5ef815b277847a18acbb1e2fe05",
-    "caldera": "e9465eda60b4498e2fdd9b3290b73a3bca5460a2558deff8184aba8007e90efc",
-    "coro": "3e1bfacf8ac0bc34392cf82c1eab028d641f4e372a8715b5315d0f0993c3901c",
-    "prefecto": "b9987e73c21e3de5ba5fe82a182f9051790891a9e5fd186aeddddea0ec1d18d4",
-    "madre": "9a23c84881424652dde4350a52d88e7a15036d38e5ccaec8f1c1254d5e08335b",
-    "portador_cenital": "95b62513403d59a3804f4dac198e02213cb19d5e9c1a411083d881915d49951a"
+    "portador": "0b1f02e037c41b947bbd7bbc4b818fc2c27e9ed0951114deaac9736e809b0401",
+    "recaudador": "c146f613e2deb1d5e446c40df223846f73ecafaf93266f2fd928a0f8f88b141e",
+    "caldera": "b7d5ded7359bd0ff2b8e949e8717c25285f644993fc0f150b64330fac6b719ad",
+    "coro": "c20ba32d9e33a8550eb8d47a60358e5100e2b75d4574998ad979bcff88b03b0e",
+    "prefecto": "575a950d3c40e8bf03a9380715456d479a0b0a33a1a0754f20843712ee201a09",
+    "madre": "a39d43d6337a39a3cf63748ff3b26c9780604f7fc9b8b62b2098ba3ccd9b7086",
+    "portador_cenital": "a17ad16eaed7c4f79cb0947460a3af759c3ce12f9a0f886a35f53a01e1b4fe0d"
   }
 }

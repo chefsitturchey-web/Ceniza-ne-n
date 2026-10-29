@@ -39,7 +39,28 @@ func run_checks() -> void:
 		verify(not frames.get_animation_loop(&"death_south") and not frames.get_animation_loop(&"attack_south"), "Muerte y ataque no se repiten: " + id)
 	var provenance: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/combat/native/provenance.json"))
 	for id: String in layout.actors:
-		verify(layout.actors[id].camera == ("lateral" if id == "portador" else "cenital"), "Proyección declarada para la cámara: " + id)
+		verify(layout.actors[id].camera == ("lateral" if id == "portador" else "three_quarter"), "Proyección declarada para la cámara: " + id)
+		var views: Dictionary = layout.actors[id].orientation_landmarks
+		verify(views.size() == 4, "Cuatro vistas dibujadas por separado: " + id)
+		for direction: String in views:
+			verify(views[direction].head[1] < views[direction].feet[1], "Cabeza sobre los pies al mirar " + direction + ": " + id)
+		if id in ["recaudador", "caldera", "coro"]:
+			verify(views.east.front[0] > views.west.front[0] and views.south.front[1] > views.north.front[1], "El frente apunta en la dirección correcta: " + id)
+		if id.begins_with("portador"):
+			var sheet: Image = load("res://assets/combat/native/%s.png" % id).get_image()
+			var cell: int = layout.actors[id].cell
+			for direction: String in ["south", "east", "north", "west"]:
+				var index: int = layout.animations["idle_" + direction].frames[0]
+				var image: Image = sheet.get_region(Rect2i(index % 8 * cell, index / 8 * cell, cell, cell))
+				var count: int = 0
+				var total_y: float = 0
+				for y: int in cell:
+					for x: int in cell:
+						var color: Color = image.get_pixel(x, y)
+						if color.a > 0.5 and color.to_html(false) in ["151c25", "26313d"]:
+							count += 1
+							total_y += y
+				verify(count >= 20 and total_y / maxf(1, count) < layout.actors[id].anchor[1] - 20, "El cabello real del PNG permanece arriba: %s/%s" % [id, direction])
 	var body: Array = layout.actors.portador.idle_body_bounds
 	var height: float = body[3] - body[1]
 	var ally: Image = UnitSpriteLibrary.frames("guardian").get_frame_texture(&"reposo", 0).get_image()
@@ -50,7 +71,27 @@ func run_checks() -> void:
 	root.add_child(studio)
 	await process_frame
 	verify(studio.actors.size() == 6, "Galería F6 presenta los seis personajes")
+	for index: int in studio.actors.size():
+		var sprite: AnimatedSprite2D = studio.actors[index]
+		var image: Image = sprite.sprite_frames.get_frame_texture(sprite.animation, sprite.frame).get_image()
+		var used: Rect2i = image.get_used_rect()
+		var top: float = sprite.position.y - image.get_height() / 2.0 + used.position.y
+		var bottom: float = top + used.size.y
+		var card_top: float = 47 + (index / 3) * 153
+		verify(top >= card_top and bottom < card_top + 127, "Silueta dentro de su tarjeta sin tapar el texto: %d" % index)
 	await picture("galeria_caminar")
+	for direction: int in range(1, 4):
+		studio.direction_choice.select(direction)
+		studio.play_all()
+		await picture("galeria_" + studio.DIRECTIONS[direction])
+	studio.direction_choice.select(0)
+	studio.play_all()
+	studio.turn_preview.button_pressed = true
+	studio._process(0.95)
+	verify(studio.direction_choice.selected == 1, "Giro de prueba avanza una vista sin tumbar el sprite")
+	studio.turn_preview.button_pressed = false
+	studio.direction_choice.select(0)
+	studio.play_all()
 	studio.change_camera(1)
 	verify(studio.guardian.visible and studio.actors[0].sprite_frames == CombatSpriteLibrary.frames("portador"), "Comparación lateral con aliado real")
 	verify(studio.actors[0].scale == Vector2.ONE and studio.guardian.scale == Vector2.ONE, "Comparación sin ampliar al protagonista")
