@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PropData" format=3]
+
+[ext_resource type="Script" path="res://data/prop_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"antenna"
+label = "Antena"
+charges = 2
+parts_per_charge = 3
+scrap_per_charge = 1
+size = Vector2(14, 40)
+fill = Color(0.51, 0.6, 0.66, 1)

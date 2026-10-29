@@ -12,3 +12,5 @@ extends Resource
 @export var background_path: String = ""
 @export var accent: Color = Color("ffce75")
 @export var waves: Array[WaveData] = []
+@export var prop_spots: Array[Vector2] = []
+@export var props: Array[PropData] = []

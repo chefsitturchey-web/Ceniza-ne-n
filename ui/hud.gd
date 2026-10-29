@@ -45,6 +45,9 @@ func _ready() -> void:
 	for key: String in ["chatarra", "energia"]:
 		_icon(resources, key)
 		values[key] = _label(resources)
+	var parts_label: Label = _label(resources)
+	parts_label.add_theme_color_override("font_color", Color("9adcd4"))
+	values["piezas"] = parts_label
 	var overload_icon: TextureRect = _icon($Gameplay, "sobrecarga")
 	overload_icon.position = Vector2(616, 338)
 	phase_banner = HBoxContainer.new()
@@ -133,6 +136,7 @@ func display_dashboard(data: Dictionary) -> void:
 	$DamageEdges.visible = $Gameplay.visible
 	values.chatarra.text = str(data.scrap)
 	values.energia.text = "%d/%d" % [data.energy, data.capacity]
+	values.piezas.text = "PIEZAS %d" % data.get("parts", 0)
 	icons.sobrecarga.modulate = Color("47dacb") if "LISTA" in [data.overload_left, data.overload_right] else Color("304356")
 	var next_phase: String = "%s:%d" % [data.phase, data.day]
 	if next_phase != phase_key:

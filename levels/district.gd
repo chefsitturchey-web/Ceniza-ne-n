@@ -33,6 +33,7 @@ var story: StoryDirector
 var mobility: MobilitySystem
 var corpse_system: CorpseSystem
 var gravedigger: Gravedigger
+var scavenge: ScavengeSystem
 
 func _ready() -> void:
 	player.combat_enabled = false
@@ -197,6 +198,11 @@ func _ready() -> void:
 	add_child(gravedigger)
 	corpse_system.gravedigger = gravedigger
 	session.corpse_system = corpse_system
+	scavenge = ScavengeSystem.new()
+	scavenge.setup(zone, bank)
+	add_child(scavenge)
+	interaction.scavenge = scavenge
+	scavenge.notice_requested.connect(presenter.show_notice)
 	for portal: EnemyRepeater in civic.gates + expedition.repeaters:
 		portal.defense_requested.connect(civic.defend_portal)
 	var arriving: bool = not CampaignRoute.pending.is_empty()
