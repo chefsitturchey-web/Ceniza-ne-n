@@ -18,6 +18,7 @@ var story: StoryDirector
 var mobility: MobilitySystem
 var scavenge: ScavengeSystem
 var trap_system: TrapSystem
+var workshop: WorkshopSystem
 const MOBILITY_TARGET: int = -5
 var committed_target: int = GameRules.NO_TARGET
 var hold_time: float = 0.0
@@ -36,6 +37,8 @@ func interaction_target() -> int:
 		return STATION_TARGET
 	if absf(player.position.x) < GameRules.CORE_INTERACT_RANGE:
 		return -1
+	var workshop_target: int = workshop.target_at(player.position.x) if workshop != null else GameRules.NO_TARGET
+	if workshop_target != GameRules.NO_TARGET: return workshop_target
 	if expansion != null:
 		var expansion_target: int = expansion.target_at(player.position.x)
 		if expansion_target != GameRules.NO_TARGET:
@@ -47,8 +50,6 @@ func interaction_target() -> int:
 		if candidate < distance:
 			distance = candidate
 			best = index
-	var trap_target: int = trap_system.target_at(player.position.x) if trap_system != null else GameRules.NO_TARGET
-	if best == GameRules.NO_TARGET and trap_target != GameRules.NO_TARGET: return trap_target
 	var prop_target: int = scavenge.target_at(player.position.x) if scavenge != null else GameRules.NO_TARGET
 	if prop_target != GameRules.NO_TARGET: return prop_target
 	if best == GameRules.NO_TARGET and mobility != null and mobility.target_at(player.position.x): return MOBILITY_TARGET
@@ -76,8 +77,8 @@ func update_interaction(delta: float) -> void:
 func perform_interaction(target: int) -> bool:
 	if target == MOBILITY_TARGET and mobility != null: return mobility.interact()
 	if target <= -400 and target >= -402 and story != null: return story.interact(target)
-	if target <= -600:
-		return trap_system.interact(target) if trap_system != null else false
+	if target <= -700:
+		return workshop.interact(target) if workshop != null else false
 	if target <= -500:
 		return scavenge.interact(target) if scavenge != null else false
 	if target <= -300 and civic != null: return civic.interact(target)
