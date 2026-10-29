@@ -39,6 +39,6 @@ Hay un presupuesto de 180 partículas y 32 impactos cosméticos por arena. Desac
 3. En `levels/story/combat_animation_preview.tscn`, pulsa F6, elige **Caminar** y cambia entre las cuatro direcciones y las dos cámaras. **1–6** amplía el personaje; **0** vuelve al conjunto.
 4. Comprueba partículas y destellos reducidos desde las opciones, y pausa durante un ataque.
 
-`tests/boss_pressure_test.gd` verifica 224 condiciones, incluida una simulación de los cinco cerebros contra un objetivo móvil y la coexistencia de sus patrones principales y secundarios. Con `-- --capture` guarda las cuatro tiras de marcha y diez capturas de combate en `.godot/combat-art/`. `tests/run_all.gd` ejecuta 39 suites.
+`tests/boss_pressure_test.gd` verifica 224 condiciones, incluida una simulación de los cinco cerebros contra un objetivo móvil y la coexistencia de sus patrones principales y secundarios. Con `-- --capture` guarda las cuatro tiras de marcha y diez capturas de combate en `.godot/combat-art/`. `tests/run_all.gd` ejecuta 40 suites.
 
 Referencias técnicas consultadas: [SLYNYRD: ciclo humano](https://www.slynyrd.com/blog/2024/5/24/pixelblog-50-human-walk-cycle), [partículas 2D de Godot](https://docs.godotengine.org/en/stable/tutorials/2d/particle_systems_2d.html) y [dibujo 2D de Godot](https://docs.godotengine.org/en/stable/tutorials/2d/custom_drawing_in_2d.html).

@@ -478,7 +478,11 @@ func refresh_info() -> void:
 	var info: Dictionary = snapshot()
 	panel.context_label.text = str(info.scene) + (" · PRÁCTICA SIN GUARDAR" if info.get("practice", false) else " · Abrir el panel no modifica el guardado")
 	panel.inspector.text = JSON.stringify(info, "  ")
-	badge.text = "F1 · PRÁCTICA" if info.get("practice", false) else "Depuración [F1]"
+	var in_arena: bool = info.has("boss")
+	badge.text = "F1" if in_arena else ("F1 · PRÁCTICA" if info.get("practice", false) else "Depuración [F1]")
+	badge.tooltip_text = "Laboratorio de jefes · Depuración" if in_arena else ""
+	badge.position = Vector2(603, 332) if in_arena else Vector2(505, 338)
+	badge.size = Vector2(31, 20) if in_arena else Vector2(131, 20)
 
 func save_report() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://debug"))

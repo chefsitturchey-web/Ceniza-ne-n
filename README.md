@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
-  <img alt="Pruebas: 39 suites" src="https://img.shields.io/badge/tests-39%20suites-47dacb">
+  <img alt="Pruebas: 40 suites" src="https://img.shields.io/badge/tests-40%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -34,6 +34,8 @@ Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y f
 **Laboratorio con F1:** acceso directo a los cinco jefes, fases, equipo, invulnerabilidad, cámara lenta, colisiones/rutas y creación de unidades. Permite volver a la escena original; las intervenciones de colonia quedan como práctica sin sobrescribir el checkpoint. [Controles y guía](docs/LABORATORIO_DEPURACION.md).
 
 **Combates con más presión:** robots un 30 % mayores, barridos de mayor alcance, ataques secundarios simultáneos, erupciones, ondas de sonar y cortes eléctricos. Los impactos tienen escombros, humo y temblor breve; las ventanas de núcleo expuesto cancelan las trampas pendientes. La marcha del Portador, Prefecto y Madre utiliza ocho fases articuladas en LibreSprite, conservando el dibujo aprobado. [Cambios y cómo probarlos](docs/EFECTOS_Y_PRESION_JEFES.md).
+
+**Interfaz de arenas:** vida numérica y barra roja del Portador, resistencia verde y barra inferior de jefe con estela del daño, marco y emblema propios de cada zona. [Diseño y pruebas](docs/INTERFAZ_COMBATE.md).
 
 **Arte de combate ilustrado:** el Portador y los cinco jefes recuperan sus diseños manga con poses de marcha, estocada, reacción y caída; el Portador tiene además volteretas propias en ambas cámaras. La base se generó con `image_gen` y se registró, ajustó y exportó en LibreSprite. Son 416 poses de entrada y 1792 fotogramas de línea de tiempo con pausas y reutilización. La galería F6 incluye **Giro**, detalle con **1–6** y conjunto con **0**. [Diseños, tamaños, prompts y fuentes editables](docs/ARTE_COMBATE_ILUSTRADO.md).
 
@@ -203,7 +205,7 @@ godot --headless --path . --editor --import --quit
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta **38 suites**, incluyendo tácticas de los cinco jefes, personajes, novela visual, fortificaciones, movilidad, campaña, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
+`run_all.gd` ejecuta **40 suites**, incluyendo tácticas de los cinco jefes, personajes, novela visual, fortificaciones, movilidad, campaña, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
 
 En una consola de PowerShell dedicada a las pruebas, configura primero el perfil aislado:
 

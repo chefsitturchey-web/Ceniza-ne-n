@@ -21,7 +21,7 @@ var world: Node2D = Node2D.new()
 var actors: Node2D = Node2D.new()
 var viewport: SubViewport = SubViewport.new()
 var banner: Label
-var bar: ColorRect = ColorRect.new()
+var combat_hud: BossBattleHud
 var pause_panel: PanelContainer = PanelContainer.new()
 var damage_edges: Control = Control.new()
 var hit_count: int = 0
@@ -260,26 +260,18 @@ func build_hud() -> void:
 	damage_edges.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(damage_edges)
 	damage_edges.set_state({"health": player.health})
-	var boss_title: Label = label(zone.boss_title, Rect2(110, 324, 420, 18))
-	boss_title.add_theme_font_override("font", ThemeDB.fallback_font)
-	boss_title.add_theme_font_size_override("font_size", 13)
-	boss_status = label(zone.briefing, Rect2(8, 9, 624, 44))
+	combat_hud = BossBattleHud.new()
+	add_child(combat_hud)
+	combat_hud.configure(zone_index, zone.boss_title, player, boss)
+	boss_status = label(zone.briefing, Rect2(243, 12, 383, 45))
 	boss_status.add_theme_font_override("font", ThemeDB.fallback_font)
-	boss_status.add_theme_font_size_override("font_size", 14)
+	boss_status.add_theme_font_size_override("font_size", 12)
+	boss_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	boss_status.add_theme_constant_override("outline_size", 4)
 	boss_status.add_theme_color_override("font_outline_color", Color("08111c"))
 	boss_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	phase_notice = label("", Rect2(80, 60, 480, 22), true)
 	phase_notice.add_theme_color_override("font_color", Color("dd6482"))
-	var backing: ColorRect = ColorRect.new()
-	backing.color = Color("0b1322")
-	backing.position = Vector2(159, 345)
-	backing.size = Vector2(322, 4)
-	add_child(backing)
-	bar.color = Color("e99b43")
-	bar.position = Vector2(160, 346)
-	bar.size = Vector2(320, 2)
-	add_child(bar)
 	result_shade = ColorRect.new()
 	result_shade.color = Color("0b1322", 0.8)
 	result_shade.size = Vector2(640, 360)
@@ -380,6 +372,7 @@ func on_damage() -> void:
 	sound.play_cue("hit")
 	hit_count += 1
 	damage_edges.set_state({"health": player.health, "player_hit": hit_count})
+	combat_hud.update_values(player, boss)
 
 func finish(victory: bool) -> void:
 	if ending or completed:
@@ -404,11 +397,11 @@ func _process(delta: float) -> void:
 	if novel != null and (novel.opened or novel.closed_frame == Engine.get_process_frames()): return
 	if get_tree().paused:
 		return
-	bar.size.x = 320 * float(boss.health) / boss.max_health
+	combat_hud.update_values(player, boss)
+	combat_hud.advance(delta)
 	boss_status.text = boss.status_text() if not ending else ""
 	phase_notice_time = maxf(0, phase_notice_time - delta)
 	phase_notice.visible = phase_notice_time > 0 and not ending
-	bar.color = Color("dd6482") if boss.phase == 2 else Color("e99b43")
 	if ending and not emitted:
 		ending_timer -= delta
 		if ending_victory and ending_timer <= 1.6:
