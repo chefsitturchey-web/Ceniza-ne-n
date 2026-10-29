@@ -2,6 +2,7 @@
 
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
+uid="uid://cpuyiidl7w6mb"
 path="res://.godot/imported/aviso.ogg-8b189f2951e843e5dd7d1f524511036d.oggvorbisstr"
 
 [deps]
@@ -16,4 +17,3 @@ loop_offset=0
 bpm=0
 beat_count=0
 bar_beats=0
-
