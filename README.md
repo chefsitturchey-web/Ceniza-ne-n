@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
-  <img alt="Pruebas: 40 suites" src="https://img.shields.io/badge/tests-40%20suites-47dacb">
+  <img alt="Pruebas: 41 suites" src="https://img.shields.io/badge/tests-41%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -34,6 +34,8 @@ Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y f
 **Laboratorio con F1:** acceso directo a los cinco jefes, fases, equipo, invulnerabilidad, cámara lenta, colisiones/rutas y creación de unidades. Permite volver a la escena original; las intervenciones de colonia quedan como práctica sin sobrescribir el checkpoint. [Controles y guía](docs/interface/LABORATORIO_DEPURACION.md).
 
 **Combates con más presión:** robots un 30 % mayores, barridos de mayor alcance, ataques secundarios simultáneos, erupciones, ondas de sonar y cortes eléctricos. Los impactos tienen escombros, humo y temblor breve; las ventanas de núcleo expuesto cancelan las trampas pendientes. La marcha del Portador, Prefecto y Madre utiliza ocho fases articuladas en LibreSprite, conservando el dibujo aprobado. [Cambios y cómo probarlos](docs/gameplay/EFECTOS_Y_PRESION_JEFES.md).
+
+**Fondos vivos:** cinco distritos con horizonte, arquitectura transparente y decoración cercana a distintas velocidades, más humo, lluvia, agua, estandartes y maquinaria según la zona. Los marcos de vida tienen arte ornamental original, distinto para cada jefe y más fino para el Portador. [Capas y fuentes LibreSprite](docs/art/FONDOS_EN_CAPAS.md).
 
 **Interfaz de arenas:** vida numérica y barra roja del Portador, resistencia verde y barra inferior de jefe con estela del daño, marco y emblema propios de cada zona. [Diseño y pruebas](docs/interface/INTERFAZ_COMBATE.md).
 
@@ -211,7 +213,7 @@ godot --headless --path . --editor --import --quit
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta **40 suites**, incluyendo tácticas de los cinco jefes, personajes, novela visual, fortificaciones, movilidad, campaña, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
+`run_all.gd` ejecuta **41 suites**, incluyendo tácticas de los cinco jefes, personajes, novela visual, fortificaciones, movilidad, campaña, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
 
 En Windows, el comando recomendado importa el proyecto, usa un perfil aislado y guarda todos los registros en `build/validation/latest/`:
 

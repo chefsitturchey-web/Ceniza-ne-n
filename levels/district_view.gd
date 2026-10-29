@@ -10,12 +10,10 @@ var zone: ZoneData:
 		zone = value
 		district_background = load(zone.background_path) as Texture2D if zone != null and not zone.background_path.is_empty() else DEFAULT_BACKGROUND
 		queue_redraw()
-const DEFAULT_BACKGROUND: Texture2D = preload("res://assets/world/backgrounds/periphery_alive_v2.png")
+const DEFAULT_BACKGROUND: Texture2D = preload("res://assets/world/backgrounds/layers/periphery_alive_v2.png")
 var district_background: Texture2D = DEFAULT_BACKGROUND
 const GROUND: Texture2D = preload("res://assets/world/structures/ground_strip.png")
 ## Cuánto siguen las capas a la cámara: 1 queda fija en pantalla, 0 se mueve con el mundo.
-const FAR_FOLLOW: float = 0.8
-const MID_FOLLOW: float = 0.55
 ## Decoración fija del distrito: [textura, x]. Lejos de las obras (±180, ±240) y del núcleo.
 const PROPS: Array = [
 	[preload("res://assets/world/props/sign.png"), -810.0], [preload("res://assets/world/props/car.png"), -720.0],
@@ -44,6 +42,7 @@ var light: Dictionary = LIGHTING["DÍA"].duplicate()
 var daylight: CanvasModulate = CanvasModulate.new()
 var time: float = 0.0
 var redraw_clock: float = 0
+var last_camera_x: float = INF
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -54,11 +53,21 @@ func _process(delta: float) -> void:
 	time += delta
 	if cycle == null:
 		return
-	var target: Dictionary = LIGHTING.get(cycle.phase, LIGHTING["DÍA"])
+	var target: Dictionary = LIGHTING.get(cycle.phase, LIGHTING["DÍA"]).duplicate()
+	if cycle.phase != "NOCHE":
+		var colors: Array = DistrictDepth.SKY_COLORS.get(zone.id if zone != null else "periphery", DistrictDepth.SKY_COLORS.periphery)
+		target.sky_top = colors[0] if cycle.phase == "DÍA" else colors[0].lerp(Color("3b3352"), 0.55)
+		target.sky_bottom = colors[1] if cycle.phase == "DÍA" else colors[1].lerp(Color("b67d65"), 0.5)
 	var weight: float = clampf(delta / TRANSITION_TIME * 3.0, 0.0, 1.0)
 	for key: String in light:
 		light[key] = lerp(light[key], target[key], weight)
 	daylight.color = light["world"]
+	var camera: Camera2D = get_viewport().get_camera_2d()
+	if camera != null:
+		var camera_x: float = camera.get_screen_center_position().x
+		if absf(camera_x - last_camera_x) > 0.5:
+			last_camera_x = camera_x
+			queue_redraw()
 	redraw_clock += delta
 	if redraw_clock >= 1.0 / 30:
 		redraw_clock = fmod(redraw_clock, 1.0 / 30)
@@ -68,23 +77,12 @@ func _draw() -> void:
 	var camera: Camera2D = get_viewport().get_camera_2d()
 	var camera_x: float = camera.get_screen_center_position().x if camera != null else 0.0
 	_draw_sky(camera_x)
+	var zone_id: String = zone.id if zone != null else "periphery"
+	DistrictDepth.draw_far(self, camera_x, time, zone_id, light["sky_bottom"])
 	if district_background != null:
-		var periphery: bool = zone != null and zone.id == "periphery"
-		var width: float = 512.0 if periphery else 640.0
-		var top: float = FLOOR_Y - 216 if periphery else FLOOR_Y - 360
-		var base: int = floori(camera_x * 0.2 / width)
-		for tile: int in range(-3, 4):
-			var index: int = base + tile
-			var x: float = index * width + camera_x * 0.8 - width * 0.5
-			var mirrored: bool = posmod(index, 2) == 1
-			draw_set_transform(Vector2(x + (width if mirrored else 0.0), 0), 0, Vector2(-1 if mirrored else 1, 1))
-			draw_texture_rect(district_background, Rect2(0, top, width, 288 if periphery else 360), false, Color(0.78, 0.82, 0.9))
-			if periphery:
-				# Restaurar el transformado del mosaico después de los rotores locales.
-				var tile_frame: Transform2D = Transform2D(0, Vector2(-1 if mirrored else 1, 1), 0, Vector2(x + (width if mirrored else 0), 0))
-				BackdropLife.draw_factory(self, time, top, tile_frame)
-			draw_set_transform(Vector2.ZERO)
-		_draw_haze(camera_x, light["far_haze"] * 0.25)
+		DistrictDepth.draw_architecture(self, district_background, camera_x, time, zone_id)
+		_draw_haze(camera_x, light["far_haze"] * 0.16)
+	DistrictDepth.draw_near(self, camera_x, time, zone_id)
 	for index: int in range(PROPS.size()):
 		var texture: Texture2D = PROPS[index][0]
 		var size: Vector2 = texture.get_size()

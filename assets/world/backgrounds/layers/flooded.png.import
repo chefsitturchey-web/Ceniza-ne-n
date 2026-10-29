@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ql1n185d8svs"
-path="res://.godot/imported/citadel.png-960d9c303fc9682ad13181f46f11a0fb.ctex"
+uid="uid://dnx4gang80m7a"
+path="res://.godot/imported/flooded.png-76a636f73caef9679731c0116eb6a8f4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/world/backgrounds/citadel.png"
-dest_files=["res://.godot/imported/citadel.png-960d9c303fc9682ad13181f46f11a0fb.ctex"]
+source_file="res://assets/world/backgrounds/layers/flooded.png"
+dest_files=["res://.godot/imported/flooded.png-76a636f73caef9679731c0116eb6a8f4.ctex"]
 
 [params]
 

@@ -1,0 +1,14 @@
+{
+  "tool": "OpenAI image_gen",
+  "record": "Generation specifications; original paintings and returned PNG plates retained unchanged.",
+  "far_skyline": "One transparent FAR BACKGROUND PARALLAX LAYER original side-view 2D pixel-art CENIZA NEON, extra wide industrial gothic ruined megacity orthographic, no foreground/sky/ground/text, distant worn spires/foundry stacks/cranes/bridges/needle antenna/ruined arches, low contrast continuous lower band fading true alpha, irregular towers upperhalf, balanced repeating edges, desaturated slate/steel tiny cyan/amber windows, fine painted pixelclusters crisp edges, no baked smoke/water/sun/mountains, panoramic 3:1.",
+  "architecture_edit": "Edit the existing game environment into ONE production-ready TRANSPARENT MIDGROUND PARALLAX PLATE. Preserve the original composition, detailed painted pixel materials, lighting, designs and relative landmark positions. Remove sky and only empty atmospheric voids to alpha. Keep complete architectural silhouettes and thin pipes/cables/bridges/antenna tips; lower35% ground/water/platform solid. Keep central reactor/fortress/furnace intact. Continuous grounded buildings, no floating fragments, colored sky scraps, triangular crops or geometric diagonal cuts. No extra objects/text/UI/border/new opaque sky.",
+  "zones": {
+    "foundry": "Preserve copper furnace, molten metal falls, chimneys, crane and conveyors.",
+    "flooded": "Preserve flooded platforms, pumps, gantries, pipes and water surface.",
+    "citadel": "Preserve monumental fortress, gates, hanging banners, bridges and cascades.",
+    "network": "Preserve central cyan reactor, conduits, antenna towers and connecting bridges."
+  },
+  "periphery": "Existing original painting; sky extracted natively in LibreSprite.",
+  "sources": "../references/{zone}.png -> ../references/{zone}_plate.png; far_skyline.png is a new original transparent horizon."
+}

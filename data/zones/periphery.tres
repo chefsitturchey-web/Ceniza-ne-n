@@ -2,4 +2,4 @@
 [ext_resource type="Script" path="res://data/zone_data.gd" id="1"]
 [resource]
 script = ExtResource("1")
-background_path = "res://assets/world/backgrounds/periphery_alive_v2.png"
+background_path = "res://assets/world/backgrounds/layers/periphery_alive_v2.png"

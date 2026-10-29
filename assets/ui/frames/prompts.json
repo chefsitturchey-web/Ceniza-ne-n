@@ -1,0 +1,8 @@
+{
+  "tool": "OpenAI image_gen",
+  "purpose": "Original ornamental health frames; native LibreSprite assembly and export",
+  "prompt": "ONE production GAME HUD SPRITE ATLAS for CENIZA NEON original industrial cyberpunk pixel-art with dark gothic Souls-like craftsmanship. Transparent, no text/numbers/filled bars/background panels. Six long EMPTY ornamental health-bar frames in exactly six horizontal rows, aligned narrow slots, unobstructed interiors, strong silhouette detailed painted pixel-metal engravings, patina/rivets/bevels restrained jewels. Row1 Recaudador brass/gunmetal hydraulic claws/cog teeth/cyan core. Row2 Caldera black copper furnace horns/vents/amber. Row3 Coro blue-silver harpoon fins/resonator sea-green enamel. Row4 Prefecto ivory antique gold sword-wing tips/formal laurel. Row5 Madre pallid silver thorns/neural filigree/crimson crystals crown endcaps. Row6 Portador finer low-profile platinum/brass braid/cyan clasp, no big spikes. Original designs, no copying games. Transparent gutters/padding.",
+  "input": "references/ornate_kit.png",
+  "specification": "996x88 boss frame; 400x42 player frame; scale 0.5. Transparent aperture and cap registration in layout.json.",
+  "record": "Generation specification; source PNG retained unchanged."
+}

@@ -14,6 +14,7 @@ Ejecutar desde la raíz del proyecto. Godot no importa esta carpeta.
 ```powershell
 python tools/art/build_illustrated_combat.py --help
 python tools/art/build_unit_sprites.py --help
+python tools/art/build_environment_art.py --help
 python tools/art/live_combat_board.py --help
 ./tools/maintenance/validate.ps1 -GodotPath "RUTA/Godot_console.exe"
 ./tools/maintenance/clean_generated.ps1
@@ -24,3 +25,5 @@ Los generadores de arte necesitan LibreSprite; `--libresprite` permite indicar s
 Las integraciones externas solo son necesarias al generar recursos nuevos. El juego y sus pruebas funcionan sin conexión a esas cuentas. `pixellab_mcp.py` utiliza la configuración local del usuario; no se deben copiar credenciales al repositorio.
 
 La validación acepta `-Suite boss_hud_test` para una prueba concreta y `-ImportOnly` para comprobar la importación. También reconoce `GODOT_BIN` o un ejecutable Godot disponible en `PATH`. No usa las partidas del jugador.
+
+`build_environment_art.py` monta doce fuentes ASE (fondos y marcos) mediante el script nativo `libresprite_environment.js`. Guarda intermedios en `build/art-depth/` y protege las ediciones manuales mediante SHA-256. Consulta [Fondos en capas](../docs/art/FONDOS_EN_CAPAS.md).

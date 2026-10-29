@@ -14,6 +14,6 @@ briefing = "Evita rejillas calientes y salvas de escoria. Ataca durante la purga
 day_duration = 180.0
 wall_offset = 300.0
 turret_offset = 220.0
-background_path = "res://assets/world/backgrounds/foundry.png"
+background_path = "res://assets/world/backgrounds/layers/foundry.png"
 accent = Color(1, 0.55, 0.22, 1)
 waves = Array[ExtResource("4")]([ExtResource("early"), ExtResource("2"), ExtResource("3")])

@@ -19,6 +19,9 @@
 
 ## Arte
 
+- [Fondos vivos, capas y marcos ornamentales](art/FONDOS_EN_CAPAS.md).
+
+
 - [Portador y jefes: diseño y pipeline vigente](art/ARTE_COMBATE_ILUSTRADO.md).
 - [Aliados y animaciones de enemigos](art/PERSONAJES_Y_ANIMACIONES.md).
 - [Novela visual y retratos](art/NOVELA_VISUAL_Y_COHERENCIA.md).

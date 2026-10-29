@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dnx4gang80m7a"
-path="res://.godot/imported/flooded.png-044da4164a115e34b4f9f8b637e4a3a8.ctex"
+uid="uid://b1eyjlk5t1yak"
+path="res://.godot/imported/madre.png-12dafe8b25a09d3052e3cb8ef4a0a254.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/world/backgrounds/flooded.png"
-dest_files=["res://.godot/imported/flooded.png-044da4164a115e34b4f9f8b637e4a3a8.ctex"]
+source_file="res://assets/ui/frames/madre.png"
+dest_files=["res://.godot/imported/madre.png-12dafe8b25a09d3052e3cb8ef4a0a254.ctex"]
 
 [params]
 

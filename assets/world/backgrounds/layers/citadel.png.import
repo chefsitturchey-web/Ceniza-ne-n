@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bdxgwrr3nwsb4"
-path="res://.godot/imported/periphery_alive_v2.png-e15cb23057c4649f728aadffe0107a48.ctex"
+uid="uid://ql1n185d8svs"
+path="res://.godot/imported/citadel.png-719192f706a3ab00c3e3c89c8aea0c7d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/world/backgrounds/periphery_alive_v2.png"
-dest_files=["res://.godot/imported/periphery_alive_v2.png-e15cb23057c4649f728aadffe0107a48.ctex"]
+source_file="res://assets/world/backgrounds/layers/citadel.png"
+dest_files=["res://.godot/imported/citadel.png-719192f706a3ab00c3e3c89c8aea0c7d.ctex"]
 
 [params]
 

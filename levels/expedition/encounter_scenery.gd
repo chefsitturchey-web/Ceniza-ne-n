@@ -5,8 +5,11 @@ var arena: RecaudadorArena
 var elapsed: float = 0
 var redraw_time: float = 0
 var equipment: Array[Sprite2D] = []
+var backdrop: Texture2D
 
 func _ready() -> void:
+	texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	backdrop = load(arena.zone.background_path) as Texture2D
 	if arena.zone_index == 0: return
 	for side: int in [-1, 1]:
 		for row: int in range(2):
@@ -26,14 +29,29 @@ func _process(delta: float) -> void:
 		queue_redraw()
 
 func _draw() -> void:
-	if arena.zone_index == 0: return
 	var center: Vector2 = Vector2(320, 240)
 	var boundary: PackedVector2Array = ArenaLayout.boundary(arena.zone_index)
 	var tint: Color = [Color("8299a8"), Color("e89e54"), Color("47dacb"), Color("ffce75"), Color("47dacb")][arena.zone_index]
 	for index: int in range(boundary.size()):
+		if arena.zone_index == 0: continue # DepotArenaVisual already paints its water and rail yard.
 		var a: Vector2 = boundary[index]
 		var b: Vector2 = boundary[(index + 1) % boundary.size()]
-		draw_colored_polygon(PackedVector2Array([a, b, center + (b - center) * 4, center + (a - center) * 4]), Color("07131d"))
+		var outside: PackedVector2Array = [a, b, center + (b - center) * 4, center + (a - center) * 4]
+		# These textured polygons are strictly outside the walkable platform.
+		draw_colored_polygon(outside, Color("07131d"))
+		var far_uv: PackedVector2Array = []
+		var near_uv: PackedVector2Array = []
+		for at: Vector2 in outside:
+			far_uv.append(at / Vector2(920, 620) + Vector2(0.15, 0.15))
+			near_uv.append(at / Vector2(720, 520) + Vector2(0.2, 0.10))
+		draw_polygon(outside, PackedColorArray([Color(tint, 0.18)]), far_uv, DistrictDepth.SKYLINE)
+		if backdrop != null: draw_polygon(outside, PackedColorArray([Color(tint, 0.38)]), near_uv, backdrop)
+	for index: int in 28:
+		if not GamePreferences.current().particles: break
+		var at: Vector2 = Vector2(fposmod(index * 79.0 + elapsed * (4 + index % 3), 880) - 120, fposmod(index * 71.0 - elapsed * 7, 680) - 100)
+		if not Geometry2D.is_point_in_polygon(at, boundary):
+			draw_line(at, at + Vector2(1, 2), Color(tint, 0.25), 1)
+	if arena.zone_index == 0: return
 	for ring: int in range(8):
 		var polygon: PackedVector2Array = []
 		for at: Vector2 in boundary: polygon.append(center + (at - center) * (1.02 + ring * 0.035))

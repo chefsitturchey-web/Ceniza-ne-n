@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://id0cpw2gx0ho"
-path="res://.godot/imported/network.png-75b0be6c9979098d25b3bcf225a35d6d.ctex"
+uid="uid://c7vbjrotm8v08"
+path="res://.godot/imported/coro.png-17988329e47dfdd09fc36a748d66e9bb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/world/backgrounds/network.png"
-dest_files=["res://.godot/imported/network.png-75b0be6c9979098d25b3bcf225a35d6d.ctex"]
+source_file="res://assets/ui/frames/coro.png"
+dest_files=["res://.godot/imported/coro.png-17988329e47dfdd09fc36a748d66e9bb.ctex"]
 
 [params]
 

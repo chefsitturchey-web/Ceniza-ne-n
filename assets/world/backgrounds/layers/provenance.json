@@ -1,0 +1,33 @@
+{
+  "tool": "LibreSprite",
+  "raster_inputs": "OpenAI image_gen: original ornamental atlas, distant skyline and four transparent architecture edits; existing periphery artwork.",
+  "sources_sha256": {
+    "assets/ui/frames/sources/recaudador.ase": "eaa8826f3be682b52a84f01514e8ec4ddd3fd1fb5f1572bed417cf8aaabedb2c",
+    "assets/ui/frames/sources/caldera.ase": "dcc21d658084ff4c9b9d4337f93436bbfd072730e6d3294c3f30475549014202",
+    "assets/ui/frames/sources/coro.ase": "9da73ac9ab47c4115f6c77c824f9b9771571a417284142af40a3b7e2bfe76ad5",
+    "assets/ui/frames/sources/prefecto.ase": "4d93f166a57fbc2abf4a5a372e492daebc351bdd5103cc71f65f4de7f934f5a3",
+    "assets/ui/frames/sources/madre.ase": "1456e826bc60276e4c8d013fb833a3408acdd6f072218eabb8a5fdc64466508d",
+    "assets/ui/frames/sources/portador.ase": "e12c73418f9e03411e751c6e2c46a863ea6695ea1ba2f8af6ca3d80aae626218",
+    "assets/world/backgrounds/sources/periphery_alive_v2.ase": "f47cc18e093130adfd2d6028ad38775d7be7d25b811cac6a8f235a46a4197356",
+    "assets/world/backgrounds/sources/foundry.ase": "b245b5d318268de37054591fa249a62d3eb4a07a7d347ccd283844ca1bb8dd0f",
+    "assets/world/backgrounds/sources/flooded.ase": "1dcb0b6ee53cb5a633fcbfb75c9e61ed8cd0e45322212b499aa4a22181f9852a",
+    "assets/world/backgrounds/sources/citadel.ase": "aa9fa70fcf6a94004a1c4e99fc5b74bbb32eb7866ed60b6d6015aa2161521e62",
+    "assets/world/backgrounds/sources/network.ase": "975829dba307cb15b33cb92b58db1c31d6c6b25746db9fe38dc03e6d1f133437",
+    "assets/world/backgrounds/sources/far_skyline.ase": "4242491137ba6319d30b22874e7416b23030996067c8729e46cd4a11637bf143"
+  },
+  "processing": "Native RGBA masks, registered frame apertures, alpha plate sampling and ASE/PNG export.",
+  "inputs": [
+    "assets/ui/frames/references/ornate_kit.png",
+    "assets/ui/frames/references/ornate_kit.png",
+    "assets/ui/frames/references/ornate_kit.png",
+    "assets/ui/frames/references/ornate_kit.png",
+    "assets/ui/frames/references/ornate_kit.png",
+    "assets/ui/frames/references/ornate_kit.png",
+    "assets/world/backgrounds/references/periphery_alive_v2.png",
+    "assets/world/backgrounds/references/foundry_plate.png",
+    "assets/world/backgrounds/references/flooded_plate.png",
+    "assets/world/backgrounds/references/citadel_plate.png",
+    "assets/world/backgrounds/references/network_plate.png",
+    "assets/world/backgrounds/references/far_skyline.png"
+  ]
+}

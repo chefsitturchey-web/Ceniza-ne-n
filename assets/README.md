@@ -6,11 +6,11 @@
 | `characters/units/` | Atlas de las nueve profesiones y unidades aliadas, con sus fuentes ASE |
 | `characters/enemies/` | Secuencias usadas por los enemigos de colonia |
 | `characters/portraits/` | Retratos manga de la novela visual |
-| `world/backgrounds/` | Los cinco fondos actuales de distrito |
+| `world/backgrounds/` | `layers/`: cinco arquitecturas transparentes y horizonte; `sources/`: ASE; `references/`: pinturas de entrada |
 | `world/structures/` | Núcleo, edificios, murallas, torretas y suelo |
 | `world/props/` | Objetos del escenario lateral |
 | `world/expedition/` | Tren, estación, repetidores y piezas de las arenas |
-| `ui/` | Iconos y arte de menú |
+| `ui/` | Iconos, arte de menú y `frames/`: seis marcos ornamentales de vida |
 | `fonts/` | Fuentes y sus licencias |
 | `audio/` | Música, efectos, configuración de bucle y licencias |
 

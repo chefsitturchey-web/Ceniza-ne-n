@@ -1,7 +1,7 @@
 class_name DepotArenaVisual
 extends Node2D
 const FLOOR: Texture2D = preload("res://assets/world/expedition/arena/floor.png")
-const CANAL: Texture2D = preload("res://assets/world/backgrounds/periphery_alive_v2.png")
+const CANAL: Texture2D = preload("res://assets/world/backgrounds/layers/periphery_alive_v2.png")
 var elapsed: float = 0
 var redraw_clock: float = 0
 

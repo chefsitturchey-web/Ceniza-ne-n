@@ -14,6 +14,6 @@ briefing = "Rodea su escudo. Esquiva estocadas y barridos; ataca durante la recu
 day_duration = 180.0
 wall_offset = 320.0
 turret_offset = 230.0
-background_path = "res://assets/world/backgrounds/citadel.png"
+background_path = "res://assets/world/backgrounds/layers/citadel.png"
 accent = Color(0.95, 0.76, 0.42, 1)
 waves = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4")])
