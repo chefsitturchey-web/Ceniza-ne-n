@@ -6,13 +6,14 @@ const WORLD_BARS_ENABLED: bool = false
 
 var base_tint: Color = Color.WHITE
 var rig: MachineRig
+var field_rig: FieldUnitVisual
 
 func bind(value: AnimatedSprite2D) -> void:
 	super.bind(value)
 	if sprite != null:
 		base_tint = sprite.modulate
 	if actor.data.id in [&"artillero", &"saboteador"]:
-		var field_rig: FieldUnitVisual = FieldUnitVisual.new()
+		field_rig = FieldUnitVisual.new()
 		field_rig.actor = actor
 		field_rig.role = String(actor.data.id)
 		actor.add_child(field_rig)

@@ -105,7 +105,7 @@ func take_damage(amount: int) -> void:
 			visual.play_visual(&"destruccion")
 			death_remaining = visual.animation_duration(&"destruccion") + DEATH_VISUAL_GRACE
 		elif data.id in [&"artillero", &"saboteador"]:
-			death_remaining = 0.7
+			death_remaining = 1.2
 		else:
 			queue_free()
 		visual.queue_redraw()

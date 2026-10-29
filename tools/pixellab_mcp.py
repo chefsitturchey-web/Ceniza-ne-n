@@ -42,10 +42,11 @@ def main():
     destination = Path(sys.argv[2])
     destination.parent.mkdir(parents=True, exist_ok=True)
     for index, request in enumerate(requests):
-        response = call('tools/call', {'name': request['name'], 'arguments': request.get('arguments', {})}, index + 2)
+        response = call(request.get('method', 'tools/call'), request.get('params',
+                        {'name': request.get('name', ''), 'arguments': request.get('arguments', {})}), index + 2)
         results.append({'request': request, 'response': response})
         destination.write_text(json.dumps(results), encoding='utf-8')
-        print(request['name'], flush=True)
+        print(request.get('name', request.get('method', 'request')), flush=True)
         for block in response.get('result', {}).get('content', []):
             if block.get('type') == 'text':
                 print(block['text'][:1800], flush=True)

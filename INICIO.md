@@ -6,6 +6,8 @@ La historia se presenta con retratos manga a color, conversaciones y fundidos. *
 
 ## Controles
 
+Para revisar las animaciones de aliados y profesiones, abre `levels/story/unit_animation_preview.tscn` y pulsa **F6**. [Guía de personajes y archivos de LibreSprite](docs/PERSONAJES_Y_ANIMACIONES.md).
+
 | Acción | Teclado | Mando Xbox |
 |---|---|---|
 | Mover | A/D o flechas | Stick izquierdo / cruceta |

@@ -1,14 +1,26 @@
 class_name WorkerVisual
-extends EntityVisual
+extends PersonVisual
 
 var actor: ColonyWorker
-var effects: DebrisEmitter = DebrisEmitter.new()
 var walking: bool = false
 var working: bool = false
 var elapsed: float = 0.0
 var work_timer: float = 0.0
+var last_x: float = 0
+var fleeing: bool = false
+
+func bind(value: AnimatedSprite2D) -> void:
+	setup_person(String(actor.role), value)
+	last_x = actor.x
+
+func refresh_state() -> void:
+	update_person(0, 1 if walking else 0, working, -1 if sprite.flip_h else 1, false, false, actor.cargo > 0, fleeing)
 
 func _process(delta: float) -> void:
+	if sprite == null: return
+	var distance: float = absf(actor.x - last_x)
+	last_x = actor.x
+	update_person(delta, distance, working, -1 if sprite.flip_h else 1, false, false, actor.cargo > 0, fleeing)
 	elapsed += delta
 	work_timer -= delta
 	if working and work_timer <= 0:
@@ -23,12 +35,6 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	if sprite != null:
-		if actor.cargo > 0:
-			draw_set_transform(Vector2(0, roundf(sin(elapsed * 10)) if walking else 0))
-			draw_rect(Rect2(-5, -42, 10, 8), Color("0b1322"))
-			draw_rect(Rect2(-4, -41, 8, 6), Color("8299a8"))
-			draw_line(Vector2(-3, -39), Vector2(3, -39), Color("b075ae"), 2)
-			draw_line(Vector2(0, -41), Vector2(0, -35), Color("304356"), 1)
 		return
 	draw_rect(Rect2(-5, -19, 10, 19), Color("b075ae"))
 	if actor.cargo > 0:

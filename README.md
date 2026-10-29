@@ -184,6 +184,7 @@ godot --headless --path . --script res://tests/run_all.gd
 - [Arquitectura y señales](docs/ARQUITECTURA.md)
 - [Guía de arte y paleta](docs/GUIA_ARTE.md)
 - [Novela visual manga y coherencia de estructuras](docs/NOVELA_VISUAL_Y_COHERENCIA.md)
+- [Personajes animados y edición en LibreSprite](docs/PERSONAJES_Y_ANIMACIONES.md)
 - [Guía de la versión actual](INICIO.md)
 - [Revisión, mejoras neuronales, audio y recursos pendientes](docs/REVISION_Y_AUDIO.md)
 - [Menú ilustrado y opciones persistentes](docs/MENU_Y_OPCIONES.md)

@@ -10,6 +10,7 @@ var district: Node2D
 var tools: Array[int] = [0, 0, 0, 0, 0, 0]
 var camp_stock: Array[int] = [2, 2]
 var villagers: Array[Dictionary] = []
+var people: Array[PersonVisual] = []
 var walls: Array[ConstructionSite] = []
 var gates: Array[EnemyRepeater] = []
 var elapsed: float = 0
@@ -191,6 +192,14 @@ func tick(delta: float) -> void:
 		for index: int in range(2): camp_stock[index] = mini(2, camp_stock[index] + 1)
 	for index: int in range(villagers.size() - 1, -1, -1):
 		var citizen: Dictionary = villagers[index]
+		var recovery: float = float(citizen.get("recover", 0))
+		if recovery > 0:
+			citizen.recover = maxf(0, recovery - delta)
+			if citizen.recover == 0: citizen.rise = 0.56
+			continue
+		if float(citizen.get("rise", 0)) > 0:
+			citizen.rise = maxf(0, float(citizen.rise) - delta)
+			continue
 		var destination: float = citizen.side * maxf(40, frontier(citizen.side) - 60) if district.cycle.phase != "DÍA" else 0
 		var role_index: int = -1
 		if district.cycle.phase == "DÍA":
@@ -201,7 +210,28 @@ func tick(delta: float) -> void:
 					break
 		citizen.x = move_toward(citizen.x, destination, delta * 65)
 		if role_index >= 0 and absf(citizen.x - destination) < 12: assign(index, role_index)
+	sync_people(delta)
 	queue_redraw()
+
+func sync_people(delta: float) -> void:
+	while people.size() > villagers.size(): people.pop_back().queue_free()
+	while people.size() < villagers.size():
+		var person: PersonVisual = PersonVisual.new()
+		add_child(person)
+		person.setup_person("civilian")
+		person.position = Vector2(villagers[people.size()].x, GameRules.FLOOR_Y)
+		people.append(person)
+	for index: int in range(villagers.size()):
+		var person: PersonVisual = people[index]
+		var citizen: Dictionary = villagers[index]
+		var displacement: float = float(citizen.x) - person.position.x
+		person.position = Vector2(citizen.x, GameRules.FLOOR_Y)
+		person.visible = float(citizen.get("recover", 0)) <= 0
+		if float(citizen.get("rise", 0)) > 0:
+			person.choose(&"levantarse")
+		else:
+			var direction: float = signf(displacement) if absf(displacement) > 0.01 else (-1 if person.sprite.flip_h else 1)
+			person.update_person(delta, absf(displacement), false, direction, false, false, false, district.cycle.phase != "DÍA")
 
 func role_ready(index: int) -> bool:
 	if index < 2: return true
@@ -256,6 +286,7 @@ static func valid(data: Variant, gate_count: int) -> bool:
 	if not data.get("villagers") is Array or data.villagers.size() > data.capacity: return false
 	for citizen: Variant in data.villagers:
 		if not citizen is Dictionary or not ExpansionSystem.number(citizen.get("x"), -1600, 1600) or not ExpansionSystem.number(citizen.get("side"), -1, 1, true) or absf(float(citizen.side)) != 1: return false
+		if not ExpansionSystem.number(citizen.get("recover", 0), 0, 1.5) or not ExpansionSystem.number(citizen.get("rise", 0), 0, 1): return false
 	if not data.get("gates") is Array or data.gates.size() != gate_count: return false
 	for flag: Variant in data.gates:
 		if not flag is bool: return false
@@ -286,7 +317,3 @@ func _draw() -> void:
 	var refuge: Rect2 = ArtScale.source(GameArt.CIVIC, 1)
 	ArtScale.footing(self, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)))
 	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)), refuge)
-	for citizen: Dictionary in villagers:
-		var region: Rect2 = ArtScale.source(GameArt.UNITS, 4)
-		var bounce: float = minf(0, roundf(sin(elapsed * 8 + float(citizen.x))))
-		draw_texture_rect_region(GameArt.UNITS, ArtScale.grounded(region, 34, Vector2(float(citizen.x), GameRules.FLOOR_Y + bounce)), region)

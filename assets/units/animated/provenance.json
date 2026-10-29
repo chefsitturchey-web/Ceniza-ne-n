@@ -1,0 +1,28 @@
+{
+  "character": {
+    "id": "bbe26193-5852-471a-a749-aa0138e7b1c9",
+    "name": "Idle",
+    "prompt": "CENIZA NEON original post-apocalyptic industrial pixel art character. Side scroller eye-level view, full body visible from helmet to boots, human adult proportions, clear readable silhouette, detailed hand placed pixel clusters, one pixel dark outline, muted charcoal steel rust copper colors, cyan and amber accents only for allied equipment, matching gritty pixel art Portador and Kingdom-like side view. hooded sharpshooter in weathered charcoal coat, light steel shoulder plates, cyan monocular visor, compact rifle held across chest, ammunition belt, dark leather boots, narrow athletic adult proportions",
+    "size": {
+      "width": 48,
+      "height": 48
+    },
+    "template_id": "mannequin",
+    "directions": 8,
+    "view": "side",
+    "created_at": "2026-10-29T00:11:37.676519+00:00"
+  },
+  "pipeline": "Native PixelLab pose clips; outfit pixel edits and two-layer ASE documents rendered by tools/libresprite_units.js inside LibreSprite; full-frame PNG sheets exported by LibreSprite.",
+  "roles": [
+    "ranger",
+    "guardian",
+    "technician",
+    "medic",
+    "builder",
+    "collector",
+    "civilian",
+    "artillero",
+    "saboteador"
+  ],
+  "frames_per_role": 72
+}

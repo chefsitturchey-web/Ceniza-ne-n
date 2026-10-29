@@ -17,7 +17,6 @@ var role: StringName:
 func _ready() -> void:
 	visual = WorkerVisual.new()
 	visual.actor = self
-	add_child(visual.effects)
 	add_child(visual)
 	visual.bind(get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D)
 	visual.play_visual(&"reposo")
@@ -28,5 +27,7 @@ func update_visual(previous_x: float, working: bool) -> void:
 	visual.working = working and not moving
 	if moving:
 		visual.face(x < previous_x)
-	visual.play_visual(&"caminar" if moving else (&"reparar" if working else &"reposo"))
+	var colony: ColonySystem = get_parent() as ColonySystem
+	visual.fleeing = colony != null and colony.unsafe_at(previous_x)
+	visual.refresh_state()
 	visual.queue_redraw()

@@ -20,9 +20,10 @@ func _ready() -> void:
 	add_child(visual)
 
 func take_damage(amount: int) -> void:
-	if hp <= 0: return
+	if hp <= 0 or amount <= 0: return
 	if role == "guardian": amount = maxi(1, ceili(amount * 0.35))
 	hp = maxi(0, hp - maxi(0, amount))
+	if hp > 0 and visual != null: visual.pulse_hurt()
 	queue_redraw()
 	if hp == 0:
 		remove_from_group(GameRules.ALLIES)
@@ -33,7 +34,7 @@ func demobilize() -> void:
 	dismissed = true
 	home.staffed = home.staff_count() > 0
 	if home.expansion.district.civic != null:
-		home.expansion.district.civic.villagers.append({"x": position.x, "side": signf(home.position.x)})
+		home.expansion.district.civic.villagers.append({"x": position.x, "side": signf(home.position.x), "recover": 1.25})
 		home.expansion.district.presenter.show_notice("Unidad desarmada: necesita una nueva herramienta")
 
 func tick(delta: float) -> void:
@@ -136,5 +137,5 @@ func restore(data: Dictionary) -> void:
 	if hp <= 0: remove_from_group(GameRules.ALLIES)
 
 func _draw() -> void:
-	if shot > 0 and hp > 0:
-		draw_line(Vector2(facing * 14, -24), to_local(beam_to), Color("47dacb") if role == "medic" else Color("ffce75"), 1)
+	if shot > 0 and hp > 0 and role != "guardian":
+		draw_line(Vector2(facing * (22 if role == "ranger" else 12), -20), to_local(beam_to), Color("47dacb") if role in ["medic", "technician"] else Color("ffce75"), 1)

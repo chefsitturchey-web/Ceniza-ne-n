@@ -43,7 +43,7 @@ func run_checks() -> void:
 	runner._physics_process(3.0)
 	verify(runner.is_queued_for_deletion(), "Cadáver se elimina aunque no avance el renderizador")
 	var builder: ColonyWorker = world.colony.workers[0]
-	verify(builder.visual.sprite != null and builder.visual.sprite.sprite_frames.get_animation_names().size() == 5, "Constructor instancia cinco animaciones")
+	verify(builder.visual.sprite != null and builder.visual.sprite.sprite_frames == UnitSpriteLibrary.frames("builder"), "Constructor instancia sus secuencias completas de LibreSprite")
 	verify(builder.visual.sprite.animation == &"reposo", "Constructor comienza en reposo")
 	world.interaction.perform_interaction(0)
 	world.colony.update_workers(0.1)
@@ -54,7 +54,7 @@ func run_checks() -> void:
 	for step: int in range(50):
 		world.colony.update_workers(0.1)
 	verify(world.construction.sites[0].hp == 240, "Animación no cambia la duración de obra")
-	verify(builder.visual.sprite.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST and builder.visual.sprite.position == Vector2(0, -21), "Anclaje y filtro del constructor")
+	verify(builder.visual.sprite.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST and builder.visual.sprite.position == UnitSpriteLibrary.OFFSET, "Anclaje y filtro del constructor")
 	verify(world.colony.workers[1].visual is EntityVisual and world.player.visual is EntityVisual, "Interfaz visual común para provisionales")
 	world.player.invulnerable = 0.0
 	world.player.take_damage(1000)
