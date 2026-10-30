@@ -2,8 +2,10 @@ class_name ResourceBank
 extends Node
 
 signal changed(scrap: int, used: int, capacity: int)
+signal parts_changed(parts: int)
 @export var scrap: int = GameRules.INITIAL_SCRAP
 @export var energy_capacity: int = GameRules.ENERGY_CAPACITY
+var parts: int = 0
 var sites: Array[ConstructionSite] = []
 var expansion: ExpansionSystem
 
@@ -25,4 +27,15 @@ func spend(amount: int) -> bool:
 	if scrap < amount:
 		return false
 	deposit(-amount)
+	return true
+
+func add_parts(amount: int) -> void:
+	parts += amount
+	parts_changed.emit(parts)
+
+func spend_parts(amount: int) -> bool:
+	if parts < amount:
+		return false
+	parts -= amount
+	parts_changed.emit(parts)
 	return true

@@ -6,8 +6,13 @@ const MAX_HEALTH: int = 100
 const MAX_STAMINA: float = 100.0
 const STAMINA_REGEN: float = 22.0
 const DODGE_COST: float = 30.0
+const COLONY_DODGE_COST: float = 20.0
+const DODGE_COOLDOWN: float = 3.0
 const DODGE_SPEED: float = 420.0
 const DODGE_DURATION: float = 0.22
+## Correr: multiplica la velocidad de caminar mientras se mantiene "sprint".
+const SPRINT_MULTIPLIER: float = 1.5
+const SPRINT_COST: float = 5.0
 const HIT_INVULNERABILITY: float = 0.6
 const RESPAWN_INVULNERABILITY: float = 2.0
 const RESPAWN_DURATION: float = 4.0
@@ -26,6 +31,8 @@ var visual: PlayerVisual = PlayerVisual.new()
 
 ## Combate manual y esquiva. Los ajustes del Inspector se conservan.
 @export var speed: float = 150.0
+# Preserve the shared arena speed; slower walking applies only to this controller.
+const COLONY_MOVEMENT_FACTOR: float = 100.0 / 220.0
 var terrain_speed_factor: float = 1.0
 var travel_speed_factor: float = 1.0
 var mobility: MobilitySystem
@@ -47,6 +54,7 @@ var health: int:
 var stamina: float = MAX_STAMINA
 var invulnerable: float = 0.0
 var dodge_remaining: float = 0.0
+var dodge_cooldown_remaining: float = 0.0
 var dodge_direction: float = 1.0
 var respawn_remaining: float = 0.0
 var enabled: bool = true
@@ -57,6 +65,8 @@ var modules: ModuleSystem
 var step_timer: float = 0.0
 @export var native_combat_art: bool = true
 var combat_visual: CombatFlipbook
+var poison_dps: float = 0.0
+var _poison_accum: float = 0.0
 
 func _ready() -> void:
 	health_component.maximum = MAX_HEALTH
@@ -116,7 +126,8 @@ func _physics_process(delta: float) -> void:
 	slash_remaining = maxf(0.0, slash_remaining - delta)
 	attack_anim_remaining = maxf(0.0, attack_anim_remaining - delta)
 	invulnerable = maxf(0.0, invulnerable - delta)
-	stamina = minf(MAX_STAMINA, stamina + (STAMINA_REGEN + neural_regen) * delta)
+	dodge_cooldown_remaining = maxf(0.0, dodge_cooldown_remaining - delta)
+	_apply_poison(delta)
 	if respawn_remaining > 0.0:
 		respawn_remaining = maxf(0.0, respawn_remaining - delta)
 		if respawn_remaining == 0.0:
@@ -128,6 +139,11 @@ func _physics_process(delta: float) -> void:
 	var direction: float = Input.get_axis("move_left", "move_right")
 	var was_grounded: bool = is_on_floor()
 	var previous_speed: float = velocity.x
+	var sprinting: bool = InputMap.has_action("sprint") and Input.is_action_pressed("sprint") and stamina > 0.0 and absf(direction) > MOVE_THRESHOLD and dodge_remaining <= 0.0 and not riding
+	if sprinting:
+		stamina = maxf(0.0, stamina - SPRINT_COST * delta)
+	else:
+		stamina = minf(MAX_STAMINA, stamina + (STAMINA_REGEN + neural_regen) * delta)
 	if dodge_remaining <= 0.0 and absf(direction) > MOVE_THRESHOLD:
 		facing = signf(direction)
 	if Input.is_action_just_pressed("dodge"):
@@ -136,7 +152,10 @@ func _physics_process(delta: float) -> void:
 		dodge_remaining = maxf(0.0, dodge_remaining - delta)
 		velocity.x = dodge_direction * DODGE_SPEED
 	else:
-		velocity.x = move_toward(velocity.x, direction * speed * terrain_speed_factor * travel_speed_factor, acceleration * delta)
+		var move_speed: float = speed * COLONY_MOVEMENT_FACTOR * terrain_speed_factor * travel_speed_factor
+		if sprinting:
+			move_speed *= SPRINT_MULTIPLIER
+		velocity.x = move_toward(velocity.x, direction * move_speed, acceleration * delta)
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	move_and_slide()
@@ -150,9 +169,10 @@ func _physics_process(delta: float) -> void:
 	refresh_state()
 
 func dodge() -> void:
-	if not enabled or health <= 0 or stamina < DODGE_COST or dodge_remaining > 0.0:
+	if not enabled or health <= 0 or stamina < COLONY_DODGE_COST or dodge_remaining > 0.0 or dodge_cooldown_remaining > 0.0:
 		return
-	stamina -= DODGE_COST
+	stamina -= COLONY_DODGE_COST
+	dodge_cooldown_remaining = DODGE_COOLDOWN
 	dodge_direction = facing
 	dodge_remaining = DODGE_DURATION
 	invulnerable = maxf(invulnerable, DODGE_DURATION)
@@ -168,6 +188,30 @@ func take_damage(amount: int) -> void:
 		velocity = Vector2.ZERO
 		dodge_remaining = 0.0
 	refresh_state()
+
+func set_poison(dps: float) -> void:
+	poison_dps = maxf(0.0, dps)
+	_update_poison_tint()
+
+func _apply_poison(delta: float) -> void:
+	if poison_dps <= 0.0 or health <= 0:
+		return
+	_poison_accum += poison_dps * delta
+	var ticks: int = floori(_poison_accum)
+	if ticks <= 0:
+		return
+	_poison_accum -= float(ticks)
+	health_component.take_damage(ticks)
+	if health <= 0:
+		respawn_remaining = RESPAWN_DURATION
+		velocity = Vector2.ZERO
+		dodge_remaining = 0.0
+
+func _update_poison_tint() -> void:
+	if combat_visual != null:
+		combat_visual.modulate = Color(0.62, 1.0, 0.62) if poison_dps > 0.0 else Color.WHITE
+	if visual != null and visual.sprite != null:
+		visual.sprite.modulate = Color(0.62, 1.0, 0.62, 1.0) if poison_dps > 0.0 else Color.WHITE
 
 func attack() -> void:
 	if not combat_enabled: return

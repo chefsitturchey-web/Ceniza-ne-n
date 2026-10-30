@@ -30,13 +30,19 @@ func simulate() -> void:
 				next_order += 1
 				if next_order == world.construction.sites.size():
 					order_time = step * 0.1
-					if world.bank.scrap != 0:
-						push_error("Las cuatro obras iniciales deben pagar su coste real de 90 chatarra")
+					# El colector puede ingresar chatarra mientras el jugador recorre los
+					# cimientos, así que el saldo no tiene por qué quedar en 0. Lo que se
+					# verifica es que las cuatro obras cuesten 90 y se hayan pagado (order_site).
+					var total_cost: int = 0
+					for built: ConstructionSite in world.construction.sites:
+						total_cost += built.cost
+					if total_cost != 90 or world.bank.scrap < 0:
+						push_error("Las cuatro obras iniciales deben costar y pagar 90 chatarra reales")
 						world.free()
 						quit(1)
 						return
 			else:
-				player.position.x = move_toward(player.position.x, site.x, player.speed * player.terrain_speed_factor * 0.1)
+				player.position.x = move_toward(player.position.x, site.x, player.speed * Player.COLONY_MOVEMENT_FACTOR * player.terrain_speed_factor * 0.1)
 				if absf(player.position.x - site.x) < 22:
 					Input.action_press("interact")
 		elif player.health <= 0:
@@ -54,7 +60,7 @@ func simulate() -> void:
 					target = enemy
 			if target != null:
 				player.facing = signf(target.position.x - player.position.x)
-				player.position.x = move_toward(player.position.x, target.position.x - player.facing * 30, player.speed * player.terrain_speed_factor * 0.1)
+				player.position.x = move_toward(player.position.x, target.position.x - player.facing * 30, player.speed * Player.COLONY_MOVEMENT_FACTOR * player.terrain_speed_factor * 0.1)
 				player.attack()
 				if (world.overload.cooldown_left if player.position.x < 0 else world.overload.cooldown_right) == 0:
 					world.overload.activate_overload()
@@ -62,7 +68,7 @@ func simulate() -> void:
 				for index: int in range(world.construction.sites.size()):
 					var site: ConstructionSite = world.construction.sites[index]
 					if site.hp < site.max_hp and not site.ordered:
-						player.position.x = move_toward(player.position.x, site.x, player.speed * player.terrain_speed_factor * 0.1)
+						player.position.x = move_toward(player.position.x, site.x, player.speed * Player.COLONY_MOVEMENT_FACTOR * player.terrain_speed_factor * 0.1)
 						if absf(player.position.x - site.x) < 22:
 							Input.action_press("interact")
 						break

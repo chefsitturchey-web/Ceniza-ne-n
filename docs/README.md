@@ -10,6 +10,7 @@
 
 ## Mecánicas
 
+- [Invasión: piezas, taller, plagas y compatibilidad con jefes](gameplay/INTEGRACION_INVASION.md).
 - [Construcción, niveles y movilidad](gameplay/ESCALA_NIVELES_Y_MOVILIDAD.md).
 - [Comandante, unidades y portales](gameplay/COMANDANTE_Y_PORTALES.md).
 - [Trabajadores, profesiones y depósito](gameplay/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).

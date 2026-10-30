@@ -144,7 +144,12 @@ func run_checks() -> void:
 	var site: ConstructionSite = world.construction.sites[0]
 	var anchor: Vector2 = site.get_global_transform_with_canvas() * Vector2(0, -site.visual_height())
 	verify(is_equal_approx(hud.context_row.position.y, clampf(anchor.y - 24, 50, 280)), "Rótulo anclado sobre objeto en pantalla")
-	world.player.position.x = 900
+	# Loot positions vary; select a genuinely empty point instead of a fixed x.
+	for candidate: int in range(-1500, 1501, 10):
+		if world.interaction.target_at_x(candidate) == GameRules.NO_TARGET:
+			world.player.position.x = candidate
+			break
+	verify(world.interaction.interaction_target() == GameRules.NO_TARGET, "Existe un punto sin interacción para comprobar el HUD")
 	world.presenter.publish()
 	verify_hud_text(hud)
 	verify(not hud.context_row.visible, "Sin objeto cercano no hay rótulo")

@@ -31,6 +31,11 @@ var experience: ExperienceSystem
 var civic: CivicSystem
 var story: StoryDirector
 var mobility: MobilitySystem
+var corpse_system: CorpseSystem
+var scavenge: ScavengeSystem
+var trap_system: TrapSystem
+var pest_system: PestSystem
+var workshop: WorkshopSystem
 
 func _ready() -> void:
 	player.combat_enabled = false
@@ -183,6 +188,38 @@ func _ready() -> void:
 	mobility.setup(self)
 	add_child(mobility)
 	interaction.mobility = mobility
+	corpse_system = CorpseSystem.new()
+	corpse_system.setup(cycle, player, director)
+	corpse_system.colony = colony
+	add_child(corpse_system)
+	corpse_system.notice_requested.connect(presenter.show_notice)
+	colony.notice_requested.connect(presenter.show_notice)
+	colony.corpse_system = corpse_system
+	interaction.corpse_system = corpse_system
+	session.corpse_system = corpse_system
+	scavenge = ScavengeSystem.new()
+	scavenge.setup(zone, bank)
+	add_child(scavenge)
+	interaction.scavenge = scavenge
+	scavenge.notice_requested.connect(presenter.show_notice)
+	trap_system = TrapSystem.new()
+	trap_system.setup(bank)
+	add_child(trap_system)
+	trap_system.notice_requested.connect(presenter.show_notice)
+	interaction.trap_system = trap_system
+	workshop = WorkshopSystem.new()
+	workshop.setup(bank, trap_system)
+	add_child(workshop)
+	workshop.notice_requested.connect(presenter.show_notice)
+	interaction.workshop = workshop
+	corpse_system.workshop = workshop
+	pest_system = PestSystem.new()
+	pest_system.setup(corpse_system, construction, trap_system)
+	add_child(pest_system)
+	pest_system.notice_requested.connect(presenter.show_notice)
+	session.pest_system = pest_system
+	session.trap_system = trap_system
+	scavenge.fit_targets(interaction)
 	for portal: EnemyRepeater in civic.gates + expedition.repeaters:
 		portal.defense_requested.connect(civic.defend_portal)
 	var arriving: bool = not CampaignRoute.pending.is_empty()

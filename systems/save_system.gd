@@ -58,18 +58,18 @@ func _snapshot() -> Dictionary:
 	var structures: Array = []
 	for site: ConstructionSite in session.bank.sites:
 		structures.append({"kind": String(site.kind), "x": site.x, "hp": site.hp,
-			"ordered": site.ordered, "progress": site.progress, "shot": site.shot, "tier": site.tier, "upgrade": site.upgrade_pending, "powered": site.powered})
+			"ordered": site.ordered, "progress": site.progress, "shot": site.shot, "tier": site.tier, "upgrade": site.upgrade_pending, "powered": site.powered, "shorted": site.shorted})
 	var workers: Array = []
 	for worker: ColonyWorker in session.colony.workers:
 		workers.append({"role": String(worker.role), "side": worker.side, "x": worker.x,
-			"job": worker.job, "external_job": worker.external_job, "gather": worker.gather, "cargo": worker.cargo})
+			"job": worker.job, "external_job": worker.external_job, "gather": worker.gather, "cargo": worker.cargo, "hp": worker.hp, "damage_accum": worker.damage_accum, "wander_target": worker.wander_target, "wander_timer": worker.wander_timer})
 	var player: Dictionary = _fields(session.player, PLAYER_FIELDS)
 	player["x"] = session.player.position.x
 	player["y"] = session.player.position.y
 	player["velocity_x"] = session.player.velocity.x
 	player["velocity_y"] = session.player.velocity.y
 	return {"version": 1, "day": session.cycle.day, "phase": session.cycle.phase, "campaign": session.campaign.duplicate(true),
-		"scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
+		"invasion": InvasionState.snapshot(session), "scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
 		"expansion": session.expansion.snapshot() if session.expansion != null else {},
 		"civic": session.civic.snapshot() if session.civic != null else {},
 		"story": session.interaction.story.snapshot() if session.interaction.story != null else {},
@@ -146,6 +146,7 @@ func load_game() -> bool:
 		site.health_component.maximum = site.data.health * site.tier
 		site.upgrade_pending = data.structures[index].get("upgrade", false)
 		site.powered = data.structures[index].get("powered", true)
+		site.shorted = data.structures[index].get("shorted", false)
 		for field: String in ["hp", "ordered", "progress", "shot"]:
 			site.set(field, data.structures[index][field])
 		site.queue_redraw()
@@ -156,6 +157,10 @@ func load_game() -> bool:
 		session.colony.add_worker(StringName(saved.role))
 		var worker: ColonyWorker = session.colony.workers.back()
 		worker.external_job = int(saved.get("external_job", -1))
+		worker.health_component.reset(int(saved.get("hp", GameRules.WORKER_HEALTH)))
+		worker.damage_accum = saved.get("damage_accum", 0.0)
+		worker.wander_target = saved.get("wander_target", saved.x)
+		worker.wander_timer = saved.get("wander_timer", 0.0)
 		for field: String in ["side", "x", "job", "gather", "cargo"]:
 			worker.set(field, saved[field])
 	for field: String in PLAYER_FIELDS:
@@ -163,6 +168,7 @@ func load_game() -> bool:
 	session.player.position = Vector2(data.player.x, data.player.y)
 	session.player.velocity = Vector2(data.player.velocity_x, data.player.velocity_y)
 	session.player.refresh_state()
+	InvasionState.restore(session, data.get("invasion", {}))
 	_apply(session.overload, data.overload)
 	session.overload.tick(0.0)
 	session.defenses.drone_timer = data.drone_timer
@@ -225,6 +231,7 @@ func _valid(value: Variant) -> bool:
 	for field: String in ["scrap", "energy_capacity"]:
 		if not _number(data, field, 0, 2147483647, true):
 			return false
+	if not InvasionState.valid(data.get("invasion", {}), session, int(data.day)): return false
 	if not _number(data, "drone_timer", 0, GameRules.DRONE_INTERVAL):
 		return false
 	if not data.get("player") is Dictionary or not data.get("overload") is Dictionary:
@@ -249,16 +256,22 @@ func _valid(value: Variant) -> bool:
 		if entry.get("kind") != String(site.kind) or not _number(entry, "x", site.x, site.x) or not entry.get("ordered") is bool:
 			return false
 		var tier: Variant = entry.get("tier", 1)
-		if not entry.get("powered", true) is bool: return false
+		if not entry.get("powered", true) is bool or not entry.get("shorted", false) is bool: return false
+		if entry.get("shorted", false) and entry.get("powered", true): return false
 		if not ExpansionSystem.number(tier, 1, 3, true) or int(tier) > ColonyCore.saved_tier(data) or not entry.get("upgrade", false) is bool: return false
 		if not _number(entry, "hp", 0, site.data.health * tier, true) or not _number(entry, "progress", 0, GameRules.BUILD_TIME) or not _number(entry, "shot", 0, maxf(site.data.interval, site.data.overloaded_interval)):
 			return false
-	if not data.get("workers") is Array or data.workers.size() < GameRules.INITIAL_POPULATION or data.workers.size() > 20:
+	if not data.get("workers") is Array or data.workers.size() < (0 if data.has("invasion") else GameRules.INITIAL_POPULATION) or data.workers.size() > 20:
 		return false
 	var jobs: Array[int] = []
 	for entry: Variant in data.workers:
 		if not entry is Dictionary or entry.get("role") not in ["builder", "collector"]:
 			return false
+		for field: String in ["hp", "damage_accum", "wander_target", "wander_timer"]:
+			if not entry.has(field): continue
+			var low: float = 1.0 if field == "hp" else (-1000000.0 if field in ["wander_target", "wander_timer"] else 0.0)
+			var high: float = GameRules.WORKER_HEALTH if field == "hp" else (1.0 if field == "damage_accum" else 1000000.0)
+			if not _number(entry, field, low, high, field == "hp"): return false
 		var worker_data: WorkerData = session.colony.builder_data if entry.role == "builder" else session.colony.collector_data
 		if not ExpansionSystem.number(entry.get("external_job", -1), -1, 13, true): return false
 		if not _number(entry, "side", -1, 1) or absf(entry.side) != 1 or not _number(entry, "x", -1000000, 1000000):

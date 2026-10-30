@@ -15,6 +15,7 @@ Para revisar las animaciones de aliados y profesiones, abre `levels/story/unit_a
 | Acción | Teclado | Mando Xbox |
 |---|---|---|
 | Mover | A/D o flechas | Stick izquierdo / cruceta |
+| Correr (gasta estamina) | Mantener Shift | Cruceta abajo |
 | Construir, reclutar, comprar herramientas, operar | Mantener E | Mantener Y |
 | Asaltar el frente donde estás / retirar tropas | F | Cruceta arriba |
 | Esquivar | Espacio | A |
@@ -30,6 +31,8 @@ En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora,
 En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y trayectoria; observa los avisos y sus ventanas de recuperación. **E** cerca de las consolas cian activa carga, refrigeración, interferencia o parapeto, según el recinto. En Madre Cero, E repara relés y Q los protege. Los refuerzos pueden recibir daño de tu hoja y módulos. [Los cinco jefes, mecanismos y escenas para probar con F6](docs/gameplay/JEFES_TACTICAS_Y_ARENAS.md).
 
 ## Primeros pasos
+
+**Mecánicas de invasión:** Shift permite correr en la colonia. Mantén E junto a restos industriales para obtener piezas y chatarra; el taller izquierdo fabrica pala y trampas. Los trabajadores pueden morir: reporta sus restos con E para que un constructor con pala los entierre. [Reglas y pruebas](docs/gameplay/INTEGRACION_INVASION.md).
 
 1. Empiezas con 90 de chatarra, un constructor y un recuperador. Mantén E en los cuatro cimientos centrales: dos murallas de 20 y dos torretas de 25. El constructor debe caminar y ejecutar las obras.
 2. Explora los suministros y construye un generador a izquierda o derecha, a 360 del núcleo. Añade cuarteles para alojar tropas. El generador amplía la capacidad energética; no produce una moneda consumible.

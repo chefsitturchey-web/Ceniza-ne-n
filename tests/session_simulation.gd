@@ -39,7 +39,7 @@ func simulate() -> void:
 				if target != null:
 					player.facing = signf(target.position.x - player.position.x)
 					if absf(target.position.x - player.position.x) > 32:
-						player.position.x = move_toward(player.position.x, target.position.x, player.speed * 0.1)
+						player.position.x = move_toward(player.position.x, target.position.x, player.speed * Player.COLONY_MOVEMENT_FACTOR * 0.1)
 					player.attack()
 					if (world.overload.cooldown_left if player.position.x < 0 else world.overload.cooldown_right) == 0:
 						world.overload.activate_overload()

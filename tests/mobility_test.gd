@@ -33,7 +33,7 @@ func run_checks() -> void:
 	Input.action_press("move_right")
 	for step: int in range(6): world.player._physics_process(0.1)
 	Input.action_release("move_right")
-	verify(world.player.velocity.x > world.player.speed and world.player.visual.sprite.animation == &"reposo", "El pasajero avanza sobre la plataforma sin correr encima")
+	verify(world.player.velocity.x > world.player.speed * Player.COLONY_MOVEMENT_FACTOR and world.player.visual.sprite.animation == &"reposo", "El pasajero supera la marcha de colonia sin correr encima")
 	ride.tick(10)
 	verify(is_equal_approx(ride.charge, 60), "Moverse consume batería según el tiempo")
 	ride.charge = 0.1

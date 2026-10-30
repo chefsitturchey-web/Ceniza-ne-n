@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
-  <img alt="Pruebas: 41 suites" src="https://img.shields.io/badge/tests-41%20suites-47dacb">
+  <img alt="Pruebas: 42 suites" src="https://img.shields.io/badge/tests-42%20suites-47dacb">
 </p>
 
 <p align="center">
@@ -28,6 +28,8 @@
 ---
 
 ## El juego
+
+**Invasi?n integrada:** piezas recuperables, pala, trampas, plagas y bajas de trabajadores con guardado. El combate y arte de los jefes conservan sus avances. [Reglas y compatibilidad](docs/gameplay/INTEGRACION_INVASION.md).
 
 Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y final](docs/design/HISTORIA_Y_CAMPANA.md). En la colonia el Portador dirige y sus tropas combaten; J funciona en arenas. Las cuatro horas siguen siendo una meta pendiente de ampliar y medir.
 
@@ -157,6 +159,7 @@ La guía detallada de esta versión está en [INICIO.md](INICIO.md).
 | Acción | Teclado | Mando |
 |---|---|---|
 | Moverse | A / D (W / S en la arena) | Stick izquierdo / cruceta |
+| Correr (gasta estamina) | Mantener Shift | Cruceta abajo |
 | Atacar en arenas de jefe | J | X / Cuadrado |
 | Esquivar | Espacio | A / Cruz |
 | Construir, reparar, reclutar, viajar | Mantener E | Mantener Y / Triángulo |
@@ -213,7 +216,7 @@ godot --headless --path . --editor --import --quit
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta **41 suites**, incluyendo tácticas de los cinco jefes, personajes, novela visual, fortificaciones, movilidad, campaña, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
+`run_all.gd` ejecuta **42 suites**, incluyendo tácticas de los cinco jefes, personajes, novela visual, fortificaciones, movilidad, campaña, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
 
 En Windows, el comando recomendado importa el proyecto, usa un perfil aislado y guarda todos los registros en `build/validation/latest/`:
 

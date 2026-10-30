@@ -1,9 +1,15 @@
-[gd_resource type="Resource" script_class="ZoneData" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="ZoneData" load_steps=12 format=3]
 [ext_resource type="Script" path="res://data/zone_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/waves/night_2.tres" id="2"]
 [ext_resource type="Resource" path="res://data/waves/night_3.tres" id="3"]
 [ext_resource type="Script" path="res://data/wave_data.gd" id="4"]
 [ext_resource type="Resource" path="res://data/waves/night_1.tres" id="early"]
+[ext_resource type="Script" path="res://data/prop_data.gd" id="prop_script"]
+[ext_resource type="Resource" path="res://data/props/antenna.tres" id="antenna"]
+[ext_resource type="Resource" path="res://data/props/crate.tres" id="crate"]
+[ext_resource type="Resource" path="res://data/props/battery.tres" id="battery"]
+[ext_resource type="Resource" path="res://data/props/spool.tres" id="spool"]
+[ext_resource type="Resource" path="res://data/props/car.tres" id="car"]
 [resource]
 script = ExtResource("1")
 id = "foundry"
@@ -17,3 +23,5 @@ turret_offset = 220.0
 background_path = "res://assets/world/backgrounds/layers/foundry.png"
 accent = Color(1, 0.55, 0.22, 1)
 waves = Array[ExtResource("4")]([ExtResource("early"), ExtResource("2"), ExtResource("3")])
+prop_spots = Array[Vector2]([Vector2(-1350, 260), Vector2(-1050, 260), Vector2(-600, 260), Vector2(660, 260), Vector2(950, 260)])
+props = Array[ExtResource("prop_script")]([ExtResource("antenna"), ExtResource("crate"), ExtResource("battery"), ExtResource("spool"), ExtResource("car")])

@@ -4,6 +4,7 @@ extends RefCounted
 const REPEATERS: StringName = &"repeaters"
 const ENEMIES: StringName = &"enemies"
 const ALLIES: StringName = &"allies"
+const PESTS: StringName = &"pests"
 const MAP_HALF_WIDTH: float = 1600.0
 const WORLD_LAYER: int = 1
 const FLOOR_Y: float = 260.0
@@ -17,6 +18,10 @@ const BUILD_ARRIVAL_DISTANCE: float = 2.0
 const GATHER_ARRIVAL_DISTANCE: float = 1.0
 const COLLECTOR_OUTSIDE_THRESHOLD: float = 100.0
 const UNSAFE_RANGE: float = 110.0
+## Daño real a trabajadores: corta distancia, distinto del radio de huida.
+const WORKER_DANGER_RANGE: float = 40.0
+const WORKER_HEALTH: int = 60
+const WORKER_DANGER_DPS: float = 12.0
 const OVERLOAD_DURATION: float = 6.0
 const OVERLOAD_COOLDOWN: float = 24.0
 const OVERLOAD_WORK_RATE: float = 2.0

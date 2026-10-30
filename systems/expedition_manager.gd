@@ -43,6 +43,13 @@ func can_travel() -> bool:
 func start() -> bool:
 	if not can_travel():
 		return false
+	# Permanent colony casualties must not produce an invalid campaign handoff.
+	var roles: Array[StringName] = []
+	for worker: ColonyWorker in district.colony.workers:
+		roles.append(worker.role)
+	if &"builder" not in roles or &"collector" not in roles:
+		district.presenter.show_notice("Recluta un constructor y un recolector antes de partir")
+		return false
 	if district.session.save_system != null:
 		district.session.save_system.save_game()
 	active = true

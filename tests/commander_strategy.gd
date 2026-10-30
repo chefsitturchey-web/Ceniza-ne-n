@@ -20,7 +20,7 @@ func tick(world: District, delta: float) -> bool:
 			index += 1
 			return true
 		x = site.position.x
-	world.player.position.x = move_toward(world.player.position.x, x, world.player.speed * delta)
+	world.player.position.x = move_toward(world.player.position.x, x, world.player.speed * Player.COLONY_MOVEMENT_FACTOR * delta)
 	if absf(world.player.position.x - x) < 12:
 		if target == -1:
 			if not world.core.ordered: world.core.request_upgrade()

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PropData" format=3]
+
+[ext_resource type="Script" path="res://data/prop_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"crate"
+label = "Caja"
+charges = 3
+parts_per_charge = 2
+scrap_per_charge = 3
+size = Vector2(18, 16)
+fill = Color(0.44, 0.33, 0.26, 1)

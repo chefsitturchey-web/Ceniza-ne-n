@@ -107,7 +107,7 @@ func run_checks() -> void:
 	verify(world.civic.interact(-340), "Se paga muralla exterior")
 	world.cycle.phase = "NOCHE"
 	work(15)
-	verify(world.civic.walls[0].hp == 0 and world.civic.walls[0].progress == 0, "Obra exterior desprotegida espera hasta el día")
+	verify(world.civic.walls[0].hp > 0 or world.civic.walls[0].progress > 0, "La obra exterior avanza de noche si no hay enemigos cerca")
 	world.cycle.phase = "DÍA"
 	work(25)
 	var wall: ConstructionSite = world.civic.walls[0]

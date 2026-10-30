@@ -100,11 +100,26 @@ func publish() -> void:
 	var text: String = "%s %d" % [cycle.phase, cycle.day]
 	var context: String = ""
 	var context_cost: int = -1
-	var context_progress: float = interaction.hold_time / GameRules.INTERACT_HOLD
+	var context_progress: float = interaction.hold_time / interaction.required_hold(interaction.interaction_target())
 	var context_key: bool = true
 	var context_screen: Vector2 = Vector2.ZERO
 	var target: int = interaction.interaction_target()
-	if target <= -400 and interaction.story != null:
+	if target <= -800 and interaction.corpse_system != null:
+		var detail: Dictionary = interaction.corpse_system.describe(target)
+		context = detail.text
+		context_cost = detail.cost
+		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -55)
+	elif target <= -700 and interaction.workshop != null:
+		var detail: Dictionary = interaction.workshop.describe(target)
+		context = detail.text
+		context_cost = detail.cost
+		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -55)
+	elif target <= -500 and interaction.scavenge != null:
+		var detail: Dictionary = interaction.scavenge.describe(target)
+		context = detail.text
+		context_cost = detail.cost
+		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -55)
+	elif target <= -400 and interaction.story != null:
 		var detail: Dictionary = interaction.story.describe(target)
 		context = detail.text
 		context_cost = detail.cost
@@ -199,9 +214,11 @@ func publish() -> void:
 		"offscreen_left": offscreen_left, "offscreen_right": offscreen_right,
 		"phase": cycle.phase, "day": cycle.day, "nights": cycle.config.nights,
 		"seconds": ceili(cycle.phase_remaining), "scrap": bank.scrap,
+		"parts": bank.parts,
 		"energy": bank.energy_used(), "capacity": bank.available_capacity(),
 		"population": session.civic.population() if session.civic != null else colony.workers.size(), "population_max": session.civic.capacity if session.civic != null else GameRules.POPULATION,
 		"health": player.health, "stamina": int(player.stamina), "core": core.health, "core_max": core.health_component.maximum,
 		"left": left_count, "right": right_count,
-		"overload_left": overload.overload_status(true), "overload_right": overload.overload_status(false)
+		"overload_left": overload.overload_status(true), "overload_right": overload.overload_status(false),
+		"poisoned": player.poison_dps > 0.0
 	})

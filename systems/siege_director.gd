@@ -30,6 +30,9 @@ func tick(delta: float) -> void:
 		spawn_remaining = wave.cadence
 
 func is_cleared() -> bool:
+	# Sin asedio iniciado aún (día previo a la primera noche) no hay enemigos: zona despejada.
+	if wave == null:
+		return true
 	return spawn_count >= wave.enemies.size() and get_tree().get_nodes_in_group(GameRules.ENEMIES).is_empty()
 
 func spawn_enemy(side: float, data: EnemyData, number: int = 1, elite: bool = false) -> SiegeEnemy:
@@ -47,5 +50,8 @@ func spawn_enemy(side: float, data: EnemyData, number: int = 1, elite: bool = fa
 	enemy.position = Vector2(side * minf(GameRules.MAP_HALF_WIDTH - 25, distance), GameRules.FLOOR_Y)
 	if session.civic != null: enemy.position.x = session.civic.entrance(side)
 	add_child(enemy)
+	# Balance only this colony instance; arena resources remain unchanged.
+	if String(data.id) in ["corredor", "saboteador", "saltador"]:
+		enemy.speed = {"corredor": 90.0, "saboteador": 85.0, "saltador": 80.0}[String(data.id)]
 	spawned.emit(enemy, side)
 	return enemy

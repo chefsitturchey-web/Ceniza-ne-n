@@ -123,10 +123,11 @@ func describe(target: int) -> Dictionary:
 	return {"text": "Reclutar superviviente · %d disponibles" % camp_stock[-300 - target], "cost": 5}
 
 func interact(target: int) -> bool:
-	if district.cycle.phase != "DÍA" and not (target <= -320 and target > -326):
-		district.presenter.show_notice("Organiza la colonia durante el día")
-		return false
+	var day: bool = district.cycle.phase == "DÍA"
 	if target == -360:
+		if not day:
+			district.presenter.show_notice("Organiza la colonia durante el día")
+			return false
 		if capacity >= 20:
 			if district.colony.workers.size() <= GameRules.INITIAL_POPULATION: return false
 			var worker: ColonyWorker = district.colony.workers.pop_back()
@@ -155,6 +156,9 @@ func interact(target: int) -> bool:
 		var blocked: String = employment_block(index)
 		district.presenter.show_notice(NAMES[index] + (": " + blocked if not blocked.is_empty() else " preparado: un superviviente irá a recogerlo"))
 	elif target in [-300, -301]:
+		if not day:
+			district.presenter.show_notice("Organiza la colonia durante el día")
+			return false
 		var index: int = -300 - target
 		if camp_stock[index] <= 0 or population() >= capacity or not district.bank.spend(5): return false
 		camp_stock[index] -= 1
@@ -378,6 +382,10 @@ func _draw() -> void:
 		var unlocked: bool = district.core.tier >= int(FortressRules.ROLES[ROLES[index]])
 		draw_texture_rect(GameArt.icon(ids[index]), Rect2(x - 9, 229, 18, 18), false, Color.WHITE if tools[index] > 0 else (Color("8299a8") if unlocked else Color("304356")))
 		for item: int in range(tools[index]): draw_rect(Rect2(x - 8 + item * 5, 254, 3, 2), Color("ffce75"))
+	# Pala y trampa: mismas estanterías, fabricadas en el taller (interacción propia).
+	var shovel_ready: bool = district.workshop != null and district.workshop.shovel_ready
+	draw_texture_rect(GameArt.icon("wrench"), Rect2(-495 - 9, 229, 18, 18), false, Color.WHITE if shovel_ready else Color("8299a8"))
+	draw_texture_rect(GameArt.icon("scrap"), Rect2(-465 - 9, 229, 18, 18), false, Color("8299a8"))
 	var refuge: Rect2 = ArtScale.source(GameArt.CIVIC, 1)
 	ArtScale.footing(self, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)))
 	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)), refuge)
