@@ -30,6 +30,8 @@ const CUES: Dictionary = {
 	"dialogue": preload("res://assets/audio/sfx/8bit/voz/dialogue.wav")
 }
 const VOICES: int = 12
+## Segundo desde el que entra el tema de derrota.
+const DEFEAT_START: float = 4.0
 var district: Node2D
 var voices: Array[AudioStreamPlayer] = []
 var music: Array[AudioStreamPlayer] = []
@@ -135,6 +137,10 @@ func play_outcome(victory: bool) -> void:
 	outcome.stream = MusicLibrary.VICTORY if victory else MusicLibrary.DEFEAT
 	outcome.volume_db = -8.0
 	outcome.play()
+	if not victory:
+		# La derrota arranca pasados los primeros segundos, que son casi silencio.
+		var start: float = minf(DEFEAT_START, maxf(0.0, outcome.stream.get_length() - 0.2))
+		outcome.seek(start)
 
 func _process(delta: float) -> void:
 	elapsed += delta
