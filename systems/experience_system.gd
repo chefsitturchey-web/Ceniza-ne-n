@@ -96,6 +96,7 @@ func tick(delta: float) -> void:
 					district.modules.cores += 1
 				else: gain(int(item.amount))
 				drops.remove_at(index)
+				district.play("pickup")
 	if present_choices and district.player.health > 0 and not panel.opened and (pending > 0 or chest_pending > 0) and not get_tree().paused and not district.session.finished:
 		panel.open_choices(chest_pending > 0)
 	queue_redraw()

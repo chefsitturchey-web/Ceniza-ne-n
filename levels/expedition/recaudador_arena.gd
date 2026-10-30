@@ -108,10 +108,13 @@ func _ready() -> void:
 	world.add_child(modules)
 	player.slash.connect(strike)
 	player.damaged.connect(on_damage)
-	player.died.connect(func() -> void: finish(false))
+	player.died.connect(func() -> void:
+		sound.play_cue("player_death")
+		finish(false))
 	boss.died.connect(func() -> void: finish(true))
 	boss.fired.connect(spawn_bullet)
 	boss.phase_changed.connect(func(number: int) -> void:
+		sound.play_cue("boss_phase")
 		phase_notice_time = 1.8
 		phase_notice.text = "SEGUNDA FASE" if number == 2 else "PRIMERA FASE")
 	camera.position_smoothing_enabled = true

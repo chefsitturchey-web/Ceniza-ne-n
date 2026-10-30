@@ -21,6 +21,7 @@ func setup(world: District) -> void:
 
 func _repeater_destroyed() -> void:
 	district.presenter.show_notice("Repetidor destruido")
+	district.play("portal_destroyed")
 	if all_destroyed():
 		station.unlocked = true
 		# Deja visible el aviso del segundo repetidor antes del aviso del tren.

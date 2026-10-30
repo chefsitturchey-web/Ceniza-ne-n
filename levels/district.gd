@@ -190,6 +190,8 @@ func _ready() -> void:
 	sound.district = self
 	add_child(sound)
 	session.finished_changed.connect(func(victory: bool) -> void: sound.play_outcome(victory))
+	player.health_component.died.connect(func() -> void: sound.play_cue("player_death"))
+	player.respawned.connect(func() -> void: sound.play_cue("respawn"))
 	presenter.publish()
 	if GamePreferences.current().briefing_requested or arriving:
 		GamePreferences.current().briefing_requested = false
@@ -199,6 +201,10 @@ func _ready() -> void:
 		add_child(briefing)
 		session.briefing = briefing
 		briefing.open_panel()
+
+## Atajo para que los sistemas de colonia pidan un efecto sin conocer el mezclador.
+func play(id: String, gain_db: float = 0.0) -> void:
+	sound.play_cue(id, gain_db)
 
 func _connect_neural(enemy: SiegeEnemy, _side: float) -> void:
 	enemy.reward_requested.connect(func(reward: int) -> void:

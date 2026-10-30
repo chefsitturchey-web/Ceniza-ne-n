@@ -68,6 +68,7 @@ func take_damage(amount: int) -> void:
 	health_component.take_damage(amount)
 
 func complete_work() -> void:
+	var repairing: bool = not upgrade_pending and health_component.current > 0
 	if upgrade_pending:
 		tier = mini(3, tier + 1)
 		health_component.maximum = data.health * tier
@@ -76,6 +77,8 @@ func complete_work() -> void:
 	health_component.reset()
 	ordered = false
 	progress = 0.0
+	if core != null and core.district != null:
+		core.district.play("repair" if repairing else "build_done")
 
 func _on_destroyed() -> void:
 	upgrade_pending = false

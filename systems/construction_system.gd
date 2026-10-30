@@ -14,6 +14,11 @@ func defensive_sites() -> Array[ConstructionSite]:
 	result.append_array(external_sites)
 	return result
 
+## Efecto de colonia sin acoplar el sistema al mezclador.
+func _cue(id: String) -> void:
+	if core != null and core.district != null:
+		core.district.play(id)
+
 func create_sites() -> void:
 	for side: float in [-1.0, 1.0]:
 		for data: StructureData in blueprints:
@@ -36,27 +41,32 @@ func order_site(site: ConstructionSite) -> bool:
 	var upgrade: bool = site.hp == site.max_hp and site.tier < 3
 	if upgrade and core != null and site.tier >= core.tier:
 		notice_requested.emit("Necesitas núcleo Nv.%d para mejorar esta defensa" % (site.tier + 1))
+		_cue("denied")
 		return false
 	if site.ordered or (site.hp == site.max_hp and not upgrade):
 		return false
 	var cost: int = site.tier * 25 if upgrade else (site.cost if site.hp == 0 else site.data.repair_cost)
 	if bank.scrap < cost:
 		notice_requested.emit("Falta chatarra")
+		_cue("denied")
 		return false
 	if site.hp == 0 and site.data.energy > 0 and bank.energy_used() + site.data.energy > bank.available_capacity():
 		notice_requested.emit("Falta energía")
+		_cue("denied")
 		return false
 	bank.spend(cost)
 	site.ordered = true
 	site.upgrade_pending = upgrade
 	site.progress = 0.0
 	notice_requested.emit("Obra encargada")
+	_cue("build_order")
 	return true
 
 func toggle_power(site: ConstructionSite) -> bool:
 	if site.kind != &"turret" or site.hp <= 0 or site.ordered: return false
 	if not site.powered and bank.energy_used() + site.data.energy > bank.available_capacity():
 		notice_requested.emit("Falta energía para reactivar")
+		_cue("denied")
 		return false
 	site.powered = not site.powered
 	bank.changed.emit(bank.scrap, bank.energy_used(), bank.available_capacity())

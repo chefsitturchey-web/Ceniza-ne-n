@@ -41,6 +41,7 @@ func setup(world: Node2D) -> void:
 			add_child(gate)
 			gate.destroyed.connect(func() -> void:
 				district.presenter.show_notice("Brecha cerrada: nueva franja de expansión")
+				district.play("portal_destroyed")
 				district.experience.gain(15)
 				district.expedition._repeater_destroyed()
 				retaliation.append({"side": signf(gate.position.x), "time": 3.0}))

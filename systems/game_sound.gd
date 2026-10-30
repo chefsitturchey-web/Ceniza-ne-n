@@ -81,7 +81,7 @@ func _ready() -> void:
 	district.director.spawned.connect(_enemy_spawned)
 	district.neural.point_earned.connect(func() -> void: play_cue("upgrade"))
 	district.overload.notice_requested.connect(func(message: String) -> void:
-		if message == "Sobrecarga activa": play_cue("upgrade"))
+		if message == "Sobrecarga activa": play_cue("overload"))
 
 func _player_state(state: Player.State) -> void:
 	if state == Player.State.ATTACK:
