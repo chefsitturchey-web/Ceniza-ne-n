@@ -22,6 +22,7 @@ var facing: Vector2 = Vector2.DOWN
 var dodge_direction: Vector2 = Vector2.DOWN
 var invulnerable: float = 0.0
 var dodge_remaining: float = 0.0
+var dodge_cooldown_remaining: float = 0.0
 var cooldown: float = 0.0
 var slash_remaining: float = 0.0
 var attack_anim_remaining: float = 0.0
@@ -77,6 +78,7 @@ func _physics_process(delta: float) -> void:
 		return
 	elapsed += delta
 	invulnerable = maxf(0, invulnerable - delta)
+	dodge_cooldown_remaining = maxf(0, dodge_cooldown_remaining - delta)
 	cooldown = maxf(0, cooldown - delta)
 	slash_remaining = maxf(0, slash_remaining - delta)
 	attack_anim_remaining = maxf(0, attack_anim_remaining - delta)
@@ -106,9 +108,10 @@ func _physics_process(delta: float) -> void:
 	update_visual()
 
 func dodge() -> void:
-	if health <= 0 or stamina < Player.DODGE_COST or dodge_remaining > 0:
+	if health <= 0 or stamina < Player.DODGE_COST or dodge_remaining > 0 or dodge_cooldown_remaining > 0:
 		return
 	stamina -= Player.DODGE_COST
+	dodge_cooldown_remaining = Player.DODGE_COOLDOWN
 	dodge_direction = facing
 	dodge_remaining = Player.DODGE_DURATION
 	invulnerable = maxf(invulnerable, Player.DODGE_DURATION)

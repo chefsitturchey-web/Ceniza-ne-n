@@ -5,7 +5,8 @@ enum State { IDLE, MOVE, ATTACK, DODGE, DEAD }
 const MAX_HEALTH: int = 100
 const MAX_STAMINA: float = 100.0
 const STAMINA_REGEN: float = 22.0
-const DODGE_COST: float = 30.0
+const DODGE_COST: float = 20.0
+const DODGE_COOLDOWN: float = 3.0
 const DODGE_SPEED: float = 420.0
 const DODGE_DURATION: float = 0.22
 const HIT_INVULNERABILITY: float = 0.6
@@ -47,6 +48,7 @@ var health: int:
 var stamina: float = MAX_STAMINA
 var invulnerable: float = 0.0
 var dodge_remaining: float = 0.0
+var dodge_cooldown_remaining: float = 0.0
 var dodge_direction: float = 1.0
 var respawn_remaining: float = 0.0
 var enabled: bool = true
@@ -104,6 +106,7 @@ func _physics_process(delta: float) -> void:
 	slash_remaining = maxf(0.0, slash_remaining - delta)
 	attack_anim_remaining = maxf(0.0, attack_anim_remaining - delta)
 	invulnerable = maxf(0.0, invulnerable - delta)
+	dodge_cooldown_remaining = maxf(0.0, dodge_cooldown_remaining - delta)
 	stamina = minf(MAX_STAMINA, stamina + (STAMINA_REGEN + neural_regen) * delta)
 	_apply_poison(delta)
 	if respawn_remaining > 0.0:
@@ -139,9 +142,10 @@ func _physics_process(delta: float) -> void:
 	refresh_state()
 
 func dodge() -> void:
-	if not enabled or health <= 0 or stamina < DODGE_COST or dodge_remaining > 0.0:
+	if not enabled or health <= 0 or stamina < DODGE_COST or dodge_remaining > 0.0 or dodge_cooldown_remaining > 0.0:
 		return
 	stamina -= DODGE_COST
+	dodge_cooldown_remaining = DODGE_COOLDOWN
 	dodge_direction = facing
 	dodge_remaining = DODGE_DURATION
 	invulnerable = maxf(invulnerable, DODGE_DURATION)

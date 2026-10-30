@@ -48,7 +48,7 @@ func run_checks() -> void:
 	world.overload.activate_overload()
 	verify(world.overload.overload_left == 2.0, "sobrecarga respeta enfriamiento")
 	world.player.dodge()
-	verify(world.player.stamina == 70.0, "coste de esquiva")
+	verify(world.player.stamina == 80.0, "coste de esquiva")
 	world.player.take_damage(25)
 	verify(world.player.health == 100, "invulnerabilidad durante esquiva")
 	world.player.invulnerable = 0.0

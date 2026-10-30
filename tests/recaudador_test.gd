@@ -84,9 +84,10 @@ func run_checks() -> void:
 	player.stamina = 100
 	player.dodge()
 	player.take_damage(40)
-	verify(player.health == 100 and player.stamina == 70, "Esquiva cuesta 30 e impide dano")
+	verify(player.health == 100 and player.stamina == 80, "Esquiva cuesta 20 e impide dano")
 	player.dodge_remaining = 0
-	player.stamina = 29
+	player.dodge_cooldown_remaining = 0
+	player.stamina = 19
 	player.dodge()
 	verify(player.dodge_remaining == 0, "No esquiva sin resistencia")
 	player.invulnerable = 0
