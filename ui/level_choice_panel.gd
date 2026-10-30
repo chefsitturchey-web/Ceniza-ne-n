@@ -49,6 +49,7 @@ func open_choices(is_chest: bool) -> void:
 		button.custom_minimum_size = Vector2(540, 70)
 		button.add_theme_font_size_override("font_size", 12)
 		button.pressed.connect(select.bind(option))
+		UiSound.attach(button)
 		rows.add_child(button)
 	var hint: Label = Label.new()
 	hint.text = "Colonia: enlaces a tropas · Jefes: armas propias · 4 pasivas"

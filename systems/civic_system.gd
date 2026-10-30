@@ -46,6 +46,7 @@ func setup(world: Node2D) -> void:
 			add_child(gate)
 			gate.destroyed.connect(func() -> void:
 				district.presenter.show_notice("Brecha cerrada: nueva franja de expansión")
+				district.play("portal_destroyed")
 				district.experience.gain(15)
 				district.expedition._repeater_destroyed()
 				retaliation.append({"side": signf(gate.position.x), "time": 3.0}))
@@ -157,6 +158,7 @@ func interact(target: int) -> bool:
 			return false
 		if tools[index] >= 4 or not district.bank.spend(COSTS[index]): return false
 		tools[index] += 1
+		district.play("purchase")
 		var blocked: String = employment_block(index)
 		district.presenter.show_notice(NAMES[index] + (": " + blocked if not blocked.is_empty() else " preparado: un superviviente irá a recogerlo"))
 	elif target in [-300, -301]:
@@ -166,6 +168,7 @@ func interact(target: int) -> bool:
 		var index: int = -300 - target
 		if camp_stock[index] <= 0 or population() >= capacity or not district.bank.spend(5): return false
 		camp_stock[index] -= 1
+		district.play("recruit")
 		villagers.append({"x": -1340.0 if index == 0 else 1340.0, "side": -1.0 if index == 0 else 1.0})
 	else: return false
 	district.expansion.checkpoint()

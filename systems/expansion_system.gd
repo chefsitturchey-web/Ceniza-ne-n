@@ -42,6 +42,7 @@ func interact(target: int) -> bool:
 		looted[index] = true
 		district.bank.deposit(20)
 		district.presenter.show_notice("Suministros recuperados: +20 chatarra")
+		district.play("pickup")
 		checkpoint()
 		return true
 	if target > -100 or target <= -100 - sites.size(): return false
@@ -49,12 +50,14 @@ func interact(target: int) -> bool:
 	var required: int = FortressRules.BUILDINGS[site.spec.id]
 	if district.core.tier < required:
 		district.presenter.show_notice("%s necesita núcleo Nv.%d" % [site.spec.title, required])
+		district.play("denied")
 		return false
 	if district.frontier != null and district.frontier.blocked(site.position.x):
 		district.presenter.show_notice("Despeja primero los escombros de la parcela")
 		return false
 	if district.civic != null and not district.civic.safe_to_build(site.position.x):
 		district.presenter.show_notice("Destruye primero la brecha de esa franja")
+		district.play("denied")
 		return false
 	if site.ordered: return false
 	if site.hp >= site.MAX_HEALTH:
@@ -63,13 +66,16 @@ func interact(target: int) -> bool:
 	var cost: int = site.spec.cost if site.hp == 0 else 12
 	if site.hp == 0 and int(site.spec.energy) > 0 and district.bank.energy_used() + site.spec.energy > district.bank.available_capacity():
 		district.presenter.show_notice("Construye un generador: falta energía")
+		district.play("denied")
 		return false
 	if not district.bank.spend(cost):
 		district.presenter.show_notice("Necesitas %d chatarra" % cost)
+		district.play("denied")
 		return false
 	site.ordered = true
 	site.progress = 0
 	district.presenter.show_notice("Obra pagada: los constructores acudirán")
+	district.play("build_order")
 	checkpoint()
 	return true
 

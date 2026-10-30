@@ -24,6 +24,8 @@ const ATTACK_OFFSET: float = 8.0
 const ATTACK_HEIGHT: float = 30.0
 signal state_changed(state: State)
 signal stepped(origin: Vector2)
+## Se emite cuando el reenlace termina y el Portador vuelve a estar activo.
+signal respawned
 var state: State = State.IDLE
 var health_component: HealthComponent = HealthComponent.new()
 var hitbox: HitboxComponent = HitboxComponent.new()
@@ -134,6 +136,7 @@ func _physics_process(delta: float) -> void:
 			health = MAX_HEALTH
 			position = Vector2(0, GameRules.FLOOR_Y)
 			invulnerable = RESPAWN_INVULNERABILITY
+			respawned.emit()
 		refresh_state()
 		return
 	var direction: float = Input.get_axis("move_left", "move_right")

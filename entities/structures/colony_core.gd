@@ -40,18 +40,22 @@ func upgrade_blocker() -> String:
 func request_upgrade() -> bool:
 	var reason: String = upgrade_blocker()
 	if not reason.is_empty():
-		if district != null: district.presenter.show_notice(reason)
+		if district != null:
+			district.presenter.show_notice(reason)
+			district.play("denied")
 		return false
 	if district.bank.parts + district.bank.stored_parts < parts_cost():
 		district.presenter.show_notice("Necesitas %d piezas para el núcleo" % parts_cost())
 		return false
 	if not district.bank.spend(upgrade_cost()):
 		district.presenter.show_notice("Falta chatarra para mejorar el núcleo")
+		district.play("denied")
 		return false
 	district.bank.spend_parts(parts_cost())
 	ordered = true
 	progress = 0
 	district.presenter.show_notice("Núcleo encargado: espera a los constructores")
+	district.play("build_order")
 	return true
 
 func complete_work() -> void:
@@ -69,6 +73,7 @@ func complete_work() -> void:
 		district.story.queue_dialogue("foundation")
 	elif district != null:
 		district.presenter.show_notice("Núcleo Nv.2: defensas, apoyo y transporte" if tier == 2 else "Núcleo Nv.3: fortificaciones avanzadas")
+		district.play("build_done")
 	if district != null and district.session.save_system != null: district.session.save_system.save_game()
 
 func snapshot() -> Dictionary: return {"tier": tier, "ordered": ordered, "progress": progress}

@@ -37,6 +37,10 @@ func _ready() -> void:
 	add_child(journal)
 	novel = NovelPanel.new()
 	novel.finished.connect(_dialogue_finished)
+	novel.panel_opened.connect(func() -> void:
+		if district != null: district.sound.set_ducked(true))
+	novel.panel_closed.connect(func() -> void:
+		if district != null: district.sound.set_ducked(false))
 	add_child(novel)
 	hud = CanvasLayer.new()
 	hud.layer = 4
