@@ -314,6 +314,10 @@ func _draw() -> void:
 		var unlocked: bool = district.core.tier >= int(FortressRules.ROLES[ROLES[index]])
 		draw_texture_rect(GameArt.icon(ids[index]), Rect2(x - 9, 229, 18, 18), false, Color.WHITE if tools[index] > 0 else (Color("8299a8") if unlocked else Color("304356")))
 		for item: int in range(tools[index]): draw_rect(Rect2(x - 8 + item * 5, 254, 3, 2), Color("ffce75"))
+	# Pala y trampa: mismas estanterías, fabricadas en el taller (interacción propia).
+	var shovel_ready: bool = district.workshop != null and district.workshop.shovel_ready
+	draw_texture_rect(GameArt.icon("wrench"), Rect2(-495 - 9, 229, 18, 18), false, Color.WHITE if shovel_ready else Color("8299a8"))
+	draw_texture_rect(GameArt.icon("scrap"), Rect2(-465 - 9, 229, 18, 18), false, Color("8299a8"))
 	var refuge: Rect2 = ArtScale.source(GameArt.CIVIC, 1)
 	ArtScale.footing(self, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)))
 	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)), refuge)

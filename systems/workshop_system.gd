@@ -14,8 +14,8 @@ var trap_system: TrapSystem
 var shovel_ready: bool = false
 
 var recipes: Array[Dictionary] = [
-	{"id": "pala", "label": "Pala", "scrap": 4, "parts": 8, "spot": Vector2(60, 260)},
-	{"id": "trampa", "label": "Trampa", "scrap": 15, "parts": 6, "spot": Vector2(100, 260)},
+	{"id": "pala", "label": "Pala", "scrap": 4, "parts": 8, "spot": Vector2(-495, 260)},
+	{"id": "trampa", "label": "Trampa", "scrap": 15, "parts": 6, "spot": Vector2(-465, 260)},
 ]
 
 func setup(bank: ResourceBank, trap_system: TrapSystem) -> void:

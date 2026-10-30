@@ -213,12 +213,6 @@ func _ready() -> void:
 	workshop.notice_requested.connect(presenter.show_notice)
 	interaction.workshop = workshop
 	corpse_system.workshop = workshop
-	var workshop_visual: CubeBody = CubeBody.new()
-	workshop_visual.size = Vector2(20, 30)
-	workshop_visual.fill = Color(0.51, 0.6, 0.66)
-	workshop_visual.glyph = "W"
-	workshop_visual.position = Vector2(80, GameRules.FLOOR_Y)
-	workshop.add_child(workshop_visual)
 	pest_system = PestSystem.new()
 	pest_system.setup(corpse_system, construction, trap_system)
 	add_child(pest_system)
