@@ -23,7 +23,11 @@ $previousAppData = $env:APPDATA
 try {
     $env:APPDATA = $profileRoot
     $importOutput = Join-Path $outputRoot 'import-console.log'
+    # Windows PowerShell treats native stderr as a terminating error under Stop.
+    # Let Godot finish importing and record its complete diagnostics first.
+    $ErrorActionPreference = 'Continue'
     & $GodotPath --headless --path $projectRoot --editor --import --quit --log-file (Join-Path $outputRoot 'import.log') *> $importOutput
+    $ErrorActionPreference = 'Stop'
     if ($LASTEXITCODE -ne 0 -or (Select-String -LiteralPath $importOutput -Pattern 'SCRIPT ERROR:|Parse Error:' -Quiet)) {
         throw "Fallo de importacion. Revisa $importOutput"
     }
@@ -36,9 +40,11 @@ try {
         # A real renderer is needed for captures; keep the preview off the desktop.
         $suiteArguments = @('--path', $projectRoot, '--position', '20000,20000', '--script', $script, '--log-file', (Join-Path $outputRoot "$Suite.log"), '--', '--capture')
     }
+    $ErrorActionPreference = 'Continue'
     & $GodotPath @suiteArguments *> $consoleOutput
+    $ErrorActionPreference = 'Stop'
     Get-Content -LiteralPath $consoleOutput -Tail 5
-    if ($LASTEXITCODE -ne 0) { throw "Validacion fallida. Revisa $consoleOutput" }
+    if ($LASTEXITCODE -ne 0 -or (Select-String -LiteralPath $consoleOutput -Pattern 'SCRIPT ERROR:|Parse Error:' -Quiet)) { throw "Validacion fallida. Revisa $consoleOutput" }
     Write-Output "Registros centralizados: $outputRoot"
 } finally {
     $env:APPDATA = $previousAppData

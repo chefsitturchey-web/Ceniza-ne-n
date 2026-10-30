@@ -202,13 +202,26 @@ func build_geometry() -> void:
 		else:
 			texture = DepotArt.prop(0 if assets[index] == "pillar_top" else (3 if assets[index] == "crate_top" else 2))
 			extent = Vector2(34, 34) if assets[index] == "pillar_top" else Vector2(32, 28)
-		var body: StaticBody2D = wall(positions[index], extent)
-		body.reparent(actors)
+		var body: ArenaCover = ArenaCover.new()
+		body.position = positions[index]
+		body.extent = extent
+		body.maximum = 130 if assets[index] == "pillar_top" else 75
+		body.health = body.maximum
+		body.collision_layer = 1
+		body.collision_mask = 0
+		var collider: CollisionShape2D = CollisionShape2D.new()
+		var shape: RectangleShape2D = RectangleShape2D.new()
+		shape.size = extent
+		collider.shape = shape
+		body.add_child(collider)
 		body.name = "Cover%d" % index
 		var sprite: Sprite2D = Sprite2D.new()
 		sprite.texture = texture
 		sprite.scale = extent / texture.get_size()
 		body.add_child(sprite)
+		actors.add_child(body)
+		body.broken.connect(func() -> void:
+			if is_instance_valid(dynamics): dynamics.call_deferred("configure_paths"))
 
 func build_lighting() -> void:
 	var ambient: CanvasModulate = CanvasModulate.new()
@@ -302,10 +315,20 @@ func build_hud() -> void:
 	exit_button.text = "Volver a mi escena" if debug_practice else "Menú principal"
 	exit_button.pressed.connect(return_to_menu)
 	rows.add_child(exit_button)
+	var lore: Button = Button.new()
+	lore.text = "Leer presentación"
+	lore.pressed.connect(func() -> void: novel.play(VisualStory.scene(zone_index, "encounter"), true))
+	rows.add_child(lore)
+	if debug_practice:
+		var aftermath: Button = Button.new()
+		aftermath.text = "Leer desenlace"
+		aftermath.pressed.connect(func() -> void: novel.play(VisualStory.scene(zone_index, "ending"), true))
+		rows.add_child(aftermath)
 	pause_panel.hide()
 
 func _input(event: InputEvent) -> void:
 	if GamePreferences.current().debug_input_blocked(): return
+	if novel != null and (novel.opened or novel.closed_frame == Engine.get_process_frames()): return
 	if options.opened or options.closed_frame == Engine.get_process_frames():
 		return
 	if event.is_action_pressed("pause") and not event.is_echo() and not ending and not completed:

@@ -172,6 +172,8 @@ func _physics_process(delta: float) -> void:
 			if closest.distance_to(target.global_position) < 52:
 				target.take_damage(32, charge_direction * 310)
 			if hit != null:
+				var cover: ArenaCover = hit.get_collider() as ArenaCover
+				if cover != null: cover.receive_damage(90 if phase == 1 else 130)
 				stun()
 			elif timer <= 0:
 				finish_charge()

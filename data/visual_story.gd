@@ -3,7 +3,7 @@ extends RefCounted
 ## Guion de presentación: conserva el lore y lo reparte en intervenciones legibles.
 const SECTIONS: Array[String] = ["opening", "rescue", "relay", "convoy", "encounter", "ending", "foundation", "expansion"]
 const TITLES: Dictionary = {"foundation": "La primera luz", "expansion": "Territorio recuperado", "opening": "Llegada", "rescue": "Supervivientes", "relay": "Una red propia", "convoy": "El regreso", "encounter": "Ante el enlace", "ending": "Después del combate"}
-const ACTORS: Dictionary = {"MARA": "mara", "IVO": "ivo", "VERA": "vera", "NOX": "nox", "ECO": "eco", "PORTADOR": "portador", "EL PREFECTO": "prefect", "MADRE CERO": "mother"}
+const ACTORS: Dictionary = {"EL RECAUDADOR": "recaudador", "SANTA CALDERA": "caldera", "CORO SUMERGIDO": "coro", "MARA": "mara", "IVO": "ivo", "VERA": "vera", "NOX": "nox", "ECO": "eco", "PORTADOR": "portador", "EL PREFECTO": "prefect", "MADRE CERO": "mother"}
 const QUESTIONS: Array[String] = ["¿Por dónde empezamos?", "¿Todavía podemos sacar a esas personas?", "¿Quién sigue hablando desde las antenas?", "¿Quién decidió que los demás se quedaran fuera?", "¿Podemos terminar esto sin repetir el mismo error?"]
 const ANSWERS: Array[String] = ["Entonces levantaremos algo que no puedan cobrarnos.", "Abriremos una salida. Nadie se queda en esa línea de montaje.", "Las escucharemos. Y después dejaremos que descansen.", "Esta vez abriremos las puertas desde dentro.", "Mantendremos el enlace. La decisión será de quienes viven aquí."]
 
@@ -42,11 +42,8 @@ static func scene(index: int, section: String) -> Dictionary:
 	var chapter: Dictionary = CampaignStory.chapter(index)
 	var lines: Array[Dictionary] = []
 	var companion: String = ACTORS.get(chapter.voice, "eco")
-	if section == "encounter":
-		lines.append({"speaker": "portador", "text": ["El Recaudador está cortando el paso al tren.", "El suelo sigue ardiendo. Tendremos que buscar el momento de acercarnos.", "Son tres enlaces. Mientras sigan vivos, no podremos alcanzar el núcleo.", "No vengo por tu insignia. Vengo a abrir la ciudad.", "Mara, mantén los relés. ECO, no cierres el enlace."][index]})
-		lines.append({"speaker": "prefect" if index == 3 else ("mother" if index == 4 else "eco"), "text": ["Su escudo protege el frente. Deja que embista contra una cobertura y ataca cuando abra el núcleo.", "Las rejillas anuncian el calor. Durante la purga de enfriamiento podrás golpearla.", "Corta las antenas y esquiva los pulsos. El silencio abrirá una ventana.", "Fuera de estas murallas no hay nada que pueda durar. Yo conservé lo único que importaba.", "La emergencia no ha terminado. Apagarme significa abandonar a todos."][index]})
-		if index == 4: lines.append({"speaker": "mara", "text": "Necesitamos dos relés activos. E los repara si estás cerca; Q puede protegerlos. Aguantaremos hasta que se abra."})
-		lines.append({"speaker": "portador", "text": ANSWERS[index]})
+	if section in ["encounter", "ending"]:
+		lines = BossDialogue.lines(index, section)
 	else:
 		var text: String = chapter[section]
 		if section == "opening":

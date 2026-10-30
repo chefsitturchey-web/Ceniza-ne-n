@@ -4,6 +4,8 @@ extends Node
 signal notice_requested(message: String)
 const STATION_TARGET: int = -2
 const CLINIC_TARGET: int = -3
+const SHOP_TARGET: int = -6
+var equipment_shop: EquipmentShop
 var clinic: NeuralClinic
 var clinic_panel: ClinicPanel
 var expedition: ExpeditionManager
@@ -95,6 +97,7 @@ func update_interaction(delta: float) -> void:
 
 func perform_interaction(target: int) -> bool:
 	var world: District = player.get_parent() as District
+	if target == SHOP_TARGET: return equipment_shop != null and equipment_shop.open_panel()
 	if target <= SettlementSystem.TARGET_BASE and world != null: return world.settlements.interact(target)
 	if target <= FrontierSystem.CLEAR_BASE and world != null: return world.frontier.interact(target)
 	if target == -1 and colony.core != null and colony.core.tier == 0: return colony.core.request_upgrade()

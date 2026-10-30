@@ -1,5 +1,15 @@
 # Menú y opciones persistentes
 
+## Arsenal y acabado de interfaz · 30/10/2026
+
+En la colonia, mantén **E frente al taller**, a la izquierda del núcleo. El catálogo reúne seis profesiones y la fabricación de pala/trampas. Selecciona una tarjeta y compra: muestra coste, existencias, requisitos y civiles disponibles. Comprar una profesión deja una herramienta real para que un civil vaya a recogerla; sigue haciendo falta una plaza en su edificio correspondiente. La pala y las trampas usan sus recetas originales, con chatarra y piezas. Al cerrar con Esc vuelve el tiempo sin activar otra acción del mundo.
+
+Inicio, opciones, pausa, clínica, diario, selección de mejoras y novela comparten acero envejecido, filetes de cobre y focos cian. Los paneles modales incorporan una ilustración en movimiento lento, ceniza y luz ambiental; respetan las opciones de partículas y movimiento reducido. El marco y los ocho símbolos del catálogo son SVG editables en `assets/ui/`; la descripción del equipo usa una fuente de lectura continua.
+
+En una arena, **Esc → Leer presentación** permite releer su escena sin avanzar el combate. Las arenas de práctica añaden **Leer desenlace**. Cerrar la novela devuelve la pausa anterior.
+
+Comprobación actual: `colony_boss_polish_test`, mediante `tools/maintenance/validate.ps1`, verifica compras, pausa, reparto de tropas, coberturas, diálogos y el cierre del Coro; `-Capture` permite revisar el resultado con OpenGL. Los registros y capturas permanecen en `build/validation/latest/`. Las cifras históricas siguientes describen sus entregas originales, no una ejecución completa de todas las suites en esta revisión.
+
 F5 abre el menú principal. Continuar muestra el día y la chatarra del último guardado compatible. Nueva partida pide una elección dentro del juego cuando existe un archivo y conserva una copia completa en `user://partida.json.anterior` antes de liberar el slot. Si falla la copia, no empieza la partida nueva. Un archivo ilegible no se borra al consultar el menú; si una carga completa falla, la sesión intenta archivarlo antes de generar otro.
 
 Opciones está disponible desde el menú y desde la pausa de la colonia. Sus cambios se aplican inmediatamente y se guardan en `user://opciones.cfg`: volumen general, música, efectos, silencio, pantalla completa, tres tamaños de ventana, reducción de destellos/sacudidas y partículas. Los porcentajes se aplican sobre el volumen original de los buses; se conserva su margen y sus efectos. M cambia el silencio global, también durante la expedición. Cerrar opciones abiertas desde pausa conserva la pausa.

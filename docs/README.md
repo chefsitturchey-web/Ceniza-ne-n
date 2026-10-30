@@ -34,6 +34,8 @@
 
 ## Interfaz, sonido y desarrollo
 
+La revisión del 30/10/2026 se integra en las guías existentes: [arsenal y acabado de menús](interface/MENU_Y_OPCIONES.md), [coberturas y cierre del Coro](gameplay/EFECTOS_Y_PRESION_JEFES.md) y [diálogos y retratos de los cinco jefes](art/NOVELA_VISUAL_Y_COHERENCIA.md).
+
 [Vida y marcos de combate](interface/INTERFAZ_COMBATE.md) · [Menús y opciones](interface/MENU_Y_OPCIONES.md) · [Laboratorio F1](interface/LABORATORIO_DEPURACION.md) · [Audio](audio/AUDIO.md) · [Arquitectura actual](development/ARQUITECTURA.md) · [Herramientas](../tools/README.md)
 
 Se eliminaron los informes antiguos sobre tres distritos, módulos sustituidos y sprites anteriores. Sus reglas actuales se encuentran en las guías de arriba; el historial de Git conserva las versiones anteriores.

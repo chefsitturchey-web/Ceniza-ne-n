@@ -39,6 +39,7 @@ var settlements: SettlementSystem
 var settlement_backdrop: SettlementBackdrop
 var frontier: FrontierSystem
 var workshop: WorkshopSystem
+var equipment_shop: EquipmentShop
 
 func _ready() -> void:
 	player.combat_enabled = false
@@ -225,6 +226,10 @@ func _ready() -> void:
 	add_child(workshop)
 	workshop.notice_requested.connect(presenter.show_notice)
 	interaction.workshop = workshop
+	equipment_shop = EquipmentShop.new()
+	equipment_shop.district = self
+	add_child(equipment_shop)
+	interaction.equipment_shop = equipment_shop
 	corpse_system.workshop = workshop
 	pest_system = PestSystem.new()
 	pest_system.setup(corpse_system, construction, trap_system)

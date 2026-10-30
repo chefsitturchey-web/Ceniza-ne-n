@@ -102,6 +102,7 @@ func resume_game() -> void:
 	presenter.publish()
 
 func _process(delta: float) -> void:
+	if interaction.equipment_shop != null and (interaction.equipment_shop.opened or interaction.equipment_shop.closed_frame == Engine.get_process_frames()): return
 	if GamePreferences.current().debug_input_blocked(): return
 	if interaction.story != null and (interaction.story.novel.opened or interaction.story.novel.closed_frame == Engine.get_process_frames()): return
 	if interaction.story != null and (interaction.story.journal.opened or interaction.story.journal.closed_frame == Engine.get_process_frames()): return

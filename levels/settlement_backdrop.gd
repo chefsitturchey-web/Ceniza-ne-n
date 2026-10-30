@@ -50,8 +50,8 @@ func _draw() -> void:
 		if absf(center - camera_x) > 650: continue
 		var variant: int = absi(index) % 2
 		var recovery: float = world.settlements.recovery_at(center)
-		facade(center - 32, 140 + (absi(index) % 3) * 9, zone * 2 + variant, Color("596b75", 0.72), true)
-		facade(center + 70, 119, zone * 2 + 1 - variant, Color("53636d", 0.64), true)
+		facade(center - 32, 140 + (absi(index) % 3) * 9, zone * 2 + variant, Color("596b75"), true)
+		facade(center + 70, 119, zone * 2 + 1 - variant, Color("53636d"), true)
 		for building: int in 3:
 			var x: float = center - 93 + building * 91
 			var height: float = 91 + (absi(index + building) % 3) * 13

@@ -159,6 +159,7 @@ static func valid(data: Variant) -> bool:
 			if not entry.crew is Array or entry.crew.size() > (3 if index % 4 == 0 else 1): return false
 			if entry.staffed != (not entry.crew.is_empty()): return false
 			for member: Variant in entry.crew:
+				if member is Dictionary and member.has("duty_side") and not number(member.duty_side, -1, 1, true): return false
 				if not member is Dictionary or member.get("role") not in (["ranger", "guardian"] if index % 4 == 0 else (["medic"] if index % 4 == 1 else ["technician"])): return false
 				if not number(member.get("hp"), 1, 90, true) or not number(member.get("x"), -GameRules.MAP_HALF_WIDTH, GameRules.MAP_HALF_WIDTH) or not number(member.get("respawn"), 0, 18) or not number(member.get("cooldown"), 0, 3): return false
 	return true

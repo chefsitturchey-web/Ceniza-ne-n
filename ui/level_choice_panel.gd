@@ -9,11 +9,17 @@ var heading: Label
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 35
-	var shade: ColorRect = ColorRect.new()
+	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
-	shade.color = Color("0b1322", 0.97)
 	add_child(shade)
+	var frame: Panel = Panel.new()
+	frame.position = Vector2(18, 10)
+	frame.size = Vector2(604, 340)
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.add_theme_stylebox_override("panel", MenuSkin.panel())
+	add_child(frame)
 	rows = VBoxContainer.new()
+	rows.theme = preload("res://ui/theme.tres")
 	rows.position = Vector2(48, 24)
 	rows.size = Vector2(544, 312)
 	rows.add_theme_constant_override("separation", 12)

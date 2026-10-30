@@ -12,6 +12,10 @@ func bind(value: AnimatedSprite2D) -> void:
 	super.bind(value)
 	if sprite != null:
 		base_tint = sprite.modulate
+		# Source canvases have different transparent foot margins.
+		# Anchor the idle contact point, preserving the authored walking bounce.
+		if actor.data.id == &"errante": sprite.position.y = -18
+		elif actor.data.id == &"corredor": sprite.position.y = -21
 	if actor.data.id in [&"artillero", &"saboteador"]:
 		field_rig = FieldUnitVisual.new()
 		field_rig.actor = actor
@@ -76,6 +80,10 @@ func update_state(moving: bool = false) -> void:
 func _draw() -> void:
 	if actor.health <= 0:
 		return
+	if actor.data.id != &"saltador":
+		draw_set_transform(Vector2(0, -1), 0, Vector2(1, 0.22))
+		draw_circle(Vector2.ZERO, 10 if actor.data.id == &"errante" else 14, Color(0.015, 0.025, 0.04, 0.38))
+		draw_set_transform(Vector2.ZERO)
 	var color: Color = actor.data.provisional_color
 	if actor.flash > 0.0:
 		color = Color.WHITE

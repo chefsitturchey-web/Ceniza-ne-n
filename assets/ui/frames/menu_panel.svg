@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+<defs><linearGradient id="steel" x2="0" y2="1"><stop stop-color="#c2ad7e"/><stop offset=".22" stop-color="#465764"/><stop offset=".52" stop-color="#283b48"/><stop offset="1" stop-color="#837754"/></linearGradient><linearGradient id="inner" x2="0" y2="1"><stop stop-color="#172632"/><stop offset="1" stop-color="#090f19"/></linearGradient></defs>
+<path d="M9 1H119L127 9V119L119 127H9L1 119V9Z" fill="#02070d"/>
+<path d="M10 3H118L125 10V118L118 125H10L3 118V10Z" fill="url(#steel)"/>
+<path d="M12 7H116L121 12V116L116 121H12L7 116V12Z" fill="url(#inner)" stroke="#57656a"/>
+<path d="M19 11H109M11 19V109M19 117H109M117 19V109" fill="none" stroke="#637268" stroke-opacity=".4"/>
+<g fill="none" stroke="#c5ae7b"><path d="M4 24V10L10 4H24M104 4H118L124 10V24M124 104V118L118 124H104M24 124H10L4 118V104"/><path d="M12 22V12H22M106 12H116V22M116 106V116H106M22 116H12V106"/></g>
+<g fill="#d4c29c" stroke="#162431"><circle cx="8" cy="8" r="2"/><circle cx="120" cy="8" r="2"/><circle cx="8" cy="120" r="2"/><circle cx="120" cy="120" r="2"/></g>
+<path d="M26 5H42M86 5H102M26 123H42M86 123H102" stroke="#56b8b2" stroke-opacity=".6"/>
+</svg>

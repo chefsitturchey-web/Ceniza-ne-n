@@ -14,12 +14,12 @@ var first: HSlider
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 40
-	var shade: ColorRect = ColorRect.new()
-	shade.color = Color(0.02, 0.03, 0.06, 0.94)
+	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
 	add_child(shade)
 	var panel: PanelContainer = PanelContainer.new()
 	panel.theme = preload("res://ui/theme.tres")
+	panel.add_theme_stylebox_override("panel", MenuSkin.panel())
 	panel.position = Vector2(100, 18)
 	panel.size = Vector2(440, 324)
 	add_child(panel)

@@ -31,6 +31,8 @@ func _physics_process(delta: float) -> void:
 	if not Rect2(0, 0, 640, 480).has_point(position) or (not boundary.is_empty() and not Geometry2D.is_point_in_polygon(position, boundary)):
 		spent = true
 	if hit != null:
+		var cover: ArenaCover = hit.get_collider() as ArenaCover
+		if cover != null: cover.receive_damage(18 + theme_index * 4)
 		var target: TopdownPlayer = hit.get_collider() as TopdownPlayer
 		if target != null:
 			target.take_damage(12)

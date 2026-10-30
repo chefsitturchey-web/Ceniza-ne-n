@@ -105,8 +105,10 @@ func _physics_process(delta: float) -> void:
 		if mark_timer <= 0 and marks.size() < 6:
 			add_marks()
 			mark_timer = 3.4 if phase == 2 else 4.2
-	for index: int in range(waves.size() - 1, -1, -1):
-		var wave: Dictionary = waves[index]
+	# Damage emits died synchronously: arena.finish() may clear both arrays.
+	# Iterate a snapshot and stop immediately when combat has resolved.
+	for wave: Dictionary in waves.duplicate():
+		if health <= 0 or not is_instance_valid(target) or target.health <= 0: return
 		var previous: float = wave.radius
 		wave.radius += delta * (115 if phase == 2 else 90)
 		var origin: Vector2 = wave.get("origin", global_position)
@@ -115,16 +117,18 @@ func _physics_process(delta: float) -> void:
 		if not wave.hit and not in_gap and distance >= previous - 9 and distance <= wave.radius + 9:
 			wave.hit = true
 			target.take_damage(16)
-		if wave.radius > 720: waves.remove_at(index)
-	for index: int in range(marks.size() - 1, -1, -1):
-		var mark: Dictionary = marks[index]
+			if target.health <= 0: return
+		if wave.radius > 720: waves.erase(wave)
+	for mark: Dictionary in marks.duplicate():
+		if health <= 0 or not is_instance_valid(target) or target.health <= 0: return
 		mark.time -= delta
 		if mark.time <= 0 and not mark.hit:
 			mark.hit = true
 			ground_impact.emit(mark.position, 32, 2.4)
 			if target.global_position.distance_to(mark.position) < 32:
 				target.take_damage(22)
-		if mark.time < -0.3: marks.remove_at(index)
+				if target.health <= 0: return
+		if mark.time < -0.3: marks.erase(mark)
 	update_puppet(delta)
 
 func update_puppet(_delta: float) -> void:

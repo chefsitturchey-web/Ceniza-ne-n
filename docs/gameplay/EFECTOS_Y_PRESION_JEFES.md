@@ -1,5 +1,15 @@
 # Marcha, impactos y presión de los cinco jefes
 
+## Coberturas destructibles y Coro · 30/10/2026
+
+Las cinco arenas usan coberturas con resistencia: pilares de 130 puntos y cajas/barriles de 75. Las balas, embestidas e impactos fuertes las desgastan; muestran grietas, chispas y escombros. El fogonazo decorativo de un arma no causa daño. Al romperse, la cobertura pierde colisión y desaparece del mapa de navegación del jefe y sus refuerzos. El escombro permanece como señal visual; los límites de la arena se conservan.
+
+La embestida contra una cobertura sigue abriendo una ventana de castigo al Recaudador, pero consume esa protección. El calor y los ataques de área de las demás arenas también erosionan los escondites mediante sus impactos. No se concede botín por destruirlos.
+
+Se corrigió la invalidación de listas de ataques cuando una muerte dispara el final del combate: el Coro, los ataques secundarios y las cargas de los dispositivos recorren instantáneas y detienen la resolución al terminar la pelea. La comprobación dirigida reproduce una derrota en segunda fase con varias ondas, marcas, ataques secundarios o cargas pendientes; ya no intenta acceder a ataques eliminados por el final del combate.
+
+En colonia, los fusileros y guardianes equilibran sus frentes por profesión aunque solo haya un cuartel; la asignación se guarda y se reajusta tras una baja. Las murallas exteriores se dibujan por delante de los pueblos, las fachadas son opacas y el Errante apoya sus pies en el suelo. Los saltos reales del Saltador permanecen intactos.
+
 Se conservan los diseños ilustrados aprobados. El Portador en ambas cámaras, el Prefecto y Madre Cero tienen ciclos de ocho fases articuladas en LibreSprite. Las rodillas y apoyos se animan sobre el mismo dibujo; las armas y el exterior del abrigo no se deforman como piernas. El avance real controla la cadencia, y el torso mantiene su identidad entre pasos.
 
 Los tres robots aumentan su escala de 0,5 a 0,65: aproximadamente 88–92 unidades de altura frente a las 35 del Portador. Los anclajes siguen en el suelo. Las sombras y la galería respetan los nuevos tamaños.

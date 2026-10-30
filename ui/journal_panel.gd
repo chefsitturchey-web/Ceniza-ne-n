@@ -15,11 +15,17 @@ var settlement_view: bool = false
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 32
-	var shade: ColorRect = ColorRect.new()
+	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
-	shade.color = Color("0b1322", 0.98)
 	add_child(shade)
+	var frame: Panel = Panel.new()
+	frame.position = Vector2(18, 10)
+	frame.size = Vector2(604, 340)
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.add_theme_stylebox_override("panel", MenuSkin.panel())
+	add_child(frame)
 	var rows: VBoxContainer = VBoxContainer.new()
+	rows.theme = preload("res://ui/theme.tres")
 	rows.position = Vector2(32, 15)
 	rows.size = Vector2(576, 330)
 	rows.add_theme_constant_override("separation", 10)

@@ -53,13 +53,13 @@ func tick(delta: float) -> void:
 		if cooldown <= 0:
 			request_combo()
 			cooldown = [7.0, 6.2, 5.6, 4.7, 4.2][arena.zone_index] * (0.76 if boss.phase == 2 else 1.0)
-	for index: int in range(hazards.size() - 1, -1, -1):
-		var hazard: Dictionary = hazards[index]
+	for hazard: Dictionary in hazards.duplicate():
 		hazard.time -= delta
 		if hazard.time <= 0 and not hazard.hit:
 			hazard.hit = true
 			resolve(hazard)
-		if hazard.time < -0.42: hazards.remove_at(index)
+			if arena.ending: return
+		if hazard.time < -0.42: hazards.erase(hazard)
 	if last_state != boss.state:
 		if boss.state == Recaudador.State.CLAW:
 			impact(boss.position + boss.facing * 65, 96, 2.8, 22)
@@ -128,6 +128,11 @@ func muzzle(origin: Vector2, direction: Vector2) -> void:
 		add_particle(origin - direction * 5, -direction * 12 + Vector2(0, -20), 0.7, 5, true)
 
 func impact(point: Vector2, radius: float, strength: float = 2.0, shards: int = 18) -> void:
+	# Cosmetic muzzle flashes never damage scenery. Heavy attacks do.
+	if enabled and not arena.ending and strength >= 2.0:
+		for child: Node in arena.actors.get_children():
+			if child is ArenaCover and child.health > 0 and child.position.distance_to(point) <= radius + child.extent.length() * 0.5:
+				child.receive_damage(roundi(22 + strength * 14 + arena.zone_index * 7))
 	if impacts.size() < 32: impacts.append({"position": point, "radius": radius, "age": 0.0, "seed": rng.randi() % 1000})
 	if not GamePreferences.current().reduced_flashes: shake = maxf(shake, strength)
 	for index: int in shards:

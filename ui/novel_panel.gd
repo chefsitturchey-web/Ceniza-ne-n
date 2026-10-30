@@ -29,16 +29,22 @@ var partner: String = "mara"
 var transition: Tween
 var stage: Control
 var reduced_motion: bool = false
+var boss_portraits: Dictionary = {}
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 45
 	stage = Control.new()
 	stage.size = Vector2(640, 360)
-	stage.theme = Theme.new()
+	stage.theme = preload("res://ui/theme.tres").duplicate()
 	stage.theme.default_font = ThemeDB.fallback_font
 	stage.theme.default_font_size = 14
 	add_child(stage)
+	var opaque_back: ColorRect = ColorRect.new()
+	opaque_back.size = stage.size
+	opaque_back.color = Color("07101b")
+	opaque_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.add_child(opaque_back)
 	background = TextureRect.new()
 	background.size = stage.size
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -57,14 +63,7 @@ func _ready() -> void:
 	var box: Panel = Panel.new()
 	box.position = Vector2(24, 214)
 	box.size = Vector2(592, 130)
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = Color("0c1825", 0.97)
-	style.border_color = Color("4a7c88")
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(7)
-	style.shadow_color = Color(0, 0, 0, 0.5)
-	style.shadow_size = 12
-	box.add_theme_stylebox_override("panel", style)
+	box.add_theme_stylebox_override("panel", MenuSkin.panel())
 	stage.add_child(box)
 	speaker = label("", Vector2(42, 222), Vector2(420, 23), 16)
 	speaker.add_theme_color_override("font_color", Color("ffce75"))
@@ -120,6 +119,9 @@ func button(text: String, at: Vector2, extent: Vector2, action: Callable) -> But
 	return result
 
 func actor_texture(id: String) -> Texture2D:
+	if id in ["recaudador", "caldera", "coro"]:
+		if not boss_portraits.has(id): boss_portraits[id] = load("res://assets/characters/portraits/bosses/%s.png" % id)
+		return boss_portraits[id]
 	if id in ["prefect", "mother"]: return ArtScale.atlas(ANTAGONISTS, 0 if id == "prefect" else 1)
 	return ArtScale.atlas(PORTRAITS, maxi(0, CAST.find(id)))
 
@@ -134,7 +136,7 @@ func play(data: Dictionary, allow_paused: bool = false) -> bool:
 	reduced_motion = GamePreferences.current().reduced_flashes
 	get_tree().paused = true
 	background.texture = load(data.background) as Texture2D
-	title.text = data.title + "  /  " + data.subtitle
+	title.text = data.title
 	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	title.size = Vector2(480, 25)
 	partner = "eco"

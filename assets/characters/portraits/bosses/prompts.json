@@ -1,0 +1,29 @@
+{
+  "tool": "OpenAI built-in image_gen",
+  "date": "2026-10-30",
+  "usage": "Visual novel portraits only; existing Prefect and Mother portraits preserved",
+  "shared_specification": "ONE standalone color manga visual novel character portrait for CENIZA NEON. Reference 1: existing antagonists_manga_v2 style only, sharp ink hatching, mature gothic anime, distressed metal, charcoal and bronze. Reference 2: current combat reference first front frame, identity only, never sprite sheet. Single character, 3/4 view, slightly facing left, safe head margins, waist-up, vertical 2:3 composition. Crisp linework, dense functional metal detail, readable at 256px. True transparent background. No scenery, floor, text, logo, or border. Preserve mechanical anatomy; never humanize robot face.",
+  "jobs": [
+    {
+      "id": "recaudador",
+      "file": "recaudador.png",
+      "style_reference": "../antagonists_manga_v2.png",
+      "character_reference": "../../combat/references/recaudador.png",
+      "specification": "Squat tracked debt collection robot with enormous claw forearms, single circular cyan chest optic, tank treads, layered steel and bronze, engraved debt seals."
+    },
+    {
+      "id": "caldera",
+      "file": "caldera.png",
+      "style_reference": "../antagonists_manga_v2.png",
+      "character_reference": "../../combat/references/caldera.png",
+      "specification": "Walking furnace robot with twin black smokestacks, orange furnace belly grill, short armored legs and large mechanical forearms, soot and glowing embers."
+    },
+    {
+      "id": "coro",
+      "file": "coro.png",
+      "style_reference": "../antagonists_manga_v2.png",
+      "character_reference": "../../combat/references/coro.png",
+      "specification": "Drowned sonar automaton with two acoustic trumpet horns, red cables, cyan glass sonar dome, heavy mechanical hands, green oxidized bronze, barnacles and droplets."
+    }
+  ]
+}

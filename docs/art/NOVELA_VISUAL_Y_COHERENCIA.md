@@ -1,5 +1,15 @@
 # Novela visual y coherencia de estructuras
 
+## Cinco encuentros conectados · 30/10/2026
+
+`data/boss_dialogue.gd` contiene las conversaciones de entrada y victoria de los cinco jefes. Recaudador explica la deuda sin saldo final; Caldera confunde producción con supervivencia; Coro conserva las últimas llamadas de los ahogados; Prefecto defiende su decisión de cerrar la Ciudadela; Madre Cero teme que terminar la emergencia vuelva inútiles las pérdidas. Las victorias enlazan tren, hornos, barrio inundado, autorización de la Ciudadela y transferencia final de autoridad a los asentamientos. No se añadieron recompensas al repetir conversaciones.
+
+Se incorporaron retratos originales del Recaudador, Santa Caldera y Coro Sumergido en `assets/characters/portraits/bosses/`, generados con imagegen usando los retratos manga aprobados como referencia de estilo y los sprites actuales como referencia de identidad. Se mantienen los retratos aprobados del Prefecto y Madre Cero. Las especificaciones reproducibles están en `assets/characters/portraits/bosses/prompts.json`; los PNG originales conservan su transparencia. Estos recursos son ilustraciones de novela y no sustituyen sprites ni animaciones de combate.
+
+La novela cubre completamente el HUD del combate, tiene marco industrial ornamental y conserva fundidos, revelado progresivo, lectura anterior y omisión. Las entradas y despedidas se reproducen en campaña; **Esc → Leer presentación** permite revisar la entrada durante una arena y la práctica también ofrece **Leer desenlace**.
+
+La revisión actual usa `colony_boss_polish_test` y `boss_pressure_test`. Las descripciones históricas de validación que siguen no certifican una nueva ejecución del conjunto completo.
+
 ## Cómo comprobarlo
 
 - En Godot, abre `levels/story/novel_preview.tscn` y pulsa **F6**. Después de cerrar la primera escena, elige capítulo y conversación. La galería permite revisar las 30 escenas sin modificar la partida.

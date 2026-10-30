@@ -20,6 +20,13 @@ func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	InputSetup.configure_input()
 	get_tree().paused = false
+	var frame: Panel = Panel.new()
+	frame.position = Vector2(24, 14)
+	frame.size = Vector2(320, 328)
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.add_theme_stylebox_override("panel", MenuSkin.panel())
+	frame.modulate.a = 0.92
+	add_child(frame)
 	if ResourceLoader.exists("res://assets/ui/menu/ruinas_menu.png"):
 		illustration = load("res://assets/ui/menu/ruinas_menu.png") as Texture2D
 	var content: VBoxContainer = VBoxContainer.new()
@@ -49,6 +56,8 @@ func _ready() -> void:
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	status.custom_minimum_size = Vector2(300, 22)
 	status.add_theme_color_override("font_color", Color("8299a8"))
+	status.add_theme_font_override("font", ThemeDB.fallback_font)
+	status.add_theme_font_size_override("font_size", 11)
 	content.add_child(status)
 	add_child(options)
 	options.closed.connect(func() -> void: options_button.grab_focus())
@@ -73,12 +82,16 @@ func _button(parent: Node, text: String, action: Callable) -> Button:
 	button.text = text
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.custom_minimum_size = Vector2(252, 25)
+	MenuSkin.button(button)
 	for state: String in ["normal", "hover", "pressed", "focus", "disabled"]:
 		var style: StyleBoxFlat = StyleBoxFlat.new()
 		style.bg_color = Color("182639", 0.88 if state != "disabled" else 0.45)
 		style.content_margin_left = 12
 		style.content_margin_right = 10
 		style.border_width_left = 2
+		style.border_width_bottom = 1
+		style.border_width_top = 1
+		style.border_width_right = 1
 		style.border_color = Color("47dacb") if state in ["focus", "hover"] else Color("304356")
 		button.add_theme_stylebox_override(state, style)
 	button.add_theme_color_override("font_color", Color("dcf6ee"))

@@ -14,6 +14,7 @@ var phase: String = "DÍA"
 var resume_button: Button
 
 func _ready() -> void:
+	add_theme_stylebox_override("panel", MenuSkin.panel())
 	rows = VBoxContainer.new()
 	rows.add_theme_font_size_override("font_size", 10)
 	rows.add_theme_constant_override("separation", 6)

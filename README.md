@@ -29,6 +29,8 @@
 
 ## El juego
 
+**Arsenal, tropas y jefes:** catálogo de herramientas y armas con existencias para los civiles; fusileros y guardianes repartidos entre ambos frentes; pueblos opacos y murallas exteriores delante del escenario. Las cinco arenas tienen coberturas destructibles y conversaciones de entrada/victoria conectadas, con retratos propios para cada jefe. Se corrigió un fallo al terminar el combate durante los ataques del Coro. [Menús y cómo probar el arsenal](docs/interface/MENU_Y_OPCIONES.md) · [Coberturas y corrección del Coro](docs/gameplay/EFECTOS_Y_PRESION_JEFES.md) · [Arte y guion](docs/art/NOVELA_VISUAL_Y_COHERENCIA.md).
+
 **Poblados y tecnología:** barrios industriales en ruinas con luces, ropa al viento, humo y reflejos. Recupera servomotores, bobinas y filtros para restaurar talleres, armerías y dispensarios con dos niveles de bonificación. **L → Poblados** muestra el catastro y los componentes. [Cómo funcionan y fuentes de LibreSprite](docs/gameplay/POBLADOS_Y_TECNOLOGIA.md).
 
 Los barrios recuperados encienden sus ventanas y banderas; mejorar las instalaciones extiende esa recuperación a calles próximas. El taller habilita repartos limitados al núcleo, con transporte visible, recogida nocturna y guardado de su carga y recorrido.

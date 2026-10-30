@@ -39,10 +39,13 @@ func configure_paths() -> void:
 	obstacle_rects.clear()
 	for child: Node in arena.actors.get_children():
 		if not child is StaticBody2D: continue
+		if child is ArenaCover and child.health <= 0: continue
 		var shape: CollisionShape2D = child.get_child(0) as CollisionShape2D
 		if shape != null and shape.shape is RectangleShape2D:
 			obstacle_rects.append(Rect2(child.position - shape.shape.size / 2, shape.shape.size))
 	arena.boss.tactics.configure_navigation(ArenaLayout.boundary(arena.zone_index), obstacle_rects)
+	for sentinel: EncounterSentinel in sentinels:
+		if is_instance_valid(sentinel): sentinel.tactics.configure_navigation(ArenaLayout.boundary(arena.zone_index), obstacle_rects, 15)
 
 func _physics_process(delta: float) -> void:
 	if arena.ending or arena.boss.health <= 0 or arena.player.health <= 0: return
@@ -63,11 +66,12 @@ func _physics_process(delta: float) -> void:
 	if barrier_left > 0:
 		barrier_left = maxf(0, barrier_left - delta)
 		if barrier_left == 0 and is_instance_valid(barrier): barrier.queue_free()
-	for index: int in range(device_effects.size() - 1, -1, -1):
-		device_effects[index].time -= delta
-		if device_effects[index].time <= 0:
-			resolve_device(device_effects[index])
-			device_effects.remove_at(index)
+	for effect: Dictionary in device_effects.duplicate():
+		effect.time -= delta
+		if effect.time <= 0:
+			device_effects.erase(effect)
+			resolve_device(effect)
+			if arena.ending: return
 	# No refuerzos durante ventanas de castigo; avisos de llegada duran 1.4 segundos.
 	summon_cooldown -= delta
 	var allowed: bool = arena.zone_index == 4 or arena.boss.phase == 2

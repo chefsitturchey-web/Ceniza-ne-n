@@ -11,6 +11,10 @@ var shot: float = 0
 var beam_to: Vector2
 var visual: FieldUnitVisual
 var dismissed: bool = false
+var duty_side: int = 0
+
+func defense_side() -> int:
+	return duty_side if duty_side != 0 else int(signf(home.position.x))
 
 func _ready() -> void:
 	add_to_group(GameRules.ALLIES)
@@ -49,18 +53,18 @@ func tick(delta: float) -> void:
 	var destination: float = home.position.x
 	var anchor: float = home.position.x
 	if world.civic != null and role in ["ranger", "guardian"]:
-		anchor = signf(home.position.x) * maxf(absf(home.position.x), world.civic.frontier(signf(home.position.x)) - (35 if role == "ranger" else -8))
+		anchor = defense_side() * maxf(180, world.civic.frontier(defense_side()) - (35 if role == "ranger" else -8))
 		destination = anchor
-	if world.story != null and world.story.convoy_active and world.story.convoy_health > 0 and home.position.x < 0 and world.civic.advance_side == 0 and role in ["ranger", "guardian"]:
+	if world.story != null and world.story.convoy_active and world.story.convoy_health > 0 and defense_side() < 0 and world.civic.advance_side == 0 and role in ["ranger", "guardian"]:
 		anchor = world.story.convoy_x + (30 if role == "guardian" else 90)
 		destination = anchor
 	var enemy: SiegeEnemy
 	var nearest: float = 260
-	var assaulting: bool = world.civic != null and world.civic.advance_side == int(signf(home.position.x)) and role in ["ranger", "guardian"]
-	if world.civic != null and world.civic.advance_side == int(signf(home.position.x)) and role in ["ranger", "guardian"] and world.defenses.nearest_enemy(position.x, 180) == null:
+	var assaulting: bool = world.civic != null and world.civic.advance_side == defense_side() and role in ["ranger", "guardian"]
+	if assaulting and world.defenses.nearest_enemy(position.x, 180) == null:
 		var portal: EnemyRepeater
 		for gate: EnemyRepeater in world.civic.gates + world.expedition.repeaters:
-			if gate.health.current <= 0 or signf(gate.position.x) != signf(home.position.x): continue
+			if gate.health.current <= 0 or int(signf(gate.position.x)) != defense_side(): continue
 			if portal == null or absf(gate.position.x) < absf(portal.position.x): portal = gate
 		if portal != null:
 			facing = signf(portal.position.x - position.x)
@@ -127,13 +131,14 @@ func tick(delta: float) -> void:
 	position.x = move_toward(position.x, clampf(destination, anchor - 260, anchor + 260), delta * 85)
 
 func snapshot() -> Dictionary:
-	return {"hp": hp, "x": position.x, "respawn": respawn, "cooldown": cooldown}
+	return {"hp": hp, "x": position.x, "respawn": respawn, "cooldown": cooldown, "duty_side": duty_side}
 
 func restore(data: Dictionary) -> void:
 	hp = int(data.hp)
 	position.x = float(data.x)
 	respawn = float(data.respawn)
 	cooldown = float(data.cooldown)
+	duty_side = int(data.get("duty_side", 0))
 	if hp <= 0: remove_from_group(GameRules.ALLIES)
 
 func _draw() -> void:

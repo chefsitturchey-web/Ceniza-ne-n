@@ -33,6 +33,9 @@ func setup(world: Node2D) -> void:
 			site.viewer = district.player
 			site.core = district.core
 			site.position = Vector2(side * distance, GameRules.FLOOR_Y)
+			# Walls belong in front of settlement scenery, regardless of parent depth.
+			site.z_as_relative = false
+			site.z_index = 1
 			walls.append(site)
 			add_child(site)
 	for side: float in [-1.0, 1.0]:
@@ -99,8 +102,7 @@ func safe_to_build(x: float) -> bool:
 func target_at(x: float) -> int:
 	for index: int in range(2):
 		if absf(x - (-1340 if index == 0 else 1340)) < 28: return -300 - index
-	for index: int in range(RACK_X.size()):
-		if absf(x - RACK_X[index]) < 13: return -320 - index
+	if x >= -700 and x <= -425: return InteractionSystem.SHOP_TARGET
 	for index: int in range(walls.size()):
 		if absf(x - walls[index].x) < 24: return -340 - index
 	if absf(x - REFUGE_X) < 24: return -360
@@ -183,14 +185,36 @@ func assign(index: int, role_index: int) -> bool:
 			if site.hp > 0 and site.spec.id == building and site.staff_count() < site.staff_capacity():
 				if home == null or site.staff_count() < home.staff_count() or (site.staff_count() == home.staff_count() and absf(site.position.x - villagers[index].x) < absf(home.position.x - villagers[index].x)): home = site
 		if home == null: return false
-		home.hire(role)
+		var recruited: FieldAlly = home.hire(role)
+		if recruited == null: return false
+		recruited.position.x = villagers[index].x
+		balance_defenders()
 	tools[role_index] -= 1
 	villagers.remove_at(index)
 	district.presenter.show_notice("Profesión: " + ["Constructor", "Recuperador", "Tirador", "Guardián", "Técnico", "Médico"][role_index])
 	return true
 
+func balance_defenders() -> void:
+	# Duty is independent of the barracks location; even one barracks covers both fronts.
+	for role: String in ["ranger", "guardian"]:
+		var left_side: Array[FieldAlly] = []
+		var right_side: Array[FieldAlly] = []
+		for site: ExpansionOutpost in district.expansion.sites:
+			for member: FieldAlly in site.squad:
+				if not is_instance_valid(member) or member.hp <= 0 or member.role != role: continue
+				if member.duty_side == 0: member.duty_side = -1 if left_side.size() <= right_side.size() else 1
+				if member.duty_side < 0: left_side.append(member)
+				else: right_side.append(member)
+		while absi(left_side.size() - right_side.size()) > 1:
+			var source: Array[FieldAlly] = left_side if left_side.size() > right_side.size() else right_side
+			var destination: Array[FieldAlly] = right_side if left_side.size() > right_side.size() else left_side
+			var member: FieldAlly = source.pop_back()
+			member.duty_side = 1 if left_side.size() >= right_side.size() else -1
+			destination.append(member)
+
 func tick(delta: float) -> void:
 	elapsed += delta
+	balance_defenders()
 	for index: int in range(retaliation.size() - 1, -1, -1):
 		retaliation[index].time -= delta
 		if retaliation[index].time <= 0:
@@ -383,16 +407,12 @@ func _draw() -> void:
 		for spark: int in range(4):
 			var rise: float = fmod(elapsed * 14 + spark * 7, 23)
 			draw_rect(Rect2(x + 25 + sin(elapsed * 2 + spark) * 2, GameRules.FLOOR_Y - 7 - rise, 1, 2), Color("ffce75", 1 - rise / 23))
-	var ids: Array[String] = ["wrench", "scrap", "blade", "shield", "wrench", "medical"]
-	for index: int in range(RACK_X.size()):
-		var x: float = RACK_X[index]
-		var unlocked: bool = district.core.tier >= int(FortressRules.ROLES[ROLES[index]])
-		draw_texture_rect(GameArt.icon(ids[index]), Rect2(x - 9, 229, 18, 18), false, Color.WHITE if tools[index] > 0 else (Color("8299a8") if unlocked else Color("304356")))
-		for item: int in range(tools[index]): draw_rect(Rect2(x - 8 + item * 5, 254, 3, 2), Color("ffce75"))
-	# Pala y trampa: mismas estanterías, fabricadas en el taller (interacción propia).
-	var shovel_ready: bool = district.workshop != null and district.workshop.shovel_ready
-	draw_texture_rect(GameArt.icon("wrench"), Rect2(-495 - 9, 229, 18, 18), false, Color.WHITE if shovel_ready else Color("8299a8"))
-	draw_texture_rect(GameArt.icon("scrap"), Rect2(-465 - 9, 229, 18, 18), false, Color("8299a8"))
+	draw_rect(Rect2(-636, 244, 72, 16), Color("17232b"))
+	draw_line(Vector2(-636, 244), Vector2(-564, 244), Color("c5ae7b"), 1)
+	for index: int in tools.size():
+		var x: float = -629 + index * 11
+		draw_rect(Rect2(x, 248, 6, 8), Color("738d92") if tools[index] == 0 else Color("e3bd72"))
+		if tools[index] > 0: draw_rect(Rect2(x + 1, 250, 4, 2), Color("47dacb"))
 	var refuge: Rect2 = ArtScale.source(GameArt.CIVIC, 1)
 	ArtScale.footing(self, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)))
 	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(refuge, 80, Vector2(REFUGE_X, GameRules.FLOOR_Y)), refuge)
