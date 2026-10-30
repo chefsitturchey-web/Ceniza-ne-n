@@ -401,6 +401,9 @@ func finish(victory: bool) -> void:
 	dynamics.clear_encounter()
 	boss.clear_hazards()
 	sound.play_cue("destroy" if victory else "alarm")
+	# Cierra la música del combate y deja el tema de victoria o derrota.
+	dash_active = false
+	sound.play_outcome(victory)
 	ending_victory = victory
 	ending_timer = 2.2 if victory else 1.2
 	player.set_physics_process(false)
