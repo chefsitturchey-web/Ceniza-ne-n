@@ -14,6 +14,14 @@ Las parcelas despejadas muestran siluetas discretas de muralla o torreta para di
 
 El taller acelera el trabajo real en núcleo, defensas, instalaciones y despejes; no modifica la velocidad de marcha. La armería mejora el daño de las unidades y torretas de colonia, incluyendo el asalto de portales. El dispensario cura al Portador, soldados y trabajadores vivos dentro de 260 píxeles; no revive bajas. Las bonificaciones no se apilan al recargar y pertenecen al distrito. Las arenas y las estadísticas de ataque de sus personajes permanecen como estaban.
 
+La recuperación también cambia el barrio: ventanas iluminadas, fachadas más claras, banderas, ropa renovada y pulsos en el cableado. El primer nivel activa los bloques cercanos; el segundo extiende la recuperación visual hasta 900 píxeles. Los sectores conectados se identifican con «RED». Este alcance visual no amplía la curación del dispensario, que sigue limitada a 260 píxeles.
+
+## Repartos del taller
+
+Un taller recuperado activa un transportador automático de suministros. Recorre físicamente el camino entre taller y núcleo, con carga visible y ruedas que giran con el desplazamiento. Entrega como máximo dos repartos por día: cada uno aporta 2 piezas y 8 de chatarra en nivel 1, o 4 piezas y 12 de chatarra en nivel 2. Las piezas se descargan en el depósito, sin ocupar la mochila.
+
+El transportador espera si detecta enemigos en la ruta; de noche se recoge en el refugio más cercano y no inicia recogidas. Puede terminar una entrega si alcanza el núcleo con carga. Es un vehículo logístico, no una unidad de combate. Su posición, carga, espera y entregas realizadas se guardan para evitar premios duplicados al cargar. El estado del reparto aparece en **L → Poblados**.
+
 ## Componentes especiales y costes
 
 Hay seis depósitos técnicos por distrito: dos servomotores, dos bobinas de inducción y dos membranas filtrantes. Cada uno entrega su componente una sola vez. No dependen de una tirada aleatoria; se necesita núcleo encendido y liberar el tramo si lo controla un portal. Mantén E durante 2,5 segundos para recuperarlos.

@@ -58,6 +58,32 @@ func run_checks() -> void:
 		wall.ordered = false
 		wall.progress = 0
 		builder.job = -1
+		var courier: SettlementCourier = city.courier
+		courier.restore({"cooldown": 0})
+		courier.tick(40)
+		verify(courier.route == SettlementCourier.Route.RETURN and courier.cargo_parts == 2, "The workshop loads a real transport at its own location")
+		if "--capture" in OS.get_cmdline_user_args() and zone == 0: await capture(world, "courier", courier.position.x + 50)
+		var stock: int = world.bank.stored_parts
+		var money: int = world.bank.scrap
+		for tick: int in 3000: courier.tick(0.1)
+		verify(courier.delivered == 2 and world.bank.stored_parts == stock + 4 and world.bank.scrap == money + 16, "A courier deposits two bounded daily shipments at the core")
+		var capped: Dictionary = courier.snapshot()
+		for tick: int in 1000: courier.tick(0.1)
+		verify(courier.delivered == 2 and world.bank.stored_parts == stock + 4, "Waiting longer does not create unlimited shipments")
+		world.cycle.day += 1
+		world.cycle.phase = "NOCHE"
+		courier.tick(100)
+		verify(courier.delivered == 0 and world.bank.stored_parts == stock + 4, "A new day budget cannot start a transport during the night")
+		world.cycle.phase = "DÍA"
+		courier.restore({"cooldown": 0})
+		var threat: SiegeEnemy = world.director.spawn_enemy(1, load("res://data/enemies/errante.tres"))
+		threat.set_physics_process(false)
+		threat.position.x = city.sites[0].position.x * 0.5
+		courier.tick(60)
+		verify(courier.blocked and courier.position.x == SettlementCourier.DOCK_X, "Transport sensors stop at enemies even during a long timestep")
+		threat.free()
+		courier.restore(capped)
+		verify(courier.delivered == 2, "Transport state preserves its daily delivery count")
 		world.player.position.x = city.sites[2].position.x
 		world.player.health = 40
 		city.tick(1)
@@ -79,6 +105,7 @@ func run_checks() -> void:
 		verify(city.interact(SettlementSystem.TARGET_BASE), "A second servomotor funds the advanced workshop")
 		step(world, 160)
 		verify(city.sites[0].tier == 2 and is_equal_approx(world.colony.work_factor, 1.5), "Support upgrades improve the earned bonus without duplicate stacking")
+		verify(city.recovery_at(city.sites[0].position.x + 800) == 1 and city.recovery_at(-6800) == 0, "Recovered neighbourhood lighting expands locally instead of changing every ruin")
 		var save: SaveSystem = SaveSystem.new()
 		save.session = world.session
 		save.save_path = "user://settlement_world_test.json"
@@ -92,6 +119,11 @@ func run_checks() -> void:
 		verify(not save._valid(bad), "Checkpoint validation rejects duplicated special components")
 		if "--capture" in OS.get_cmdline_user_args() and zone == 0:
 			await capture(world, "restored", city.sites[2].position.x)
+			world.cycle.phase = "NOCHE"
+			world.view._process(3)
+			await capture(world, "night", city.sites[2].position.x)
+			world.cycle.phase = "DÍA"
+			world.view._process(3)
 			world.story.journal.open_panel()
 			world.story.journal.settlement_button.pressed.emit()
 			await capture(world, "journal", city.sites[2].position.x)

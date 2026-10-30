@@ -17,6 +17,7 @@ var sites: Array[SettlementSupport] = []
 var caches: Array[RelicCache] = []
 var components: Array[int] = [0, 0, 0]
 var healing_time: float = 0
+var courier: SettlementCourier
 
 func setup(district: District) -> void:
 	world = district
@@ -37,6 +38,10 @@ func setup(district: District) -> void:
 		cache.position = Vector2(find_space(anchor + world.zone_index * 43), GameRules.FLOOR_Y)
 		caches.append(cache)
 		add_child(cache)
+
+	courier = SettlementCourier.new()
+	courier.system = self
+	add_child(courier)
 
 func find_space(anchor: float) -> float:
 	for attempt: int in 121:
@@ -127,7 +132,14 @@ func refresh_bonuses() -> void:
 	world.colony.work_factor = 1.0 + sites[0].tier * 0.25
 	world.defenses.settlement_damage_factor = 1.0 + sites[1].tier * 0.15
 
+func recovery_at(x: float) -> float:
+	var recovery: float = 0.0
+	for site: SettlementSupport in sites:
+		if absf(site.position.x - x) < (900 if site.tier == 2 else 560): recovery = maxf(recovery, site.tier * 0.5)
+	return recovery
+
 func tick(delta: float) -> void:
+	courier.tick(delta)
 	for site: SettlementSupport in sites: site.tick(delta)
 	for cache: RelicCache in caches: cache.tick(delta)
 	healing_time += delta
@@ -154,6 +166,7 @@ func journal_text() -> String:
 		text += "[color=#ffce75]%s · %s %d[/color]\n" % [SPECS[index].title, direction, int(absf(site.position.x))]
 		text += ("En ruinas" if site.tier == 0 else "Nivel %d" % site.tier) + " · " + effect(index, maxi(1, site.tier)) + "\n"
 		text += "Componente: %s · disponibles %d\n\n" % [NAMES[index], components[index]]
+	text += courier.status() + "\n\n"
 	text += "[color=#47dacb]DEPÓSITOS DE TECNOLOGÍA[/color]\n"
 	for cache: RelicCache in caches:
 		text += "%s · %s %d · %s\n" % [NAMES[cache.kind], "izq." if cache.position.x < 0 else "der.", int(absf(cache.position.x)), "recuperado" if cache.claimed else "sin explorar"]
@@ -165,11 +178,12 @@ func snapshot() -> Dictionary:
 	for site: SettlementSupport in sites: buildings.append({"x": site.position.x, "tier": site.tier, "ordered": site.ordered, "progress": site.progress})
 	var storage: Array = []
 	for cache: RelicCache in caches: storage.append({"x": cache.position.x, "claimed": cache.claimed})
-	return {"sites": buildings, "caches": storage, "components": components.duplicate(), "healing": healing_time}
+	return {"courier": courier.snapshot(), "sites": buildings, "caches": storage, "components": components.duplicate(), "healing": healing_time}
 
 func valid(value: Variant) -> bool:
 	if not value is Dictionary: return false
 	if value.is_empty(): return true
+	if not SettlementCourier.valid(value.get("courier", {})): return false
 	if not value.get("sites") is Array or value.sites.size() != 3 or not value.get("caches") is Array or value.caches.size() != 6: return false
 	if not value.get("components") is Array or value.components.size() != 3 or not ExpansionSystem.number(value.get("healing"), 0, 1): return false
 	for index: int in 3:
@@ -212,4 +226,5 @@ func restore(data: Dictionary) -> void:
 		var entry: Dictionary = data.caches[index] if not data.is_empty() else {}
 		caches[index].position.x = float(entry.get("x", caches[index].position.x))
 		caches[index].claimed = entry.get("claimed", false)
+	courier.restore(data.get("courier", {}))
 	refresh_bonuses()
