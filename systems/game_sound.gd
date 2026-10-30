@@ -31,7 +31,7 @@ const CUES: Dictionary = {
 }
 const VOICES: int = 12
 ## Segundo desde el que entra el tema de derrota.
-const DEFEAT_START: float = 4.0
+const DEFEAT_START: float = 3.0
 var district: Node2D
 var voices: Array[AudioStreamPlayer] = []
 var music: Array[AudioStreamPlayer] = []
