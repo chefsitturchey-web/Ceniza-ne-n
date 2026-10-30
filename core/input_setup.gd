@@ -17,6 +17,7 @@ static func configure_input() -> void:
 		InputMap.action_add_event(entry[0], axis)
 	add_action("attack", KEY_J, JOY_BUTTON_X)
 	add_action("dodge", KEY_SPACE, JOY_BUTTON_A)
+	add_action("sprint", KEY_SHIFT, JOY_BUTTON_DPAD_DOWN)
 	add_action("interact", KEY_E, JOY_BUTTON_Y)
 	add_action("overload", KEY_Q, JOY_BUTTON_LEFT_SHOULDER)
 	add_action("pause", KEY_ESCAPE, JOY_BUTTON_START)

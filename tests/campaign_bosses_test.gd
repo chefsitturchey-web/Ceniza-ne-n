@@ -176,7 +176,7 @@ func run_checks() -> void:
 	world.story.present_dialogue = false
 	current_scene = world
 	freeze(world)
-	verify(world.player.speed == 220 and world.player.attack_damage == 50 and world.cycle.config.day_duration == 180, "Conserva personaje y ofrece preparación de colonia")
+	verify(world.player.speed == 100 and world.player.attack_damage == 50 and world.cycle.config.day_duration == 180, "Conserva personaje y ofrece preparación de colonia")
 	world.neural.kills = 60
 	verify(world.neural.install("blade") and world.neural.upgrade_module("tesla"), "Prepara mejoras para traslado")
 	world.colony.add_worker(&"collector")

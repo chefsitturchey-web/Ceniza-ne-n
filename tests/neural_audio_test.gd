@@ -35,7 +35,7 @@ func run_checks() -> void:
 	verify(world.experience.defeated == 6 and neural.points() == 1, "Las muertes dejan experiencia que se recoge una sola vez")
 	verify(not neural.install("inexistente") and neural.points() == 1, "Una mejora desconocida no consume puntos")
 	verify(neural.install("blade") and world.player.neural_damage == 10, "Filo instalado")
-	verify(world.player.attack_damage == 50 and world.player.speed == 220, "Se conservan ajustes del Inspector")
+	verify(world.player.attack_damage == 50 and world.player.speed == 100, "Se conservan ajustes del Inspector")
 	var target: TrainingEnemy = TrainingEnemy.new()
 	target.position = world.player.position + Vector2(24, 0)
 	world.add_child(target)

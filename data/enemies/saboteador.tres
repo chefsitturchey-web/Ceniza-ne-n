@@ -5,7 +5,7 @@
 script = ExtResource("1")
 id = &"saboteador"
 health = 100
-speed = 52.0
+speed = 85.0
 damage = 12
 reward = 5
 windup = 0.65

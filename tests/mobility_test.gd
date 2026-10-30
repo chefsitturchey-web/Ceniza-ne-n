@@ -28,7 +28,7 @@ func run_checks() -> void:
 	world.player.position.x = MobilitySystem.PAD_X
 	verify(world.interaction.interaction_target() == InteractionSystem.MOBILITY_TARGET, "E detecta el taller de transporte")
 	verify(world.interaction.perform_interaction(InteractionSystem.MOBILITY_TARGET) and world.bank.scrap == 455 and ride.mounted, "Compra única por 45 y monta")
-	verify(world.player.speed == 220 and world.player.travel_speed_factor == 1.45, "Conserva la velocidad del Inspector y aplica un factor de viaje")
+	verify(world.player.speed == 100 and world.player.travel_speed_factor == 1.45, "Conserva la velocidad del Inspector y aplica un factor de viaje")
 	await physics_frame
 	Input.action_press("move_right")
 	for step: int in range(6): world.player._physics_process(0.1)
@@ -75,7 +75,7 @@ func run_checks() -> void:
 	load("res://tests/game_fixture.gd").stabilize(world)
 	world.expedition.restore({"destroyed": [true, true], "train_arrived": true})
 	verify(world.expedition.start(), "Viaja a un jefe con transporte adquirido")
-	verify(world.expedition.arena.player.speed == 220 and not ride.hud.visible and not world.story.hud.visible, "En arena mantiene combate a pie y oculta el HUD de colonia")
+	verify(world.expedition.arena.player.speed == 100 and not ride.hud.visible and not world.story.hud.visible, "En arena mantiene combate a pie y oculta el HUD de colonia")
 	world.expedition.resolve(false)
 	verify(ride.owned and ride.mounted, "Volver de una derrota conserva el vehículo de la colonia")
 	world.player.health = 0

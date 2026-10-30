@@ -30,8 +30,14 @@ func simulate() -> void:
 				next_order += 1
 				if next_order == world.construction.sites.size():
 					order_time = step * 0.1
-					if world.bank.scrap != 0:
-						push_error("Las cuatro obras iniciales deben pagar su coste real de 90 chatarra")
+					# El colector puede ingresar chatarra mientras el jugador recorre los
+					# cimientos, así que el saldo no tiene por qué quedar en 0. Lo que se
+					# verifica es que las cuatro obras cuesten 90 y se hayan pagado (order_site).
+					var total_cost: int = 0
+					for built: ConstructionSite in world.construction.sites:
+						total_cost += built.cost
+					if total_cost != 90 or world.bank.scrap < 0:
+						push_error("Las cuatro obras iniciales deben costar y pagar 90 chatarra reales")
 						world.free()
 						quit(1)
 						return

@@ -9,6 +9,9 @@ const DODGE_COST: float = 20.0
 const DODGE_COOLDOWN: float = 3.0
 const DODGE_SPEED: float = 420.0
 const DODGE_DURATION: float = 0.22
+## Correr: multiplica la velocidad de caminar mientras se mantiene "sprint".
+const SPRINT_MULTIPLIER: float = 1.5
+const SPRINT_COST: float = 5.0
 const HIT_INVULNERABILITY: float = 0.6
 const RESPAWN_INVULNERABILITY: float = 2.0
 const RESPAWN_DURATION: float = 4.0
@@ -26,7 +29,7 @@ var hitbox: HitboxComponent = HitboxComponent.new()
 var visual: PlayerVisual = PlayerVisual.new()
 
 ## Combate manual y esquiva. Los ajustes del Inspector se conservan.
-@export var speed: float = 150.0
+@export var speed: float = 100.0
 var terrain_speed_factor: float = 1.0
 var travel_speed_factor: float = 1.0
 var mobility: MobilitySystem
@@ -107,7 +110,6 @@ func _physics_process(delta: float) -> void:
 	attack_anim_remaining = maxf(0.0, attack_anim_remaining - delta)
 	invulnerable = maxf(0.0, invulnerable - delta)
 	dodge_cooldown_remaining = maxf(0.0, dodge_cooldown_remaining - delta)
-	stamina = minf(MAX_STAMINA, stamina + (STAMINA_REGEN + neural_regen) * delta)
 	_apply_poison(delta)
 	if respawn_remaining > 0.0:
 		respawn_remaining = maxf(0.0, respawn_remaining - delta)
@@ -120,6 +122,11 @@ func _physics_process(delta: float) -> void:
 	var direction: float = Input.get_axis("move_left", "move_right")
 	var was_grounded: bool = is_on_floor()
 	var previous_speed: float = velocity.x
+	var sprinting: bool = InputMap.has_action("sprint") and Input.is_action_pressed("sprint") and stamina > 0.0 and absf(direction) > MOVE_THRESHOLD and dodge_remaining <= 0.0 and not riding
+	if sprinting:
+		stamina = maxf(0.0, stamina - SPRINT_COST * delta)
+	else:
+		stamina = minf(MAX_STAMINA, stamina + (STAMINA_REGEN + neural_regen) * delta)
 	if dodge_remaining <= 0.0 and absf(direction) > MOVE_THRESHOLD:
 		facing = signf(direction)
 	if Input.is_action_just_pressed("dodge"):
@@ -128,7 +135,10 @@ func _physics_process(delta: float) -> void:
 		dodge_remaining = maxf(0.0, dodge_remaining - delta)
 		velocity.x = dodge_direction * DODGE_SPEED
 	else:
-		velocity.x = move_toward(velocity.x, direction * speed * terrain_speed_factor * travel_speed_factor, acceleration * delta)
+		var move_speed: float = speed * terrain_speed_factor * travel_speed_factor
+		if sprinting:
+			move_speed *= SPRINT_MULTIPLIER
+		velocity.x = move_toward(velocity.x, direction * move_speed, acceleration * delta)
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	move_and_slide()

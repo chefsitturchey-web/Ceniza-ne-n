@@ -27,7 +27,7 @@ func run_checks() -> void:
 		var data: EnemyData = load("res://data/enemies/%s.tres" % id)
 		var runner: bool = id == "corredor"
 		verify(data.id == id and data.health == (60 if runner else 100), id + ": identidad y vida")
-		verify(data.speed == (56.0 if runner else 32.0) and data.damage == (8 if runner else 12), id + ": velocidad y daño")
+		verify(data.speed == (90.0 if runner else 32.0) and data.damage == (8 if runner else 12), id + ": velocidad y daño")
 		verify(data.reward == 3 and data.health_per_night == 20, id + ": recompensa y escalado")
 		verify(data.windup == 0.5 and data.cooldown == 1.1 and data.attack_visual_duration == 1.6, id + ": tiempos de ataque")
 		verify(data.hurt_duration == 0.32 and data.flash_duration == 0.12, id + ": reacción visual")

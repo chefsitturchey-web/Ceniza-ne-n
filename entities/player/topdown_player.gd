@@ -11,7 +11,7 @@ const FRAMES: SpriteFrames = preload("res://entities/player/player_frames.tres")
 const VIEWS: Array[Texture2D] = [preload("res://assets/player/topdown/idle_south.png"), preload("res://assets/player/topdown/idle_north.png"), preload("res://assets/player/topdown/idle_east.png"), preload("res://assets/player/topdown/idle_west.png")]
 var health: int = Player.MAX_HEALTH
 var stamina: float = Player.MAX_STAMINA
-var speed: float = 220.0
+var speed: float = 100.0
 var attack_damage: int = 50
 var attack_range: float = 42.0
 var attack_cooldown: float = 0.4
@@ -82,8 +82,12 @@ func _physics_process(delta: float) -> void:
 	cooldown = maxf(0, cooldown - delta)
 	slash_remaining = maxf(0, slash_remaining - delta)
 	attack_anim_remaining = maxf(0, attack_anim_remaining - delta)
-	stamina = minf(Player.MAX_STAMINA, stamina + (Player.STAMINA_REGEN + neural_regen) * delta)
 	var direction: Vector2 = Input.get_vector("move_left", "move_right", "arena_up", "arena_down")
+	var sprinting: bool = InputMap.has_action("sprint") and Input.is_action_pressed("sprint") and stamina > 0.0 and direction.length() > Player.MOVE_THRESHOLD and dodge_remaining <= 0.0
+	if sprinting:
+		stamina = maxf(0.0, stamina - Player.SPRINT_COST * delta)
+	else:
+		stamina = minf(Player.MAX_STAMINA, stamina + (Player.STAMINA_REGEN + neural_regen) * delta)
 	if dodge_remaining <= 0 and direction.length() > Player.MOVE_THRESHOLD:
 		facing = direction.normalized()
 	if Input.is_action_just_pressed("dodge"):
@@ -92,7 +96,7 @@ func _physics_process(delta: float) -> void:
 		velocity = dodge_direction * Player.DODGE_SPEED
 		dodge_remaining = maxf(0, dodge_remaining - delta)
 	else:
-		velocity = direction * speed + knockback
+		velocity = direction * speed * (Player.SPRINT_MULTIPLIER if sprinting else 1.0) + knockback
 	knockback = knockback.move_toward(Vector2.ZERO, 900 * delta)
 	move_and_slide()
 	step_timer = maxf(0, step_timer - delta)

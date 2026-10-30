@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"corredor"
 health = 60
-speed = 56.0
+speed = 90.0
 damage = 8
 scene = ExtResource("2")
 move_animation = &"correr"

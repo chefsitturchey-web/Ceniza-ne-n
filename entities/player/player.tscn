@@ -8,7 +8,7 @@ size = Vector2(16, 30)
 
 [node name="Player" type="CharacterBody2D" unique_id=427188144]
 script = ExtResource("1")
-speed = 220.0
+speed = 100.0
 attack_damage = 50
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1851775431]

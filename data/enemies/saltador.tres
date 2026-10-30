@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"saltador"
 health = 75
-speed = 50.0
+speed = 80.0
 damage = 8
 reward = 4
 scene = ExtResource("2")
