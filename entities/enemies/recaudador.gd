@@ -6,6 +6,8 @@ signal fired(origin: Vector2, direction: Vector2)
 signal cue_requested(id: String)
 signal phase_changed(number: int)
 signal hit_feedback(blocked: bool)
+## Avisa el principio y el final de una embestida para que el rumor la acompañe.
+signal dash_changed(active: bool)
 enum State { APPROACH, CLAW_WINDUP, CLAW, VOLLEY_WINDUP, VOLLEY, CHARGE_WINDUP, CHARGE, STUNNED, RECOVER, DEAD }
 ## Around 20 exposed windows at base damage; target 3-5 minutes with flank hits.
 @export var max_health: int = 10000
@@ -114,6 +116,10 @@ func change_state(value: State, duration: float) -> void:
 		cue_requested.emit("alarm")
 	elif value == State.STUNNED:
 		cue_requested.emit("hit")
+	if value == State.CHARGE and state != State.CHARGE:
+		dash_changed.emit(true)
+	elif state == State.CHARGE and value != State.CHARGE:
+		dash_changed.emit(false)
 	state = value
 	timer = duration
 	velocity = Vector2.ZERO
@@ -160,7 +166,6 @@ func _physics_process(delta: float) -> void:
 		State.CHARGE_WINDUP:
 			if timer <= 0:
 				change_state(State.CHARGE, 1.8)
-				cue_requested.emit("dash")
 		State.CHARGE:
 			var before: Vector2 = global_position
 			velocity = charge_direction * (360 if phase == 1 else 440)
@@ -230,6 +235,8 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 	var factor: float = hit_multiplier(origin)
 	var damage: int = maxi(1, int(amount * factor)) if factor > 0 else 0
 	hit_feedback.emit(damage == 0)
+	if damage == 0:
+		cue_requested.emit("shield")
 	effects.emit_pixels(global_position + (origin - global_position).normalized() * 28, 5, Color("ffce75"))
 	health = maxi(0, health - damage)
 	if damage > 0 and combat_visual != null: combat_visual.pulse_hurt()

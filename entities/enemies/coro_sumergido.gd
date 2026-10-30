@@ -101,6 +101,7 @@ func _physics_process(delta: float) -> void:
 		if pulse_timer <= 0 and silence_left <= 0:
 			if waves.size() < 6:
 				waves.append({"radius": 18.0, "hit": false, "origin": global_position, "gap": (target.global_position - global_position).angle() + PI * 0.55})
+				cue_requested.emit("sonar")
 			pulse_timer = 1.5 if phase == 2 else 2.4
 		if mark_timer <= 0 and marks.size() < 6:
 			add_marks()

@@ -155,6 +155,186 @@ def render(spec):
     return wave_data
 
 
+def render_rumble(spec):
+    """Rumor continuo: sin envolvente de caída, pensado para durar todo un estado.
+
+    La tierra moviéndose es ruido muy filtrado hacia abajo con temblor lento.
+    """
+    rng = np.random.default_rng(spec.get("seed", 1))
+    seconds = spec.get("seconds", 2.0)
+    n = int(seconds * RATE)
+    t = np.arange(n) / RATE
+    freq = spec["start"] * np.power(2.0, spec.get("slide", 0.0) * t)
+    freq = np.clip(freq, spec.get("min", 30.0), RATE * 0.45)
+    phase = np.cumsum(2.0 * np.pi * freq / RATE)
+    data = oscillator(phase, "noise", 0.5, rng)
+    data *= 1.0 + spec.get("tremolo", 0.0) * np.sin(2.0 * np.pi * spec.get("tremolo_rate", 5.0) * t)
+    data = lowpass(data, spec["lowpass"], spec.get("lowpass_sweep", 0.0), spec.get("resonance", 0.0))
+    if spec.get("highpass", 0.0) > 0.0:
+        data = highpass(data, spec["highpass"])
+    drive = spec.get("drive", 0.0)
+    if drive > 0.0:
+        data = np.tanh(data * drive) / np.tanh(drive)
+    data = highpass(data, 20.0)
+    # Cierre corto: si la embestida dura todo el archivo, no debe cortarse en seco.
+    fade = min(len(data), int(0.03 * RATE))
+    data[-fade:] *= np.linspace(1.0, 0.0, fade)
+    peak = np.max(np.abs(data)) + 1e-9
+    return data * 10.0 ** (spec.get("peak_db", -8.0) / 20.0) / peak
+
+
+def render_sfxr(ps):
+    """Port fiel del motor de jsfxr (sfxr.js), para presets en su escala 0-1.
+
+    Se usa cuando el sonido viene de la web: traducir esos parámetros a Hz y
+    segundos cambia el resultado, así que se reproduce el algoritmo original.
+    """
+    sample_rate = int(ps.get("sample_rate", 44100))
+    rng = np.random.default_rng(int(ps.get("seed", 1)))
+    oversampling = 8
+    shape = int(ps.get("wave_type", 0))
+
+    fltw = ps["p_lpf_freq"] ** 3 * 0.1
+    enable_lpf = ps["p_lpf_freq"] != 1
+    fltw_d = 1 + ps["p_lpf_ramp"] * 0.0001
+    fltdmp = min(5 / (1 + ps["p_lpf_resonance"] ** 2 * 20) * (0.01 + fltw), 0.8)
+    flthp = ps["p_hpf_freq"] ** 2 * 0.1
+    flthp_d = 1 + ps["p_hpf_ramp"] * 0.0003
+
+    vibrato_speed = ps["p_vib_speed"] ** 2 * 0.01
+    vibrato_amplitude = ps["p_vib_strength"] * 0.5
+
+    env_length = [int(ps["p_env_attack"] ** 2 * 100000),
+                  int(ps["p_env_sustain"] ** 2 * 100000),
+                  int(ps["p_env_decay"] ** 2 * 100000)]
+    punch = ps["p_env_punch"]
+
+    flanger_offset = ps["p_pha_offset"] ** 2 * 1020 * (-1 if ps["p_pha_offset"] < 0 else 1)
+    flanger_slide = ps["p_pha_ramp"] ** 2 * (-1 if ps["p_pha_ramp"] < 0 else 1)
+
+    gain = np.exp(ps.get("sound_vol", 0.25)) - 1
+
+    period = 100 / (ps["p_base_freq"] ** 2 + 0.001)
+    period_max = 100 / (ps["p_freq_limit"] ** 2 + 0.001)
+    cutoff = ps["p_freq_limit"] > 0
+    period_mult = 1 - ps["p_freq_ramp"] ** 3 * 0.01
+    period_mult_slide = -ps["p_freq_dramp"] ** 3 * 0.000001
+    duty = 0.5 - ps["p_duty"] * 0.5
+    duty_slide = -ps["p_duty_ramp"] * 0.00005
+    arpeggio = 1 - ps["p_arp_mod"] ** 2 * 0.9 if ps["p_arp_mod"] >= 0 else 1 + ps["p_arp_mod"] ** 2 * 10
+    arpeggio_time = int((1 - ps["p_arp_speed"]) ** 2 * 20000 + 32)
+    if ps["p_arp_speed"] == 1:
+        arpeggio_time = 0
+
+    fltp = fltdp = fltphp = 0.0
+    noise = rng.uniform(-1.0, 1.0, 32)
+    stage = 0
+    elapsed_env = 0
+    vibrato_phase = 0.0
+    phase = 0.0
+    ipp = 0
+    flanger = np.zeros(1024)
+    summands = max(1, int(44100 / sample_rate))
+    sample_sum = 0.0
+    num_summed = 0
+    output = []
+
+    for step in range(sample_rate * 4):
+        if arpeggio_time != 0 and step >= arpeggio_time:
+            arpeggio_time = 0
+            period *= arpeggio
+
+        period_mult += period_mult_slide
+        period *= period_mult
+        if period > period_max:
+            period = period_max
+            if cutoff:
+                break
+
+        rfperiod = period
+        if vibrato_amplitude > 0:
+            vibrato_phase += vibrato_speed
+            rfperiod = period * (1 + np.sin(vibrato_phase) * vibrato_amplitude)
+        iperiod = max(int(rfperiod), oversampling)
+
+        duty += duty_slide
+        duty = min(max(duty, 0.0), 0.5)
+
+        elapsed_env += 1
+        if elapsed_env > env_length[stage]:
+            elapsed_env = 0
+            stage += 1
+            if stage > 2:
+                break
+        envf = elapsed_env / env_length[stage] if env_length[stage] > 0 else 1.0
+        if stage == 0:
+            env_vol = envf
+        elif stage == 1:
+            env_vol = 1 + (1 - envf) * 2 * punch
+        else:
+            env_vol = 1 - envf
+
+        flanger_offset += flanger_slide
+        iphase = min(abs(int(flanger_offset)), 1023)
+
+        if flthp_d != 0:
+            flthp *= flthp_d
+            flthp = min(max(flthp, 0.00001), 0.1)
+
+        sample = 0.0
+        for _ in range(oversampling):
+            phase += 1
+            if phase >= iperiod:
+                phase %= iperiod
+                if shape == 3:
+                    noise = rng.uniform(-1.0, 1.0, 32)
+            fp = phase / iperiod
+            if shape == 0:
+                sub = 0.5 if fp < duty else -0.5
+            elif shape == 1:
+                sub = -1 + 2 * fp / duty if fp < duty else 1 - 2 * (fp - duty) / (1 - duty)
+            elif shape == 2:
+                sub = np.sin(fp * 2 * np.pi)
+            else:
+                sub = noise[int(phase * 32 / iperiod) % 32]
+
+            previous = fltp
+            fltw *= fltw_d
+            fltw = min(max(fltw, 0.0), 0.1)
+            if enable_lpf:
+                fltdp += (sub - fltp) * fltw
+                fltdp -= fltdp * fltdmp
+            else:
+                fltp = sub
+                fltdp = 0.0
+            fltp += fltdp
+
+            fltphp += fltp - previous
+            fltphp -= fltphp * flthp
+            sub = fltphp
+
+            flanger[ipp & 1023] = sub
+            sub += flanger[(ipp - iphase + 1024) & 1023]
+            ipp = (ipp + 1) & 1023
+            sample += sub * env_vol
+
+        sample_sum += sample
+        num_summed += 1
+        if num_summed < summands:
+            continue
+        sample = sample_sum / summands
+        sample_sum = 0.0
+        num_summed = 0
+        sample = sample / oversampling * gain
+        # Cuantización a 8 bits como el original, guardada luego en 16.
+        quantized = min(max(np.floor((sample + 1.0) * 128.0), 0.0), 255.0)
+        output.append(quantized / 128.0 - 1.0)
+
+    data = np.array(output, dtype=np.float64)
+    peak = np.max(np.abs(data)) + 1e-9
+    return data * 10.0 ** (ps.get("peak_db", -6.0) / 20.0) / peak
+
+
 def save(group, name, data):
     folder = DST / group
     folder.mkdir(parents=True, exist_ok=True)
@@ -169,11 +349,21 @@ def save(group, name, data):
 
 PRESETS = {
     # --- Combate base ---
-    # Corte de espada: banda de aire que baja de 4,8 kHz a 1 kHz, con algo de
-    # resonancia para que el filo tenga filo metálico y no sea solo viento.
-    "slash": dict(wave="noise", attack=0.002, sustain=0.012, decay=0.100, start=2800.0,
-                  min=350.0, slide=-14.0, lowpass=4800.0, lowpass_sweep=-20000.0,
-                  resonance=0.20, highpass=1600.0, highpass_sweep=-11000.0, drive=2.6, seed=7),
+    # Corte de espada: preset "laser shoot" de jsfxr, tal cual se descargó.
+    # Va en parámetros de sfxr (0-1) y se reproduce con su propio motor.
+    "slash": dict(peak_db=-6.0, sfxr={
+        "wave_type": 3,
+        "p_env_attack": 0, "p_env_sustain": 0.067, "p_env_punch": 0, "p_env_decay": 0.514,
+        "p_base_freq": 0.647, "p_freq_limit": 0.192, "p_freq_ramp": -0.067, "p_freq_dramp": -0.506,
+        "p_vib_strength": 0, "p_vib_speed": 0,
+        "p_arp_mod": -0.145, "p_arp_speed": 0,
+        "p_duty": 0, "p_duty_ramp": -0.5036802108433026,
+        "p_repeat_speed": 0,
+        "p_pha_offset": 0.09, "p_pha_ramp": 0.027,
+        "p_lpf_freq": 0.153, "p_lpf_ramp": 0.137, "p_lpf_resonance": 1,
+        "p_hpf_freq": 1, "p_hpf_ramp": 1,
+        "sound_vol": 0.25, "sample_rate": 44100, "sample_size": 8,
+    }),
     # Láser: barrido descendente rápido y seco.
     "shot": dict(wave="square", duty=0.5, attack=0.0, sustain=0.008, decay=0.060, start=2400.0,
                  min=220.0, slide=-30.0, punch=0.10, highpass=400.0, seed=11),
@@ -183,14 +373,36 @@ PRESETS = {
                  slide=-10.0, lowpass=900.0, seed=17),
     "dodge": dict(wave="square", duty=0.25, attack=0.005, sustain=0.030, decay=0.080, start=680.0, min=140.0,
                   slide=-6.0, punch=0.10, lowpass=2600.0, seed=19),
-    # Embestida de jefe: ráfaga de aire que baja de tono mientras avanza.
-    "dash": dict(wave="noise", attack=0.004, sustain=0.030, decay=0.220, start=900.0, min=120.0,
-                 slide=-4.0, lowpass=2200.0, lowpass_sweep=-1200.0, highpass=220.0,
-                 highpass_sweep=-150.0, drive=2.0, peak_db=-8.0, seed=101),
-    # La misma embestida para Santa Caldera: más grave, más larga y con más cuerpo.
-    "dash_caldera": dict(wave="noise", attack=0.004, sustain=0.045, decay=0.300, start=500.0,
-                         min=60.0, slide=-2.5, punch=0.20, lowpass=1400.0, lowpass_sweep=-500.0,
-                         highpass=90.0, drive=3.0, peak_db=-7.0, seed=103),
+    # Embestida de jefe: rumor de tierra que dura todo el desplazamiento.
+    # Sin envolvente: el juego lo arranca al cargar y lo corta al terminar.
+    "dash": dict(seconds=2.2, start=240.0, min=40.0, slide=-1.2, lowpass=420.0, resonance=0.28,
+                 highpass=70.0, tremolo=0.35, tremolo_rate=5.5, drive=2.2, peak_db=-8.0, seed=101),
+    # La misma embestida para Santa Caldera: más grave, más pesada, más lenta.
+    "dash_caldera": dict(seconds=2.2, start=170.0, min=28.0, slide=-1.6, lowpass=320.0, resonance=0.32,
+                         highpass=55.0, tremolo=0.45, tremolo_rate=4.2, drive=3.0, peak_db=-7.0, seed=103),
+    # Ola de sonar: ruido que se abre con un golpe de volumen y se apaga.
+    "sonar": dict(wave="noise", attack=0.220, sustain=0.180, decay=0.500, start=900.0, min=120.0,
+                  slide=-3.0, lowpass=1400.0, lowpass_sweep=800.0, resonance=0.15, highpass=150.0,
+                  drive=1.8, peak_db=-8.0, seed=107),
+    # Escudo que rebota: misma receta que el slash (ruido con filtro resonante),
+    # algo más agudo y más largo para leerse como un rebote y no como un tajo.
+    "shield": dict(peak_db=-10.0, sfxr={
+        "wave_type": 3,
+        "p_env_attack": 0, "p_env_sustain": 0.04, "p_env_punch": 0, "p_env_decay": 0.30,
+        "p_base_freq": 0.85, "p_freq_limit": 0.35, "p_freq_ramp": -0.09, "p_freq_dramp": -0.35,
+        "p_vib_strength": 0, "p_vib_speed": 0,
+        "p_arp_mod": -0.145, "p_arp_speed": 0,
+        "p_duty": 0, "p_duty_ramp": -0.5036802108433026,
+        "p_repeat_speed": 0,
+        "p_pha_offset": 0.05, "p_pha_ramp": 0.02,
+        "p_lpf_freq": 0.22, "p_lpf_ramp": 0.137, "p_lpf_resonance": 1,
+        "p_hpf_freq": 1, "p_hpf_ramp": 1,
+        "sound_vol": 0.25, "sample_rate": 44100, "sample_size": 8,
+    }),
+    # Pulso de fuego: ráfaga con cuerpo y crepitar, más brillante que la caldera.
+    "fire_pulse": dict(wave="noise", attack=0.004, sustain=0.050, decay=0.280, start=700.0, min=60.0,
+                       slide=-3.5, punch=0.20, lowpass=2400.0, lowpass_sweep=-900.0, resonance=0.25,
+                       highpass=120.0, drive=2.6, peak_db=-7.0, seed=113),
     # Klaxon de aviso: alterna dos alturas cada 140 ms sobre la misma nota base.
     "alarm": dict(wave="square", duty=0.5, attack=0.005, sustain=0.300, decay=0.145, start=620.0,
                   min=600.0, arp_mult=1.5, arp_speed=0.14, lowpass=2600.0, highpass=300.0,
@@ -245,7 +457,8 @@ PRESETS = {
 
 
 GROUPS = {
-    "combate": ["slash", "shot", "hit", "step", "dodge", "alarm", "upgrade", "destroy", "dash", "dash_caldera"],
+    "combate": ["slash", "shot", "hit", "step", "dodge", "alarm", "upgrade", "destroy", "dash", "dash_caldera",
+                "sonar", "shield", "fire_pulse"],
     "economia": ["denied", "pickup", "build_order", "build_done", "repair"],
     "hitos": ["overload", "portal_destroyed", "boss_phase", "player_death", "respawn"],
     "interfaz": ["ui_click", "ui_hover", "ui_move", "ui_back"],
@@ -256,7 +469,13 @@ GROUPS = {
 def main():
     for group, names in GROUPS.items():
         for name in names:
-            data = render(PRESETS[name])
+            spec = PRESETS[name]
+            if "sfxr" in spec:
+                data = render_sfxr(dict(spec["sfxr"], peak_db=spec.get("peak_db", -6.0)))
+            elif "seconds" in spec:
+                data = render_rumble(spec)
+            else:
+                data = render(spec)
             path = save(group, name, data)
             print("%-9s %-21s %6.1f ms" % (group, name, len(data) / RATE * 1000.0))
     unused = [name for name in PRESETS if name not in sum(GROUPS.values(), [])]
