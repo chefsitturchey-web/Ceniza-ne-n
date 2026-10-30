@@ -144,6 +144,7 @@ La guía detallada de esta versión está en [INICIO.md](INICIO.md).
 | Acción | Teclado | Mando |
 |---|---|---|
 | Moverse | A / D (W / S en la arena) | Stick izquierdo / cruceta |
+| Correr (gasta estamina) | Mantener Shift | Cruceta abajo |
 | Atacar en arenas de jefe | J | X / Cuadrado |
 | Esquivar | Espacio | A / Cruz |
 | Construir, reparar, reclutar, viajar | Mantener E | Mantener Y / Triángulo |

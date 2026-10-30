@@ -11,6 +11,7 @@ Para revisar las animaciones de aliados y profesiones, abre `levels/story/unit_a
 | Acción | Teclado | Mando Xbox |
 |---|---|---|
 | Mover | A/D o flechas | Stick izquierdo / cruceta |
+| Correr (gasta estamina) | Mantener Shift | Cruceta abajo |
 | Construir, reclutar, comprar herramientas, operar | Mantener E | Mantener Y |
 | Asaltar el frente donde estás / retirar tropas | F | Cruceta arriba |
 | Esquivar | Espacio | A |
