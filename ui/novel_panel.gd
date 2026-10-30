@@ -5,6 +5,10 @@ signal finished(scene_id: String)
 const PORTRAITS: Texture2D = preload("res://assets/story/portraits_manga_v2.png")
 const ANTAGONISTS: Texture2D = preload("res://assets/story/antagonists_manga_v2.png")
 const CAST: Array[String] = ["mara", "ivo", "vera", "nox", "eco", "portador"]
+## Voz de texto: un blip corto por personaje, emoción y altura, sin voces reales.
+const VOICE_INTERVAL: float = 0.08
+## Varias voces a la vez: un blip largo no corta al siguiente.
+const VOICE_VOICES: int = 3
 var opened: bool = false
 var closed_frame: int = -1
 var scene_data: Dictionary = {}
@@ -29,6 +33,12 @@ var partner: String = "mara"
 var transition: Tween
 var stage: Control
 var reduced_motion: bool = false
+var voices: Array[AudioStreamPlayer] = []
+var voice_stream: AudioStream
+var voice_pitch: float = 1.0
+var voice_db: float = -14.0
+var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var blip_wait: float = 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -86,6 +96,13 @@ func _ready() -> void:
 	curtain.color = Color.BLACK
 	curtain.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stage.add_child(curtain)
+	for index: int in range(VOICE_VOICES):
+		var player: AudioStreamPlayer = AudioStreamPlayer.new()
+		player.bus = &"SFX"
+		player.process_mode = Node.PROCESS_MODE_ALWAYS
+		add_child(player)
+		voices.append(player)
+	rng.randomize()
 	hide()
 
 func portrait(at: Vector2) -> TextureRect:
@@ -116,6 +133,7 @@ func button(text: String, at: Vector2, extent: Vector2, action: Callable) -> But
 	result.text = text
 	result.add_theme_font_size_override("font_size", 12)
 	result.pressed.connect(action)
+	UiSound.attach(result)
 	stage.add_child(result)
 	return result
 
@@ -153,6 +171,8 @@ func play(data: Dictionary, allow_paused: bool = false) -> bool:
 
 func show_line() -> void:
 	var line: Dictionary = scene_data.lines[line_index]
+	var parts: PackedStringArray = String(scene_data.get("id", "")).split(":")
+	var section: String = parts[parts.size() - 1] if parts.size() > 1 else "opening"
 	if line.speaker not in ["portador", "narrator"]: partner = line.speaker
 	left.texture = actor_texture(partner)
 	left.modulate = Color.WHITE if line.speaker == partner else Color(0.56, 0.64, 0.72, 0.85)
@@ -164,6 +184,11 @@ func show_line() -> void:
 	body.text = line.text
 	body.visible_characters = 0
 	reveal = 0
+	blip_wait = 0.0
+	var actor: String = String(line.speaker)
+	voice_stream = VoiceLibrary.stream_for(actor, VoiceLibrary.emotion_for(section), rng.randi_range(1, VoiceLibrary.VARIANTS))
+	voice_pitch = pow(2.0, VoiceLibrary.shift_for(actor) / 12.0)
+	voice_db = -20.0 if actor == "narrator" else -14.0
 	counter.text = "%d / %d" % [line_index + 1, scene_data.lines.size()]
 	previous_button.disabled = line_index == 0
 	next_button.text = "Continuar  ›" if line_index < scene_data.lines.size() - 1 else "Volver al juego"
@@ -174,9 +199,32 @@ func _process(delta: float) -> void:
 	if not reduced_motion:
 		left.position.y = 24 + sin(elapsed * 1.7) * 0.8
 		right.position.y = 24 + sin(elapsed * 1.6 + 1) * 0.8
-	if not transitioning:
-		reveal += delta * 44
-		body.visible_characters = mini(body.get_total_character_count(), int(reveal))
+	blip_wait = maxf(0.0, blip_wait - delta)
+	var total: int = body.get_total_character_count()
+	# Solo avanza y suena mientras quede texto: sin la condición, reveal seguía
+	# creciendo y los blips se repetían en bucle con la línea ya completa.
+	if not transitioning and body.visible_characters < total:
+		var before: int = int(reveal)
+		reveal = minf(reveal + delta * 44.0, float(total))
+		body.visible_characters = mini(total, int(reveal))
+		if int(reveal) > before:
+			_speak()
+
+func _speak() -> void:
+	if blip_wait > 0.0 or DisplayServer.get_name() == "headless" or voice_stream == null:
+		return
+	var target: AudioStreamPlayer = null
+	for player: AudioStreamPlayer in voices:
+		if not player.playing:
+			target = player
+			break
+	if target == null:
+		return
+	blip_wait = VOICE_INTERVAL
+	target.stream = voice_stream
+	target.pitch_scale = voice_pitch * (1.0 + rng.randf_range(-0.015, 0.015))
+	target.volume_db = voice_db
+	target.play()
 
 func advance() -> void:
 	if not opened or transitioning or Engine.get_process_frames() <= input_after: return

@@ -52,6 +52,7 @@ func _ready() -> void:
 	begin_button.text = "Comenzar"
 	begin_button.custom_minimum_size.y = 24
 	begin_button.pressed.connect(close_panel)
+	UiSound.attach(begin_button)
 	rows.add_child(begin_button)
 	hide()
 

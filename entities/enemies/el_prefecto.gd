@@ -55,6 +55,7 @@ func _physics_process(delta: float) -> void:
 				if not chained_thrust: charges_left = 2 if phase == 2 else 1
 				chained_thrust = false
 				change_state(State.CHARGE, 0.48)
+				cue_requested.emit("dash")
 		State.CHARGE:
 			var before: Vector2 = global_position
 			velocity = charge_direction * 460

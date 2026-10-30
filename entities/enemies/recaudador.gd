@@ -160,6 +160,7 @@ func _physics_process(delta: float) -> void:
 		State.CHARGE_WINDUP:
 			if timer <= 0:
 				change_state(State.CHARGE, 1.8)
+				cue_requested.emit("dash")
 		State.CHARGE:
 			var before: Vector2 = global_position
 			velocity = charge_direction * (360 if phase == 1 else 440)

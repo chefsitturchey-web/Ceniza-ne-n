@@ -2,14 +2,31 @@ class_name GameSound
 extends Node
 ## Audio de sesión: voces acotadas y música sincronizada por capas.
 const CUES: Dictionary = {
-	"slash": preload("res://assets/audio/sfx/slash.ogg"),
-	"shot": preload("res://assets/audio/sfx/shot.ogg"),
-	"hit": preload("res://assets/audio/sfx/hit.ogg"),
-	"step": preload("res://assets/audio/sfx/hit.ogg"),
-	"dodge": preload("res://assets/audio/sfx/dodge.ogg"),
-	"alarm": preload("res://assets/audio/sfx/alarm.ogg"),
-	"upgrade": preload("res://assets/audio/sfx/upgrade.ogg"),
-	"destroy": preload("res://assets/audio/sfx/destroy.ogg")
+	"slash": preload("res://assets/audio/sfx/8bit/combate/slash.wav"),
+	"shot": preload("res://assets/audio/sfx/8bit/combate/shot.wav"),
+	"hit": preload("res://assets/audio/sfx/8bit/combate/hit.wav"),
+	"step": preload("res://assets/audio/sfx/8bit/combate/step.wav"),
+	"dodge": preload("res://assets/audio/sfx/8bit/combate/dodge.wav"),
+	"alarm": preload("res://assets/audio/sfx/8bit/combate/alarm.wav"),
+	"upgrade": preload("res://assets/audio/sfx/8bit/combate/upgrade.wav"),
+	"destroy": preload("res://assets/audio/sfx/8bit/combate/destroy.wav"),
+	"dash": preload("res://assets/audio/sfx/8bit/combate/dash.wav"),
+	"dash_caldera": preload("res://assets/audio/sfx/8bit/combate/dash_caldera.wav"),
+	"denied": preload("res://assets/audio/sfx/8bit/economia/denied.wav"),
+	"pickup": preload("res://assets/audio/sfx/8bit/economia/pickup.wav"),
+	"build_order": preload("res://assets/audio/sfx/8bit/economia/build_order.wav"),
+	"build_done": preload("res://assets/audio/sfx/8bit/economia/build_done.wav"),
+	"repair": preload("res://assets/audio/sfx/8bit/economia/repair.wav"),
+	"overload": preload("res://assets/audio/sfx/8bit/hitos/overload.wav"),
+	"portal_destroyed": preload("res://assets/audio/sfx/8bit/hitos/portal_destroyed.wav"),
+	"boss_phase": preload("res://assets/audio/sfx/8bit/hitos/boss_phase.wav"),
+	"player_death": preload("res://assets/audio/sfx/8bit/hitos/player_death.wav"),
+	"respawn": preload("res://assets/audio/sfx/8bit/hitos/respawn.wav"),
+	"ui_click": preload("res://assets/audio/sfx/8bit/interfaz/ui_click.wav"),
+	"ui_hover": preload("res://assets/audio/sfx/8bit/interfaz/ui_hover.wav"),
+	"ui_move": preload("res://assets/audio/sfx/8bit/interfaz/ui_move.wav"),
+	"ui_back": preload("res://assets/audio/sfx/8bit/interfaz/ui_back.wav"),
+	"dialogue": preload("res://assets/audio/sfx/8bit/voz/dialogue.wav")
 }
 const VOICES: int = 12
 var district: Node2D

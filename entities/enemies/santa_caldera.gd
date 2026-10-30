@@ -91,7 +91,9 @@ func _physics_process(delta: float) -> void:
 				charge_direction = (target.global_position - global_position).normalized()
 				change_state(State.CHARGE_WINDUP, 1.1)
 		State.CHARGE_WINDUP:
-			if timer <= 0: change_state(State.CHARGE, 0.7)
+			if timer <= 0:
+				change_state(State.CHARGE, 0.7)
+				cue_requested.emit("dash_caldera")
 		State.CHARGE:
 			velocity = charge_direction * (390 if phase == 2 else 330)
 			move_and_slide()

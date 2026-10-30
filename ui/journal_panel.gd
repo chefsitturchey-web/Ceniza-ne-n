@@ -41,6 +41,7 @@ func _ready() -> void:
 	var replay_button: Button = Button.new()
 	replay_button.text = "Ver conversación"
 	replay_button.pressed.connect(replay_scene)
+	UiSound.attach(replay_button)
 	scenes.add_child(replay_button)
 	var buttons: HBoxContainer = HBoxContainer.new()
 	buttons.add_theme_constant_override("separation", 12)
@@ -48,14 +49,17 @@ func _ready() -> void:
 	previous = Button.new()
 	previous.text = "Anterior"
 	previous.pressed.connect(func() -> void: chapter_index -= 1; refresh())
+	UiSound.attach(previous)
 	buttons.add_child(previous)
 	next = Button.new()
 	next.text = "Siguiente"
 	next.pressed.connect(func() -> void: chapter_index += 1; refresh())
+	UiSound.attach(next)
 	buttons.add_child(next)
 	var close: Button = Button.new()
 	close.text = "Volver · L / Esc"
 	close.pressed.connect(close_panel)
+	UiSound.attach(close)
 	buttons.add_child(close)
 	hide()
 
