@@ -127,8 +127,8 @@ func _draw_ash(camera_x: float) -> void:
 		draw_rect(Rect2(roundf(x), roundf(y), 1, 2 if ember else 1), Color(0.9, 0.57, 0.3, 0.45) if ember else Color(0.73, 0.8, 0.85, 0.22))
 
 func _draw_wet_ground(camera_x: float) -> void:
-	for index: int in range(30):
-		var x: float = -1500.0 + index * 106.0
+	for index: int in range(floori((camera_x - 450) / 106), ceili((camera_x + 450) / 106)):
+		var x: float = index * 106.0
 		if absf(x - camera_x) > 430:
 			continue
 		var width: float = 32.0 + index % 3 * 13.0

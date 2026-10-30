@@ -41,6 +41,8 @@ func _ready() -> void:
 		var chapter: Dictionary = CampaignStory.chapter(index)
 		instructions[0] = chapter.voice + ": " + String(chapter.opening).get_slice(".", 0) + "."
 		instructions[3] = "Rescata, recupera el relé y escolta el transporte. L abre la historia y el objetivo actual."
+	instructions[1] = "Recupera 12 piezas y levanta el núcleo con E. La mochila admite 24; el exceso puede romperse al caer."
+	instructions[2] = "Despeja solares con constructores. Murallas y generador abren el núcleo Nv.2 y las torretas."
 	for text: String in instructions:
 		var label: Label = Label.new()
 		label.text = text

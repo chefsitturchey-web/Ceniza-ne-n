@@ -71,6 +71,8 @@ func refresh() -> void:
 	previous.disabled = chapter_index <= 0
 	next.disabled = chapter_index >= story.district.zone_index
 	scene_sections.assign(["opening"])
+	if not current or story.district.core.tier > 0: scene_sections.append("foundation")
+	if not current or "%d:expansion" % chapter_index in story.seen_scenes: scene_sections.append("expansion")
 	for index: int in range(3):
 		if not current or story.completed[index]: scene_sections.append(["rescue", "relay", "convoy"][index])
 	if not current: scene_sections.append_array(["encounter", "ending"])

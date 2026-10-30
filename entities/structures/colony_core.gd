@@ -9,21 +9,26 @@ const TEXTURE: Texture2D = preload("res://assets/world/structures/core_01.png")
 var effects: StructureEffects = StructureEffects.new()
 
 var health_component: HealthComponent = HealthComponent.new()
-var tier: int = 1
+var tier: int = 0
 var ordered: bool = false
 var progress: float = 0
 var district: District
-const BUILD_TIME: float = 8
+const BUILD_TIME: float = 24
 
-func upgrade_cost() -> int: return FortressRules.UPGRADE_COSTS[tier - 1]
+func upgrade_cost() -> int: return 20 if tier == 0 else FortressRules.UPGRADE_COSTS[tier - 1]
+
+func parts_cost() -> int: return [12, 10, 18, 0][tier]
 
 func upgrade_blocker() -> String:
 	if tier >= 3: return "Núcleo al máximo"
 	if ordered: return "Núcleo en obras"
 	if district == null: return "Colonia no disponible"
+	if tier == 0: return ""
 	if district.expansion.energy_bonus() == 0: return "Primero construye un generador"
+	var walls: int = 0
 	for site: ConstructionSite in district.construction.sites:
-		if site.hp <= 0: return "Primero termina las cuatro defensas centrales"
+		if site.data.blocks_enemies and site.hp > 0: walls += 1
+	if walls < 2: return "Termina las dos murallas centrales"
 	if tier == 2:
 		if district.cycle.day < 2: return "Nv.3: resiste al menos una noche"
 		var built: int = 0
@@ -37,9 +42,13 @@ func request_upgrade() -> bool:
 	if not reason.is_empty():
 		if district != null: district.presenter.show_notice(reason)
 		return false
+	if district.bank.parts + district.bank.stored_parts < parts_cost():
+		district.presenter.show_notice("Necesitas %d piezas para el núcleo" % parts_cost())
+		return false
 	if not district.bank.spend(upgrade_cost()):
 		district.presenter.show_notice("Falta chatarra para mejorar el núcleo")
 		return false
+	district.bank.spend_parts(parts_cost())
 	ordered = true
 	progress = 0
 	district.presenter.show_notice("Núcleo encargado: espera a los constructores")
@@ -49,14 +58,18 @@ func complete_work() -> void:
 	if not ordered: return
 	var previous: int = health_component.maximum
 	tier = mini(3, tier + 1)
-	health_component.maximum = FortressRules.CORE_HEALTH[tier - 1]
-	health_component.heal(health_component.maximum - previous)
+	health_component.maximum = FortressRules.CORE_HEALTH[maxi(1, tier) - 1]
+	if tier == 1: health_component.reset()
+	else: health_component.heal(health_component.maximum - previous)
 	ordered = false
 	progress = 0
 	effects.repair_sparks()
-	if district != null:
+	if district != null and tier == 1:
+		district.presenter.show_notice("Núcleo encendido: almacena piezas y prepara la primera noche")
+		district.story.queue_dialogue("foundation")
+	elif district != null:
 		district.presenter.show_notice("Núcleo Nv.2: defensas, apoyo y transporte" if tier == 2 else "Núcleo Nv.3: fortificaciones avanzadas")
-		if district.session.save_system != null: district.session.save_system.save_game()
+	if district != null and district.session.save_system != null: district.session.save_system.save_game()
 
 func snapshot() -> Dictionary: return {"tier": tier, "ordered": ordered, "progress": progress}
 
@@ -64,13 +77,13 @@ func restore(data: Dictionary) -> void:
 	tier = int(data.get("tier", 1))
 	ordered = data.get("ordered", false)
 	progress = float(data.get("progress", 0))
-	health_component.maximum = FortressRules.CORE_HEALTH[tier - 1]
+	health_component.maximum = FortressRules.CORE_HEALTH[maxi(1, tier) - 1]
 	queue_redraw()
 
 static func valid(data: Variant) -> bool:
 	if not data is Dictionary: return false
 	if data.is_empty(): return true
-	return ExpansionSystem.number(data.get("tier"), 1, 3, true) and data.get("ordered") is bool and ExpansionSystem.number(data.get("progress"), 0, BUILD_TIME) and (data.tier < 3 or not data.ordered) and (data.ordered or data.progress == 0)
+	return ExpansionSystem.number(data.get("tier"), 0, 3, true) and data.get("ordered") is bool and ExpansionSystem.number(data.get("progress"), 0, BUILD_TIME) and (data.tier < 3 or not data.ordered) and (data.ordered or data.progress == 0)
 
 static func saved_tier(document: Dictionary) -> int:
 	if document.has("core_building"): return int(document.core_building.get("tier", 1))
@@ -117,6 +130,17 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	if tier == 0:
+		var rubble: Texture2D = preload("res://assets/world/props/scrap.png")
+		draw_texture_rect(rubble, Rect2(-32, -18, 64, 18), false, Color("6b7e8c"))
+		for side: int in [-1, 1]:
+			draw_line(Vector2(side * 44, 0), Vector2(side * 44, -8 if not ordered else -64), Color("8299a8"), 3)
+			draw_line(Vector2(side * 44, -5), Vector2(side * 28, -5), Color("47dacb"), 2)
+		if ordered:
+			draw_line(Vector2(-44, -52), Vector2(44, -52), Color("8c674d"), 3)
+			for step: int in 5:
+				if progress / BUILD_TIME > step / 5.0: draw_rect(Rect2(-28 + step * 11, -36, 9, 28), Color("304356"))
+		return
 	var art: Texture2D = FortressArt.texture("core", tier)
 	var source: Rect2 = ArtScale.source(art)
 	var frame: Rect2 = ArtScale.grounded(source, FortressArt.CORE_HEIGHTS[tier - 1])

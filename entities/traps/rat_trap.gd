@@ -6,8 +6,14 @@ extends CubeBody
 
 var armed: bool = false
 var cooldown: float = 0.0
+var art: Texture2D = load("res://assets/world/salvage/trap.png")
+
+func _draw() -> void:
+	var frame: int = 1 if not armed else (2 if cooldown > 0 else 0)
+	draw_texture_rect_region(art, Rect2(-16, -21, 32, 24), Rect2(frame * 32, 0, 32, 24), Color.WHITE if armed else Color("53616d"))
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	size = Vector2(18, 6)
 	glyph = "T"
 

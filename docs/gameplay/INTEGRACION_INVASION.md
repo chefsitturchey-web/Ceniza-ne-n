@@ -1,5 +1,7 @@
 # Integración de mecánicas de invasión
 
+Este documento registra la integración anterior. Para las reglas vigentes de mapa, núcleo, mochila y construcción consulta [Frontera y reconstrucción](FRONTERA_Y_RECONSTRUCCION.md).
+
 Se integra `origin/feature/mecanicas-invasion` (`339e1e1`) en `prueba/audio-8bit`, partiendo de `26fe467`. La referencia local `backup/audio-8bit-antes-invasion` conserva el estado anterior. No se publica en remoto ni se modifica `main`.
 
 ## Qué incorpora

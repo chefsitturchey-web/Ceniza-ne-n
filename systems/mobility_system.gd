@@ -113,7 +113,7 @@ static func valid(data: Variant) -> bool:
 	if not data is Dictionary: return false
 	if data.is_empty(): return true
 	if not data.get("owned") is bool or not data.get("mounted") is bool: return false
-	return (not data.mounted or data.owned) and ExpansionSystem.number(data.get("charge"), 0, 100) and ExpansionSystem.number(data.get("parked_x"), -1600, 1600)
+	return (not data.mounted or data.owned) and ExpansionSystem.number(data.get("charge"), 0, 100) and ExpansionSystem.number(data.get("parked_x"), -GameRules.MAP_HALF_WIDTH, GameRules.MAP_HALF_WIDTH)
 
 func _draw() -> void:
 	# El apoyo del pasajero coincide con la cubierta, no con los márgenes del PNG.

@@ -35,6 +35,7 @@ var corpse_system: CorpseSystem
 var scavenge: ScavengeSystem
 var trap_system: TrapSystem
 var pest_system: PestSystem
+var frontier: FrontierSystem
 var workshop: WorkshopSystem
 
 func _ready() -> void:
@@ -42,6 +43,7 @@ func _ready() -> void:
 	player.hitbox.enabled = false
 	InputSetup.configure_input()
 	zone = CampaignRoute.zone(zone_index)
+	_configure_frontier_map()
 	if zone_index > 0:
 		var blueprints: Array[StructureData] = []
 		for original: StructureData in construction.blueprints:
@@ -50,8 +52,14 @@ func _ready() -> void:
 			blueprints.append(copy)
 		construction.blueprints = blueprints
 		cycle.config = cycle.config.duplicate() as CycleConfig
-		cycle.config.day_duration = zone.day_duration
+		cycle.config.day_duration = 360 + zone_index * 30
 		director.waves.assign(zone.waves)
+	var invasion_waves: Array[WaveData] = []
+	for original: WaveData in director.waves:
+		var wave: WaveData = original.duplicate() as WaveData
+		wave.cadence = maxf(0.55, original.cadence * (0.92 - zone_index * 0.04))
+		invasion_waves.append(wave)
+	director.waves = invasion_waves
 	construction.bank = bank
 	core.district = self
 	construction.core = core
@@ -188,6 +196,9 @@ func _ready() -> void:
 	mobility.setup(self)
 	add_child(mobility)
 	interaction.mobility = mobility
+	frontier = FrontierSystem.new()
+	frontier.setup(self)
+	add_child(frontier)
 	corpse_system = CorpseSystem.new()
 	corpse_system.setup(cycle, player, director)
 	corpse_system.colony = colony
@@ -224,6 +235,10 @@ func _ready() -> void:
 		portal.defense_requested.connect(civic.defend_portal)
 	var arriving: bool = not CampaignRoute.pending.is_empty()
 	session.initialize()
+	clinic.visible = core.tier > 0
+	if core.tier == 0: presenter.show_notice("Empieza por las baterías cercanas; mantén E para recuperar piezas")
+	if session.save_system == null: frontier.restore({})
+	story.queue_dialogue("opening")
 	sound.district = self
 	add_child(sound)
 	session.finished_changed.connect(func(victory: bool) -> void: sound.play_outcome(victory))
@@ -240,3 +255,18 @@ func _ready() -> void:
 func _connect_neural(enemy: SiegeEnemy, _side: float) -> void:
 	enemy.reward_requested.connect(func(reward: int) -> void:
 		if reward > 0: experience.drop(enemy.position, reward, enemy.elite))
+
+func _configure_frontier_map() -> void:
+	var floor_shape: CollisionShape2D = $Floor/Shape
+	floor_shape.shape = floor_shape.shape.duplicate()
+	(floor_shape.shape as RectangleShape2D).size.x = GameRules.MAP_HALF_WIDTH * 2
+	$LeftEdge.position.x = -GameRules.MAP_HALF_WIDTH - 8
+	$RightEdge.position.x = GameRules.MAP_HALF_WIDTH + 8
+	var camera: Camera2D = $Player/Camera2D
+	camera.limit_left = -int(GameRules.MAP_HALF_WIDTH)
+	camera.limit_right = int(GameRules.MAP_HALF_WIDTH)
+	$LeftRepeater.position.x = -6820 + zone_index * 20
+	$RightRepeater.position.x = 6900 - zone_index * 25
+	$Station.position.x = 6640 - zone_index * 35
+	cycle.config = cycle.config.duplicate()
+	cycle.config.day_duration = 360 + zone_index * 30

@@ -43,6 +43,9 @@ func update_workers(delta: float) -> void:
 			continue
 		var previous_x: float = worker.x
 		if worker.role == "collector":
+			if core != null and core.tier == 0:
+				worker.update_visual(previous_x, false)
+				continue
 			var gather_destination: float
 			if unsafe_at(worker.x):
 				gather_destination = safe_spot(worker.x)
@@ -182,6 +185,8 @@ func work_external(worker: ColonyWorker, delta: float) -> bool:
 			worker.external_job = -1
 			return false
 	var candidates: Array[Node2D] = civic.jobs()
+	if worker.external_job >= 0:
+		if worker.external_job >= candidates.size(): worker.external_job = -1
 	if worker.external_job >= 0:
 		var current: Node2D = candidates[worker.external_job]
 		if not current.ordered or unsafe_at(current.position.x): worker.external_job = -1

@@ -187,9 +187,9 @@ static func valid(data: Variant) -> bool:
 	if not data.get("drops") is Array or data.drops.size() > 260: return false
 	var signal_data: Variant = data.get("lost", {})
 	if not signal_data is Dictionary: return false
-	if not signal_data.is_empty() and (not ExpansionSystem.number(signal_data.get("x"), -1600, 1600) or not ExpansionSystem.number(signal_data.get("amount"), 0, 1000, true)): return false
+	if not signal_data.is_empty() and (not ExpansionSystem.number(signal_data.get("x"), -GameRules.MAP_HALF_WIDTH, GameRules.MAP_HALF_WIDTH) or not ExpansionSystem.number(signal_data.get("amount"), 0, 1000, true)): return false
 	for item: Variant in data.drops:
-		if not item is Dictionary or not item.get("chest") is bool or not ExpansionSystem.number(item.get("x"), -1600, 1600) or not ExpansionSystem.number(item.get("amount"), 0, 1000000, true): return false
+		if not item is Dictionary or not item.get("chest") is bool or not ExpansionSystem.number(item.get("x"), -GameRules.MAP_HALF_WIDTH, GameRules.MAP_HALF_WIDTH) or not ExpansionSystem.number(item.get("amount"), 0, 1000000, true): return false
 	return true
 
 func _draw() -> void:

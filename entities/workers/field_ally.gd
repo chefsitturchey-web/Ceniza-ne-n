@@ -91,7 +91,7 @@ func tick(delta: float) -> void:
 				world.sound.play_cue("shot", -10)
 	elif role == "technician":
 		if world.story != null and world.story.relay_ordered and not world.story.completed[1] and world.cycle.phase == "DÍA":
-			anchor = StoryDirector.RELAY_X
+			anchor = world.story.relay_x
 			destination = anchor
 			if absf(position.x - anchor) < 50:
 				world.story.work_relay(delta)

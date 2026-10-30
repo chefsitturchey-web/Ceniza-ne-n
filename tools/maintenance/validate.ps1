@@ -1,7 +1,8 @@
 param(
     [string]$GodotPath = $env:GODOT_BIN,
     [ValidatePattern('^[a-zA-Z0-9_]+$')][string]$Suite = 'run_all',
-    [switch]$ImportOnly
+    [switch]$ImportOnly,
+    [switch]$Capture
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
@@ -30,7 +31,12 @@ try {
     $script = "res://tests/$Suite.gd"
     if (-not (Test-Path -LiteralPath (Join-Path $projectRoot "tests/$Suite.gd"))) { throw "Suite inexistente: $Suite" }
     $consoleOutput = Join-Path $outputRoot "$Suite-console.log"
-    & $GodotPath --headless --path $projectRoot --script $script --log-file (Join-Path $outputRoot "$Suite.log") *> $consoleOutput
+    $suiteArguments = @('--headless', '--path', $projectRoot, '--script', $script, '--log-file', (Join-Path $outputRoot "$Suite.log"))
+    if ($Capture) {
+        # A real renderer is needed for captures; keep the preview off the desktop.
+        $suiteArguments = @('--path', $projectRoot, '--position', '20000,20000', '--script', $script, '--log-file', (Join-Path $outputRoot "$Suite.log"), '--', '--capture')
+    }
+    & $GodotPath @suiteArguments *> $consoleOutput
     Get-Content -LiteralPath $consoleOutput -Tail 5
     if ($LASTEXITCODE -ne 0) { throw "Validacion fallida. Revisa $consoleOutput" }
     Write-Output "Registros centralizados: $outputRoot"

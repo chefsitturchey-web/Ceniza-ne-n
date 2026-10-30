@@ -26,6 +26,19 @@ func create_sites() -> void:
 			sites.append(site)
 			add_child(site)
 
+	# Extend the frontier with defendable turret plots; the original four slots stay first.
+	for wall_x: float in FrontierLayout.wall_positions(core.district.zone_index):
+		if absf(wall_x) <= 1100: continue
+		var data: StructureData = load("res://data/structures/turret.tres").duplicate() as StructureData
+		var site: ConstructionSite = data.scene.instantiate() as ConstructionSite
+		site.data = data
+		site.viewer = viewer
+		site.core = core
+		site.position = Vector2(wall_x - signf(wall_x) * 135, GameRules.FLOOR_Y)
+		site.z_index = -1
+		sites.append(site)
+		add_child(site)
+
 func order(target: int) -> bool:
 	if target < 0 or target >= sites.size():
 		return false
@@ -33,6 +46,13 @@ func order(target: int) -> bool:
 	return order_site(site)
 
 func order_site(site: ConstructionSite) -> bool:
+	var required: int = 2 if site.kind == &"turret" else 1
+	if core != null and core.tier < required:
+		notice_requested.emit("Necesitas núcleo Nv.%d para esta defensa" % required)
+		return false
+	if core != null and core.district.frontier != null and core.district.frontier.blocked(site.x):
+		notice_requested.emit("Despeja primero la parcela con constructores")
+		return false
 	var upgrade: bool = site.hp == site.max_hp and site.tier < 3
 	if upgrade and core != null and site.tier >= core.tier:
 		notice_requested.emit("Necesitas núcleo Nv.%d para mejorar esta defensa" % (site.tier + 1))

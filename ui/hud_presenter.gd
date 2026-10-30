@@ -104,7 +104,14 @@ func publish() -> void:
 	var context_key: bool = true
 	var context_screen: Vector2 = Vector2.ZERO
 	var target: int = interaction.interaction_target()
-	if target <= -800 and interaction.corpse_system != null:
+	if target <= FrontierSystem.CLEAR_BASE:
+		var detail: Dictionary = (player.get_parent() as District).frontier.describe(target)
+		context = detail.text
+		context_cost = detail.cost
+		context_progress = detail.progress
+		context_key = detail.get("key", true)
+		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -60)
+	elif target <= -800 and interaction.corpse_system != null:
 		var detail: Dictionary = interaction.corpse_system.describe(target)
 		context = detail.text
 		context_cost = detail.cost
@@ -128,7 +135,7 @@ func publish() -> void:
 		var detail: Dictionary = interaction.civic.describe(target)
 		context = detail.text
 		context_cost = detail.cost
-		context_key = not detail.get("locked", false) and cycle.phase == "DÍA"
+		context_key = not detail.get("locked", false) and (cycle.phase == "DÍA" or (target <= -320 and target > -326) or (target <= -340 and target > -340 - interaction.civic.walls.size()))
 		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -60)
 	elif target <= -200 and interaction.expansion != null:
 		context = "Recuperar suministros: +20"
@@ -140,14 +147,16 @@ func publish() -> void:
 			var purpose: Dictionary = {"generator": "+2 energía", "recycler": "+5 chatarra / 12 s de día", "barracks": "guarnición", "medical": "puesto de médicos"}
 			context = outpost.spec.title + ": " + (String(purpose[outpost.spec.id]) if interaction.expansion.powered(outpost) else "sin energía")
 		context_cost = -1 if outpost.hp >= outpost.MAX_HEALTH or outpost.ordered else (12 if outpost.hp > 0 else int(outpost.spec.cost))
-		context_key = cycle.phase == "DÍA" and not outpost.ordered and outpost.hp < outpost.MAX_HEALTH
-		context_progress = outpost.progress / 6 if outpost.ordered else context_progress
+		context_key = not outpost.ordered and outpost.hp < outpost.MAX_HEALTH
+		context_progress = outpost.progress / ExpansionOutpost.BUILD_TIME if outpost.ordered else context_progress
 		context_screen = outpost.get_global_transform_with_canvas() * Vector2(0, -48)
 		var required: int = FortressRules.BUILDINGS[outpost.spec.id]
 		if core.tier < required:
 			context = outpost.spec.title + ": requiere núcleo Nv.%d" % required
 			context_key = false
 			context_cost = -1
+		elif outpost.spec.id == "generator" and outpost.hp > 0:
+			context = "Generador · +%d capacidad" % (2 * maxi(1, core.tier))
 	elif target == InteractionSystem.MOBILITY_TARGET:
 		var detail: Dictionary = interaction.mobility.describe()
 		context = detail.text
@@ -174,7 +183,10 @@ func publish() -> void:
 			var reason: String = core.upgrade_blocker()
 			if not reason.is_empty(): context = reason; context_key = false; context_cost = -1
 			if core.ordered: context_progress = core.progress / ColonyCore.BUILD_TIME
-		context_screen = core.get_global_transform_with_canvas() * Vector2(0, -FortressArt.CORE_HEIGHTS[core.tier - 1])
+		if (player.health == Player.MAX_HEALTH or core.tier == 0) and core.tier < 3 and not core.ordered:
+			context += " · %d piezas" % core.parts_cost()
+		if core.tier == 0: context = "Levantar núcleo · 12 piezas" if not core.ordered else "Construyendo el primer núcleo"
+		context_screen = core.get_global_transform_with_canvas() * Vector2(0, -24 if core.tier == 0 else -FortressArt.CORE_HEIGHTS[core.tier - 1])
 	elif target >= 0:
 		var site: ConstructionSite = construction.sites[target]
 		context_screen = site.get_global_transform_with_canvas() * Vector2(0, -site.visual_height())
@@ -182,6 +194,10 @@ func publish() -> void:
 			context = "Construyendo"
 			context_key = false
 			context_progress = site.progress / GameRules.BUILD_TIME
+		elif core.tier < (2 if site.kind == &"turret" else 1):
+			context = "Requiere núcleo Nv.%d" % (2 if site.kind == &"turret" else 1)
+			context_key = false
+			context_cost = -1
 		elif site.hp != site.max_hp:
 			context = "Construir" if site.hp == 0 else "Reparar"
 			context_cost = site.cost if site.hp == 0 else site.data.repair_cost
@@ -214,7 +230,7 @@ func publish() -> void:
 		"offscreen_left": offscreen_left, "offscreen_right": offscreen_right,
 		"phase": cycle.phase, "day": cycle.day, "nights": cycle.config.nights,
 		"seconds": ceili(cycle.phase_remaining), "scrap": bank.scrap,
-		"parts": bank.parts,
+		"parts": bank.parts, "parts_capacity": bank.parts_capacity, "stored_parts": bank.stored_parts,
 		"energy": bank.energy_used(), "capacity": bank.available_capacity(),
 		"population": session.civic.population() if session.civic != null else colony.workers.size(), "population_max": session.civic.capacity if session.civic != null else GameRules.POPULATION,
 		"health": player.health, "stamina": int(player.stamina), "core": core.health, "core_max": core.health_component.maximum,

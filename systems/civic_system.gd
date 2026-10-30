@@ -23,8 +23,9 @@ var retaliation: Array[Dictionary] = []
 func setup(world: Node2D) -> void:
 	district = world
 	z_index = -1
-	for side: float in [-1.0, 1.0]:
-		for distance: float in [600.0, 980.0, 1320.0]:
+	for position_x: float in FrontierLayout.wall_positions(world.zone_index):
+		var side: float = signf(position_x)
+		for distance: float in [absf(position_x)]:
 			var data: StructureData = load("res://data/structures/wall.tres").duplicate() as StructureData
 			data.offset = distance
 			var site: ConstructionSite = data.scene.instantiate() as ConstructionSite
@@ -34,9 +35,10 @@ func setup(world: Node2D) -> void:
 			site.position = Vector2(side * distance, GameRules.FLOOR_Y)
 			walls.append(site)
 			add_child(site)
-		for index: int in range(mini(3, district.zone_index)):
+	for side: float in [-1.0, 1.0]:
+		for index: int in range(FrontierLayout.profile(world.zone_index).gates.size()):
 			var gate: ConduitGate = ConduitGate.new()
-			gate.position = Vector2(side * (1180 - index * 250), GameRules.FLOOR_Y)
+			gate.position = Vector2(side * float(FrontierLayout.profile(world.zone_index).gates[index]), GameRules.FLOOR_Y)
 			gates.append(gate)
 			add_child(gate)
 			gate.destroyed.connect(func() -> void:
@@ -65,7 +67,7 @@ func defend_portal(portal: EnemyRepeater) -> void:
 		enemy.position.x = portal.position.x - signf(portal.position.x) * 20
 
 func entrance(side: float) -> float:
-	var closest: float = 1440
+	var closest: float = GameRules.MAP_HALF_WIDTH - 250
 	for gate: EnemyRepeater in gates:
 		if gate.health.current > 0 and signf(gate.position.x) == side: closest = minf(closest, absf(gate.position.x))
 	return side * closest
@@ -106,7 +108,7 @@ func target_at(x: float) -> int:
 
 func describe(target: int) -> Dictionary:
 	if target == -360:
-		if capacity < 20 and capacity >= FortressRules.CAPACITY[district.core.tier - 1]:
+		if capacity < 20 and capacity >= FortressRules.CAPACITY[maxi(1, district.core.tier) - 1]:
 			return {"text": "Refugio: requiere núcleo Nv.%d" % (district.core.tier + 1), "cost": -1, "locked": true}
 		return {"text": "Refugio: reasignar un trabajador", "cost": -1} if capacity >= 20 else {"text": "Refugio: ampliar población %d → %d" % [capacity, capacity + 4], "cost": 30}
 	if target <= -340:
@@ -135,12 +137,12 @@ func interact(target: int) -> bool:
 			worker.free()
 			district.presenter.show_notice("Habitante disponible: compra la nueva herramienta")
 		else:
-			if capacity >= FortressRules.CAPACITY[district.core.tier - 1]:
+			if capacity >= FortressRules.CAPACITY[maxi(1, district.core.tier) - 1]:
 				district.presenter.show_notice("Mejora el núcleo para ampliar el refugio")
 				return false
 			if not district.bank.spend(30): return false
 			capacity += 4
-	elif target <= -340 and target > -346:
+	elif target <= -340 and target > -340 - walls.size():
 		var index: int = -340 - target
 		if not safe_to_build(walls[index].x):
 			district.presenter.show_notice("Destruye la brecha que bloquea esa franja")
@@ -312,6 +314,8 @@ func jobs() -> Array[Node2D]:
 	var result: Array[Node2D] = []
 	for wall: ConstructionSite in walls: result.append(wall)
 	for site: ExpansionOutpost in district.expansion.sites: result.append(site)
+	if district.frontier != null:
+		for plot: ClearanceSite in district.frontier.plots: result.append(plot)
 	return result
 
 func snapshot() -> Dictionary:
@@ -331,7 +335,7 @@ func restore(data: Dictionary) -> void:
 	advance_side = int(data.get("advance", 0))
 	var saved: Array = data.get("walls", [])
 	for index: int in range(walls.size()):
-		var state: Dictionary = saved[index] if not saved.is_empty() else {}
+		var state: Dictionary = saved[index] if index < saved.size() else {}
 		walls[index].tier = int(state.get("tier", 1))
 		walls[index].health_component.maximum = walls[index].data.health * walls[index].tier
 		walls[index].hp = int(state.get("hp", 0))
@@ -339,7 +343,7 @@ func restore(data: Dictionary) -> void:
 		walls[index].progress = float(state.get("progress", 0))
 		walls[index].upgrade_pending = state.get("upgrade", false)
 	var saved_gates: Array = data.get("gates", [])
-	for index: int in range(gates.size()): gates[index].restore(saved_gates[index] if not saved_gates.is_empty() else false)
+	for index: int in range(gates.size()): gates[index].restore(saved_gates[index] if index < saved_gates.size() else false)
 
 static func valid(data: Variant, gate_count: int) -> bool:
 	if not data is Dictionary: return false
@@ -353,18 +357,19 @@ static func valid(data: Variant, gate_count: int) -> bool:
 	if not ExpansionSystem.number(data.get("capacity"), 8, 20, true) or not ExpansionSystem.number(data.get("day"), 1, 1000000, true): return false
 	if not data.get("villagers") is Array or data.villagers.size() > data.capacity: return false
 	for citizen: Variant in data.villagers:
-		if not citizen is Dictionary or not ExpansionSystem.number(citizen.get("x"), -1600, 1600) or not ExpansionSystem.number(citizen.get("side"), -1, 1, true) or absf(float(citizen.side)) != 1: return false
+		if not citizen is Dictionary or not ExpansionSystem.number(citizen.get("x"), -GameRules.MAP_HALF_WIDTH, GameRules.MAP_HALF_WIDTH) or not ExpansionSystem.number(citizen.get("side"), -1, 1, true) or absf(float(citizen.side)) != 1: return false
 		if not ExpansionSystem.number(citizen.get("recover", 0), 0, 1.5) or not ExpansionSystem.number(citizen.get("rise", 0), 0, 1): return false
 	if not data.get("gates") is Array or data.gates.size() != gate_count: return false
 	for flag: Variant in data.gates:
 		if not flag is bool: return false
-	if not data.get("walls") is Array or data.walls.size() != 6: return false
+	if not data.get("walls") is Array or data.walls.size() not in [6, 12]: return false
 	for wall: Variant in data.walls:
 		if not wall is Dictionary or not ExpansionSystem.number(wall.get("tier"), 1, 3, true): return false
-		if not ExpansionSystem.number(wall.get("hp"), 0, 240 * wall.tier, true) or not ExpansionSystem.number(wall.get("progress"), 0, 4) or not wall.get("ordered") is bool or not wall.get("upgrade") is bool: return false
+		if not ExpansionSystem.number(wall.get("hp"), 0, 240 * wall.tier, true) or not ExpansionSystem.number(wall.get("progress"), 0, GameRules.BUILD_TIME) or not wall.get("ordered") is bool or not wall.get("upgrade") is bool: return false
 	return true
 
 func _draw() -> void:
+	if district.core.tier == 0: return
 	var workshop: Rect2 = ArtScale.source(GameArt.CIVIC, 2)
 	ArtScale.footing(self, ArtScale.grounded(workshop, 94, Vector2(-600, GameRules.FLOOR_Y)))
 	draw_texture_rect_region(GameArt.CIVIC, ArtScale.grounded(workshop, 94, Vector2(-600, GameRules.FLOOR_Y)), workshop)

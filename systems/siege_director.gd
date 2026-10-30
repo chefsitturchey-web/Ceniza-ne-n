@@ -36,6 +36,10 @@ func is_cleared() -> bool:
 	return spawn_count >= wave.enemies.size() and get_tree().get_nodes_in_group(GameRules.ENEMIES).is_empty()
 
 func spawn_enemy(side: float, data: EnemyData, number: int = 1, elite: bool = false) -> SiegeEnemy:
+	if session.zone_index > 0:
+		data = data.duplicate() as EnemyData
+		data.health = roundi(data.health * (1.0 + session.zone_index * 0.18))
+		data.damage = roundi(data.damage * (1.0 + session.zone_index * 0.08))
 	var enemy: SiegeEnemy = data.scene.instantiate() as SiegeEnemy
 	enemy.data = data
 	enemy.player = player
@@ -48,7 +52,9 @@ func spawn_enemy(side: float, data: EnemyData, number: int = 1, elite: bool = fa
 	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
 	var distance: float = maxf(data.spawn_distance, expansion.frontier(side) + 180) if expansion != null else data.spawn_distance
 	enemy.position = Vector2(side * minf(GameRules.MAP_HALF_WIDTH - 25, distance), GameRules.FLOOR_Y)
-	if session.civic != null: enemy.position.x = session.civic.entrance(side)
+	if session.civic != null:
+		# Unsealed conduits raid the current perimeter; the outer portals still govern expansion.
+		enemy.position.x = side * minf(absf(session.civic.entrance(side)), maxf(1100, session.civic.frontier(side) + 480))
 	add_child(enemy)
 	# Balance only this colony instance; arena resources remain unchanged.
 	if String(data.id) in ["corredor", "saboteador", "saltador"]:

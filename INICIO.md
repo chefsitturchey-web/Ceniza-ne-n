@@ -32,17 +32,15 @@ En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y 
 
 ## Primeros pasos
 
-**Mecánicas de invasión:** Shift permite correr en la colonia. Mantén E junto a restos industriales para obtener piezas y chatarra; el taller izquierdo fabrica pala y trampas. Los trabajadores pueden morir: reporta sus restos con E para que un constructor con pala los entierre. [Reglas y pruebas](docs/gameplay/INTEGRACION_INVASION.md).
+1. Empiezas con un constructor y un recolector, sin núcleo. Las dos baterías junto al punto de llegada contienen las primeras piezas. Mantén E para extraerlas.
+2. Con 12 piezas y 20 de chatarra, mantén E en el cimiento central. El constructor levanta el núcleo en 24 segundos. Hasta encenderlo, el asedio y la recolección automática esperan.
+3. Construye las dos murallas centrales. Encarga con E el despeje de una parcela de generador; cuesta 5 de chatarra y requiere que llegue un constructor. Después paga su construcción.
+4. Murallas, generador, 60 de chatarra y 10 piezas permiten encargar el núcleo Nv.2. Entonces se desbloquean las torretas. Las defensas tardan 16 segundos y las instalaciones 24, además del viaje del trabajador.
+5. La mochila lleva 24 piezas. El exceso cae y cada pieza tiene un 25 % de probabilidad de romperse. E recoge los montones si queda espacio. Regresa al núcleo para descargar automáticamente al depósito.
+6. Recluta en los campamentos y compra herramientas en el taller izquierdo. Un cuartel permite formar tropas; F ordena atacar el portal de ese frente y otra F las retira. Cierra los portales para abrir las parcelas exteriores.
+7. El núcleo Nv.3 exige una noche resistida, dos instalaciones, 120 de chatarra y 18 piezas. Amplía la capacidad de energía y las mejoras de defensas. L muestra el objetivo y permite releer la historia.
 
-1. Empiezas con 90 de chatarra, un constructor y un recuperador. Mantén E en los cuatro cimientos centrales: dos murallas de 20 y dos torretas de 25. El constructor debe caminar y ejecutar las obras.
-2. Explora los suministros y construye un generador a izquierda o derecha, a 360 del núcleo. Añade cuarteles para alojar tropas. El generador amplía la capacidad energética; no produce una moneda consumible.
-3. El núcleo comienza en nivel 1 y tus defensas también. Tras terminar el generador y las cuatro defensas, mantén E en el núcleo: por 60 encargas el nivel 2. El constructor debe terminarlo. Se desbloquean mejoras de defensas, guardianes, técnicos, médicos y transporte. El nivel 3 cuesta 120 y exige una noche resistida y dos instalaciones. Cada nivel cambia de diseño.
-4. Recluta personas en los campamentos con E y compra herramientas en el taller izquierdo. Una persona sin profesión recoge una herramienta disponible. Conviene formar un guardián y dos tiradores por cuartel antes de asaltar. El refugio se amplía según el nivel del núcleo.
-5. Durante la noche mantén las defensas y usa Q en el frente bajo presión. Los trabajadores se retiran ante el peligro. Para ampliar el perímetro paga murallas exteriores y espera a los constructores.
-6. F ordena a los soldados del frente atacar la entrada más cercana. Los portales avisan y generan defensores al perder vida. Otra F retira la escuadra. Esos refuerzos no dan botín: no se puede ganar experiencia infinita provocando una puerta.
-7. Recoge los datos que dejan los enemigos. Cada nivel pausa el juego y ofrece armas, pasivas o implantes con iconos. Hay dos ranuras de módulo y cuatro pasivas; evoluciona con nivel 5, catalizador y núcleo. La clínica permite consultar y equipar lo que ya obtuviste.
-
-Si una persona no recoge una herramienta, consulta el aviso sobre el taller: indica la instalación o plaza que falta. Las herramientas reservadas no se pierden. De noche pueden recogerlas si el taller queda dentro de las murallas y está a salvo. [Recogida, animaciones y nuevo depósito del jefe](docs/gameplay/DEPOSITO_Y_VIDA_DEL_DISTRITO.md).
+Cada distrito mide 14.400 píxeles y tiene su propio trazado de solares y obstáculos. Shift permite correr; el transporte se desbloquea con núcleo Nv.2. [Reglas completas, diseños de LibreSprite y guardados](docs/gameplay/FRONTERA_Y_RECONSTRUCCION.md).
 
 ## Historia, operaciones y tren
 

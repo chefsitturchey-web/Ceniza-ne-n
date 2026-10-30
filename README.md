@@ -12,7 +12,7 @@
   <img alt="GDScript" src="https://img.shields.io/badge/GDScript-tipado-355570">
   <img alt="Plataforma" src="https://img.shields.io/badge/plataforma-Windows-0b1322">
   <img alt="Estado" src="https://img.shields.io/badge/estado-demo%20jugable-e89e54">
-  <img alt="Pruebas: 42 suites" src="https://img.shields.io/badge/tests-42%20suites-47dacb">
+  <img alt="Validación dirigida" src="https://img.shields.io/badge/tests-validacion%20dirigida-47dacb">
 </p>
 
 <p align="center">
@@ -29,7 +29,9 @@
 
 ## El juego
 
-**Invasi?n integrada:** piezas recuperables, pala, trampas, plagas y bajas de trabajadores con guardado. El combate y arte de los jefes conservan sus avances. [Reglas y compatibilidad](docs/gameplay/INTEGRACION_INVASION.md).
+**Frontera y reconstrucción:** mapas de colonia 4,5 veces más anchos, cinco trazados distintos, núcleo desde cero, despejes con constructores, torretas desde el núcleo Nv.2 y mochila de 24 piezas. [Reglas actuales y arte editable](docs/gameplay/FRONTERA_Y_RECONSTRUCCION.md).
+
+**Invasión integrada:** piezas recuperables, pala, trampas, plagas y bajas de trabajadores con guardado. El combate y arte de los jefes conservan sus avances. [Reglas y compatibilidad](docs/gameplay/INTEGRACION_INVASION.md).
 
 Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y final](docs/design/HISTORIA_Y_CAMPANA.md). En la colonia el Portador dirige y sus tropas combaten; J funciona en arenas. Las cuatro horas siguen siendo una meta pendiente de ampliar y medir.
 
@@ -45,7 +47,7 @@ Estado actual: [guía para jugar](INICIO.md), [cinco capítulos, operaciones y f
 
 El núcleo, murallas y torretas tienen tres niveles, diseños industriales coherentes y desbloqueos. Se normalizó la escala respecto al Portador y se añadió transporte eléctrico opcional. [Progresión, tamaños y movilidad](docs/gameplay/ESCALA_NIVELES_Y_MOVILIDAD.md).
 
-La historia incluye **30 conversaciones de novela visual**, ocho retratos manga a color, transiciones y repetición desde el diario. Las profesiones aliadas, civiles, Artillero y Saboteador tienen **nueve variantes con 72 fotogramas cada una**, con archivos editables de LibreSprite.
+La historia incluye **40 conversaciones de novela visual**, ocho retratos manga a color, transiciones y repetición desde el diario. Las profesiones aliadas, civiles, Artillero y Saboteador tienen **nueve variantes con 72 fotogramas cada una**, con archivos editables de LibreSprite.
 
 <p align="center">
   <img src="docs/media/colonia_actual.png" alt="Colonia actual: núcleo industrial, refugio, murallas y torretas de nivel dos" width="100%"><br>
@@ -177,7 +179,7 @@ La guía detallada de esta versión está en [INICIO.md](INICIO.md).
 
 | Hecho | En curso | Próximo |
 |---|---|---|
-| Cinco distritos, quince operaciones y final; diario y 30 conversaciones ilustradas | Medición de duración y variedad de campaña | Operaciones exclusivas, eventos y decisiones con consecuencias |
+| Cinco distritos, quince operaciones y final; diario y 40 conversaciones ilustradas | Medición de duración y variedad de campaña | Operaciones exclusivas, eventos y decisiones con consecuencias |
 | Recaudador, Santa Caldera, Coro, Prefecto y MADRE CERO | Equilibrio y pruebas con jugadores | Más encuentros y expediciones opcionales |
 | Núcleo y defensas por niveles; campamentos, herramientas, profesiones y transporte | Pulido de economía y legibilidad | Mapas por semilla y más opciones del GDD |
 | Siete tipos de enemigo; nueve variantes animadas con fuentes de LibreSprite | Ampliación del catálogo y revisión artística | Enemigos y equipo restantes del GDD |
@@ -216,13 +218,13 @@ godot --headless --path . --editor --import --quit
 godot --headless --path . --script res://tests/run_all.gd
 ```
 
-`run_all.gd` ejecuta **42 suites**, incluyendo tácticas de los cinco jefes, personajes, novela visual, fortificaciones, movilidad, campaña, menús, módulos, combate, guardado y simulaciones desde cero en las cinco zonas. La última ejecución completa terminó con **0 fallos**. Termina con error ante fallos, errores de script o advertencias. En Windows sustituye `godot` por la ruta del ejecutable de consola y usa un perfil de pruebas separado de tu partida.
-
-En Windows, el comando recomendado importa el proyecto, usa un perfil aislado y guarda todos los registros en `build/validation/latest/`:
+La revisión de frontera utiliza validación dirigida: progresión real y guardado en los cinco distritos, compilación de scripts y tácticas de los cinco jefes. No se ha vuelto a certificar la batería histórica completa; las simulaciones antiguas que parten de cuatro cimientos y un núcleo construido necesitan migrarse a las nuevas reglas.
 
 ```powershell
-.\tools\maintenance\validate.ps1 -GodotPath "RUTA\Godot_console.exe"
+.\tools\maintenance\validate.ps1 -GodotPath "RUTA\Godot_console.exe" -Suite frontier_progression_test
 ```
+
+La opción `-Capture` revisa la misma progresión con el renderizador real y guarda capturas en `build/validation/latest/`. `run_all.gd` conserva las 42 suites históricas de referencia.
 
 `summary.json` resume los resultados y `suites/` contiene un registro por prueba y variante; se reutilizan los nombres en cada ejecución. Para borrar registros antiguos y cachés de Python: `./tools/maintenance/clean_generated.ps1`. Añade `-Validation` para borrar también las salidas y perfiles de pruebas de `build/validation/`. [Mapa del proyecto y limpieza](docs/ORGANIZACION.md), [índice de documentación](docs/README.md).
 
@@ -231,7 +233,7 @@ Para una revisión visual rápida, abre una escena y pulsa **F6**:
 | Escena | Qué revisar |
 |---|---|
 | `levels/story/unit_animation_preview.tscn` | Nueve variantes, estados, dirección y pausa de animación |
-| `levels/story/novel_preview.tscn` | Las 30 conversaciones ilustradas |
+| `levels/story/novel_preview.tscn` | Las 40 conversaciones ilustradas |
 | `levels/zones/fortress_playground.tscn` | Construcciones, niveles y transporte con presupuesto de práctica |
 
 Las fuentes editables están en `assets/characters/units/sources/`. [Edición y reconstrucción sin conexión](docs/art/PERSONAJES_Y_ANIMACIONES.md).

@@ -1,8 +1,8 @@
 class_name VisualStory
 extends RefCounted
 ## Guion de presentación: conserva el lore y lo reparte en intervenciones legibles.
-const SECTIONS: Array[String] = ["opening", "rescue", "relay", "convoy", "encounter", "ending"]
-const TITLES: Dictionary = {"opening": "Llegada", "rescue": "Supervivientes", "relay": "Una red propia", "convoy": "El regreso", "encounter": "Ante el enlace", "ending": "Después del combate"}
+const SECTIONS: Array[String] = ["opening", "rescue", "relay", "convoy", "encounter", "ending", "foundation", "expansion"]
+const TITLES: Dictionary = {"foundation": "La primera luz", "expansion": "Territorio recuperado", "opening": "Llegada", "rescue": "Supervivientes", "relay": "Una red propia", "convoy": "El regreso", "encounter": "Ante el enlace", "ending": "Después del combate"}
 const ACTORS: Dictionary = {"MARA": "mara", "IVO": "ivo", "VERA": "vera", "NOX": "nox", "ECO": "eco", "PORTADOR": "portador", "EL PREFECTO": "prefect", "MADRE CERO": "mother"}
 const QUESTIONS: Array[String] = ["¿Por dónde empezamos?", "¿Todavía podemos sacar a esas personas?", "¿Quién sigue hablando desde las antenas?", "¿Quién decidió que los demás se quedaran fuera?", "¿Podemos terminar esto sin repetir el mismo error?"]
 const ANSWERS: Array[String] = ["Entonces levantaremos algo que no puedan cobrarnos.", "Abriremos una salida. Nadie se queda en esa línea de montaje.", "Las escucharemos. Y después dejaremos que descansen.", "Esta vez abriremos las puertas desde dentro.", "Mantendremos el enlace. La decisión será de quienes viven aquí."]

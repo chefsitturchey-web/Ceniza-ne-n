@@ -22,16 +22,22 @@ func setup(zone: ZoneData, bank: ResourceBank) -> void:
 		return
 	rng = RandomNumberGenerator.new()
 	rng.randomize()
-	for index: int in range(zone.prop_spots.size()):
-		var spot: Vector2 = zone.prop_spots[index]
+	var spots: Array[Vector2] = zone.prop_spots.duplicate()
+	for side: float in [-1.0, 1.0]:
+		for distance: float in [1850, 2450, 3200, 3800, 4500, 5100, 5800, 6350]:
+			spots.append(Vector2(side * (distance + int(zone.id.hash() % 7) * 12), GameRules.FLOOR_Y))
+	spots.append(Vector2(-75, GameRules.FLOOR_Y))
+	spots.append(Vector2(75, GameRules.FLOOR_Y))
+	for index: int in range(spots.size()):
+		var spot: Vector2 = spots[index]
 		var prop: ScavengeProp = ScavengeProp.new()
-		prop.data = zone.props[index % zone.props.size()]
+		prop.data = zone.props[index % zone.props.size()] if index < spots.size() - 2 else load("res://data/props/battery.tres") as PropData
 		add_child(prop)
 		# Anchors are fixed reachability points; the jitter band (spot.x +- JITTER)
 		# must stay clear of higher-priority POI ranges checked earlier in
 		# InteractionSystem.interaction_target(). The +550 anchor was moved to +660
 		# because the railway station (+560, range 55 -> [505, 615]) shadowed it.
-		prop.position = Vector2(spot.x + rng.randf_range(-JITTER, JITTER), GameRules.FLOOR_Y)
+		prop.position = Vector2(spot.x + (rng.randf_range(-JITTER, JITTER) if index < spots.size() - 2 else 0.0), GameRules.FLOOR_Y)
 		props.append(prop)
 
 func target_at(x: float) -> int:
@@ -54,12 +60,14 @@ func interact(target: int) -> bool:
 	var data: PropData = prop.data
 	if not prop.extract():
 		return false
+	var overflow: int = maxi(0, data.parts_per_charge - (bank.parts_capacity - bank.parts))
 	bank.add_parts(data.parts_per_charge)
 	var message: String = "+%d piezas" % data.parts_per_charge
 	if data.scrap_per_charge > 0:
 		bank.deposit(data.scrap_per_charge)
 		message += ", +%d chatarra" % data.scrap_per_charge
-	notice_requested.emit(message)
+	# Keep the more useful spill/breakage notice when the backpack overflowed.
+	if overflow == 0: notice_requested.emit(message)
 	return true
 
 func describe(target: int) -> Dictionary:
@@ -77,7 +85,7 @@ func fit_targets(interaction: InteractionSystem) -> void:
 		var prop: ScavengeProp = props[index]
 		var anchor: float = prop.position.x
 		for attempt: int in 33:
-			if interaction.target_at_x(prop.position.x) == TARGET_BASE - index:
+			if interaction.target_at_x(prop.position.x, true) == TARGET_BASE - index:
 				break
 			var direction: float = -1.0 if attempt % 2 == 0 else 1.0
 			prop.position.x = clampf(anchor + direction * (floori(attempt * 0.5) + 1) * 20, -GameRules.MAP_HALF_WIDTH + 20, GameRules.MAP_HALF_WIDTH - 20)

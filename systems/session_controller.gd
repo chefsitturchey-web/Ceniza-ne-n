@@ -126,7 +126,7 @@ func _process(delta: float) -> void:
 	if get_tree().paused or finished:
 		presenter.publish()
 		return
-	if core.health <= 0:
+	if core.tier > 0 and core.health <= 0:
 		finish(false)
 		return
 	presenter.tick(delta)
@@ -134,10 +134,12 @@ func _process(delta: float) -> void:
 		experience.tick(delta)
 		if get_tree().paused: return
 	overload.tick(delta)
-	cycle.update_phase(delta)
+	if core.tier > 0: cycle.update_phase(delta)
 	if finished:
 		return
 	colony.update_workers(delta)
+	var world: District = get_parent() as District
+	if world != null and world.frontier != null: world.frontier.tick(delta)
 	if corpse_system != null:
 		corpse_system.tick(delta)
 	if trap_system != null:

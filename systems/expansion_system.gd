@@ -15,13 +15,14 @@ var elapsed: float = 0.0
 
 func setup(world: Node2D) -> void:
 	district = world
-	for side: float in [-1.0, 1.0]:
-		for spec: Dictionary in SPECS:
+	for sector: int in 2:
+		for slot: int in 8:
+			var spec: Dictionary = SPECS[slot % 4].duplicate()
 			var site: ExpansionOutpost = ExpansionOutpost.new()
 			site.z_index = -1
 			site.spec = spec
 			site.expansion = self
-			site.position = Vector2(spec.x * side, GameRules.FLOOR_Y)
+			site.position = Vector2(FrontierLayout.lot_x(world.zone_index, sector * 8 + slot), GameRules.FLOOR_Y)
 			sites.append(site)
 			add_child(site)
 
@@ -48,6 +49,9 @@ func interact(target: int) -> bool:
 	var required: int = FortressRules.BUILDINGS[site.spec.id]
 	if district.core.tier < required:
 		district.presenter.show_notice("%s necesita núcleo Nv.%d" % [site.spec.title, required])
+		return false
+	if district.frontier != null and district.frontier.blocked(site.position.x):
+		district.presenter.show_notice("Despeja primero los escombros de la parcela")
 		return false
 	if district.civic != null and not district.civic.safe_to_build(site.position.x):
 		district.presenter.show_notice("Destruye primero la brecha de esa franja")
@@ -76,7 +80,7 @@ func checkpoint() -> void:
 func energy_bonus() -> int:
 	var result: int = 0
 	for site: ExpansionOutpost in sites:
-		if site.spec.id == "generator" and site.hp > 0: result += 2
+		if site.spec.id == "generator" and site.hp > 0: result += 2 * maxi(1, district.core.tier)
 	return result
 
 func refresh_energy() -> void:
@@ -109,6 +113,13 @@ func frontier(side: float) -> float:
 
 func tick(delta: float) -> void:
 	elapsed += delta
+	# Supply caches are loose salvage: walking over one cannot be masked by a wall.
+	for index: int in CACHE_X.size():
+		if not looted[index] and absf(district.player.position.x - CACHE_X[index]) < 18:
+			looted[index] = true
+			district.bank.deposit(20)
+			district.presenter.show_notice("Suministros recuperados: +20 chatarra")
+			checkpoint()
 	for site: ExpansionOutpost in sites: site.tick(delta)
 	queue_redraw()
 
@@ -120,7 +131,7 @@ func snapshot() -> Dictionary:
 func restore(data: Dictionary) -> void:
 	looted.assign(data.get("looted", [false, false, false, false, false, false]))
 	var entries: Array = data.get("sites", [])
-	for index: int in range(sites.size()): sites[index].restore(entries[index] if not entries.is_empty() else {})
+	for index: int in range(sites.size()): sites[index].restore(entries[index] if index < entries.size() else {})
 	queue_redraw()
 
 static func number(value: Variant, low: float, high: float, integer: bool = false) -> bool:
@@ -131,25 +142,25 @@ static func valid(data: Variant) -> bool:
 	if data.is_empty(): return true
 	var entries: Variant = data.get("sites")
 	var caches: Variant = data.get("looted")
-	if not entries is Array or entries.size() != 8 or not caches is Array or caches.size() != 6: return false
+	if not entries is Array or entries.size() not in [8, 16] or not caches is Array or caches.size() != 6: return false
 	for flag: Variant in caches:
 		if not flag is bool: return false
 	for index: int in range(entries.size()):
 		var entry: Variant = entries[index]
 		if not entry is Dictionary or entry.get("id") != SPECS[index % 4].id or not entry.get("ordered") is bool: return false
 		if entry.has("staffed") and (not entry.staffed is bool or entry.get("role", "") not in ["", "ranger", "guardian", "technician", "medic"]): return false
-		if not number(entry.get("hp"), 0, 180, true) or not number(entry.get("progress"), 0, 6) or not number(entry.get("income"), 0, 12): return false
+		if not number(entry.get("hp"), 0, 180, true) or not number(entry.get("progress"), 0, ExpansionOutpost.BUILD_TIME) or not number(entry.get("income"), 0, 12): return false
 		var ally: Variant = entry.get("ally", {})
 		if not ally is Dictionary: return false
 		if not ally.is_empty():
 			if index % 4 == 3: return false
-			if not number(ally.get("hp"), 0, 90, true) or not number(ally.get("x"), -1600, 1600) or not number(ally.get("respawn"), 0, 18) or not number(ally.get("cooldown"), 0, 3): return false
+			if not number(ally.get("hp"), 0, 90, true) or not number(ally.get("x"), -GameRules.MAP_HALF_WIDTH, GameRules.MAP_HALF_WIDTH) or not number(ally.get("respawn"), 0, 18) or not number(ally.get("cooldown"), 0, 3): return false
 		if entry.has("crew"):
 			if not entry.crew is Array or entry.crew.size() > (3 if index % 4 == 0 else 1): return false
 			if entry.staffed != (not entry.crew.is_empty()): return false
 			for member: Variant in entry.crew:
 				if not member is Dictionary or member.get("role") not in (["ranger", "guardian"] if index % 4 == 0 else (["medic"] if index % 4 == 1 else ["technician"])): return false
-				if not number(member.get("hp"), 1, 90, true) or not number(member.get("x"), -1600, 1600) or not number(member.get("respawn"), 0, 18) or not number(member.get("cooldown"), 0, 3): return false
+				if not number(member.get("hp"), 1, 90, true) or not number(member.get("x"), -GameRules.MAP_HALF_WIDTH, GameRules.MAP_HALF_WIDTH) or not number(member.get("respawn"), 0, 18) or not number(member.get("cooldown"), 0, 3): return false
 	return true
 
 func _draw() -> void:

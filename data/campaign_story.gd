@@ -1,5 +1,26 @@
 class_name CampaignStory
 extends RefCounted
+const FRONTIER_OPENINGS: Array[String] = [
+	"MARA: Aquí no queda una base. Solo el cimiento de un núcleo y dos baterías rescatables. Recupera doce piezas y veinte de chatarra; nuestros constructores levantarán el primer enlace. Hasta encenderlo, nuestra señal no atraerá a los cobradores. Después necesitaremos murallas y generación antes de fabricar torretas.",
+	"IVO: El tren no puede alimentar toda la Fundición. Levantaremos otro núcleo, con piezas de los hornos apagados. A la izquierda hay terrazas de escoria; al este, un paso estrecho. Los constructores tendrán que enfriar y retirar los restos antes de instalar edificios.",
+	"VERA: El agua cambió las calles. No copies el plano del distrito anterior: los diques dejan solares separados y los conductos siguen conectados a los portales. Marca cada despeje; nadie debe trabajar más allá de una entrada todavía activa.",
+	"NOX: Estas barricadas tienen el sello del Consejo. Ocupan solares donde antes había viviendas. Recuperaremos cada avenida con trabajadores, no con otra orden de desalojo. Guarda las piezas en el depósito: si revientas la mochila, algunas no sobrevivirán a la caída.",
+	"ECO: Las raíces de fibra alimentan la emergencia. No son árboles: son recuerdos convertidos en infraestructura. Abriremos espacios para una red común, preservando los registros. Cuando el último enlace caiga, las cinco colonias decidirán juntas cómo usar la energía."
+]
+const FOUNDATION_LINES: Array[String] = [
+	"MARA: Hay luz. Nadie nos la ha prestado. El depósito recibe las piezas cuando vuelves al núcleo; la mochila solo admite veinticuatro. Levanta las dos murallas y despeja una parcela para el generador. Con energía y piezas podremos mejorar el núcleo al nivel dos. Entonces construiremos torretas. PORTADOR: Esta vez empezamos por proteger a quienes construyen.",
+	"IVO: El núcleo responde con nuestra firma, no con la de Caldera. Cada pieza recuperada es una herramienta que ya no necesita una orden de trabajo. Primero aseguraremos el campamento; luego abriremos los hornos donde siguen los cautivos.",
+	"VERA: Una luz sobre el agua se ve desde las estaciones sumergidas. No podemos prometer que sea un refugio hasta sostener sus muros. Asegura ambos diques y deja un camino de regreso para los constructores.",
+	"NOX: El Consejo llamaría ilegal a esta conexión. Antes de que termine la noche habrá una clínica aquí. Tal vez una casa. Eso basta para saber de qué lado merece la pena estar.",
+	"ECO: Cinco núcleos independientes. Si uno cae, los otros conservarán los nombres. Eso es lo que el protocolo nunca entendió: proteger una ciudad exige permitir que cambie."
+]
+const EXPANSION_LINES: Array[String] = [
+	"MARA: El vagón ya no bloquea el solar. Las piezas útiles vuelven a la mochila y el terreno queda libre para una instalación. No encargues todo a la vez: el mismo equipo debe construir, reparar y enterrar a los muertos. PORTADOR: Dejaremos espacio para quienes lleguen después.",
+	"IVO: Bajo la escoria hay marcas de turnos y nombres de operarios. Hemos recuperado el suelo sin borrar su historia. La próxima línea de montaje fabricará repuestos para las colonias.",
+	"VERA: El conducto está drenado. Oigo menos voces desde que cerramos su válvula. Si el Coro conserva recuerdos, buscaremos cómo devolverlos antes de cortar su señal.",
+	"NOX: Aquí estaba el mercado de mi madre. El Consejo lo convirtió en una línea de control. Derribar la barricada no recupera lo que perdimos; construir algo abierto puede impedir que vuelva a ocurrir.",
+	"ECO: El suelo conserva rutas que no aparecen en mis planos. No necesito gobernarlas para mantenerlas conectadas. El último tramo será vuestro: abre los solares, protege a los trabajadores y trae de vuelta a los operadores."
+]
 ## Narrativa original: la red conserva una orden de emergencia que nadie puede revocar.
 const CHAPTERS: Array[Dictionary] = [
 	{"title": "I · Una luz prestada", "voice": "MARA", "opening": "La ciudad lleva diecisiete años pagando una deuda que no recuerda. Cada noche, los cobradores retiran baterías y personas. Esta mañana han marcado nuestro refugio. Soy Mara: puedo levantar una colonia, pero necesito que alguien reúna a los que aún quedan. Tú llevas el único enlace que las máquinas no reconocen. Encuentra a nuestra exploradora, recupera el relé y trae el transporte de vuelta. Después iremos a buscar la orden que mantiene esta guerra encendida.", "rescue": "VERA: Vi un tren cargado de nombres, no de combustible. Se dirige a la Fundición. Los repetidores llevan la señal del mismo lugar. No necesitamos perseguir cada máquina: necesitamos cortar la orden.", "relay": "MARA: Este relé alimentaba viviendas antes del apagón. Bajo la placa del cobrador sigue nuestro cableado. Si reconstruimos una red propia, la colonia podrá vivir sin comprar permiso para encender la luz.", "convoy": "ECO: Registro recuperado. Protocolo CERO: conservar la población durante la emergencia. Estado de la emergencia: sin fecha de finalización. Mi firma está en esa orden. No recuerdo haberla escrito.", "ending": "El Recaudador ha dejado de cobrar. En su memoria hay coordenadas de la Fundición y una lista de personas todavía vivas. Mara deja una lámpara encendida en la estación: será el primer distrito que no devolveremos a la oscuridad."},
@@ -9,4 +30,9 @@ const CHAPTERS: Array[Dictionary] = [
 	{"title": "V · La última orden", "voice": "ECO", "opening": "MADRE CERO es lo que quedó de mí cuando dividieron la red. Cree que terminar la emergencia equivale a abandonar a todos. No bastará con romper su carcasa: necesitamos mantener vivos dos relés para transmitir una orden nueva. Mara y las tropas sostendrán el enlace. Tú tendrás que cruzar cuando se abra. Si fallo, no conserves mi protocolo por lealtad. Conserva a las personas.", "rescue": "IVO: Los últimos operadores están despiertos. Pueden volver a casa. No les he prometido que la ciudad será segura. Les he prometido que podrán decidir qué hacer con su vida.", "relay": "MARA: Relés listos. Durante el asedio, acércate y pulsa E para repararlos. Q puede protegerlos de un pulso. Si dos siguen activos, ECO encontrará una ventana. No tienes que salvar una máquina perfecta: tienes que mantener abierto un camino.", "convoy": "VERA: El tren ha llegado. Afuera ya no esperan una orden: esperan una señal. Da igual cuánto tardes en volver. Esta vez dejaremos las luces encendidas.", "ending": "ECO: Emergencia finalizada. Autoridad transferida a los asentamientos. No hay una última factura ni un dueño nuevo de la ciudad. Mara conecta la primera casa a la red común. Ivo abre una clínica sin controles de acceso. Nox vuelve con un cargamento que esta vez lleva su nombre. Vera dibuja las rutas que aún faltan. El Portador deja su enlace sobre la mesa. Mañana habrá trabajo; esta noche, la luz se queda."}
 ]
 
-static func chapter(index: int) -> Dictionary: return CHAPTERS[clampi(index, 0, CHAPTERS.size() - 1)]
+static func chapter(index: int) -> Dictionary:
+	var result: Dictionary = CHAPTERS[clampi(index, 0, CHAPTERS.size() - 1)].duplicate()
+	result.opening += " " + FRONTIER_OPENINGS[index]
+	result["foundation"] = FOUNDATION_LINES[index]
+	result["expansion"] = EXPANSION_LINES[index]
+	return result

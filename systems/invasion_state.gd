@@ -32,7 +32,7 @@ static func valid(value: Variant, session: SessionController, day: int) -> bool:
 	if not number(data, "dodge", 0, Player.DODGE_COOLDOWN) or not number(data, "poison", 0, 1): return false
 	for key: String in ["props", "corpses", "traps", "rats"]:
 		if not data.get(key) is Array: return false
-	if data.props.size() != session.interaction.scavenge.props.size() or data.traps.size() != session.trap_system.traps.size(): return false
+	if data.props.size() not in [4, 5, session.interaction.scavenge.props.size()] or data.traps.size() != session.trap_system.traps.size(): return false
 	if data.corpses.size() > 4096 or data.rats.size() > PestSystem.MAX_RATS: return false
 	for index: int in data.props.size():
 		var prop: PropData = session.interaction.scavenge.props[index].data
@@ -60,13 +60,14 @@ static func restore(session: SessionController, data: Dictionary) -> void:
 	for rat: SewerRat in session.pest_system.rats:
 		if is_instance_valid(rat): rat.free()
 	session.pest_system.rats.clear()
-	session.bank.parts = int(data.get("parts", 0))
+	session.bank.parts = mini(session.bank.parts_capacity, int(data.get("parts", 0)))
+	session.bank.stored_parts += maxi(0, int(data.get("parts", 0)) - session.bank.parts_capacity)
 	session.interaction.workshop.shovel_ready = data.get("shovel", false)
 	session.player.dodge_cooldown_remaining = data.get("dodge", 0.0)
 	session.player._poison_accum = data.get("poison", 0.0)
 	for index: int in session.interaction.scavenge.props.size():
 		var prop: ScavengeProp = session.interaction.scavenge.props[index]
-		var saved: Dictionary = data.get("props", [])[index] if not data.is_empty() else {"x": prop.position.x, "charges": prop.data.charges}
+		var saved: Dictionary = data.get("props", [])[index] if index < data.get("props", []).size() else {"x": prop.position.x, "charges": prop.data.charges}
 		prop.position.x = saved.x
 		prop.charges_left = int(saved.charges)
 		prop.depleted = prop.charges_left == 0

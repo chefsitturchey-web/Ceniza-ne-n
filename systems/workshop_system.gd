@@ -44,7 +44,7 @@ func interact(target: int) -> bool:
 	if bank.scrap < scrap_cost:
 		notice_requested.emit("Falta chatarra")
 		return false
-	if bank.parts < parts_cost:
+	if bank.parts + bank.stored_parts < parts_cost:
 		notice_requested.emit("Faltan piezas")
 		return false
 	if id == "pala" and shovel_ready:

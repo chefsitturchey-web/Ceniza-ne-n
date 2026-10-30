@@ -69,7 +69,7 @@ func _snapshot() -> Dictionary:
 	player["velocity_x"] = session.player.velocity.x
 	player["velocity_y"] = session.player.velocity.y
 	return {"version": 1, "day": session.cycle.day, "phase": session.cycle.phase, "campaign": session.campaign.duplicate(true),
-		"invasion": InvasionState.snapshot(session), "scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
+		"frontier": (session.get_parent() as District).frontier.snapshot(), "stored_parts": session.bank.stored_parts, "invasion": InvasionState.snapshot(session), "scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
 		"expansion": session.expansion.snapshot() if session.expansion != null else {},
 		"civic": session.civic.snapshot() if session.civic != null else {},
 		"story": session.interaction.story.snapshot() if session.interaction.story != null else {},
@@ -138,6 +138,7 @@ func load_game() -> bool:
 	session.cycle.phase = data.phase
 	session.cycle.phase_remaining = session.cycle.config.day_duration
 	session.bank.scrap = int(data.scrap)
+	session.bank.stored_parts = int(data.get("stored_parts", 0))
 	session.bank.energy_capacity = int(data.energy_capacity)
 	session.core.health = int(data.core_health)
 	for index: int in range(data.structures.size()):
@@ -156,7 +157,7 @@ func load_game() -> bool:
 	for saved: Dictionary in data.workers:
 		session.colony.add_worker(StringName(saved.role))
 		var worker: ColonyWorker = session.colony.workers.back()
-		worker.external_job = int(saved.get("external_job", -1))
+		worker.external_job = int(saved.get("external_job", -1)) if data.has("frontier") else -1
 		worker.health_component.reset(int(saved.get("hp", GameRules.WORKER_HEALTH)))
 		worker.damage_accum = saved.get("damage_accum", 0.0)
 		worker.wander_target = saved.get("wander_target", saved.x)
@@ -169,6 +170,7 @@ func load_game() -> bool:
 	session.player.velocity = Vector2(data.player.velocity_x, data.player.velocity_y)
 	session.player.refresh_state()
 	InvasionState.restore(session, data.get("invasion", {}))
+	(session.get_parent() as District).frontier.restore(data.get("frontier", {}))
 	_apply(session.overload, data.overload)
 	session.overload.tick(0.0)
 	session.defenses.drone_timer = data.drone_timer
@@ -178,6 +180,8 @@ func load_game() -> bool:
 func apply_handoff(data: Dictionary) -> void:
 	session.campaign = CampaignRoute.initial_state(int(data.campaign.zone))
 	session.bank.scrap = int(data.scrap)
+	session.bank.parts = int(data.get("carried_parts", 0))
+	session.bank.parts_changed.emit(session.bank.parts)
 	session.neural.restore(data.neural)
 	if session.interaction.mobility != null: session.interaction.mobility.restore(data.get("mobility", {}))
 	if session.civic != null: session.civic.capacity = mini(20, maxi(8, ceili(data.crew.size() / 4.0) * 4))
@@ -207,9 +211,9 @@ func _valid(value: Variant) -> bool:
 	if not ExpansionSystem.valid(data.get("expansion", {})):
 		return false
 	if not StoryDirector.valid(data.get("story", {})): return false
-	if not CivicSystem.valid(data.get("civic", {}), mini(3, session.zone_index) * 2): return false
+	if not CivicSystem.valid(data.get("civic", {}), session.civic.gates.size()): return false
 	for wall: Dictionary in data.get("civic", {}).get("walls", []):
-		if int(wall.tier) > ColonyCore.saved_tier(data): return false
+		if int(wall.tier) > maxi(1, ColonyCore.saved_tier(data)): return false
 	if not data.get("civic", {}).is_empty() and data.get("workers") is Array:
 		var population: int = data.workers.size() + data.civic.villagers.size()
 		for site: Dictionary in data.get("expansion", {}).get("sites", []):
@@ -226,12 +230,15 @@ func _valid(value: Variant) -> bool:
 		return false
 	if not _number(data, "version", 1, 1, true) or data.get("phase") != "DÍA":
 		return false
-	if not _number(data, "day", 1, 1000000 if session.cycle.boss_required else session.cycle.config.nights, true) or not _number(data, "core_health", 1, FortressRules.CORE_HEALTH[ColonyCore.saved_tier(data) - 1], true):
+	if not _number(data, "day", 1, 1000000 if session.cycle.boss_required else session.cycle.config.nights, true) or not _number(data, "core_health", 1, FortressRules.CORE_HEALTH[maxi(1, ColonyCore.saved_tier(data)) - 1], true):
 		return false
 	for field: String in ["scrap", "energy_capacity"]:
 		if not _number(data, field, 0, 2147483647, true):
 			return false
+	if not (session.get_parent() as District).frontier.valid(data.get("frontier", {})): return false
+	if not ExpansionSystem.number(data.get("stored_parts", 0), 0, 2147483647, true): return false
 	if not InvasionState.valid(data.get("invasion", {}), session, int(data.day)): return false
+	if data.has("frontier") and int(data.get("invasion", {}).get("parts", 0)) > session.bank.parts_capacity: return false
 	if not _number(data, "drone_timer", 0, GameRules.DRONE_INTERVAL):
 		return false
 	if not data.get("player") is Dictionary or not data.get("overload") is Dictionary:
@@ -246,19 +253,19 @@ func _valid(value: Variant) -> bool:
 			return false
 	if data.overload.size() != OVERLOAD_FIELDS.size():
 		return false
-	if not data.get("structures") is Array or data.structures.size() != session.bank.sites.size():
+	if not data.get("structures") is Array or data.structures.size() not in [4, session.bank.sites.size()]:
 		return false
 	for index: int in range(data.structures.size()):
 		var entry: Variant = data.structures[index]
 		var site: ConstructionSite = session.bank.sites[index]
 		if not entry is Dictionary:
 			return false
-		if entry.get("kind") != String(site.kind) or not _number(entry, "x", site.x, site.x) or not entry.get("ordered") is bool:
+		if entry.get("kind") != String(site.kind) or (data.has("frontier") and not _number(entry, "x", site.x, site.x)) or not entry.get("ordered") is bool:
 			return false
 		var tier: Variant = entry.get("tier", 1)
 		if not entry.get("powered", true) is bool or not entry.get("shorted", false) is bool: return false
 		if entry.get("shorted", false) and entry.get("powered", true): return false
-		if not ExpansionSystem.number(tier, 1, 3, true) or int(tier) > ColonyCore.saved_tier(data) or not entry.get("upgrade", false) is bool: return false
+		if not ExpansionSystem.number(tier, 1, 3, true) or int(tier) > maxi(1, ColonyCore.saved_tier(data)) or not entry.get("upgrade", false) is bool: return false
 		if not _number(entry, "hp", 0, site.data.health * tier, true) or not _number(entry, "progress", 0, GameRules.BUILD_TIME) or not _number(entry, "shot", 0, maxf(site.data.interval, site.data.overloaded_interval)):
 			return false
 	if not data.get("workers") is Array or data.workers.size() < (0 if data.has("invasion") else GameRules.INITIAL_POPULATION) or data.workers.size() > 20:
@@ -273,7 +280,7 @@ func _valid(value: Variant) -> bool:
 			var high: float = GameRules.WORKER_HEALTH if field == "hp" else (1.0 if field == "damage_accum" else 1000000.0)
 			if not _number(entry, field, low, high, field == "hp"): return false
 		var worker_data: WorkerData = session.colony.builder_data if entry.role == "builder" else session.colony.collector_data
-		if not ExpansionSystem.number(entry.get("external_job", -1), -1, 13, true): return false
+		if not ExpansionSystem.number(entry.get("external_job", -1), -1, 255, true): return false
 		if not _number(entry, "side", -1, 1) or absf(entry.side) != 1 or not _number(entry, "x", -1000000, 1000000):
 			return false
 		if not _number(entry, "job", -1, data.structures.size() - 1, true) or not _number(entry, "cargo", 0, worker_data.cargo, true) or not _number(entry, "gather", 0, worker_data.gather_time):

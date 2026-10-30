@@ -88,6 +88,7 @@ func resolve(victory: bool) -> void:
 		district.modules.cores += 1
 		if district.zone_index < CampaignRoute.COUNT - 1:
 			next_checkpoint = CampaignRoute.handoff(district.zone_index + 1, district.neural.snapshot(), district.bank.scrap, district.colony.workers, district.mobility.snapshot())
+			next_checkpoint["carried_parts"] = district.bank.parts
 			var saved: bool = true
 			if district.session.save_system != null:
 				saved = district.session.save_system.save_handoff(next_checkpoint)

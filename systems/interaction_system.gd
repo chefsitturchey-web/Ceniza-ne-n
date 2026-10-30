@@ -28,7 +28,13 @@ var hold_target: int = GameRules.NO_TARGET
 func interaction_target() -> int:
 	return target_at_x(player.position.x)
 
-func target_at_x(x: float) -> int:
+func target_at_x(x: float, planning: bool = false) -> int:
+	if absf(x) < GameRules.CORE_INTERACT_RANGE: return -1
+	var world: District = player.get_parent() as District
+	if world != null and world.frontier != null:
+		var frontier_target: int = world.frontier.target_at(x)
+		if frontier_target != GameRules.NO_TARGET: return frontier_target
+	if world != null and world.core.tier == 0 and not planning: return scavenge.target_at(x) if scavenge != null else GameRules.NO_TARGET
 	if story != null:
 		var story_target: int = story.target_at(x)
 		if story_target != GameRules.NO_TARGET: return story_target
@@ -74,13 +80,16 @@ func update_interaction(delta: float) -> void:
 		return
 	hold_time += delta
 	if target >= 0 and target < construction.sites.size(): construction.sites[target].payment_fraction = hold_time / GameRules.INTERACT_HOLD
-	elif target <= -340 and target > -346 and civic != null: civic.walls[-340 - target].payment_fraction = hold_time / GameRules.INTERACT_HOLD
+	elif target <= -340 and target > -340 - civic.walls.size() and civic != null: civic.walls[-340 - target].payment_fraction = hold_time / GameRules.INTERACT_HOLD
 	if hold_time >= required_hold(target):
 		perform_interaction(target)
 		committed_target = target
 		hold_time = 0.0
 
 func perform_interaction(target: int) -> bool:
+	var world: District = player.get_parent() as District
+	if target <= FrontierSystem.CLEAR_BASE and world != null: return world.frontier.interact(target)
+	if target == -1 and colony.core != null and colony.core.tier == 0: return colony.core.request_upgrade()
 	if target == MOBILITY_TARGET and mobility != null: return mobility.interact()
 	if target <= -400 and target >= -402 and story != null: return story.interact(target)
 	if target <= -800:

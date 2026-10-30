@@ -51,6 +51,7 @@ static func handoff(zone: int, neural: Dictionary, scrap: int, workers: Array, m
 static func valid_handoff(value: Variant) -> bool:
 	if not value is Dictionary or value.get("version") != 1 or value.get("handoff") != true or value.get("phase") != "DÍA" or value.get("day") != 1:
 		return false
+	if not ExpansionSystem.number(value.get("carried_parts", 0), 0, 24, true): return false
 	if not valid_state(value.get("campaign")) or value.campaign.zone < 1 or not NeuralSystem.valid(value.get("neural")):
 		return false
 	if not MobilitySystem.valid(value.get("mobility", {})): return false

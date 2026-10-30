@@ -31,7 +31,7 @@
 [ext_resource type="Script" path="res://entities/structures/railway_station.gd" id="station"]
 
 [sub_resource type="RectangleShape2D" id="floor"]
-size = Vector2(3200, 40)
+size = Vector2(14400, 40)
 [sub_resource type="RectangleShape2D" id="edge"]
 size = Vector2(16, 400)
 [node name="PrimerDistrito" type="Node2D"]
@@ -41,11 +41,11 @@ position = Vector2(0, 280)
 [node name="Shape" type="CollisionShape2D" parent="Floor"]
 shape = SubResource("floor")
 [node name="LeftEdge" type="StaticBody2D" parent="."]
-position = Vector2(-1608, 100)
+position = Vector2(-7208, 100)
 [node name="Shape" type="CollisionShape2D" parent="LeftEdge"]
 shape = SubResource("edge")
 [node name="RightEdge" type="StaticBody2D" parent="."]
-position = Vector2(1608, 100)
+position = Vector2(7208, 100)
 [node name="Shape" type="CollisionShape2D" parent="RightEdge"]
 shape = SubResource("edge")
 [node name="Player" parent="." instance=ExtResource("player")]
@@ -88,12 +88,12 @@ script = ExtResource("View")
 [node name="Expedition" type="Node" parent="."]
 script = ExtResource("expedition")
 [node name="LeftRepeater" type="Node2D" parent="."]
-position = Vector2(-1440, 260)
+position = Vector2(-6820, 260)
 script = ExtResource("repeater")
 [node name="RightRepeater" type="Node2D" parent="."]
-position = Vector2(1440, 260)
+position = Vector2(6900, 260)
 script = ExtResource("repeater")
 [node name="Station" type="Node2D" parent="."]
-position = Vector2(560, 260)
+position = Vector2(6640, 260)
 z_index = -1
 script = ExtResource("station")

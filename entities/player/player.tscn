@@ -17,9 +17,9 @@ shape = SubResource("BodyShape")
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1867234079]
 position = Vector2(0, -68)
 zoom = Vector2(1.25, 1.25)
-limit_left = -1600
+limit_left = -7200
 limit_top = -200
-limit_right = 1600
+limit_right = 7200
 limit_bottom = 380
 position_smoothing_enabled = true
 position_smoothing_speed = 6.0

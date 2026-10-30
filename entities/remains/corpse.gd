@@ -16,6 +16,14 @@ var bury_progress: float = 0.0
 ## Managed by CorpseSystem; a single float, not a Timer node.
 var rat_timer: float = 0.0
 
+func _draw() -> void:
+	var frames: SpriteFrames = UnitSpriteLibrary.frames("builder" if kind == &"worker" else "ranger")
+	var texture: Texture2D = frames.get_frame_texture(&"caer", frames.get_frame_count(&"caer") - 1)
+	draw_texture(texture, Vector2(-32, -56), Color.WHITE.lerp(Color("517354"), stage / 4.0))
+	if stage >= 2:
+		for index: int in 4:
+			draw_circle(Vector2(-12 + index * 8, -5 - index % 2 * 3), 2, Color(0.3, 0.6, 0.34, 0.25))
+
 func _ready() -> void:
 	size = Vector2(16, 10)
 

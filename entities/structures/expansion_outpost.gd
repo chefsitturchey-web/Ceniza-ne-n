@@ -1,6 +1,7 @@
 class_name ExpansionOutpost
 extends Node2D
 
+const BUILD_TIME: float = 24.0
 const MAX_HEALTH: int = 180
 const ART: Texture2D = preload("res://assets/world/structures/industrial_atlas_v2.png")
 var spec: Dictionary
@@ -71,8 +72,8 @@ func tick(delta: float) -> void:
 	elapsed += delta
 	flash = maxf(0, flash - delta)
 	if ordered:
-		progress = minf(6, progress)
-		if progress >= 6:
+		progress = minf(BUILD_TIME, progress)
+		if progress >= BUILD_TIME:
 			hp = MAX_HEALTH
 			ordered = false
 			progress = 0
@@ -135,7 +136,7 @@ func _draw() -> void:
 
 	if hp > 0 or ordered:
 		ArtScale.footing(self, frame)
-		var fraction: float = clampf(progress / 6, 0, 1) if ordered else 1.0
+		var fraction: float = clampf(progress / BUILD_TIME, 0, 1) if ordered else 1.0
 		var shown: float = height * fraction
 		draw_texture_rect_region(ART, Rect2(-frame.size.x * 0.5, -shown, frame.size.x, shown), Rect2(source.position + Vector2(0, source.size.y * (1 - fraction)), Vector2(source.size.x, source.size.y * fraction)), Color.WHITE if hp > MAX_HEALTH / 2 or ordered else Color("ac8d7b"))
 		if ordered:
@@ -158,7 +159,7 @@ func _draw_prototype() -> void:
 		draw_rect(Rect2(-27, -42, 54, 42), Color("47dacb", 0.28), false, 1)
 		for x: int in [-29, 27]: draw_rect(Rect2(x, -4, 3, 4), Color("8299a8"))
 		return
-	var built: float = progress / 6 if ordered else 1.0
+	var built: float = progress / BUILD_TIME if ordered else 1.0
 	draw_set_transform(Vector2.ZERO, 0, Vector2(1, maxf(0.1, built)))
 	plate(Rect2(-29, -5, 58, 5))
 	plate(Rect2(-24, -39, 48, 34), Color("704c43") if spec.id == "recycler" else Color("304356"))
