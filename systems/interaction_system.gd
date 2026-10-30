@@ -97,9 +97,6 @@ func perform_interaction(target: int) -> bool:
 	if target == STATION_TARGET:
 		return expedition != null and expedition.start()
 	if target == -1:
-		if cycle.phase != "DÍA":
-			notice_requested.emit("Solo de día")
-			return false
 		if player.health < Player.MAX_HEALTH:
 			player.health = Player.MAX_HEALTH
 			notice_requested.emit("Salud restaurada")

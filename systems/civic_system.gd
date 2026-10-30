@@ -121,10 +121,11 @@ func describe(target: int) -> Dictionary:
 	return {"text": "Reclutar superviviente · %d disponibles" % camp_stock[-300 - target], "cost": 5}
 
 func interact(target: int) -> bool:
-	if district.cycle.phase != "DÍA":
-		district.presenter.show_notice("Organiza la colonia durante el día")
-		return false
+	var day: bool = district.cycle.phase == "DÍA"
 	if target == -360:
+		if not day:
+			district.presenter.show_notice("Organiza la colonia durante el día")
+			return false
 		if capacity >= 20:
 			if district.colony.workers.size() <= GameRules.INITIAL_POPULATION: return false
 			var worker: ColonyWorker = district.colony.workers.pop_back()
@@ -144,6 +145,9 @@ func interact(target: int) -> bool:
 			return false
 		return district.construction.order_site(walls[index])
 	elif target <= -320 and target > -326:
+		if not day:
+			district.presenter.show_notice("Organiza la colonia durante el día")
+			return false
 		var index: int = -320 - target
 		if district.core.tier < int(FortressRules.ROLES[ROLES[index]]):
 			district.presenter.show_notice("Herramienta bloqueada: mejora el núcleo a Nv.%d" % int(FortressRules.ROLES[ROLES[index]]))
@@ -151,6 +155,9 @@ func interact(target: int) -> bool:
 		if tools[index] >= 4 or not district.bank.spend(COSTS[index]): return false
 		tools[index] += 1
 	elif target in [-300, -301]:
+		if not day:
+			district.presenter.show_notice("Organiza la colonia durante el día")
+			return false
 		var index: int = -300 - target
 		if camp_stock[index] <= 0 or population() >= capacity or not district.bank.spend(5): return false
 		camp_stock[index] -= 1

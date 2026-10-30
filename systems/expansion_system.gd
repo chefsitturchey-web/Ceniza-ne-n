@@ -52,9 +52,6 @@ func interact(target: int) -> bool:
 	if district.civic != null and not district.civic.safe_to_build(site.position.x):
 		district.presenter.show_notice("Destruye primero la brecha de esa franja")
 		return false
-	if district.cycle.phase != "DÍA":
-		district.presenter.show_notice("Despliega y repara módulos de día")
-		return false
 	if site.ordered: return false
 	if site.hp >= site.MAX_HEALTH:
 		district.presenter.show_notice(site.spec.title + ": operativo")

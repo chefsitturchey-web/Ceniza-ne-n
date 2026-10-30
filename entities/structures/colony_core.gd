@@ -21,7 +21,6 @@ func upgrade_blocker() -> String:
 	if tier >= 3: return "Núcleo al máximo"
 	if ordered: return "Núcleo en obras"
 	if district == null: return "Colonia no disponible"
-	if district.cycle.phase != "DÍA": return "Mejora el núcleo de día"
 	if district.expansion.energy_bonus() == 0: return "Primero construye un generador"
 	for site: ConstructionSite in district.construction.sites:
 		if site.hp <= 0: return "Primero termina las cuatro defensas centrales"
