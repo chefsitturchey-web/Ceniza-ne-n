@@ -84,6 +84,8 @@ func _on_destroyed() -> void:
 	upgrade_pending = false
 	if turret_visual != null:
 		turret_visual.clear_target()
+	if core != null and core.district != null:
+		core.district.sound.play_world("wall_destroy", global_position)
 	effects.shatter()
 	ordered = false
 	progress = 0.0

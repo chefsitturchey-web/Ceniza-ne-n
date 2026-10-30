@@ -13,6 +13,18 @@ const CUES: Dictionary = {
 	"sonar": preload("res://assets/audio/sfx/8bit/combate/sonar.wav"),
 	"shield": preload("res://assets/audio/sfx/8bit/combate/shield.wav"),
 	"fire_pulse": preload("res://assets/audio/sfx/8bit/combate/fire_pulse.wav"),
+	"telegraph_claw": preload("res://assets/audio/sfx/8bit/combate/telegraph_claw.wav"),
+	"telegraph_charge": preload("res://assets/audio/sfx/8bit/combate/telegraph_charge.wav"),
+	"telegraph_volley": preload("res://assets/audio/sfx/8bit/combate/telegraph_volley.wav"),
+	"wall_destroy": preload("res://assets/audio/sfx/8bit/combate/wall_destroy.wav"),
+	"artillery_shot": preload("res://assets/audio/sfx/8bit/combate/artillery_shot.wav"),
+	"saboteur_hit": preload("res://assets/audio/sfx/8bit/combate/saboteur_hit.wav"),
+	"turret_on": preload("res://assets/audio/sfx/8bit/combate/turret_on.wav"),
+	"turret_off": preload("res://assets/audio/sfx/8bit/combate/turret_off.wav"),
+	"recruit": preload("res://assets/audio/sfx/8bit/economia/recruit.wav"),
+	"purchase": preload("res://assets/audio/sfx/8bit/economia/purchase.wav"),
+	"train_arrive": preload("res://assets/audio/sfx/8bit/hitos/train_arrive.wav"),
+	"phase_dawn": preload("res://assets/audio/sfx/8bit/hitos/phase_dawn.wav"),
 	"denied": preload("res://assets/audio/sfx/8bit/economia/denied.wav"),
 	"pickup": preload("res://assets/audio/sfx/8bit/economia/pickup.wav"),
 	"build_order": preload("res://assets/audio/sfx/8bit/economia/build_order.wav"),
@@ -30,11 +42,24 @@ const CUES: Dictionary = {
 	"dialogue": preload("res://assets/audio/sfx/8bit/voz/dialogue.wav")
 }
 const VOICES: int = 12
+## Ambiente por zona: archivo de bucle, sin eventos ni melodía.
+const AMBIENCE: Dictionary = {
+	"periphery": "amb_periferia",
+	"foundry": "amb_fundicion",
+	"flooded": "amb_inundado",
+	"citadel": "amb_ciudadela",
+	"network": "amb_red"
+}
+const AMBIENCE_VOLUME: float = -14.0
 ## Segundo desde el que entra el tema de derrota.
 const DEFEAT_START: float = 3.0
 var district: Node2D
 var voices: Array[AudioStreamPlayer] = []
 var music: Array[AudioStreamPlayer] = []
+## Voces espaciales: solo para sonidos del mundo, así Godot calcula el paneo.
+const WORLD_VOICES: int = 8
+var world_voices: Array[AudioStreamPlayer2D] = []
+var ambience: AudioStreamPlayer = AudioStreamPlayer.new()
 var warning_player: AudioStreamPlayer = AudioStreamPlayer.new()
 var outcome: AudioStreamPlayer = AudioStreamPlayer.new()
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -57,11 +82,31 @@ func _ready() -> void:
 		add_child(voice)
 		voices.append(voice)
 	rng.seed = get_instance_id() * 2654435761 + Time.get_ticks_usec()
+	for index: int in range(WORLD_VOICES):
+		var spatial: AudioStreamPlayer2D = AudioStreamPlayer2D.new()
+		spatial.bus = &"SFX"
+		# El volumen lo calcula el juego; el nodo solo aporta el paneo.
+		spatial.attenuation = 0.0
+		spatial.max_distance = 4000.0
+		spatial.panning_strength = 1.0
+		spatial.process_mode = Node.PROCESS_MODE_PAUSABLE
+		add_child(spatial)
+		world_voices.append(spatial)
+	ambience.bus = &"SFX"
+	ambience.volume_db = AMBIENCE_VOLUME
+	ambience.process_mode = Node.PROCESS_MODE_PAUSABLE
+	add_child(ambience)
 	for player: AudioStreamPlayer in [warning_player, outcome]:
 		player.bus = &"Music"
 		player.volume_db = -60.0
 		player.process_mode = Node.PROCESS_MODE_ALWAYS
 		add_child(player)
+	if district != null:
+		var ambience_stream: AudioStream = _ambience_for(district.zone.id)
+		if ambience_stream != null:
+			ambience.stream = ambience_stream
+			if playback_enabled:
+				ambience.play()
 	if music_enabled:
 		# Sin distrito no hay colonia: el audio corresponde a una arena de jefe.
 		_add_music_player(MusicLibrary.boss_for(rng) if district == null else MusicLibrary.day_for(district.zone.id, rng))
@@ -79,7 +124,8 @@ func _ready() -> void:
 	district.core.health_component.damaged.connect(func(_a: int, _b: int) -> void: play_cue("alarm"))
 	district.defenses.shot_fired.connect(func(origin: Vector2) -> void: play_world("shot", origin))
 	district.cycle.phase_changed.connect(func(phase: String, _day: int) -> void:
-		if phase != "DÍA": play_cue("alarm"))
+		if phase != "DÍA": play_cue("alarm")
+		else: play_cue("phase_dawn"))
 	district.director.spawned.connect(_enemy_spawned)
 	district.neural.point_earned.connect(func() -> void: play_cue("upgrade"))
 	district.overload.notice_requested.connect(func(message: String) -> void:
@@ -95,11 +141,22 @@ func _enemy_spawned(enemy: Node2D, _side: float) -> void:
 	enemy.reward_requested.connect(func(_reward: int) -> void: play_world("destroy", enemy.position))
 
 func play_world(id: String, origin: Vector2, gain_db: float = 0.0) -> void:
-	if district == null:
+	if district == null or not playback_enabled or muted or not CUES.has(id):
+		return
+	if elapsed < float(cooldowns.get(id, -1.0)):
 		return
 	var distance: float = absf(origin.x - district.player.position.x)
-	if distance < 480:
-		play_cue(id, -distance / 35.0 + gain_db)
+	if distance >= 480.0:
+		return
+	cooldowns[id] = elapsed + (0.1 if id == "shot" else 0.06)
+	for voice: AudioStreamPlayer2D in world_voices:
+		if voice.playing:
+			continue
+		voice.global_position = origin
+		voice.stream = CUES[id]
+		voice.volume_db = gain_db - distance / 35.0
+		voice.play()
+		return
 
 func play_cue(id: String, gain_db: float = 0.0) -> void:
 	if not playback_enabled or muted or not CUES.has(id) or elapsed < float(cooldowns.get(id, -1.0)):
@@ -112,6 +169,21 @@ func play_cue(id: String, gain_db: float = 0.0) -> void:
 			voice.pitch_scale = 1.0 + sin(elapsed * 7.3) * 0.035
 			voice.play()
 			return
+
+## Carga diferida: un preload nulo dejaría la zona en silencio sin avisar.
+## El bucle se fija en código porque el importador puede ignorar el ajuste.
+func _ambience_for(zone_id: String) -> AudioStream:
+	var name: String = String(AMBIENCE.get(zone_id, ""))
+	if name.is_empty():
+		return null
+	var stream: AudioStreamWAV = load("res://assets/audio/sfx/8bit/ambiente/%s.wav" % name) as AudioStreamWAV
+	if stream == null:
+		return null
+	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	stream.loop_begin = 0
+	# data.size() está comprimido; el largo en frames sale de la duración real.
+	stream.loop_end = int(round(stream.get_length() * stream.mix_rate))
+	return stream
 
 func _add_music_player(stream: AudioStream) -> void:
 	var layer: AudioStreamPlayer = AudioStreamPlayer.new()

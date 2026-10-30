@@ -112,8 +112,12 @@ func piece(asset: String, offset: Vector2) -> Sprite2D:
 	return sprite
 
 func change_state(value: State, duration: float) -> void:
-	if value in [State.CLAW_WINDUP, State.CHARGE_WINDUP, State.VOLLEY_WINDUP]:
-		cue_requested.emit("alarm")
+	if value == State.CLAW_WINDUP:
+		cue_requested.emit("telegraph_claw")
+	elif value == State.CHARGE_WINDUP:
+		cue_requested.emit("telegraph_charge")
+	elif value == State.VOLLEY_WINDUP:
+		cue_requested.emit("telegraph_volley")
 	elif value == State.STUNNED:
 		cue_requested.emit("hit")
 	if value == State.CHARGE and state != State.CHARGE:

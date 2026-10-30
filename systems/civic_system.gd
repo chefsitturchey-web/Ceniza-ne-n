@@ -153,12 +153,14 @@ func interact(target: int) -> bool:
 			return false
 		if tools[index] >= 4 or not district.bank.spend(COSTS[index]): return false
 		tools[index] += 1
+		district.play("purchase")
 		var blocked: String = employment_block(index)
 		district.presenter.show_notice(NAMES[index] + (": " + blocked if not blocked.is_empty() else " preparado: un superviviente irá a recogerlo"))
 	elif target in [-300, -301]:
 		var index: int = -300 - target
 		if camp_stock[index] <= 0 or population() >= capacity or not district.bank.spend(5): return false
 		camp_stock[index] -= 1
+		district.play("recruit")
 		villagers.append({"x": -1340.0 if index == 0 else 1340.0, "side": -1.0 if index == 0 else 1.0})
 	else: return false
 	district.expansion.checkpoint()

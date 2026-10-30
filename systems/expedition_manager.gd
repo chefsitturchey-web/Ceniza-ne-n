@@ -14,6 +14,7 @@ var next_checkpoint: Dictionary = {}
 func setup(world: District) -> void:
 	district = world
 	station = world.get_node("Station") as RailwayStation
+	station.arrived.connect(func() -> void: district.play("train_arrive"))
 	for path: String in ["LeftRepeater", "RightRepeater"]:
 		var repeater: EnemyRepeater = world.get_node(path) as EnemyRepeater
 		repeaters.append(repeater)

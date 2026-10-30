@@ -70,7 +70,7 @@ func add_marks() -> void:
 	if phase == 2:
 		for offset: Vector2 in [Vector2(0, -70), Vector2(0, 70)]:
 			marks.append({"position": (target.global_position + offset).clamp(Vector2(40, 40), Vector2(600, 440)), "time": 0.9, "hit": false})
-	cue_requested.emit("alarm")
+	cue_requested.emit("telegraph_volley")
 
 func _physics_process(delta: float) -> void:
 	if health <= 0 or target == null or target.health <= 0:

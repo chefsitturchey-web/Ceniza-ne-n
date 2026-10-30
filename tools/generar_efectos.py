@@ -335,6 +335,54 @@ def render_sfxr(ps):
     return data * 10.0 ** (ps.get("peak_db", -6.0) / 20.0) / peak
 
 
+def fft_band(values, low, high, rate=RATE):
+    """Banda con bordes suaves en el dominio de la frecuencia (rápido y estable)."""
+    n = len(values)
+    spectrum = np.fft.rfft(values)
+    freqs = np.fft.rfftfreq(n, 1.0 / rate)
+    edge = max(low * 0.6, 20.0)
+    top = max(high * 0.35, 20.0)
+    weight = np.clip((freqs - (low - edge)) / edge, 0.0, 1.0)
+    weight *= np.clip(((high + top) - freqs) / top, 0.0, 1.0)
+    return np.fft.irfft(spectrum * weight, n)
+
+
+def render_ambience(spec):
+    """Colchón de ambiente en bucle: ruido filtrado con respiración lenta.
+
+    No hay melodía ni eventos: solo textura, para que no canse en sesiones
+    largas. El bucle se cierra cruzando la cola con el arranque.
+    """
+    seconds = spec.get("seconds", 16.0)
+    n = int(seconds * RATE)
+    time = np.arange(n) / RATE
+    rng = np.random.default_rng(spec.get("seed", 1))
+    mix = np.zeros(n)
+    for layer in spec["layers"]:
+        if layer.get("crackle"):
+            impulses = np.zeros(n)
+            count = max(1, int(layer["crackle"] * seconds))
+            positions = rng.integers(0, n, count)
+            impulses[positions] = rng.uniform(-1.0, 1.0, count)
+            signal = fft_band(impulses, layer["low"], layer["high"])
+        else:
+            signal = fft_band(rng.uniform(-1.0, 1.0, n), layer["low"], layer["high"])
+        period = layer.get("lfo", 0.0)
+        amplitude = 1.0
+        if period > 0:
+            amplitude = 0.55 + 0.45 * np.sin(2.0 * np.pi * time / period + layer.get("phase", 0.0))
+        mix += signal * amplitude * layer["gain"]
+
+    # Cierre del bucle: la cola se mezcla con el arranque y se descarta.
+    fade = min(n // 3, int(0.6 * RATE))
+    ramp = np.linspace(0.0, 1.0, fade)
+    mix[:fade] = mix[:fade] * ramp + mix[-fade:] * (1.0 - ramp)
+    mix = mix[:-fade]
+    mix = highpass(mix, 25.0)
+    peak = np.max(np.abs(mix)) + 1e-9
+    return mix * 10.0 ** (spec.get("peak_db", -20.0) / 20.0) / peak
+
+
 def save(group, name, data):
     folder = DST / group
     folder.mkdir(parents=True, exist_ok=True)
@@ -403,6 +451,47 @@ PRESETS = {
     "fire_pulse": dict(wave="noise", attack=0.004, sustain=0.050, decay=0.280, start=700.0, min=60.0,
                        slide=-3.5, punch=0.20, lowpass=2400.0, lowpass_sweep=-900.0, resonance=0.25,
                        highpass=120.0, drive=2.6, peak_db=-7.0, seed=113),
+    # Telegrafiados: tres avisos cortos y bien distintos entre sí, para no
+    # tapar el ataque con el klaxon largo de la alarma.
+    "telegraph_claw": dict(wave="noise", attack=0.002, sustain=0.012, decay=0.100, start=2200.0,
+                           min=300.0, slide=-14.0, lowpass=4500.0, lowpass_sweep=-3000.0,
+                           highpass=700.0, drive=1.8, peak_db=-8.0, seed=127),
+    "telegraph_charge": dict(wave="noise", attack=0.010, sustain=0.090, decay=0.220, start=500.0,
+                             min=60.0, slide=-2.0, lowpass=900.0, lowpass_sweep=400.0,
+                             highpass=60.0, drive=2.4, peak_db=-7.0, seed=131),
+    "telegraph_volley": dict(wave="square", duty=0.25, attack=0.001, sustain=0.020, decay=0.120,
+                             start=1600.0, min=400.0, slide=-6.0, noise_mix=0.30, highpass=900.0,
+                             lowpass=5000.0, peak_db=-8.0, seed=137),
+    # Muralla que se derrumba: más larga y grave que la muerte de un enemigo.
+    "wall_destroy": dict(wave="noise", attack=0.004, sustain=0.060, decay=0.550, start=700.0, min=35.0,
+                         slide=-2.5, punch=0.25, lowpass=1400.0, lowpass_sweep=-700.0, resonance=0.20,
+                         highpass=70.0, drive=2.8, peak_db=-6.0, seed=139),
+    # Disparo de artillero: golpe de mortero con caída.
+    "artillery_shot": dict(wave="noise", attack=0.002, sustain=0.020, decay=0.200, start=900.0, min=80.0,
+                           slide=-12.0, punch=0.15, lowpass=2000.0, lowpass_sweep=-1200.0, highpass=200.0,
+                           drive=2.0, peak_db=-8.0, seed=149),
+    # Saboteador golpeando una instalación: chapa metálica.
+    "saboteur_hit": dict(wave="square", duty=0.125, attack=0.001, sustain=0.010, decay=0.120, start=1200.0,
+                         min=300.0, slide=-8.0, noise_mix=0.40, highpass=600.0, lowpass=4000.0,
+                         peak_db=-8.0, seed=151),
+    # Energía de torreta: sube al encender, cae al apagar.
+    "turret_on": dict(wave="square", duty=0.25, attack=0.002, sustain=0.050, decay=0.150, start=300.0,
+                      min=290.0, slide=8.0, lowpass=2500.0, peak_db=-9.0, seed=157),
+    "turret_off": dict(wave="square", duty=0.25, attack=0.002, sustain=0.040, decay=0.130, start=600.0,
+                       min=200.0, slide=-8.0, lowpass=2500.0, peak_db=-9.0, seed=163),
+    # Tren entrando a la estación: rumor largo, sin ataque.
+    "train_arrive": dict(wave="noise", attack=0.120, sustain=0.400, decay=0.580, start=280.0, min=45.0,
+                         slide=-0.8, lowpass=700.0, lowpass_sweep=300.0, highpass=50.0, drive=2.2,
+                         peak_db=-8.0, seed=167),
+    # Reclutar a alguien en el campamento.
+    "recruit": dict(wave="sine", attack=0.002, sustain=0.030, decay=0.120, start=520.0, min=500.0,
+                    slide=4.0, arp_mult=1.5, arp_speed=0.080, peak_db=-9.0, seed=173),
+    # Comprar una herramienta en el taller.
+    "purchase": dict(wave="square", duty=0.5, attack=0.0, sustain=0.020, decay=0.090, start=980.0,
+                     min=960.0, arp_mult=1.5, arp_speed=0.045, highpass=300.0, peak_db=-8.0, seed=179),
+    # Amanecer: campana suave que separa la noche del día.
+    "phase_dawn": dict(wave="sine", attack=0.005, sustain=0.100, decay=0.600, start=660.0, min=650.0,
+                       lowpass=3000.0, peak_db=-12.0, seed=181),
     # Klaxon de aviso: alterna dos alturas cada 140 ms sobre la misma nota base.
     "alarm": dict(wave="square", duty=0.5, attack=0.005, sustain=0.300, decay=0.145, start=620.0,
                   min=600.0, arp_mult=1.5, arp_speed=0.14, lowpass=2600.0, highpass=300.0,
@@ -456,11 +545,44 @@ PRESETS = {
 }
 
 
+AMBIENCE = {
+    # Periferia: viento sobre chapa y escombros.
+    "amb_periferia": dict(seconds=16.0, peak_db=-20.0, seed=191, layers=[
+        dict(low=200.0, high=900.0, gain=0.55, lfo=8.0),
+        dict(low=900.0, high=2600.0, gain=0.18, lfo=5.3, phase=1.1),
+        dict(low=40.0, high=120.0, gain=0.30, lfo=4.0, phase=2.3),
+    ]),
+    # Fundición: rugido de horno y crepitar de escoria.
+    "amb_fundicion": dict(seconds=16.0, peak_db=-20.0, seed=193, layers=[
+        dict(low=60.0, high=300.0, gain=0.55, lfo=4.0),
+        dict(low=400.0, high=1200.0, gain=0.14, lfo=2.7, phase=0.8),
+        dict(low=1500.0, high=5000.0, gain=0.05, crackle=6.0),
+    ]),
+    # Barrio inundado: agua quieta y goteos dispersos.
+    "amb_inundado": dict(seconds=16.0, peak_db=-20.0, seed=197, layers=[
+        dict(low=100.0, high=600.0, gain=0.45, lfo=5.3),
+        dict(low=1500.0, high=4000.0, gain=0.10, lfo=3.2, phase=1.7),
+        dict(low=900.0, high=2600.0, gain=0.07, crackle=1.5),
+    ]),
+    # Ciudadela: aire acondicionado, casi sin movimiento.
+    "amb_ciudadela": dict(seconds=16.0, peak_db=-22.0, seed=199, layers=[
+        dict(low=80.0, high=400.0, gain=0.42, lfo=16.0),
+        dict(low=900.0, high=1800.0, gain=0.09, lfo=16.0, phase=2.0),
+    ]),
+    # Núcleo: zumbido eléctrico y pulsos de datos.
+    "amb_red": dict(seconds=16.0, peak_db=-20.0, seed=211, layers=[
+        dict(low=50.0, high=150.0, gain=0.30, lfo=8.0),
+        dict(low=300.0, high=1200.0, gain=0.22, lfo=2.0),
+        dict(low=3000.0, high=7000.0, gain=0.06, crackle=12.0),
+    ]),
+}
+
 GROUPS = {
     "combate": ["slash", "shot", "hit", "step", "dodge", "alarm", "upgrade", "destroy", "dash", "dash_caldera",
-                "sonar", "shield", "fire_pulse"],
-    "economia": ["denied", "pickup", "build_order", "build_done", "repair"],
-    "hitos": ["overload", "portal_destroyed", "boss_phase", "player_death", "respawn"],
+                "sonar", "shield", "fire_pulse", "telegraph_claw", "telegraph_charge", "telegraph_volley",
+                "wall_destroy", "artillery_shot", "saboteur_hit", "turret_on", "turret_off"],
+    "economia": ["denied", "pickup", "build_order", "build_done", "repair", "recruit", "purchase"],
+    "hitos": ["overload", "portal_destroyed", "boss_phase", "player_death", "respawn", "train_arrive", "phase_dawn"],
     "interfaz": ["ui_click", "ui_hover", "ui_move", "ui_back"],
     "voz": ["dialogue"],
 }
@@ -470,7 +592,9 @@ def main():
     for group, names in GROUPS.items():
         for name in names:
             spec = PRESETS[name]
-            if "sfxr" in spec:
+            if "amb" in spec:
+                data = render_ambience(dict(spec["amb"], peak_db=spec.get("peak_db", -20.0)))
+            elif "sfxr" in spec:
                 data = render_sfxr(dict(spec["sfxr"], peak_db=spec.get("peak_db", -6.0)))
             elif "seconds" in spec:
                 data = render_rumble(spec)
@@ -478,6 +602,10 @@ def main():
                 data = render(spec)
             path = save(group, name, data)
             print("%-9s %-21s %6.1f ms" % (group, name, len(data) / RATE * 1000.0))
+    for name, spec in AMBIENCE.items():
+        data = render_ambience(spec)
+        save("ambiente", name, data)
+        print("%-9s %-21s %6.1f ms" % ("ambiente", name, len(data) / RATE * 1000.0))
     unused = [name for name in PRESETS if name not in sum(GROUPS.values(), [])]
     if unused:
         print("SIN CARPETA: " + ", ".join(unused))

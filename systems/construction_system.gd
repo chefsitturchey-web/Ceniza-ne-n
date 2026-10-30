@@ -69,6 +69,7 @@ func toggle_power(site: ConstructionSite) -> bool:
 		_cue("denied")
 		return false
 	site.powered = not site.powered
+	_cue("turret_on" if site.powered else "turret_off")
 	bank.changed.emit(bank.scrap, bank.energy_used(), bank.available_capacity())
 	notice_requested.emit("Torreta activa" if site.powered else "Energía de torreta liberada")
 	return true
