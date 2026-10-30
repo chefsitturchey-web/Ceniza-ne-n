@@ -19,6 +19,7 @@ var civic: CivicSystem
 var core: ColonyCore
 var corpse_system: CorpseSystem
 ## Corpse reported by the player that a builder must bury before resuming work.
+var work_factor: float = 1.0
 var burial_target: Corpse
 
 func add_worker(role: StringName) -> void:
@@ -99,7 +100,7 @@ func update_workers(delta: float) -> void:
 			worker.x = move_toward(worker.x, core.position.x, worker.data.speed * delta)
 			var arrived: bool = absf(worker.x - core.position.x) < GameRules.BUILD_ARRIVAL_DISTANCE
 			if arrived:
-				core.progress = minf(ColonyCore.BUILD_TIME, core.progress + delta)
+				core.progress = minf(ColonyCore.BUILD_TIME, core.progress + delta * work_factor)
 				if core.progress >= ColonyCore.BUILD_TIME: core.complete_work()
 			worker.update_visual(previous_x, arrived)
 			continue
@@ -128,7 +129,7 @@ func update_workers(delta: float) -> void:
 		worker.x = move_toward(worker.x, destination, worker.data.speed * delta)
 		if worker.job >= 0 and absf(worker.x - destination) < GameRules.BUILD_ARRIVAL_DISTANCE:
 			var job: ConstructionSite = sites[worker.job]
-			job.progress += delta * (GameRules.OVERLOAD_WORK_RATE if overload.overloaded(job.x) else 1.0)
+			job.progress += delta * work_factor * (GameRules.OVERLOAD_WORK_RATE if overload.overloaded(job.x) else 1.0)
 			if job.progress >= GameRules.BUILD_TIME:
 				job.complete_work()
 				worker.job = -1
@@ -206,7 +207,7 @@ func work_external(worker: ColonyWorker, delta: float) -> bool:
 	worker.x = move_toward(worker.x, site.position.x, worker.data.speed * delta)
 	var arrived: bool = absf(worker.x - site.position.x) < GameRules.BUILD_ARRIVAL_DISTANCE
 	if arrived:
-		site.progress += delta * (GameRules.OVERLOAD_WORK_RATE if overload.overloaded(site.position.x) else 1)
+		site.progress += delta * work_factor * (GameRules.OVERLOAD_WORK_RATE if overload.overloaded(site.position.x) else 1)
 		if site is ConstructionSite and site.progress >= GameRules.BUILD_TIME:
 			site.complete_work()
 			worker.external_job = -1

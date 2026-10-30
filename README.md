@@ -29,6 +29,8 @@
 
 ## El juego
 
+**Poblados y tecnología:** barrios industriales en ruinas con luces, ropa al viento, humo y reflejos. Recupera servomotores, bobinas y filtros para restaurar talleres, armerías y dispensarios con dos niveles de bonificación. **L → Poblados** muestra el catastro y los componentes. [Cómo funcionan y fuentes de LibreSprite](docs/gameplay/POBLADOS_Y_TECNOLOGIA.md).
+
 **Frontera y reconstrucción:** mapas de colonia 4,5 veces más anchos, cinco trazados distintos, núcleo desde cero, despejes con constructores, torretas desde el núcleo Nv.2 y mochila de 24 piezas. [Reglas actuales y arte editable](docs/gameplay/FRONTERA_Y_RECONSTRUCCION.md).
 
 **Invasión integrada:** piezas recuperables, pala, trampas, plagas y bajas de trabajadores con guardado. El combate y arte de los jefes conservan sus avances. [Reglas y compatibilidad](docs/gameplay/INTEGRACION_INVASION.md).

@@ -316,6 +316,8 @@ func jobs() -> Array[Node2D]:
 	for site: ExpansionOutpost in district.expansion.sites: result.append(site)
 	if district.frontier != null:
 		for plot: ClearanceSite in district.frontier.plots: result.append(plot)
+	if district.settlements != null:
+		for site: SettlementSupport in district.settlements.sites: result.append(site)
 	return result
 
 func snapshot() -> Dictionary:

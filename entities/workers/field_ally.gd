@@ -66,7 +66,7 @@ func tick(delta: float) -> void:
 			facing = signf(portal.position.x - position.x)
 			position.x = move_toward(position.x, portal.position.x - facing * (30 if role == "guardian" else 110), delta * 70)
 			if absf(portal.position.x - position.x) < (45 if role == "guardian" else 150) and cooldown <= 0:
-				portal.hurtbox.receive(14 + world.modules.command_damage())
+				portal.hurtbox.receive(roundi((14 + world.modules.command_damage()) * world.defenses.settlement_damage_factor))
 				beam_to = portal.position + Vector2(0, -30)
 				shot = 0.12
 				cooldown = 1.2
@@ -83,8 +83,8 @@ func tick(delta: float) -> void:
 				facing = signf(enemy.position.x - position.x)
 			destination = enemy.position.x - facing * (30 if role == "guardian" else 145)
 			if absf(enemy.position.x - position.x) <= (42 if role == "guardian" else 180) and cooldown <= 0:
-				if role == "guardian": enemy.take_damage(22 + world.modules.command_damage())
-				else: enemy.receive_shot(16 + world.modules.command_damage(), global_position + Vector2(0, -24))
+				if role == "guardian": enemy.take_damage(roundi((22 + world.modules.command_damage()) * world.defenses.settlement_damage_factor))
+				else: enemy.receive_shot(roundi((16 + world.modules.command_damage()) * world.defenses.settlement_damage_factor), global_position + Vector2(0, -24))
 				beam_to = enemy.position + Vector2(0, -20)
 				cooldown = 0.9
 				shot = 0.12

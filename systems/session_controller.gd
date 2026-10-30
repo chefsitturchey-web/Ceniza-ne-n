@@ -140,6 +140,7 @@ func _process(delta: float) -> void:
 	colony.update_workers(delta)
 	var world: District = get_parent() as District
 	if world != null and world.frontier != null: world.frontier.tick(delta)
+	if world != null and world.settlements != null: world.settlements.tick(delta)
 	if corpse_system != null:
 		corpse_system.tick(delta)
 	if trap_system != null:

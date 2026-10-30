@@ -9,6 +9,8 @@ var next: Button
 var chapter_index: int = 0
 var scene_picker: OptionButton
 var scene_sections: Array[String] = []
+var settlement_button: Button
+var settlement_view: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -42,6 +44,12 @@ func _ready() -> void:
 	replay_button.text = "Ver conversación"
 	replay_button.pressed.connect(replay_scene)
 	scenes.add_child(replay_button)
+	settlement_button = Button.new()
+	settlement_button.text = "Poblados"
+	settlement_button.pressed.connect(func() -> void:
+		settlement_view = not settlement_view
+		refresh())
+	scenes.add_child(settlement_button)
 	var buttons: HBoxContainer = HBoxContainer.new()
 	buttons.add_theme_constant_override("separation", 12)
 	rows.add_child(buttons)
@@ -78,6 +86,8 @@ func refresh() -> void:
 	if not current: scene_sections.append_array(["encounter", "ending"])
 	scene_picker.clear()
 	for section: String in scene_sections: scene_picker.add_item(VisualStory.TITLES[section])
+	settlement_button.text = "Historia" if settlement_view else "Poblados"
+	if settlement_view: page.text = story.district.settlements.journal_text()
 
 func replay_scene() -> void:
 	if story.novel.opened or scene_picker.selected < 0: return
@@ -92,6 +102,7 @@ func replay_scene() -> void:
 func open_panel() -> void:
 	if get_tree().paused or story.district.expedition.active or story.district.session.finished: return
 	chapter_index = story.district.zone_index
+	settlement_view = false
 	refresh()
 	opened = true
 	show()

@@ -35,6 +35,8 @@ var corpse_system: CorpseSystem
 var scavenge: ScavengeSystem
 var trap_system: TrapSystem
 var pest_system: PestSystem
+var settlements: SettlementSystem
+var settlement_backdrop: SettlementBackdrop
 var frontier: FrontierSystem
 var workshop: WorkshopSystem
 
@@ -231,6 +233,12 @@ func _ready() -> void:
 	session.pest_system = pest_system
 	session.trap_system = trap_system
 	scavenge.fit_targets(interaction)
+	settlements = SettlementSystem.new()
+	settlements.setup(self)
+	add_child(settlements)
+	settlement_backdrop = SettlementBackdrop.new()
+	settlement_backdrop.world = self
+	add_child(settlement_backdrop)
 	for portal: EnemyRepeater in civic.gates + expedition.repeaters:
 		portal.defense_requested.connect(civic.defend_portal)
 	var arriving: bool = not CampaignRoute.pending.is_empty()

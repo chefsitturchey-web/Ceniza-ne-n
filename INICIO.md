@@ -32,6 +32,8 @@ En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y 
 
 ## Primeros pasos
 
+**El mapa tiene poblados recuperables.** Consulta **L → Poblados** para encontrar componentes especiales y restaurar talleres, armerías o dispensarios. Necesitan materiales y constructores; mejoran obras, daño aliado o curación local. [Ubicaciones, costes y bonificaciones](docs/gameplay/POBLADOS_Y_TECNOLOGIA.md).
+
 1. Empiezas con un constructor y un recolector, sin núcleo. Las dos baterías junto al punto de llegada contienen las primeras piezas. Mantén E para extraerlas.
 2. Con 12 piezas y 20 de chatarra, mantén E en el cimiento central. El constructor levanta el núcleo en 24 segundos. Hasta encenderlo, el asedio y la recolección automática esperan.
 3. Construye las dos murallas centrales. Encarga con E el despeje de una parcela de generador; cuesta 5 de chatarra y requiere que llegue un constructor. Después paga su construcción.

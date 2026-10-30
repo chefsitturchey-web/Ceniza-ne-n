@@ -11,6 +11,7 @@
 | `world/structures/` | Núcleo, edificios, murallas, torretas y suelo |
 | `world/props/` | Objetos del escenario lateral |
 | `world/salvage/` | Batería, antena, trampa y piezas recuperables; PNG y fuentes ASE |
+| `world/settlements/` | Fachadas en ruinas, instalaciones recuperables y componentes técnicos, con editables ASE |
 | `world/expedition/` | Tren, estación, repetidores y piezas de las arenas |
 | `ui/` | Iconos, arte de menú y `frames/`: seis marcos ornamentales de vida |
 | `fonts/` | Fuentes y sus licencias |

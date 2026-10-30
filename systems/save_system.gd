@@ -69,7 +69,7 @@ func _snapshot() -> Dictionary:
 	player["velocity_x"] = session.player.velocity.x
 	player["velocity_y"] = session.player.velocity.y
 	return {"version": 1, "day": session.cycle.day, "phase": session.cycle.phase, "campaign": session.campaign.duplicate(true),
-		"frontier": (session.get_parent() as District).frontier.snapshot(), "stored_parts": session.bank.stored_parts, "invasion": InvasionState.snapshot(session), "scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
+		"settlements": (session.get_parent() as District).settlements.snapshot(), "frontier": (session.get_parent() as District).frontier.snapshot(), "stored_parts": session.bank.stored_parts, "invasion": InvasionState.snapshot(session), "scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
 		"expansion": session.expansion.snapshot() if session.expansion != null else {},
 		"civic": session.civic.snapshot() if session.civic != null else {},
 		"story": session.interaction.story.snapshot() if session.interaction.story != null else {},
@@ -171,6 +171,7 @@ func load_game() -> bool:
 	session.player.refresh_state()
 	InvasionState.restore(session, data.get("invasion", {}))
 	(session.get_parent() as District).frontier.restore(data.get("frontier", {}))
+	(session.get_parent() as District).settlements.restore(data.get("settlements", {}))
 	_apply(session.overload, data.overload)
 	session.overload.tick(0.0)
 	session.defenses.drone_timer = data.drone_timer
@@ -236,6 +237,7 @@ func _valid(value: Variant) -> bool:
 		if not _number(data, field, 0, 2147483647, true):
 			return false
 	if not (session.get_parent() as District).frontier.valid(data.get("frontier", {})): return false
+	if not (session.get_parent() as District).settlements.valid(data.get("settlements", {})): return false
 	if not ExpansionSystem.number(data.get("stored_parts", 0), 0, 2147483647, true): return false
 	if not InvasionState.valid(data.get("invasion", {}), session, int(data.day)): return false
 	if data.has("frontier") and int(data.get("invasion", {}).get("parts", 0)) > session.bank.parts_capacity: return false

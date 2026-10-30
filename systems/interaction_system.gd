@@ -31,6 +31,13 @@ func interaction_target() -> int:
 func target_at_x(x: float, planning: bool = false) -> int:
 	if absf(x) < GameRules.CORE_INTERACT_RANGE: return -1
 	var world: District = player.get_parent() as District
+	if world != null and world.core.tier > 0 and story != null:
+		# A moving convoy may pass through a settlement; keep its controls accessible.
+		var mission_target: int = story.target_at(x)
+		if mission_target != GameRules.NO_TARGET: return mission_target
+	if world != null and world.settlements != null:
+		var settlement_target: int = world.settlements.target_at(x)
+		if settlement_target != GameRules.NO_TARGET: return settlement_target
 	if world != null and world.frontier != null:
 		var frontier_target: int = world.frontier.target_at(x)
 		if frontier_target != GameRules.NO_TARGET: return frontier_target
@@ -88,6 +95,7 @@ func update_interaction(delta: float) -> void:
 
 func perform_interaction(target: int) -> bool:
 	var world: District = player.get_parent() as District
+	if target <= SettlementSystem.TARGET_BASE and world != null: return world.settlements.interact(target)
 	if target <= FrontierSystem.CLEAR_BASE and world != null: return world.frontier.interact(target)
 	if target == -1 and colony.core != null and colony.core.tier == 0: return colony.core.request_upgrade()
 	if target == MOBILITY_TARGET and mobility != null: return mobility.interact()
@@ -135,6 +143,7 @@ func perform_interaction(target: int) -> bool:
 	return construction.order(target)
 
 func required_hold(target: int) -> float:
+	if target <= SettlementSystem.CACHE_BASE: return 2.5
 	if target <= -500 and target > -700 and scavenge != null:
 		var index: int = ScavengeSystem.TARGET_BASE - target
 		if index >= 0 and index < scavenge.props.size():

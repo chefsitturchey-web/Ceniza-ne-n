@@ -7,6 +7,7 @@ var overload: OverloadSystem
 var drone_timer: float = 0.0
 var beams: Array[Dictionary] = []
 var drone_rank: int = 0
+var settlement_damage_factor: float = 1.0
 var modules: ModuleSystem
 signal shot_fired(origin: Vector2)
 
@@ -48,7 +49,7 @@ func update_defenses(delta: float) -> void:
 		if site.shot == 0.0:
 			if target != null:
 				site.fire_effects()
-				fire_from(site.muzzle_position(), target, FortressRules.damage(site), overload.overloaded(site.x))
+				fire_from(site.muzzle_position(), target, roundi(FortressRules.damage(site) * settlement_damage_factor), overload.overloaded(site.x))
 				site.shot = FortressRules.interval(site, overload.overloaded(site.x))
 	# La colonia se defiende con tropas y edificios; el equipo personal va al jefe.
 	if not player.combat_enabled: return

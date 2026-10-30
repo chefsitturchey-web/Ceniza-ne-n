@@ -52,6 +52,7 @@ func _ready() -> void:
 	bag_icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
 	resources.add_child(bag_icon)
 	var parts_label: Label = _label(resources)
+	parts_label.mouse_filter = Control.MOUSE_FILTER_PASS
 	parts_label.add_theme_color_override("font_color", Color("9adcd4"))
 	values["piezas"] = parts_label
 	var overload_icon: TextureRect = _icon($Gameplay, "sobrecarga")
@@ -143,7 +144,8 @@ func display_dashboard(data: Dictionary) -> void:
 	values.chatarra.text = str(data.scrap)
 	values.energia.text = "%d/%d" % [data.energy, data.capacity]
 	values.piezas.text = "P %d/%d +%d" % [data.get("parts", 0), data.get("parts_capacity", 24), data.get("stored_parts", 0)]
-	values.piezas.tooltip_text = "Mochila / capacidad / piezas almacenadas en el núcleo. El exceso cae y puede romperse."
+	values.piezas.text += " TEC %d" % data.get("relics", 0)
+	values.piezas.tooltip_text = "Mochila / capacidad / piezas almacenadas en el núcleo. El exceso cae y puede romperse.\n" + data.get("settlement_summary", "")
 	icons.sobrecarga.modulate = Color("47dacb") if "LISTA" in [data.overload_left, data.overload_right] else Color("304356")
 	var next_phase: String = "%s:%d" % [data.phase, data.day]
 	if next_phase != phase_key:

@@ -10,6 +10,7 @@
 
 ## Mecánicas
 
+- [Poblados en ruinas, componentes especiales e instalaciones de apoyo](gameplay/POBLADOS_Y_TECNOLOGIA.md).
 - [Reglas actuales: cinco fronteras, núcleo desde cero, despejes y mochila](gameplay/FRONTERA_Y_RECONSTRUCCION.md).
 - [Invasión: piezas, taller, plagas y compatibilidad con jefes](gameplay/INTEGRACION_INVASION.md).
 - [Construcción, niveles y movilidad](gameplay/ESCALA_NIVELES_Y_MOVILIDAD.md).

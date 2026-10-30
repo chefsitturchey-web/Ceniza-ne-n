@@ -104,7 +104,14 @@ func publish() -> void:
 	var context_key: bool = true
 	var context_screen: Vector2 = Vector2.ZERO
 	var target: int = interaction.interaction_target()
-	if target <= FrontierSystem.CLEAR_BASE:
+	if target <= SettlementSystem.TARGET_BASE:
+		var detail: Dictionary = (player.get_parent() as District).settlements.describe(target)
+		context = detail.text
+		context_cost = detail.cost
+		context_progress = detail.progress
+		context_key = detail.key
+		context_screen = player.get_global_transform_with_canvas() * Vector2(0, -66)
+	elif target <= FrontierSystem.CLEAR_BASE:
 		var detail: Dictionary = (player.get_parent() as District).frontier.describe(target)
 		context = detail.text
 		context_cost = detail.cost
@@ -230,7 +237,7 @@ func publish() -> void:
 		"offscreen_left": offscreen_left, "offscreen_right": offscreen_right,
 		"phase": cycle.phase, "day": cycle.day, "nights": cycle.config.nights,
 		"seconds": ceili(cycle.phase_remaining), "scrap": bank.scrap,
-		"parts": bank.parts, "parts_capacity": bank.parts_capacity, "stored_parts": bank.stored_parts,
+		"relics": (player.get_parent() as District).settlements.components.reduce(func(a: int, b: int) -> int: return a + b, 0), "settlement_summary": (player.get_parent() as District).settlements.summary(), "parts": bank.parts, "parts_capacity": bank.parts_capacity, "stored_parts": bank.stored_parts,
 		"energy": bank.energy_used(), "capacity": bank.available_capacity(),
 		"population": session.civic.population() if session.civic != null else colony.workers.size(), "population_max": session.civic.capacity if session.civic != null else GameRules.POPULATION,
 		"health": player.health, "stamina": int(player.stamina), "core": core.health, "core_max": core.health_component.maximum,
