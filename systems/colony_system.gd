@@ -43,13 +43,19 @@ func update_workers(delta: float) -> void:
 			continue
 		var previous_x: float = worker.x
 		if worker.role == "collector":
-			var gather_destination: float = worker.side * worker.data.gather_distance if cycle.phase == "DÍA" and worker.cargo == 0 else worker.side * worker.data.home_distance
-			# De noche se repliega tras la torreta más cercana; así no vuelve al núcleo.
-			if cycle.phase != "DÍA": gather_destination = safe_spot(worker.x)
+			var gather_destination: float
+			if unsafe_at(worker.x):
+				gather_destination = safe_spot(worker.x)
+			elif cycle.phase == "DÍA" and worker.cargo == 0:
+				gather_destination = worker.side * worker.data.gather_distance
+			elif cycle.phase == "DÍA":
+				gather_destination = worker.side * worker.data.home_distance
+			else:
+				gather_destination = _wander_destination(worker, delta)
 			if unsafe_at(gather_destination): gather_destination = safe_spot(worker.x)
 			worker.x = move_toward(worker.x, gather_destination, worker.data.speed * delta)
 			if absf(worker.x - gather_destination) < GameRules.GATHER_ARRIVAL_DISTANCE:
-				if absf(gather_destination) > GameRules.COLLECTOR_OUTSIDE_THRESHOLD:
+				if cycle.phase == "DÍA" and absf(gather_destination) > GameRules.COLLECTOR_OUTSIDE_THRESHOLD:
 					worker.gather += delta
 					if worker.gather >= worker.data.gather_time:
 						worker.cargo = worker.data.cargo
@@ -60,8 +66,15 @@ func update_workers(delta: float) -> void:
 			var gathering: bool = cycle.phase == "DÍA" and worker.cargo == 0 and absf(gather_destination) > GameRules.COLLECTOR_OUTSIDE_THRESHOLD and absf(worker.x - gather_destination) < GameRules.GATHER_ARRIVAL_DISTANCE
 			worker.update_visual(previous_x, gathering)
 			continue
+		# Si un enemigo se acerca, el constructor se repliega tras la torreta.
+		if unsafe_at(worker.x):
+			worker.job = -1
+			worker.external_job = -1
+			worker.x = move_toward(worker.x, safe_spot(worker.x), worker.data.speed * delta)
+			worker.update_visual(previous_x, false)
+			continue
 		# Un solo constructor entierra; espera si el cadáver sigue en zona peligrosa.
-		if burial_target != null and is_instance_valid(burial_target) and not burial_target.buried and burial_crew < 1 and not unsafe_at(burial_target.position.x):
+		if burial_target != null and is_instance_valid(burial_target) and not burial_target.buried and burial_crew < 1 and cycle.phase == "DÍA" and not unsafe_at(burial_target.position.x):
 			burial_crew += 1
 			worker.job = -1
 			worker.external_job = -1
@@ -104,9 +117,11 @@ func update_workers(delta: float) -> void:
 				if not reserved:
 					worker.job = site_index
 					break
-		var destination: float = safe_spot(worker.x)
+		var destination: float
 		if worker.job >= 0:
 			destination = sites[worker.job].x
+		else:
+			destination = _wander_destination(worker, delta)
 		worker.x = move_toward(worker.x, destination, worker.data.speed * delta)
 		if worker.job >= 0 and absf(worker.x - destination) < GameRules.BUILD_ARRIVAL_DISTANCE:
 			var job: ConstructionSite = sites[worker.job]
@@ -144,8 +159,18 @@ func safe_spot(x: float) -> float:
 		return 0.0
 	return best.x - signf(best.x) * HIDE_INSET
 
+## Destino de deambular sin faena: pasea por dentro de la muralla, protegido.
+func _wander_destination(worker: ColonyWorker, delta: float) -> float:
+	worker.wander_timer -= delta
+	var limit: float = 60.0
+	if civic != null:
+		limit = maxf(civic.frontier(worker.side) - 40.0, 60.0)
+	if worker.wander_timer <= 0.0 or absf(worker.x - worker.wander_target) < 4.0:
+		worker.wander_target = randf_range(-limit, limit)
+		worker.wander_timer = randf_range(2.0, 4.5)
+	return worker.wander_target
+
 func unsafe_at(x: float) -> bool:
-	if civic != null and cycle.phase != "DÍA" and absf(x) > civic.frontier(signf(x)): return true
 	for enemy: Node2D in get_tree().get_nodes_in_group(GameRules.ENEMIES):
 		if absf(enemy.position.x - x) < GameRules.UNSAFE_RANGE:
 			return true
@@ -159,12 +184,11 @@ func work_external(worker: ColonyWorker, delta: float) -> bool:
 	var candidates: Array[Node2D] = civic.jobs()
 	if worker.external_job >= 0:
 		var current: Node2D = candidates[worker.external_job]
-		if not current.ordered or unsafe_at(current.position.x) or (cycle.phase != "DÍA" and absf(current.position.x) > civic.frontier(signf(current.position.x))): worker.external_job = -1
+		if not current.ordered or unsafe_at(current.position.x): worker.external_job = -1
 	if worker.external_job < 0:
 		for index: int in range(candidates.size()):
 			var candidate: Node2D = candidates[index]
 			if not candidate.ordered or unsafe_at(candidate.position.x) or not civic.safe_to_build(candidate.position.x): continue
-			if cycle.phase != "DÍA" and absf(candidate.position.x) > civic.frontier(signf(candidate.position.x)): continue
 			var assigned: int = 0
 			for other: ColonyWorker in workers:
 				if other.external_job == index: assigned += 1

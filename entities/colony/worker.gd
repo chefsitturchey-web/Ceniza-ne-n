@@ -15,6 +15,8 @@ var role: StringName:
 	get: return data.id
 var health_component: HealthComponent
 var damage_accum: float = 0.0
+var wander_target: float = 0.0
+var wander_timer: float = 0.0
 var hp: int:
 	get: return health_component.current
 
