@@ -2,6 +2,9 @@ class_name NovelPanel
 extends CanvasLayer
 ## Modal con dueño de pausa; el texto no avanza el reloj ni ejecuta acciones del mundo.
 signal finished(scene_id: String)
+## Abre y cierra para que el audio del mundo baje mientras se lee.
+signal panel_opened
+signal panel_closed
 const PORTRAITS: Texture2D = preload("res://assets/story/portraits_manga_v2.png")
 const ANTAGONISTS: Texture2D = preload("res://assets/story/antagonists_manga_v2.png")
 const CAST: Array[String] = ["mara", "ivo", "vera", "nox", "eco", "portador"]
@@ -167,6 +170,7 @@ func play(data: Dictionary, allow_paused: bool = false) -> bool:
 	transition = create_tween()
 	transition.tween_property(curtain, "color:a", 0.0, 0.12 if reduced_motion else 0.35)
 	transition.finished.connect(func() -> void: transitioning = false; next_button.grab_focus())
+	panel_opened.emit()
 	return true
 
 func show_line() -> void:
@@ -258,6 +262,7 @@ func finish_close() -> void:
 	hide()
 	get_tree().paused = previous_pause
 	GamePreferences.current().block_gameplay_input()
+	panel_closed.emit()
 	finished.emit(scene_data.id)
 
 func _input(event: InputEvent) -> void:

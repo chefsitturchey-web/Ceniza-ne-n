@@ -150,6 +150,8 @@ func _ready() -> void:
 	boss.cue_requested.connect(func(id: String) -> void: sound.play_cue(id, -4))
 	player.slash.connect(func(_o: Vector2, _d: Vector2, _a: int, _r: float) -> void: sound.play_cue("slash"))
 	novel = NovelPanel.new()
+	novel.panel_opened.connect(func() -> void: sound.set_ducked(true))
+	novel.panel_closed.connect(func() -> void: sound.set_ducked(false))
 	add_child(novel)
 	if present_story: novel.play(VisualStory.scene(zone_index, "encounter"))
 

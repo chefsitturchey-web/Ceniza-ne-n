@@ -53,12 +53,15 @@ const AMBIENCE: Dictionary = {
 const AMBIENCE_VOLUME: float = -14.0
 ## Segundo desde el que entra el tema de derrota.
 const DEFEAT_START: float = 3.0
+## Baja la música mientras hay un panel de lectura abierto.
+const DUCK_DB: float = -30.0
 var district: Node2D
 var voices: Array[AudioStreamPlayer] = []
 var music: Array[AudioStreamPlayer] = []
 ## Voces espaciales: solo para sonidos del mundo, así Godot calcula el paneo.
 const WORLD_VOICES: int = 8
 var world_voices: Array[AudioStreamPlayer2D] = []
+var ducked: bool = false
 var ambience: AudioStreamPlayer = AudioStreamPlayer.new()
 var warning_player: AudioStreamPlayer = AudioStreamPlayer.new()
 var outcome: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -185,6 +188,10 @@ func _ambience_for(zone_id: String) -> AudioStream:
 	stream.loop_end = int(round(stream.get_length() * stream.mix_rate))
 	return stream
 
+## La novela avisa al abrir y al cerrar para que la música ceda el paso.
+func set_ducked(value: bool) -> void:
+	ducked = value
+
 func _add_music_player(stream: AudioStream) -> void:
 	var layer: AudioStreamPlayer = AudioStreamPlayer.new()
 	layer.stream = stream
@@ -219,6 +226,8 @@ func _process(delta: float) -> void:
 	if music.size() == 1:
 		# Arena de jefe: un solo tema, sin mezcla por fases.
 		var single_db: float = -18.0 if get_tree().paused else -12.0
+		if ducked:
+			single_db = DUCK_DB
 		music[0].volume_db = move_toward(music[0].volume_db, -60.0 if muted else single_db, delta * 12.0)
 		return
 	if music.size() != 2:
@@ -230,6 +239,8 @@ func _process(delta: float) -> void:
 		intensity = 1.0
 	var quiet: bool = get_tree().paused or (district != null and district.session.finished)
 	var base_db: float = -24.0 if quiet else -12.0
+	if ducked:
+		base_db = DUCK_DB
 	# Cruce por fase: un tema audible a la vez, sin exigir duraciones iguales.
 	var day_db: float = -60.0
 	var night_db: float = -60.0
