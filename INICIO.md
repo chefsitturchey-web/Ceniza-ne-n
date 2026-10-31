@@ -48,7 +48,9 @@ Cada distrito mide 14.400 píxeles y tiene su propio trazado de solares y obstá
 
 **L abre el diario.** La ruta es Periferia → Fundición → Barrio inundado → Ciudadela → Núcleo de la red. Mara, Ivo, Vera, Nox y ECO revelan por qué las máquinas siguen ejecutando una emergencia que nunca terminó.
 
-Cada capítulo exige rescatar la baliza occidental (-760), recuperar el relé oriental (+1080) y escoltar el transporte (-1240) hasta el núcleo. El relé necesita energía, 30 de chatarra y un técnico que llegue y trabaje. El transporte requiere al Portador cerca y soldados que lo protejan. Tras activarlo, F retira la orden de asalto para que las tropas izquierdas pasen a escoltarlo. Una avería se repara con E por 25.
+Cada capítulo exige rescatar la baliza occidental, recuperar el relé oriental y escoltar el transporte hasta el núcleo; el objetivo del HUD indica la distancia de cada uno. El relé necesita energía, 30 de chatarra y un técnico que llegue y trabaje. El transporte espera a su escolta: la emboscada salta cuando llegan los soldados del frente izquierdo y avanza si el Portador va a su lado. Una avería se repara con E por 25.
+
+**El objetivo del HUD siempre muestra el siguiente paso concreto y dónde hacerlo** (por ejemplo, qué parcela despejar o qué herramienta comprar). En el último minuto del día te avisa si conviene reparar, reforzar o subir el núcleo a Nv.3 antes de la noche, y te advierte si te quedas sin constructores. Al anochecer, las tropas en asalto vuelven solas a las murallas.
 
 Cierra las entradas con tus tropas, completa las tres operaciones y estabiliza la colonia: dos murallas centrales, generación y al menos una noche resistida. Después toma el tren de día con E. Los días siguen avanzando después del tercero y reponen reclutas. El daño y vida de los enemigos no crecen indefinidamente por tardar.
 

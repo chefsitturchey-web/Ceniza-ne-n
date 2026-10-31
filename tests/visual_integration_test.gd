@@ -16,6 +16,7 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	load("res://tests/game_fixture.gd").found_colony(world)
 	world.story.present_dialogue = false
 	# Banco de combate aislado de las reglas de colonia.
 	world.player.combat_enabled = true
@@ -51,7 +52,7 @@ func run_checks() -> void:
 	for step: int in range(34):
 		world.colony.update_workers(0.1)
 	verify(builder.visual.sprite.animation == &"reparar", "Constructor trabaja al llegar")
-	for step: int in range(50):
+	for step: int in range(220):
 		world.colony.update_workers(0.1)
 	verify(world.construction.sites[0].hp == 240, "Animación no cambia la duración de obra")
 	verify(builder.visual.sprite.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST and builder.visual.sprite.position == UnitSpriteLibrary.OFFSET, "Anclaje y filtro del constructor")

@@ -193,7 +193,7 @@ func publish() -> void:
 			var reason: String = core.upgrade_blocker()
 			if not reason.is_empty(): context = reason; context_key = false; context_cost = -1
 			if core.ordered: context_progress = core.progress / ColonyCore.BUILD_TIME
-		if (player.health == Player.MAX_HEALTH or core.tier == 0) and core.tier < 3 and not core.ordered:
+		if (player.health == Player.MAX_HEALTH or core.tier == 0) and core.tier < 3 and not core.ordered and core.upgrade_blocker().is_empty():
 			context += " · %d piezas" % core.parts_cost()
 		if core.tier == 0: context = "Levantar núcleo · 12 piezas" if not core.ordered else "Construyendo el primer núcleo"
 		context_screen = core.get_global_transform_with_canvas() * Vector2(0, -24 if core.tier == 0 else -FortressArt.CORE_HEIGHTS[core.tier - 1])
@@ -221,6 +221,8 @@ func publish() -> void:
 		elif site.kind == &"turret":
 			context = "T: apagar torreta" if site.powered else "T: reactivar torreta"
 		if site.kind == &"turret": context += " - T: energía"
+	# La fuente pixel del HUD no lleva adornos; los describe() comparten texto con el diario.
+	context = context.replace(" · ", " - ")
 	var hint_text: String = context
 	var result_text: String = ""
 	if player.health <= 0:

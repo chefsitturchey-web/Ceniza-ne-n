@@ -214,6 +214,10 @@ func balance_defenders() -> void:
 
 func tick(delta: float) -> void:
 	elapsed += delta
+	if advance_side != 0 and district.cycle.phase != "DÍA":
+		# Como en Kingdom, las tropas vuelven tras las murallas al anochecer.
+		advance_side = 0
+		district.presenter.show_notice("Anochece: las tropas regresan a las murallas")
 	balance_defenders()
 	for index: int in range(retaliation.size() - 1, -1, -1):
 		retaliation[index].time -= delta

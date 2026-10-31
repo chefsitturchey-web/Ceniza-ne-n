@@ -23,6 +23,7 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	load("res://tests/game_fixture.gd").found_colony(world)
 	world.story.present_dialogue = false
 	current_scene = world
 	world.session.set_process(false)
@@ -53,7 +54,7 @@ func run_checks() -> void:
 		site.complete_work()
 		if site.kind == &"turret":
 			turrets.append(site)
-	verify("Estabiliza" in world.presenter.objective_text(), "Con defensas construidas señala la estabilización pendiente")
+	verify("generador" in world.presenter.objective_text(), "Con murallas construidas señala la siguiente infraestructura")
 	var turret: ConstructionSite = turrets[0]
 	var base_position: Vector2 = turret.position
 	verify(turret.turret_visual != null, "Torreta dispone de cabezal articulado")

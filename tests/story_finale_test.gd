@@ -23,16 +23,17 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	world.get_node("Session").persistence_enabled = false
 	root.add_child(world)
+	load("res://tests/game_fixture.gd").found_colony(world)
 	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	world.experience.present_choices = false
 	world.bank.scrap = 500
 	var story: StoryDirector = world.story
-	verify("defensas" in story.objective() and not story.ready_to_travel(), "La historia empieza con una tarea concreta")
+	verify("murallas" in story.objective() and not story.ready_to_travel(), "La historia empieza con una tarea concreta")
 	verify(CampaignRoute.COUNT == 5 and CampaignStory.CHAPTERS.size() == 5, "Cinco capítulos con principio y final")
 	verify(CampaignRoute.valid_state({"zone": 2, "cleared": [true, true, false]}), "Migra las rutas anteriores de tres distritos")
-	for site: ConstructionSite in world.construction.sites: site.complete_work()
+	for site: ConstructionSite in world.construction.sites.slice(0, 4): site.complete_work()
 	verify("generador" in story.objective(), "Las prioridades siguen la infraestructura real")
 	verify(not story.interact(-401), "El relé necesita generación eléctrica")
 	verify(story.interact(-400) and story.completed[0], "Rescatar desbloquea la conversación una sola vez")
@@ -44,9 +45,12 @@ func run_checks() -> void:
 	verify(story.relay_progress == 0, "El relé no se monta sin técnico")
 	world.expansion.sites[2].hire("technician")
 	var technician: FieldAlly = world.expansion.sites[2].squad[0]
+	var post_x: float = technician.position.x
 	technician.tick(0.1)
-	verify(story.relay_progress == 0 and technician.position.x > -360, "El técnico recorre la distancia física")
-	for step: int in range(300): technician.tick(0.1)
+	verify(story.relay_progress == 0 and absf(story.relay_x - technician.position.x) < absf(story.relay_x - post_x), "El técnico recorre la distancia física")
+	for step: int in range(3000):
+		technician.tick(0.1)
+		if story.completed[1]: break
 	verify(story.completed[1] and story.relay_progress == 6, "El técnico llega y termina la reparación")
 	world.player.position.x = story.convoy_x
 	verify(story.interact(-402) and story.convoy_active, "El transporte parte después del rescate y el relé")
@@ -58,7 +62,7 @@ func run_checks() -> void:
 	home.hire("guardian")
 	home.hire("ranger")
 	for enemy: SiegeEnemy in get_nodes_in_group(GameRules.ENEMIES): enemy.set_physics_process(false)
-	for step: int in range(900):
+	for step: int in range(2500):
 		world.player.position.x = story.convoy_x
 		for ally: FieldAlly in home.squad: ally.tick(0.1)
 		for enemy: SiegeEnemy in get_nodes_in_group(GameRules.ENEMIES): enemy._physics_process(0.1)

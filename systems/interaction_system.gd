@@ -60,10 +60,6 @@ func target_at_x(x: float, planning: bool = false) -> int:
 	if workshop_target != GameRules.NO_TARGET: return workshop_target
 	var corpse_target: int = corpse_system.target_at(x) if corpse_system != null else GameRules.NO_TARGET
 	if corpse_target != GameRules.NO_TARGET: return corpse_target
-	if expansion != null:
-		var expansion_target: int = expansion.target_at(x)
-		if expansion_target != GameRules.NO_TARGET:
-			return expansion_target
 	var best: int = GameRules.NO_TARGET
 	var distance: float = GameRules.SITE_INTERACT_RANGE
 	for index: int in range(construction.sites.size()):
@@ -71,6 +67,12 @@ func target_at_x(x: float, planning: bool = false) -> int:
 		if candidate < distance:
 			distance = candidate
 			best = index
+	if expansion != null:
+		var expansion_target: int = expansion.target_at(x)
+		# A supply cache may sit beside a foundation; the nearer one wins so both stay reachable.
+		var cache_closer: bool = expansion_target <= -200 and expansion_target != GameRules.NO_TARGET and absf(ExpansionSystem.CACHE_X[-200 - expansion_target] - x) <= distance
+		if expansion_target != GameRules.NO_TARGET and (best == GameRules.NO_TARGET or expansion_target > -200 or cache_closer):
+			return expansion_target
 	var prop_target: int = scavenge.target_at(x) if scavenge != null else GameRules.NO_TARGET
 	if best == GameRules.NO_TARGET and mobility != null and mobility.target_at(x): return MOBILITY_TARGET
 	if prop_target != GameRules.NO_TARGET and best == GameRules.NO_TARGET: return prop_target

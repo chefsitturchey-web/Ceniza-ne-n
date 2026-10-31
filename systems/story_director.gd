@@ -86,6 +86,22 @@ func soldiers() -> int:
 	return result
 
 func objective() -> String:
+	if district.core.tier > 0 and district.cycle.phase == "AVISO": return "Se acerca la noche: vuelve tras las murallas"
+	if district.core.tier > 0 and district.cycle.phase == "NOCHE": return "Noche: resiste hasta el amanecer junto al núcleo"
+	# Sin constructores ninguna obra avanza: es el primer bloqueo a resolver.
+	if not district.colony.workers.any(func(worker: ColonyWorker) -> bool: return worker.role == &"builder"):
+		if district.civic.tools[0] == 0: return "Sin constructores: compra un martillo en el taller (izq. 600) - E"
+		if district.civic.villagers.is_empty(): return recruit_step()
+		return "Un superviviente recoge el martillo en el taller"
+	if district.core.tier > 0 and district.cycle.phase == "DÍA" and district.cycle.phase_remaining < 60:
+		var core: ColonyCore = district.core
+		if core.tier == 2 and not core.ordered and core.upgrade_blocker().is_empty() and district.bank.scrap >= core.upgrade_cost() and district.bank.parts + district.bank.stored_parts >= core.parts_cost():
+			return "Anochece en %d s: mejora el núcleo a Nv.3 - E" % ceili(district.cycle.phase_remaining)
+		for site: ConstructionSite in district.construction.sites.slice(0, 4):
+			if site.ordered or site.hp <= 0: continue
+			var cost: int = site.data.repair_cost if site.hp < site.max_hp else (site.tier * 25 if site.tier < district.core.tier else -1)
+			if cost >= 0 and district.bank.scrap >= cost:
+				return "Anochece en %d s: %s %s - E" % [ceili(district.cycle.phase_remaining), "repara" if site.hp < site.max_hp else "refuerza", "la muralla" if site.data.blocks_enemies else "la torreta"]
 	if ready_to_travel():
 		var closed: int = 0
 		var portals: Array = district.civic.gates + district.expedition.repeaters
@@ -102,16 +118,56 @@ func objective() -> String:
 	for site: ConstructionSite in district.construction.sites:
 		if site.hp > 0 and site.data.blocks_enemies: built += 1
 	if built < 2: return "Construye las dos murallas centrales - mantener E"
-	if district.expansion.energy_bonus() == 0: return "Despeja una parcela de generador y construye energía"
-	if district.core.tier < 2: return "Mejora el núcleo con E: desbloquea apoyo y defensas Nv.2"
-	if soldiers() < 2: return "Cuartel + reclutas + fusil y escudo en el taller"
+	if district.expansion.energy_bonus() == 0:
+		var power: String = outpost_step("generator", "generador")
+		return power if not power.is_empty() else "El generador necesita energía: revisa el consumo"
+	if district.core.tier < 2:
+		if district.bank.parts + district.bank.stored_parts < district.core.parts_cost(): return "Reúne %d piezas para el núcleo Nv.2 (restos del distrito)" % district.core.parts_cost()
+		return "Mejora el núcleo con E: desbloquea torretas y apoyo"
+	var turrets: int = 0
+	for site: ConstructionSite in district.construction.sites.slice(0, 4):
+		if site.kind == &"turret" and (site.hp > 0 or site.ordered): turrets += 1
+	if turrets < 2: return "Construye las dos torretas centrales antes de la noche - mantener E"
+	if soldiers() < 2: return soldier_step()
 	if not completed[0]: return "Rescata la baliza (izq. %d) - E" % int(absf(rescue_x)) if district.civic.safe_to_build(rescue_x) else "F: asalta la brecha izquierda para llegar al rescate"
 	if not completed[1]:
-		return "Contrata un técnico: irá al relé oriental" if relay_ordered else "Encarga el relé (der. %d) - E" % int(relay_x)
+		if not relay_ordered: return "Encarga el relé (der. %d) - E" % int(relay_x)
+		for ally: FieldAlly in get_tree().get_nodes_in_group(GameRules.ALLIES):
+			if ally.role == "technician" and ally.hp > 0: return "El técnico repara el relé oriental: protégelo"
+		if district.civic.tools[4] == 0: return "Compra una herramienta técnica en el taller (izq. 600) - E"
+		if district.civic.villagers.is_empty(): return recruit_step()
+		return "Un superviviente recoge la herramienta técnica en el taller"
 	if not completed[2]:
 		if convoy_health <= 0: return "Recupera el transporte averiado - E cuesta 25"
 		return "Escolta el transporte al núcleo - F retira tropas" if convoy_active else "Activa el transporte (izq. %d) - E" % int(absf(convoy_x))
 	return "Consulta el objetivo en el diario (L)"
+
+## Divide "formar soldados" en el paso concreto que falta y dónde hacerlo.
+func soldier_step() -> String:
+	var step: String = outpost_step("barracks", "cuartel")
+	return weapons_step() if step.is_empty() else step
+
+## Paso pendiente de la instalación más cercana de ese tipo; vacío si ya funciona.
+func outpost_step(id: String, title: String) -> String:
+	var nearest: ExpansionOutpost
+	for site: ExpansionOutpost in district.expansion.sites:
+		if site.spec.id != id: continue
+		if site.hp > 0: return ""
+		if site.ordered: return "Los constructores levantan el " + title
+		if district.civic.safe_to_build(site.position.x) and (nearest == null or absf(site.position.x) < absf(nearest.position.x)): nearest = site
+	var place: String = "%s %d" % ["izq." if nearest.position.x < 0 else "der.", int(absf(nearest.position.x))]
+	if district.frontier.blocked(nearest.position.x): return "Despeja la parcela del %s (%s) - E" % [title, place]
+	return "Construye el %s (%s) - E" % [title, place]
+
+func weapons_step() -> String:
+	var pending: int = district.civic.tools[2] + district.civic.tools[3]
+	if soldiers() + pending < 2: return "Compra fusiles en el taller (izq. 600) - soldados %d/2" % soldiers()
+	if district.civic.villagers.size() < pending: return recruit_step()
+	return "Los reclutas recogen sus armas en el taller"
+
+func recruit_step() -> String:
+	if district.civic.population() >= district.civic.capacity: return "Población al máximo: amplía el refugio junto al núcleo - E"
+	return "Recluta supervivientes en un campamento (izq./der. 1340) - E"
 
 func target_at(x: float) -> int:
 	if not completed[0] and absf(x - rescue_x) < 25: return -400
@@ -147,15 +203,9 @@ func interact(target: int) -> bool:
 				convoy_health = 180
 			elif convoy_active: return false
 			convoy_active = true
-			# Emboscada única: reparar el convoy no repite enemigos ni recompensas.
-			if not ambush_triggered:
-				ambush_triggered = true
-				for offset: float in [-100.0, 120.0]:
-					var data: EnemyData = load("res://data/enemies/errante.tres").duplicate() as EnemyData
-					data.reward = 0
-					var enemy: SiegeEnemy = district.director.spawn_enemy(-1, data, district.cycle.day)
-					enemy.position.x = convoy_x + offset
-				district.civic.advance_side = 0
+			# La emboscada espera a la escolta (tick): los soldados tardan en cruzar el distrito.
+			district.civic.advance_side = 0
+			if not ambush_triggered: district.presenter.show_notice("Transporte listo: espera a que llegue la escolta")
 		_:
 			return false
 	checkpoint()
@@ -179,6 +229,15 @@ func tick(delta: float) -> void:
 		var escorted: bool = false
 		for ally: FieldAlly in get_tree().get_nodes_in_group(GameRules.ALLIES):
 			if ally.role in ["ranger", "guardian"] and ally.hp > 0 and absf(ally.position.x - convoy_x) < 260: escorted = true
+		if escorted and not ambush_triggered:
+			# Emboscada única: reparar el convoy no repite enemigos ni recompensas.
+			ambush_triggered = true
+			district.presenter.show_notice("¡Emboscada! La escolta protege el transporte")
+			for offset: float in [-160.0, 200.0]:
+				var data: EnemyData = load("res://data/enemies/errante.tres").duplicate() as EnemyData
+				data.reward = 0
+				var enemy: SiegeEnemy = district.director.spawn_enemy(-1, data, district.cycle.day)
+				enemy.position.x = convoy_x + offset
 		if escorted and district.player.health > 0 and absf(district.player.position.x - convoy_x) < 180:
 			convoy_x = move_toward(convoy_x, 0, delta * 48)
 		damage_timer = maxf(0, damage_timer - delta)

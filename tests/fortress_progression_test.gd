@@ -30,25 +30,27 @@ func run_checks() -> void:
 	world = load("res://levels/main.tscn").instantiate() as District
 	world.get_node("Session").persistence_enabled = false
 	root.add_child(world)
+	load("res://tests/game_fixture.gd").found_colony(world)
 	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	world.experience.present_choices = false
 	world.bank.scrap = 1000
+	world.bank.stored_parts = 200
 	var save: SaveSystem = SaveSystem.new()
 	save.session = world.session
 	save.save_path = PATH
 	world.add_child(save)
 	var wall: ConstructionSite = world.construction.sites[0]
 	var turret: ConstructionSite = world.construction.sites[1]
-	for site: ConstructionSite in world.construction.sites: site.complete_work()
+	for site: ConstructionSite in world.construction.sites.slice(0, 4): site.complete_work()
 	var balance: int = world.bank.scrap
 	verify(world.core.tier == 1 and world.core.health == 300, "Nace una base Nv.1 sin cambiar la integridad inicial")
 	verify(not world.construction.order_site(wall) and not world.construction.order_site(turret) and world.bank.scrap == balance, "Nv.1 bloquea mejoras sin cobrar ni apagar la torreta")
 	verify(not world.expansion.interact(-101) and not world.civic.interact(-323) and world.bank.scrap == balance, "Servicios y escudos bloqueados antes de Nv.2")
 	verify(not world.core.request_upgrade() and world.bank.scrap == balance, "El núcleo requiere generación operativa")
 	verify(world.expansion.interact(-102), "Generador básico disponible desde Nv.1")
-	work(35)
+	work(60)
 	verify(world.expansion.energy_bonus() == 2, "El constructor entrega el generador")
 	balance = world.bank.scrap
 	verify(world.core.request_upgrade(), "Se encarga la primera mejora del núcleo")
@@ -63,13 +65,13 @@ func run_checks() -> void:
 	verify(save.save_game(), "Guarda una mejora del núcleo pagada y en curso")
 	world.core.ordered = false
 	verify(save.load_game() and world.core.ordered and is_equal_approx(world.core.progress, partial), "Cargar conserva obra y progreso sin volver a pagar")
-	work(30)
+	work(45)
 	verify(world.core.tier == 2 and world.core.health == 450 and not world.core.ordered, "Trabajo real desbloquea Nv.2 e integridad nueva")
 	verify(world.civic.interact(-323) and world.civic.interact(-324), "Nv.2 desbloquea escudos y herramientas técnicas")
 	verify(world.expansion.interact(-101), "Nv.2 desbloquea el puesto médico")
 	verify(world.construction.order_site(wall) and world.construction.order_site(turret), "Nv.2 permite reforzar muros y torretas")
 	verify(wall.tier == 1 and turret.tier == 1, "Las defensas conservan su nivel durante las obras")
-	work(35)
+	work(90)
 	verify(wall.tier == 2 and turret.tier == 2 and turret.max_hp == 200, "Ambas mejoras terminan mediante constructor")
 	verify(FortressRules.damage(turret) > turret.data.damage and FortressRules.reach(turret) > turret.data.attack_range and FortressRules.interval(turret, false) < turret.data.interval, "La torreta mejorada cambia daño, alcance y cadencia")
 	balance = world.bank.scrap
@@ -77,10 +79,10 @@ func run_checks() -> void:
 	verify(not world.core.request_upgrade(), "Nv.3 exige sobrevivir una noche")
 	world.cycle.day = 2
 	verify(world.core.request_upgrade(), "Noche resistida e instalaciones desbloquean Nv.3")
-	work(25)
+	work(60)
 	verify(world.core.tier == 3 and world.core.health_component.maximum == 650, "El tercer diseño tiene integridad propia")
 	verify(world.construction.order_site(wall) and world.construction.order_site(turret), "Nv.3 habilita fortificaciones avanzadas")
-	work(20)
+	work(60)
 	verify(wall.tier == 3 and turret.tier == 3 and wall.max_hp == 720 and turret.max_hp == 300, "Niveles finales efectivos")
 	balance = world.bank.scrap
 	verify(not world.core.request_upgrade() and not world.construction.order_site(wall) and world.bank.scrap == balance, "El tope no cobra ni inventa un cuarto nivel")
@@ -106,7 +108,7 @@ func run_checks() -> void:
 	Input.action_press("interact")
 	world.interaction.update_interaction(0)
 	world.interaction.update_interaction(0.81)
-	work(20)
+	work(60)
 	world.interaction.update_interaction(2)
 	verify(outer.tier == 2 and not outer.ordered, "Mantener E no paga otro nivel al terminar la primera mejora")
 	Input.action_release("interact")

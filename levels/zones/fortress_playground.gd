@@ -14,7 +14,12 @@ func prepare() -> void:
 	world.cycle.config.day_duration = 900
 	world.cycle.phase_remaining = 900
 	world.cycle.day = 2
-	for site: ConstructionSite in world.construction.sites: site.complete_work()
+	world.core.restore({"tier": 1, "ordered": false, "progress": 0})
+	world.core.health = world.core.health_component.maximum
+	for plot: ClearanceSite in world.frontier.plots:
+		plot.cleared = true
+		plot.visible = false
+	for site: ConstructionSite in world.construction.sites.slice(0, 4): site.complete_work()
 	world.expansion.sites[2].hp = 180
 	world.expansion.sites[0].hp = 180
 	world.colony.add_worker(&"builder")
