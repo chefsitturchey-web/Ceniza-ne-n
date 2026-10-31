@@ -72,11 +72,13 @@ func _ready() -> void:
 	resume_button = Button.new()
 	resume_button.text = "Continuar"
 	resume_button.pressed.connect(func() -> void: resume_requested.emit())
+	UiSound.attach(resume_button)
 	actions.add_child(resume_button)
 	for pair: Array in [["Opciones", func() -> void: options_requested.emit()], ["Menú principal", func() -> void: menu_requested.emit()]]:
 		var button: Button = Button.new()
 		button.text = pair[0]
 		button.pressed.connect(pair[1])
+		UiSound.attach(button)
 		actions.add_child(button)
 
 

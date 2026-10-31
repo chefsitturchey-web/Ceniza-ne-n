@@ -14,6 +14,7 @@ var next_checkpoint: Dictionary = {}
 func setup(world: District) -> void:
 	district = world
 	station = world.get_node("Station") as RailwayStation
+	station.arrived.connect(func() -> void: district.play("train_arrive"))
 	for path: String in ["LeftRepeater", "RightRepeater"]:
 		var repeater: EnemyRepeater = world.get_node(path) as EnemyRepeater
 		repeaters.append(repeater)
@@ -21,6 +22,7 @@ func setup(world: District) -> void:
 
 func _repeater_destroyed() -> void:
 	district.presenter.show_notice("Repetidor destruido")
+	district.play("portal_destroyed")
 	if all_destroyed():
 		station.unlocked = true
 		# Deja visible el aviso del segundo repetidor antes del aviso del tren.

@@ -10,6 +10,8 @@ var debug_practice: bool = false
 
 const DAMAGE_EDGES: Script = preload("res://ui/damage_edges.gd")
 const THEME: Theme = preload("res://ui/theme.tres")
+const DASH: AudioStream = preload("res://assets/audio/sfx/8bit/combate/dash.wav")
+const DASH_CALDERA: AudioStream = preload("res://assets/audio/sfx/8bit/combate/dash_caldera.wav")
 var completed: bool = false
 var ending: bool = false
 var ending_victory: bool = false
@@ -27,6 +29,8 @@ var damage_edges: Control = Control.new()
 var hit_count: int = 0
 var camera: Camera2D = Camera2D.new()
 var sound: GameSound = GameSound.new()
+var dash_player: AudioStreamPlayer = AudioStreamPlayer.new()
+var dash_active: bool = false
 var configured: bool = false
 var present_story: bool = false
 var novel: NovelPanel
@@ -105,10 +109,13 @@ func _ready() -> void:
 	world.add_child(modules)
 	player.slash.connect(strike)
 	player.damaged.connect(on_damage)
-	player.died.connect(func() -> void: finish(false))
+	player.died.connect(func() -> void:
+		sound.play_cue("player_death")
+		finish(false))
 	boss.died.connect(func() -> void: finish(true))
 	boss.fired.connect(spawn_bullet)
 	boss.phase_changed.connect(func(number: int) -> void:
+		sound.play_cue("boss_phase")
 		phase_notice_time = 1.8
 		phase_notice.text = "SEGUNDA FASE" if number == 2 else "PRIMERA FASE")
 	camera.position_smoothing_enabled = true
@@ -130,6 +137,7 @@ func _ready() -> void:
 	combat_effects.arena = self
 	world.add_child(combat_effects)
 	boss.ground_impact.connect(combat_effects.impact)
+	boss.ground_impact.connect(_on_ground_impact)
 	build_lighting()
 	build_hud()
 	add_child(options)
@@ -137,12 +145,19 @@ func _ready() -> void:
 		if pause_panel.visible:
 			pause_panel.get_child(0).get_child(1).grab_focus())
 	add_child(sound)
+	dash_player.bus = &"SFX"
+	dash_player.volume_db = -60.0
+	dash_player.stream = DASH_CALDERA if zone_index == 1 else DASH
+	add_child(dash_player)
+	boss.dash_changed.connect(_on_dash)
 	modules.fired.connect(func() -> void: sound.play_cue("shot", -5))
 	player.dodged.connect(func() -> void: sound.play_cue("dodge"))
 	player.stepped.connect(func(_origin: Vector2) -> void: sound.play_cue("step", -18))
 	boss.cue_requested.connect(func(id: String) -> void: sound.play_cue(id, -4))
 	player.slash.connect(func(_o: Vector2, _d: Vector2, _a: int, _r: float) -> void: sound.play_cue("slash"))
 	novel = NovelPanel.new()
+	novel.panel_opened.connect(func() -> void: sound.set_ducked(true))
+	novel.panel_closed.connect(func() -> void: sound.set_ducked(false))
 	add_child(novel)
 	if present_story: novel.play(VisualStory.scene(zone_index, "encounter"))
 
@@ -215,6 +230,7 @@ func build_geometry() -> void:
 		collider.shape = shape
 		body.add_child(collider)
 		body.name = "Cover%d" % index
+		body.broken.connect(func() -> void: sound.play_cue("cover_break", -9))
 		var sprite: Sprite2D = Sprite2D.new()
 		sprite.texture = texture
 		sprite.scale = extent / texture.get_size()
@@ -344,6 +360,14 @@ func _input(event: InputEvent) -> void:
 			continued.emit()
 		get_viewport().set_input_as_handled()
 
+func _on_dash(active: bool) -> void:
+	dash_active = active
+	if active:
+		# Entra a volumen de una: la embestida dura menos que cualquier fundido.
+		dash_player.volume_db = -6.0
+		if not dash_player.playing:
+			dash_player.play()
+
 func toggle_pause() -> void:
 	get_tree().paused = not get_tree().paused
 	if not get_tree().paused:
@@ -406,6 +430,9 @@ func finish(victory: bool) -> void:
 	dynamics.clear_encounter()
 	boss.clear_hazards()
 	sound.play_cue("destroy" if victory else "alarm")
+	# Cierra la música del combate y deja el tema de victoria o derrota.
+	dash_active = false
+	sound.play_outcome(victory)
 	ending_victory = victory
 	ending_timer = 2.2 if victory else 1.2
 	player.set_physics_process(false)
@@ -416,12 +443,21 @@ func finish(victory: bool) -> void:
 			child.queue_free()
 	banner.text = "" if victory else "SENAL PERDIDA"
 
+## La intensidad de la marca ajusta el volumen del golpe.
+func _on_ground_impact(_point: Vector2, _radius: float, strength: float) -> void:
+	sound.play_cue("ground_impact", -15.0 + strength * 2.5)
+
 func _process(delta: float) -> void:
 	if novel != null and (novel.opened or novel.closed_frame == Engine.get_process_frames()): return
 	if get_tree().paused:
 		return
 	combat_hud.update_values(player, boss)
 	combat_hud.advance(delta)
+	# El rumor sigue a la embestida: entra de golpe y se apaga al terminar.
+	if not dash_active:
+		dash_player.volume_db = move_toward(dash_player.volume_db, -60.0, delta * 150.0)
+		if dash_player.playing and dash_player.volume_db <= -59.0:
+			dash_player.stop()
 	boss_status.text = boss.status_text() if not ending else ""
 	phase_notice_time = maxf(0, phase_notice_time - delta)
 	phase_notice.visible = phase_notice_time > 0 and not ending

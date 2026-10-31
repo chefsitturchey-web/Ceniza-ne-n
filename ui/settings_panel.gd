@@ -64,6 +64,7 @@ func _ready() -> void:
 		rows.add_child(toggle)
 		toggles[pair[0]] = toggle
 		toggle.toggled.connect(func(value: bool) -> void: _set_option(pair[0], value))
+		UiSound.attach(toggle)
 	window_size = OptionButton.new()
 	for caption: String in ["Ventana: 1280 × 720", "Ventana: 1600 × 900", "Ventana: 1920 × 1080"]:
 		window_size.add_item(caption)
@@ -75,6 +76,7 @@ func _ready() -> void:
 	var back: Button = Button.new()
 	back.text = "Volver  [Esc / Start]"
 	back.pressed.connect(close_panel)
+	UiSound.attach(back)
 	rows.add_child(back)
 	GamePreferences.current().changed.connect(refresh)
 	hide()

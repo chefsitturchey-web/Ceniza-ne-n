@@ -49,6 +49,7 @@ func _ready() -> void:
 		var button: Button = Button.new()
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.pressed.connect(_install.bind(NeuralSystem.IDS[index]))
+		UiSound.attach(button)
 		implants.add_child(button)
 		buttons.append(button)
 	var scroll: ScrollContainer = ScrollContainer.new()
@@ -76,6 +77,7 @@ func _ready() -> void:
 			var button: Button = Button.new()
 			button.text = pair[1]
 			button.pressed.connect(_equipment_action.bind(data.id, pair[0]))
+			UiSound.attach(button)
 			actions.add_child(button)
 			controls[pair[0]] = button
 		module_rows[data.id] = controls
@@ -85,11 +87,13 @@ func _ready() -> void:
 	for id: String in ModuleSystem.PASSIVE_IDS:
 		var toggle: Button = Button.new()
 		toggle.pressed.connect(_toggle_passive.bind(id))
+		UiSound.attach(toggle)
 		passive_grid.add_child(toggle)
 		passive_buttons[id] = toggle
 	var close: Button = Button.new()
 	close.text = "Volver  [Esc / Start]"
 	close.pressed.connect(close_panel)
+	UiSound.attach(close)
 	rows.add_child(close)
 	hide()
 

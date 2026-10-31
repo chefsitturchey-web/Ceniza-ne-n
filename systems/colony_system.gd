@@ -88,6 +88,7 @@ func update_workers(delta: float) -> void:
 				burial_target.bury_progress += delta
 				if burial_target.bury_progress >= BURY_DURATION:
 					burial_target.bury()
+					if core != null and core.district != null: core.district.play("corpse_bury")
 					burial_target = null
 					notice_requested.emit("Muerto sepultado")
 			worker.update_visual(previous_x, arrived)

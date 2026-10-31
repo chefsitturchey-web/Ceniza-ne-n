@@ -49,6 +49,7 @@ func open_choices(is_chest: bool) -> void:
 		button.custom_minimum_size = Vector2(540, 70)
 		button.add_theme_font_size_override("font_size", 12)
 		button.pressed.connect(select.bind(option))
+		UiSound.attach(button)
 		rows.add_child(button)
 	var hint: Label = Label.new()
 	hint.text = "Cada mejora actúa en la colonia y contra los jefes - 2 armas - 4 pasivas"

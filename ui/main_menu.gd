@@ -68,6 +68,8 @@ func _ready() -> void:
 	confirm.cancel_button_text = "Volver"
 	confirm.confirmed.connect(func() -> void: _launch(true))
 	add_child(confirm)
+	UiSound.attach(confirm.get_ok_button())
+	UiSound.attach(confirm.get_cancel_button())
 	music.stream = MusicLibrary.MENU
 	music.bus = &"Music"
 	music.volume_db = -18
@@ -97,6 +99,7 @@ func _button(parent: Node, text: String, action: Callable) -> Button:
 	button.add_theme_color_override("font_color", Color("dcf6ee"))
 	button.add_theme_color_override("font_disabled_color", Color("8299a8", 0.5))
 	button.pressed.connect(action)
+	UiSound.attach(button)
 	parent.add_child(button)
 	return button
 

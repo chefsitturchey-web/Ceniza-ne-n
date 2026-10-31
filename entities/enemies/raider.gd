@@ -55,6 +55,7 @@ func land_hit() -> void:
 		bolt.position = position + Vector2(facing * 32, -24)
 		bolt.direction = facing
 		get_parent().add_child(bolt)
-		if session.expansion != null: session.expansion.district.sound.play_cue("shot", -9)
+		if session.expansion != null: session.expansion.district.sound.play_world("artillery_shot", position)
 	elif absf(special_target.position.x - position.x) < 38:
 		special_target.take_damage(damage * 2)
+		if session.expansion != null: session.expansion.district.sound.play_world("saboteur_hit", position)

@@ -16,6 +16,8 @@ var corpse_system: CorpseSystem
 var construction: ConstructionSystem
 var trap_system: TrapSystem
 var rats: Array[SewerRat] = []
+## Referencia para pedir efectos; la colonia la asigna al montar el sistema.
+var district: Node2D
 
 func setup(corpse_system: CorpseSystem, construction: ConstructionSystem, trap_system: TrapSystem) -> void:
 	self.corpse_system = corpse_system
@@ -30,6 +32,7 @@ func _on_rat_spawn(corpse: Corpse) -> void:
 	add_child(rat)
 	rat.position = corpse.position
 	rats.append(rat)
+	_play("rat_squeak", -8.0)
 
 func tick(delta: float) -> void:
 	for rat: SewerRat in rats:
@@ -67,6 +70,7 @@ func _update_rat(rat: SewerRat, delta: float) -> void:
 				rat.visible = false
 				rat.chew_time = 0.0
 				rat.state = SewerRat.State.HIDE
+				_play("rat_chew", -8.0)
 		SewerRat.State.HIDE:
 			rat.chew_time += delta
 			if rat.chew_time >= CHEW_DURATION:
@@ -75,6 +79,7 @@ func _update_rat(rat: SewerRat, delta: float) -> void:
 				rat.target_site.powered = false
 				rat.target_site.queue_redraw()
 				notice_requested.emit("Cortocircuito: máquina fuera de servicio")
+				_play("saboteur_hit", -6.0)
 				rat.chews += 1
 				if rat.chews >= CHEWS_BEFORE_FLEE:
 					_begin_flee(rat)
@@ -88,6 +93,10 @@ func _update_rat(rat: SewerRat, delta: float) -> void:
 			rat.position.x = move_toward(rat.position.x, rat.exit_x, rat.speed * delta)
 			if absf(rat.position.x) >= GameRules.MAP_HALF_WIDTH + 60.0:
 				rat.queue_free()
+
+func _play(id: String, gain_db: float = 0.0) -> void:
+	if district != null:
+		district.play(id, gain_db)
 
 func _choose_machine(rat: SewerRat) -> ConstructionSite:
 	var best: ConstructionSite = null
@@ -111,4 +120,5 @@ func _catch(rat: SewerRat, trap: RatTrap) -> void:
 	trap.cooldown = trap_system.TRAP_COOLDOWN
 	trap.refresh_visual()
 	notice_requested.emit("Rata atrapada")
+	_play("trap_snap")
 	rat.queue_free()
