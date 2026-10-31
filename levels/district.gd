@@ -234,6 +234,7 @@ func _ready() -> void:
 	pest_system = PestSystem.new()
 	pest_system.setup(corpse_system, construction, trap_system)
 	add_child(pest_system)
+	pest_system.district = self
 	pest_system.notice_requested.connect(presenter.show_notice)
 	session.pest_system = pest_system
 	session.trap_system = trap_system

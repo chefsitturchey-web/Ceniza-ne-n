@@ -25,6 +25,8 @@ func _process(delta: float) -> void:
 		frontier.district.bank.parts_changed.emit(frontier.district.bank.parts)
 		frontier.district.bank.deposit(6)
 		frontier.district.presenter.show_notice("Parcela despejada: +4 piezas al depósito y +6 chatarra")
+		frontier.district.play("debris_clear")
+		frontier.district.play("parts_pickup", -4.0)
 		frontier.district.story.queue_dialogue("expansion")
 		frontier.district.expansion.checkpoint()
 	visible = not cleared

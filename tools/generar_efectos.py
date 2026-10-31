@@ -492,6 +492,43 @@ PRESETS = {
     # Amanecer: campana suave que separa la noche del día.
     "phase_dawn": dict(wave="sine", attack=0.005, sustain=0.100, decay=0.600, start=660.0, min=650.0,
                        lowpass=3000.0, peak_db=-12.0, seed=181),
+    # Dron de escolta disparando: ráfaga corta con caída.
+    "sentinel_shot": dict(wave="noise", attack=0.002, sustain=0.015, decay=0.150, start=1400.0, min=200.0,
+                          slide=-14.0, punch=0.15, lowpass=3200.0, lowpass_sweep=-1800.0, highpass=300.0,
+                          drive=2.0, peak_db=-9.0, seed=223),
+    # Dron abriéndose: mecánica que sube antes de fijar puntería.
+    "sentinel_deploy": dict(wave="square", duty=0.25, attack=0.004, sustain=0.060, decay=0.180, start=260.0,
+                            min=250.0, slide=6.0, arp_mult=1.4, arp_speed=0.090, lowpass=2600.0,
+                            peak_db=-10.0, seed=227),
+    # Impacto de marca en el suelo: grave, con escombros.
+    "ground_impact": dict(wave="noise", attack=0.003, sustain=0.030, decay=0.420, start=420.0, min=35.0,
+                          slide=-3.0, punch=0.25, lowpass=1100.0, lowpass_sweep=-500.0, resonance=0.15,
+                          highpass=55.0, drive=2.6, peak_db=-7.0, seed=229),
+    # Cobertura de arena que se rompe: caja o bidón, no muralla.
+    "cover_break": dict(wave="noise", attack=0.002, sustain=0.020, decay=0.240, start=900.0, min=80.0,
+                        slide=-8.0, punch=0.20, lowpass=2600.0, lowpass_sweep=-1500.0, highpass=180.0,
+                        drive=2.2, peak_db=-8.0, seed=233),
+    # Rata: chillido corto y agudo.
+    "rat_squeak": dict(wave="square", duty=0.125, attack=0.001, sustain=0.008, decay=0.060, start=2400.0,
+                       min=900.0, slide=-10.0, vibrato=0.8, vibrato_speed=22.0, highpass=900.0,
+                       peak_db=-12.0, seed=239),
+    # Rata royendo cable: dos mordiscos cortos, para repetir.
+    "rat_chew": dict(wave="noise", attack=0.001, sustain=0.010, decay=0.070, start=1600.0, min=400.0,
+                     slide=-6.0, lowpass=3200.0, highpass=700.0, drive=1.6, peak_db=-12.0, seed=241),
+    # Trampa cerrándose: metal seco y muy corto.
+    "trap_snap": dict(wave="square", duty=0.125, attack=0.0, sustain=0.004, decay=0.050, start=1800.0,
+                      min=300.0, slide=-20.0, noise_mix=0.45, highpass=900.0, peak_db=-8.0, seed=251),
+    # Pala enterrando: tierra, sorda y corta.
+    "corpse_bury": dict(wave="noise", attack=0.008, sustain=0.040, decay=0.220, start=380.0, min=60.0,
+                        slide=-4.0, lowpass=900.0, lowpass_sweep=-300.0, highpass=90.0, drive=1.6,
+                        peak_db=-12.0, seed=257),
+    # Despejar escombros: piedra que se corre.
+    "debris_clear": dict(wave="noise", attack=0.004, sustain=0.050, decay=0.300, start=600.0, min=60.0,
+                         slide=-5.0, punch=0.15, lowpass=1800.0, lowpass_sweep=-900.0, highpass=120.0,
+                         drive=2.0, peak_db=-10.0, seed=263),
+    # Recoger piezas: tintineo metálico, distinto de la chatarra.
+    "parts_pickup": dict(wave="square", duty=0.125, attack=0.0, sustain=0.010, decay=0.100, start=1500.0,
+                         min=1400.0, arp_mult=1.335, arp_speed=0.050, highpass=700.0, peak_db=-9.0, seed=269),
     # Klaxon de aviso: alterna dos alturas cada 140 ms sobre la misma nota base.
     "alarm": dict(wave="square", duty=0.5, attack=0.005, sustain=0.300, decay=0.145, start=620.0,
                   min=600.0, arp_mult=1.5, arp_speed=0.14, lowpass=2600.0, highpass=300.0,
@@ -580,9 +617,12 @@ AMBIENCE = {
 GROUPS = {
     "combate": ["slash", "shot", "hit", "step", "dodge", "alarm", "upgrade", "destroy", "dash", "dash_caldera",
                 "sonar", "shield", "fire_pulse", "telegraph_claw", "telegraph_charge", "telegraph_volley",
-                "wall_destroy", "artillery_shot", "saboteur_hit", "turret_on", "turret_off"],
-    "economia": ["denied", "pickup", "build_order", "build_done", "repair", "recruit", "purchase"],
+                "wall_destroy", "artillery_shot", "saboteur_hit", "turret_on", "turret_off",
+                "sentinel_shot", "sentinel_deploy", "ground_impact", "cover_break"],
+    "economia": ["denied", "pickup", "build_order", "build_done", "repair", "recruit", "purchase",
+                 "debris_clear", "parts_pickup"],
     "hitos": ["overload", "portal_destroyed", "boss_phase", "player_death", "respawn", "train_arrive", "phase_dawn"],
+    "plagas": ["rat_squeak", "rat_chew", "trap_snap", "corpse_bury"],
     "interfaz": ["ui_click", "ui_hover", "ui_move", "ui_back"],
     "voz": ["dialogue"],
 }

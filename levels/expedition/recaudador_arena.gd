@@ -137,6 +137,7 @@ func _ready() -> void:
 	combat_effects.arena = self
 	world.add_child(combat_effects)
 	boss.ground_impact.connect(combat_effects.impact)
+	boss.ground_impact.connect(_on_ground_impact)
 	build_lighting()
 	build_hud()
 	add_child(options)
@@ -229,6 +230,7 @@ func build_geometry() -> void:
 		collider.shape = shape
 		body.add_child(collider)
 		body.name = "Cover%d" % index
+		body.broken.connect(func() -> void: sound.play_cue("cover_break", -9))
 		var sprite: Sprite2D = Sprite2D.new()
 		sprite.texture = texture
 		sprite.scale = extent / texture.get_size()
@@ -440,6 +442,10 @@ func finish(victory: bool) -> void:
 		if child is RecaudadorBullet:
 			child.queue_free()
 	banner.text = "" if victory else "SENAL PERDIDA"
+
+## La intensidad de la marca ajusta el volumen del golpe.
+func _on_ground_impact(_point: Vector2, _radius: float, strength: float) -> void:
+	sound.play_cue("ground_impact", -15.0 + strength * 2.5)
 
 func _process(delta: float) -> void:
 	if novel != null and (novel.opened or novel.closed_frame == Engine.get_process_frames()): return

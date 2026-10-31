@@ -54,6 +54,7 @@ func interact(target: int) -> bool:
 		return false
 	if district.frontier != null and district.frontier.blocked(site.position.x):
 		district.presenter.show_notice("Despeja primero los escombros de la parcela")
+		district.play("denied")
 		return false
 	if district.civic != null and not district.civic.safe_to_build(site.position.x):
 		district.presenter.show_notice("Destruye primero la brecha de esa franja")
@@ -125,6 +126,7 @@ func tick(delta: float) -> void:
 			looted[index] = true
 			district.bank.deposit(20)
 			district.presenter.show_notice("Suministros recuperados: +20 chatarra")
+			district.play("pickup")
 			checkpoint()
 	for site: ExpansionOutpost in sites: site.tick(delta)
 	queue_redraw()

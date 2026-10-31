@@ -16,6 +16,16 @@ const CUES: Dictionary = {
 	"telegraph_claw": preload("res://assets/audio/sfx/8bit/combate/telegraph_claw.wav"),
 	"telegraph_charge": preload("res://assets/audio/sfx/8bit/combate/telegraph_charge.wav"),
 	"telegraph_volley": preload("res://assets/audio/sfx/8bit/combate/telegraph_volley.wav"),
+	"sentinel_shot": preload("res://assets/audio/sfx/8bit/combate/sentinel_shot.wav"),
+	"sentinel_deploy": preload("res://assets/audio/sfx/8bit/combate/sentinel_deploy.wav"),
+	"ground_impact": preload("res://assets/audio/sfx/8bit/combate/ground_impact.wav"),
+	"cover_break": preload("res://assets/audio/sfx/8bit/combate/cover_break.wav"),
+	"rat_squeak": preload("res://assets/audio/sfx/8bit/plagas/rat_squeak.wav"),
+	"rat_chew": preload("res://assets/audio/sfx/8bit/plagas/rat_chew.wav"),
+	"trap_snap": preload("res://assets/audio/sfx/8bit/plagas/trap_snap.wav"),
+	"corpse_bury": preload("res://assets/audio/sfx/8bit/plagas/corpse_bury.wav"),
+	"debris_clear": preload("res://assets/audio/sfx/8bit/economia/debris_clear.wav"),
+	"parts_pickup": preload("res://assets/audio/sfx/8bit/economia/parts_pickup.wav"),
 	"wall_destroy": preload("res://assets/audio/sfx/8bit/combate/wall_destroy.wav"),
 	"artillery_shot": preload("res://assets/audio/sfx/8bit/combate/artillery_shot.wav"),
 	"saboteur_hit": preload("res://assets/audio/sfx/8bit/combate/saboteur_hit.wav"),
@@ -53,11 +63,19 @@ const AMBIENCE: Dictionary = {
 const AMBIENCE_VOLUME: float = -14.0
 ## Segundo desde el que entra el tema de derrota.
 const DEFEAT_START: float = 3.0
+## Los avisos que el jugador necesita oír no deben quedarse sin voz.
+const PRIORITY_HIGH: Array[String] = ["alarm", "telegraph_claw", "telegraph_charge", "telegraph_volley",
+	"boss_phase", "player_death", "train_arrive", "wall_destroy", "portal_destroyed", "ground_impact"]
+const PRIORITY_MID: Array[String] = ["shot", "slash", "hit", "destroy", "shield", "sonar", "fire_pulse",
+	"sentinel_shot", "cover_break", "sentinel_deploy", "dash", "dash_caldera"]
+const PRIORITY_LOW: Array[String] = ["step", "rat_chew", "rat_squeak", "ui_hover"]
 ## Baja la música mientras hay un panel de lectura abierto.
 const DUCK_DB: float = -30.0
 var district: Node2D
 var voices: Array[AudioStreamPlayer] = []
 var music: Array[AudioStreamPlayer] = []
+## Qué cue ocupa cada voz, en paralelo a `voices`; sirve para robar la menos importante.
+var voice_ids: Array[String] = []
 ## Voces espaciales: solo para sonidos del mundo, así Godot calcula el paneo.
 const WORLD_VOICES: int = 8
 var world_voices: Array[AudioStreamPlayer2D] = []
@@ -84,6 +102,7 @@ func _ready() -> void:
 		voice.process_mode = Node.PROCESS_MODE_PAUSABLE
 		add_child(voice)
 		voices.append(voice)
+		voice_ids.append("")
 	rng.seed = get_instance_id() * 2654435761 + Time.get_ticks_usec()
 	for index: int in range(WORLD_VOICES):
 		var spatial: AudioStreamPlayer2D = AudioStreamPlayer2D.new()
@@ -165,13 +184,38 @@ func play_cue(id: String, gain_db: float = 0.0) -> void:
 	if not playback_enabled or muted or not CUES.has(id) or elapsed < float(cooldowns.get(id, -1.0)):
 		return
 	cooldowns[id] = elapsed + (0.1 if id == "shot" else 0.06)
-	for voice: AudioStreamPlayer in voices:
-		if not voice.playing:
-			voice.stream = CUES[id]
-			voice.volume_db = -9.0 + gain_db
-			voice.pitch_scale = 1.0 + sin(elapsed * 7.3) * 0.035
-			voice.play()
+	for index: int in range(voices.size()):
+		if not voices[index].playing:
+			_start_cue(index, id, gain_db)
 			return
+	# Todas ocupadas: si el nuevo importa más, se lleva la voz menos importante.
+	var incoming: int = _priority(id)
+	var victim: int = -1
+	var worst: int = incoming
+	for index: int in range(voices.size()):
+		var current: int = _priority(voice_ids[index])
+		if current < worst:
+			worst = current
+			victim = index
+	if victim >= 0:
+		_start_cue(victim, id, gain_db)
+
+func _start_cue(index: int, id: String, gain_db: float) -> void:
+	var voice: AudioStreamPlayer = voices[index]
+	voice_ids[index] = id
+	voice.stream = CUES[id]
+	voice.volume_db = -9.0 + gain_db
+	voice.pitch_scale = 1.0 + sin(elapsed * 7.3) * 0.035
+	voice.play()
+
+func _priority(id: String) -> int:
+	if id in PRIORITY_HIGH:
+		return 3
+	if id in PRIORITY_MID:
+		return 2
+	if id in PRIORITY_LOW:
+		return 0
+	return 1
 
 ## Carga diferida: un preload nulo dejaría la zona en silencio sin avisar.
 ## El bucle se fija en código porque el importador puede ignorar el ajuste.

@@ -14,6 +14,7 @@ var muzzle_time: float = 0
 var rotor: float = 0
 var role: String = "gunner"
 var relay_target: NetworkRelay
+var deployed: bool = false
 
 func _ready() -> void:
 	collision_layer = 0
@@ -32,6 +33,9 @@ func _physics_process(delta: float) -> void:
 	muzzle_time = maxf(0, muzzle_time - delta)
 	tactics.observe(encounter.player, delta)
 	if windup > 0:
+		if not deployed:
+			deployed = true
+			encounter.sound.play_cue("sentinel_deploy", -12)
 		windup -= delta
 		velocity = Vector2.ZERO
 		if windup <= 0:
@@ -44,6 +48,7 @@ func _physics_process(delta: float) -> void:
 				if difference.length() < 75 and aim.dot(difference.normalized()) > 0.5:
 					encounter.player.take_damage(12, aim * 90)
 			else: encounter.spawn_bullet(global_position + aim * 15, aim)
+			encounter.sound.play_cue("sentinel_shot", -10)
 			muzzle_time = 0.12
 			cooldown = 3.8
 	else:
