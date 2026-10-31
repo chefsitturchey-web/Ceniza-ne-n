@@ -7,7 +7,7 @@ var heat_tick: float = 0.0
 var machine: BossMachineVisual
 
 func _init() -> void:
-	max_health = 8500
+	max_health = 10500
 
 func build_visual() -> void:
 	machine = BossMachineVisual.new()
@@ -56,7 +56,7 @@ func _physics_process(delta: float) -> void:
 					"charge":
 						charges_left = 2 if phase == 2 else 1
 						charge_direction = (tactics.predicted(target) - global_position).normalized()
-						change_state(State.CHARGE_WINDUP, 1.1)
+						change_state(State.CHARGE_WINDUP, charge_windup())
 					"volley": change_state(State.VOLLEY_WINDUP, 0.9)
 					_: prepare_heat(true)
 		State.CLAW_WINDUP:
@@ -82,14 +82,14 @@ func _physics_process(delta: float) -> void:
 				change_state(State.VOLLEY, 1.6)
 		State.VOLLEY:
 			shot_timer -= delta
-			if shot_timer <= 0 and volleys < 3:
+			if shot_timer <= 0 and volleys < (4 if phase == 2 else 3):
 				fire_fan()
 				volleys += 1
 				shot_timer = 0.45
 			if timer <= 0:
 				charges_left = 2 if phase == 2 else 1
 				charge_direction = (target.global_position - global_position).normalized()
-				change_state(State.CHARGE_WINDUP, 1.1)
+				change_state(State.CHARGE_WINDUP, charge_windup())
 		State.CHARGE_WINDUP:
 			if timer <= 0: change_state(State.CHARGE, 0.7)
 		State.CHARGE:
@@ -126,3 +126,8 @@ func _draw() -> void:
 	if health > 0:
 		draw_set_transform(Vector2(0, 4), 0, Vector2(1, 0.55))
 		draw_circle(Vector2.ZERO, 60, Color(0, 0, 0, 0.4))
+
+## Retarda la arremetida contra quien esquiva por anticipado; en fase 2 carga antes.
+func charge_windup() -> float:
+	if phase == 2 and tactics.dodge_happy(): return 1.5 if tactics.decisions % 2 == 0 else 0.7
+	return 0.9 if phase == 2 else 1.1

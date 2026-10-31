@@ -45,7 +45,7 @@ static func handoff(zone: int, neural: Dictionary, scrap: int, workers: Array, m
 	if not transport.is_empty():
 		transport.mounted = false
 		transport.parked_x = 0.0
-	return {"version": 1, "handoff": true, "campaign": initial_state(zone), "phase": "DÍA", "day": 1,
+	return {"version": 1, "handoff": true, "layout_seed": FrontierLayout.active_seed, "campaign": initial_state(zone), "phase": "DÍA", "day": 1,
 		"scrap": GameRules.INITIAL_SCRAP + mini(40, maxi(0, scrap)), "neural": carried, "crew": roles, "mobility": transport}
 
 static func valid_handoff(value: Variant) -> bool:

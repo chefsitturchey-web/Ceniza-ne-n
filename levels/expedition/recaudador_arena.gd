@@ -480,19 +480,27 @@ func show_completed(next_zone: String = "") -> void:
 	player.attack_anim_remaining = 0
 	player.slash_remaining = 0
 	player.update_visual()
-	banner.text = "DISTRITO %d COMPLETADO" % (zone_index + 1)
+	var finale: bool = next_zone.is_empty() and zone_index == CampaignRoute.COUNT - 1 and not debug_practice
+	banner.text = "FIN DE LA CAMPAÑA" if finale else "DISTRITO %d COMPLETADO" % (zone_index + 1)
 	var ending_text: RichTextLabel = RichTextLabel.new()
 	ending_text.theme = THEME
 	ending_text.position = Vector2(40, 45)
 	ending_text.size = Vector2(560, 85)
 	ending_text.add_theme_font_size_override("normal_font_size", 12)
 	ending_text.text = CampaignStory.chapter(zone_index).ending
+	if finale:
+		ending_text.text = CampaignStory.EPILOGUE
+		ending_text.size.y = 110
+		var credits: Label = label(CampaignStory.CREDITS, Rect2(40, 165, 560, 90))
+		credits.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		credits.modulate.a = 0
+		create_tween().tween_property(credits, "modulate:a", 1.0, 2.5).set_delay(1.5)
 	add_child(ending_text)
-	label("Ruta disponible completada." if next_zone.is_empty() else "Siguiente destino: " + next_zone + ". Equipo y tripulación conservados.", Rect2(40, 178, 560, 16))
+	if not finale: label("Ruta disponible completada." if next_zone.is_empty() else "Siguiente destino: " + next_zone + ". Equipo y tripulación conservados.", Rect2(40, 178, 560, 16))
 	var button: Button = Button.new()
 	button.theme = THEME
 	button.text = ("Volver a mi escena" if debug_practice else "Volver al menú") if next_zone.is_empty() else "Viajar a " + next_zone
-	button.position = Vector2(210, 200)
+	button.position = Vector2(210, 268 if finale else 200)
 	button.size = Vector2(220, 28)
 	button.pressed.connect(func() -> void:
 		if configured:

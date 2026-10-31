@@ -126,6 +126,7 @@ func _launch(fresh: bool) -> void:
 		CampaignRoute.pending.clear()
 		var info: Dictionary = SaveSystem.checkpoint_info(checkpoint_path)
 		CampaignRoute.resume_path = checkpoint_path
+		FrontierLayout.active_seed = FrontierLayout.new_seed() if fresh else int(info.get("seed", 0))
 		if not fresh and int(info.get("zone", 0)) > 0:
 			GamePreferences.current().briefing_requested = true
 		get_tree().change_scene_to_file(CampaignRoute.SCENES[0 if fresh else int(info.get("zone", 0))])

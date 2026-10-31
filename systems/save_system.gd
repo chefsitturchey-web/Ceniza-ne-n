@@ -15,7 +15,7 @@ static func checkpoint_info(path: String = "user://partida.json") -> Dictionary:
 		return {}
 	var data: Dictionary = parser.data
 	if data.get("handoff", false) == true:
-		return {"day": 1, "scrap": int(data.scrap), "zone": int(data.campaign.zone)} if CampaignRoute.valid_handoff(data) else {}
+		return {"day": 1, "scrap": int(data.scrap), "zone": int(data.campaign.zone), "seed": layout_seed(data)} if CampaignRoute.valid_handoff(data) else {}
 	if not CampaignRoute.valid_state(data.get("campaign", CampaignRoute.initial_state())):
 		return {}
 	if data.get("version") != 1 or data.get("phase") != "DÍA":
@@ -26,7 +26,12 @@ static func checkpoint_info(path: String = "user://partida.json") -> Dictionary:
 			return {}
 	if not data.get("player") is Dictionary or not data.get("structures") is Array:
 		return {}
-	return {"day": int(data.day), "scrap": int(data.scrap), "zone": int(data.get("campaign", CampaignRoute.initial_state()).zone)}
+	return {"day": int(data.day), "scrap": int(data.scrap), "zone": int(data.get("campaign", CampaignRoute.initial_state()).zone), "seed": layout_seed(data)}
+
+## Semilla de trazado guardada; las partidas anteriores usan el trazado de referencia (0).
+static func layout_seed(data: Dictionary) -> int:
+	var value: Variant = data.get("layout_seed", 0)
+	return int(value) if (value is int or value is float) and is_finite(float(value)) and value >= 0 and value < 2147483647 else 0
 
 static func archive_checkpoint(path: String = "user://partida.json", remove_original: bool = true) -> bool:
 	if not FileAccess.file_exists(path):
@@ -68,7 +73,7 @@ func _snapshot() -> Dictionary:
 	player["y"] = session.player.position.y
 	player["velocity_x"] = session.player.velocity.x
 	player["velocity_y"] = session.player.velocity.y
-	return {"version": 1, "day": session.cycle.day, "phase": session.cycle.phase, "campaign": session.campaign.duplicate(true),
+	return {"version": 1, "layout_seed": FrontierLayout.active_seed, "day": session.cycle.day, "phase": session.cycle.phase, "campaign": session.campaign.duplicate(true),
 		"settlements": (session.get_parent() as District).settlements.snapshot(), "frontier": (session.get_parent() as District).frontier.snapshot(), "stored_parts": session.bank.stored_parts, "invasion": InvasionState.snapshot(session), "scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
 		"expansion": session.expansion.snapshot() if session.expansion != null else {},
 		"civic": session.civic.snapshot() if session.civic != null else {},

@@ -1,4 +1,4 @@
-﻿# CENIZA NEÓN — guía de arte v0.1
+# CENIZA NEÓN — guía de arte v0.1
 
 ## Dirección común
 
@@ -12,16 +12,16 @@ Pixel art lateral de ruinas industriales cyberpunk. Oscuro, pero legible: grande
 - Contorno selectivo de un píxel oscuro; dos o tres tonos por material. Luz principal arriba a la izquierda. Nada de texto dentro de los sprites.
 - El color se acompaña de formas: visor rectangular aliado, ojo triangular enemigo, aviso de ataque con símbolo y animación.
 
-| Uso | Color |
-|---|---|
-| Sombra profunda | #0B1322 |
-| Fondo y metal oscuro | #182639 / #304356 |
-| Metal iluminado | #8299A8 |
-| Energía aliada | #47DACB |
-| Construcción, advertencia | #FFCE75 |
-| Enemigo y daño | #DD6482 |
-| Óxido y corredor | #E89E54 |
-| Recuperadores, marcas de obra | #B075AE |
+| Uso                           | Color             |
+| ----------------------------- | ----------------- |
+| Sombra profunda               | #0B1322           |
+| Fondo y metal oscuro          | #182639 / #304356 |
+| Metal iluminado               | #8299A8           |
+| Energía aliada               | #47DACB           |
+| Construcción, advertencia    | #FFCE75           |
+| Enemigo y daño               | #DD6482           |
+| Óxido y corredor             | #E89E54           |
+| Recuperadores, marcas de obra | #B075AE           |
 
 ## Cómo mantener consistencia en otra herramienta
 
@@ -56,18 +56,23 @@ Añadir al prompt base:
 Generar cada elemento por separado sobre transparencia.
 
 **Muralla — `wall_01.png`:**
+
 > A single repaired defensive barricade made from vertically bolted salvaged steel plates, dark braces, small amber construction marks, sturdy readable rectangular silhouette. Side-view gameplay asset, target canvas 32x64 pixels, ground contact on bottom row. No surrounding scenery and no guns.
 
 **Torreta — `turret_01.png`:**
+
 > A single friendly automatic ballistic turret facing right, squat rotating gun housing on a narrow steel pedestal, one small cyan status light, salvaged industrial construction matching the wall reference. Target canvas 48x64 pixels, ground contact on bottom row. No projectile and no muzzle flash; those are separate effects.
 
 **Núcleo — `core_01.png`:**
+
 > A single colony power-and-neural relay, compact armored industrial cabinet with reinforced base, central vertical amber chamber, two small cyan conduits, asymmetrical repair plates, recognizable safe-home silhouette. Side view, target canvas 96x96 pixels, ground contact on bottom row. No lettering, no people, no scenery.
 
 **Suelo — `ground_strip.png`:**
+
 > A seamless horizontally tileable side-view ground strip of cracked industrial pavement above dark rubble, target 128x32 pixels. Continuous flat walkable top edge, visually quiet upper surface, darker underside. No foreground props, no perspective, no bright lights. Left and right edges must match.
 
 **Fondo lejano — `background_far.png`:**
+
 > A horizontally tileable distant skyline for a side-scrolling game, target 640x360 pixels. Abandoned industrial towers, collapsed transit structures and sparse dim windows. Low contrast navy silhouettes, strongest detail in the lower half, empty dark sky in the upper third for HUD readability. Flat side view, no characters, no ground gameplay layer, no text, no bright cyan or pink foreground accents. Opaque background.
 
 ## Animaciones, después de aprobar los maestros

@@ -64,7 +64,7 @@ func run_checks() -> void:
 	var arena: RecaudadorArena = arena_for(1)
 	var boiler: SantaCaldera = arena.boss as SantaCaldera
 	await physics_frame
-	verify(boiler != null and boiler.max_health == 8500, "Fundición crea Santa Caldera")
+	verify(boiler != null and boiler.max_health == 10500, "Fundición crea Santa Caldera")
 	verify(boiler.receive_hit(Vector2.ZERO, 100) == 35, "Armadura reduce daño al 35 por ciento")
 	boiler.prepare_heat()
 	verify(boiler.heat_areas.size() == 3 and boiler.timer == 1.2, "Tres franjas con aviso de 1.2 segundos")
@@ -93,7 +93,7 @@ func run_checks() -> void:
 	boiler._physics_process(0.81)
 	for step: int in range(20):
 		boiler._physics_process(0.1)
-	verify(fired.size() == 21, "Tres abanicos de siete proyectiles en segunda fase")
+	verify(fired.size() == 28, "Cuatro abanicos de siete proyectiles en segunda fase")
 	boiler.change_state(Recaudador.State.RECOVER, 4)
 	boiler.machine._process(0.1)
 	verify(boiler.machine.opening > 0 and boiler.machine.opening < 1, "Compuertas abren progresivamente")

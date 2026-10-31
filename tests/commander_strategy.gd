@@ -134,6 +134,11 @@ func tick(world: District, delta: float) -> bool:
 	if world.core.tier == 2 and world.cycle.day >= 2 and nearest_outpost(world, "barracks").hp > 0 and world.expansion.sites.filter(func(site: ExpansionOutpost) -> bool: return site.hp > 0).size() < 2:
 		build_outpost(world, "medical", delta)
 		return true
+	var guard: Dictionary = story.protection_target()
+	if not guard.is_empty():
+		var wall: ConstructionSite = guard.wall
+		if world.bank.scrap >= wall.cost and walk(world, wall.x, delta): world.civic.interact(-340 - world.civic.walls.find(wall))
+		return true
 	if not story.completed[0]:
 		if walk(world, story.rescue_x, delta): story.interact(-400)
 		return true

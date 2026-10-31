@@ -11,8 +11,73 @@ const PROFILES: Array[Dictionary] = [
 	{"name": "Raíces de la red", "left": [980, 1820, 3050, 4250, 5550, 6600], "right": [1140, 2350, 3550, 4650, 5650, 6500], "lots": [610, 1430, 430, 2500], "outer": [3150, 4200, 5300, 6150], "gates": [2050, 3950, 5750], "rescue": -3500, "relay": 5000, "convoy": -5900, "obstacle": "Raíz de fibra activa"}
 ]
 
+## Semilla de la campaña: 0 conserva el trazado de referencia (partidas antiguas y pruebas).
+static var active_seed: int = 0
+static var profile_cache: Dictionary = {}
+
+static func new_seed() -> int:
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.randomize()
+	return rng.randi_range(1, 2147483646)
+
 static func profile(zone: int) -> Dictionary:
-	return PROFILES[clampi(zone, 0, 4)]
+	var base: Dictionary = PROFILES[clampi(zone, 0, 4)]
+	if active_seed == 0: return base
+	var key: String = "%d:%d" % [zone, active_seed]
+	if not profile_cache.has(key): profile_cache[key] = varied(base, zone)
+	return profile_cache[key]
+
+## Desplazamiento determinista para otros elementos del distrito (poblados, alijos).
+static func offset(zone: int, salt: int, amount: float) -> float:
+	if active_seed == 0: return 0.0
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.seed = hash([active_seed, zone, salt])
+	return roundf(rng.randf_range(-amount, amount) / 10.0) * 10.0
+
+## Cada campaña mueve murallas, brechas, solares y operaciones dentro de márgenes que
+## conservan el orden de avance: muros crecientes y espaciados, brechas entre muros,
+## y operaciones de cerca a lejos (rescate antes que transporte).
+static func varied(base: Dictionary, zone: int) -> Dictionary:
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.seed = hash([active_seed, zone, "frontier"])
+	var result: Dictionary = base.duplicate(true)
+	result.rescue = -clampf(absf(float(base.rescue)) + rng.randi_range(-30, 30) * 10, 1900.0, 3800.0)
+	result.relay = clampf(float(base.relay) + rng.randi_range(-40, 40) * 10, 2600.0, 5600.0)
+	result.convoy = -clampf(absf(float(base.convoy)) + rng.randi_range(-40, 40) * 10, absf(result.rescue) + 900.0, 6200.0)
+	for side: String in ["left", "right"]:
+		# Puntos fijos de cada lado que un muro o su torreta no deben tapar.
+		var taken: Array[float] = [700.0, 1140.0, 1340.0, 1500.0, 6640.0 - zone * 35, 6820.0, 6900.0]
+		if side == "left": taken.append_array([880.0, 425.0, 560.0, 700.0, absf(result.rescue), absf(result.convoy)])
+		else: taken.append(float(result.relay))
+		var walls: Array = []
+		var previous: float = 600.0
+		for index: int in 6:
+			var low: float = previous + 650.0 if index > 0 else 700.0
+			var value: float = clampf(float(base[side][index]) + rng.randi_range(-18, 18) * 10, low, 6650.0 - (5 - index) * 650.0)
+			# Busca el hueco libre más cercano alternando hacia fuera y hacia dentro.
+			# Si el margen normal no deja hueco (último muro), admite muros algo más juntos.
+			for step: int in 320:
+				var candidate: float = value + ceili((step % 160) / 2.0) * 10.0 * (1 if step % 2 == 1 else -1)
+				if candidate < (low if step < 160 else previous + 450.0) or candidate > 6650.0: continue
+				if not crowded(candidate, taken) and (candidate <= 1100.0 or not crowded(candidate - 135.0, taken)):
+					value = candidate
+					break
+			walls.append(value)
+			previous = value
+		result[side] = walls
+	for key: String in ["lots", "outer"]:
+		var values: Array = []
+		for value: Variant in base[key]: values.append(float(value) + rng.randi_range(-12, 12) * 10)
+		result[key] = values
+	var gates: Array = []
+	for gate: Variant in base.gates: gates.append(clampf(float(gate) + rng.randi_range(-20, 20) * 10, 1800.0, 6000.0))
+	gates.sort()
+	for index: int in range(1, gates.size()): gates[index] = maxf(gates[index], gates[index - 1] + 900.0)
+	result.gates = gates
+	return result
+
+static func crowded(x: float, taken: Array[float]) -> bool:
+	return taken.any(func(point: float) -> bool: return absf(point - x) < 80.0)
 
 static func wall_positions(zone: int) -> Array[float]:
 	var data: Dictionary = profile(zone)
@@ -25,8 +90,9 @@ static func wall_positions(zone: int) -> Array[float]:
 	return result
 
 static func lot_x(zone: int, index: int) -> float:
-	if not lot_cache.has(zone): lot_cache[zone] = plan_lots(zone)
-	return lot_cache[zone][index]
+	var key: String = "%d:%d" % [zone, active_seed]
+	if not lot_cache.has(key): lot_cache[key] = plan_lots(zone)
+	return lot_cache[key][index]
 
 static func plan_lots(zone: int) -> Array[float]:
 	var data: Dictionary = profile(zone)

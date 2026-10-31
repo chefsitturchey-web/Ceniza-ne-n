@@ -73,7 +73,7 @@ func run_checks() -> void:
 	InputSetup.add_action("arena_up", KEY_W, JOY_BUTTON_DPAD_UP)
 	InputSetup.add_action("arena_down", KEY_S, JOY_BUTTON_DPAD_DOWN)
 	capacitor_player._physics_process(0.1)
-	verify(is_equal_approx(capacitor_player.stamina, 23.7), "Regeneración real del capacitor en la arena")
+	verify(is_equal_approx(capacitor_player.stamina, 20 + 3.7 * TopdownPlayer.ARENA_STAMINA_REGEN), "Regeneración real del capacitor en la arena")
 	capacitor_player.free()
 	var saved: Dictionary = neural.snapshot()
 	verify(NeuralSystem.valid(saved), "Estado neuronal válido")

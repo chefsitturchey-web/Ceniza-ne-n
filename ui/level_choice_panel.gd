@@ -51,7 +51,7 @@ func open_choices(is_chest: bool) -> void:
 		button.pressed.connect(select.bind(option))
 		rows.add_child(button)
 	var hint: Label = Label.new()
-	hint.text = "Colonia: enlaces a tropas · Jefes: armas propias · 4 pasivas"
+	hint.text = "Cada mejora actúa en la colonia y contra los jefes - 2 armas - 4 pasivas"
 	hint.add_theme_font_size_override("font_size", 10)
 	rows.add_child(hint)
 	show()

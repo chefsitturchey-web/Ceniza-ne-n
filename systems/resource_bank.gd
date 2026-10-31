@@ -14,7 +14,7 @@ var expansion: ExpansionSystem
 
 func available_capacity() -> int:
 	var core_bonus: int = maxi(0, expansion.district.core.tier - 1) * 4 if expansion != null else 0
-	return energy_capacity + core_bonus + (expansion.energy_bonus() if expansion != null else 0)
+	return energy_capacity + core_bonus + (expansion.energy_bonus() + expansion.district.modules.energy_bonus() if expansion != null else 0)
 
 func energy_used() -> int:
 	var used: int = expansion.energy_used() if expansion != null else 0

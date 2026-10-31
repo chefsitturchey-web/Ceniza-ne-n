@@ -93,6 +93,9 @@ func objective() -> String:
 		if district.civic.tools[0] == 0: return "Sin constructores: compra un martillo en el taller (izq. 600) - E"
 		if district.civic.villagers.is_empty(): return recruit_step()
 		return "Un superviviente recoge el martillo en el taller"
+	for site: ExpansionOutpost in district.expansion.sites:
+		if site.hp > 0 and site.spec.id == "barracks" and site.staff_count() > 0 and not district.expansion.powered(site):
+			return "El cuartel no tiene energía: apaga una torreta con T o construye otro generador"
 	if district.core.tier > 0 and district.cycle.phase == "DÍA" and district.cycle.phase_remaining < 60:
 		var core: ColonyCore = district.core
 		if core.tier == 2 and not core.ordered and core.upgrade_blocker().is_empty() and district.bank.scrap >= core.upgrade_cost() and district.bank.parts + district.bank.stored_parts >= core.parts_cost():
@@ -129,8 +132,11 @@ func objective() -> String:
 		if site.kind == &"turret" and (site.hp > 0 or site.ordered): turrets += 1
 	if turrets < 2: return "Construye las dos torretas centrales antes de la noche - mantener E"
 	if soldiers() < 2: return soldier_step()
+	var exposed: String = protection_step()
+	if not exposed.is_empty(): return exposed
 	if not completed[0]: return "Rescata la baliza (izq. %d) - E" % int(absf(rescue_x)) if district.civic.safe_to_build(rescue_x) else "F: asalta la brecha izquierda para llegar al rescate"
 	if not completed[1]:
+		if not district.civic.safe_to_build(relay_x): return "F: asalta la brecha derecha para llegar al relé"
 		if not relay_ordered: return "Encarga el relé (der. %d) - E" % int(relay_x)
 		for ally: FieldAlly in get_tree().get_nodes_in_group(GameRules.ALLIES):
 			if ally.role == "technician" and ally.hp > 0: return "El técnico repara el relé oriental: protégelo"
@@ -138,9 +144,38 @@ func objective() -> String:
 		if district.civic.villagers.is_empty(): return recruit_step()
 		return "Un superviviente recoge la herramienta técnica en el taller"
 	if not completed[2]:
+		if not district.civic.safe_to_build(convoy_x): return "F: asalta la brecha izquierda para llegar al transporte"
 		if convoy_health <= 0: return "Recupera el transporte averiado - E cuesta 25"
 		return "Escolta el transporte al núcleo - F retira tropas" if convoy_active else "Activa el transporte (izq. %d) - E" % int(absf(convoy_x))
 	return "Consulta el objetivo en el diario (L)"
+
+## Como en Kingdom, una instalación más allá de las murallas centrales pide extender el muro.
+func protection_step() -> String:
+	var guard: Dictionary = protection_target()
+	if guard.is_empty(): return ""
+	var wall: ConstructionSite = guard.wall
+	return "Protege %s: construye la muralla exterior (%s %d) - E" % [guard.title, "izq." if wall.x < 0 else "der.", int(absf(wall.x))]
+
+## Muralla exterior más cercana que cubriría una instalación expuesta, o vacío.
+func protection_target() -> Dictionary:
+	for site: ExpansionOutpost in district.expansion.sites:
+		if site.hp <= 0 or absf(site.position.x) <= central_reach(): continue
+		var side: float = signf(site.position.x)
+		var guard: ConstructionSite
+		var covered: bool = false
+		for wall: ConstructionSite in district.civic.walls:
+			if signf(wall.x) != side or absf(wall.x) <= absf(site.position.x): continue
+			if wall.hp > 0 or wall.ordered: covered = true
+			elif guard == null or absf(wall.x) < absf(guard.x): guard = wall
+		if not covered and guard != null and district.civic.safe_to_build(guard.x) and not district.frontier.blocked(guard.x):
+			return {"wall": guard, "title": String(site.spec.title).to_lower()}
+	return {}
+
+func central_reach() -> float:
+	var reach: float = 0
+	for site: ConstructionSite in district.construction.sites.slice(0, 4):
+		if site.data.blocks_enemies: reach = maxf(reach, absf(site.x))
+	return reach
 
 ## Divide "formar soldados" en el paso concreto que falta y dónde hacerlo.
 func soldier_step() -> String:

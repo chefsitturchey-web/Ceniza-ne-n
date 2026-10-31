@@ -11,7 +11,7 @@ var machine: BossMachineVisual
 var silence_left: float = 0
 
 func _init() -> void:
-	max_health = 9000
+	max_health = 12000
 
 func build_visual() -> void:
 	machine = BossMachineVisual.new()
@@ -55,6 +55,10 @@ func strike_attachments(origin: Vector2, direction: Vector2, amount: int, reach:
 			continue
 		relay.receive(amount)
 		cue_requested.emit("hit")
+		# Represalia: en fase 2 romper una antena atrae marcas sobre el atacante.
+		if phase == 2 and active_links() > 0 and marks.size() < 6:
+			add_marks()
+			mark_timer = maxf(mark_timer, 2.0)
 		if active_links() == 0:
 			exposure_left = 6.0
 			waves.clear()

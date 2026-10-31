@@ -26,7 +26,7 @@ Para revisar las animaciones de aliados y profesiones, abre `levels/story/unit_a
 | Pausar | Esc | Start |
 | Atacar, solo en arenas de jefe | J | X |
 
-En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora, recoge datos, esquiva y activa sobrecargas. Sus armas personales funcionan contra los jefes; los módulos equipados también transmiten una bonificación de daño a los soldados.
+En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora, recoge datos, esquiva y activa sobrecargas. Los datos que sueltan los enemigos te suben de nivel y eliges una mejora, como en Vampire Survivors. **Cada carta actúa en la colonia y contra los jefes.** En la colonia: dron, daño de torretas; Tesla, murallas electrificadas; orbital, blindaje de tropas; óptica, alcance de torretas; batería, energía; rodamiento, velocidad de obra. Contra los jefes son tus armas automáticas.
 
 En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y trayectoria; observa los avisos y sus ventanas de recuperación. **E** cerca de las consolas cian activa carga, refrigeración, interferencia o parapeto, según el recinto. En Madre Cero, E repara relés y Q los protege. Los refuerzos pueden recibir daño de tu hoja y módulos. [Los cinco jefes, mecanismos y escenas para probar con F6](docs/gameplay/JEFES_TACTICAS_Y_ARENAS.md).
 
@@ -42,7 +42,7 @@ En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y 
 6. Recluta en los campamentos y compra herramientas en el taller izquierdo. Un cuartel permite formar tropas; F ordena atacar el portal de ese frente y otra F las retira. Cierra los portales para abrir las parcelas exteriores.
 7. El núcleo Nv.3 exige una noche resistida, dos instalaciones, 120 de chatarra y 18 piezas. Amplía la capacidad de energía y las mejoras de defensas. L muestra el objetivo y permite releer la historia.
 
-Cada distrito mide 14.400 píxeles y tiene su propio trazado de solares y obstáculos. Shift permite correr; el transporte se desbloquea con núcleo Nv.2. [Reglas completas, diseños de LibreSprite y guardados](docs/gameplay/FRONTERA_Y_RECONSTRUCCION.md).
+Cada distrito mide 14.400 píxeles y tiene su propio trazado. **Cada campaña nueva genera su propio mapa**: murallas, brechas, solares, poblados y operaciones cambian de sitio dentro de límites que mantienen el orden de avance. La semilla se guarda con la partida. Shift permite correr; el transporte se desbloquea con núcleo Nv.2. [Reglas completas, diseños de LibreSprite y guardados](docs/gameplay/FRONTERA_Y_RECONSTRUCCION.md).
 
 ## Historia, operaciones y tren
 
@@ -58,11 +58,11 @@ Cierra las entradas con tus tropas, completa las tres operaciones y estabiliza l
 
 - **Recaudador:** haz que embista una cobertura y golpea su núcleo expuesto.
 - **Santa Caldera:** evita franjas calientes, salvas y arremetidas; ataca durante la purga.
-- **Coro Sumergido:** corta sus tres enlaces y aprovecha la apertura.
-- **Prefecto:** rodea su escudo, esquiva la estocada y sal del barrido. En segunda fase encadena estocadas.
-- **MADRE CERO:** mantén al menos dos relés activos. E cerca de uno repara a cambio de resistencia; Q protege de los pulsos. El enlace abre la ventana para atacar. Tus soldados de la colonia aportan apoyo a los relés.
+- **Coro Sumergido:** corta sus tres enlaces y aprovecha la apertura. En segunda fase, romper una antena atrae marcas sobre ti.
+- **Prefecto:** duelista. Golpear su escudo provoca un contraataque; si esquivas por anticipado, retrasa la estocada y corrige su rumbo. Castiga solo durante su recuperación. Al 30 % entra en su **última guardia**: tres estocadas seguidas y ventanas más cortas.
+- **MADRE CERO:** mantén al menos dos relés activos. E cerca de uno repara a cambio de resistencia; Q protege de los pulsos. El enlace abre la ventana para atacar. Tus soldados de la colonia aportan apoyo a los relés. Al 30 % activa su **último protocolo**: pulsos triples y ataques incluso mientras está expuesta.
 
-Las arenas permiten movimiento en ocho direcciones y combate personal. Si pierdes vuelves a la colonia; si ganas continúas con tus mejoras y habitantes económicos. La última victoria cierra la historia.
+Las arenas permiten movimiento en ocho direcciones y combate personal, con un ritmo más pausado que antes y una resistencia que se recarga más despacio. Cada jefe resiste más que el anterior (9.000 a 16.000 de integridad) y aprende tus hábitos de esquiva. Vencer a MADRE CERO muestra el epílogo y los créditos. Si pierdes vuelves a la colonia; si ganas continúas con tus mejoras y habitantes económicos. La última victoria cierra la historia.
 
 ## Transporte opcional
 

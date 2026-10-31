@@ -183,6 +183,11 @@ func find_wall() -> int:
 			return index
 	return -1
 
+## Módulo Tesla en la colonia: la muralla golpeada devuelve una descarga.
+func shock_from_wall() -> void:
+	var world: District = core.district if core != null else null
+	if world != null and world.modules.wall_shock() > 0 and health > 0: take_damage(world.modules.wall_shock())
+
 func choose_special_target(_delta: float) -> bool:
 	return false
 
@@ -192,6 +197,7 @@ func land_hit() -> void:
 			player.take_damage(damage)
 	elif target_kind == "wall":
 		construction.damage_site(target_index, damage)
+		shock_from_wall()
 	elif target_kind == "core":
 		core.take_damage(damage)
 	elif target_kind == "ally" and is_instance_valid(ally_target) and absf(ally_target.position.x - position.x) < 38:

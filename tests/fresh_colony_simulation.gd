@@ -7,6 +7,10 @@ func _initialize() -> void:
 
 func simulate() -> void:
 	var zone: int = 4 if "--network" in OS.get_cmdline_user_args() else (3 if "--citadel" in OS.get_cmdline_user_args() else (2 if "--flooded" in OS.get_cmdline_user_args() else (1 if "--foundry" in OS.get_cmdline_user_args() else 0)))
+	if "--seeded" in OS.get_cmdline_user_args():
+		# Barrio inundado con trazado generado: brechas, operaciones y solares desplazados.
+		zone = 2
+		FrontierLayout.active_seed = 7777
 	var world: District = load(CampaignRoute.SCENES[zone]).instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
@@ -82,6 +86,7 @@ func simulate() -> void:
 			Input.action_release("interact")
 			var valid: bool = world.session.won and all_built and order_time > 0 and world.core.health > 0
 			print("Colonia nueva zona=%d: obras encargadas=%.1fs; cuatro defensas construidas=%s; victoria=%s; núcleo=%d; sesión=%.1fs" % [zone, order_time, all_built, world.session.won, world.core.health, step * 0.1])
+			print("Progresión: nivel=%d bajas=%d puntos_libres=%d gastados=%d" % [world.experience.level, world.neural.kills, world.neural.points(), world.modules.spent()])
 			world.free()
 			await process_frame
 			if valid:

@@ -109,7 +109,7 @@ func run_checks() -> void:
 	player._physics_process(0.1)
 	Input.action_release("arena_up")
 	Input.action_release("move_right")
-	verify(player.facing.x > 0 and player.facing.y < 0 and is_equal_approx(player.velocity.length(), player.speed), "Movimiento diagonal normalizado")
+	verify(player.facing.x > 0 and player.facing.y < 0 and is_equal_approx(player.velocity.length(), player.speed * TopdownPlayer.ARENA_PACE), "Movimiento diagonal normalizado al ritmo de arena")
 	player.facing = Vector2.UP
 	player.velocity = Vector2.UP * player.speed
 	player.update_visual()

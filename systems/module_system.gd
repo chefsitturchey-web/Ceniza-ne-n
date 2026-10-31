@@ -62,6 +62,35 @@ func command_damage() -> int:
 		bonus += int(levels[id]) + (3 if evolved[id] else 0)
 	return bonus + (passive_rank("condenser") if passives.condenser else 0)
 
+## Cada carta tiene efecto doble: en la colonia potencia defensas y tropas (el Portador no
+## combate allí) y en la arena dispara. Bonificaciones pequeñas por nivel y acotadas.
+const COLONY_TEXT: Dictionary = {
+	"drone": "Colonia: +6% daño de torretas por nivel.", "tesla": "Colonia: las murallas electrocutan a quien las golpea.", "orbital": "Colonia: tropas con +5% de blindaje por nivel.",
+	"optic": "Colonia: +6 de alcance de torretas por nivel.", "battery": "Colonia: +1 de energía en niveles 1, 3 y 5.", "bearing": "Colonia: constructores un 6% más rápidos por nivel.",
+	"magnet": "Colonia y jefes: recoges datos desde más lejos.", "condenser": "Colonia: +1 daño de tropas por nivel.", "recovery": "Colonia y jefes: más regeneración de resistencia."}
+
+func active_level(id: String) -> int: return int(levels[id]) if id in equipped else 0
+
+func turret_damage_factor() -> float:
+	return 1.0 + active_level("drone") * 0.06 + (0.15 if evolved.drone and "drone" in equipped else 0.0)
+
+func turret_reach_bonus() -> float:
+	return passive_rank("optic") * 6.0 if passives.optic else 0.0
+
+## Daño que devuelve una muralla al ser golpeada.
+func wall_shock() -> int:
+	return active_level("tesla") * 3 + (8 if evolved.tesla and "tesla" in equipped else 0)
+
+## Fracción del daño que absorben las tropas.
+func troop_armor() -> float:
+	return minf(0.4, active_level("orbital") * 0.05 + (0.15 if evolved.orbital and "orbital" in equipped else 0.0))
+
+func energy_bonus() -> int:
+	return (passive_rank("battery") + 1) / 2 if passives.battery else 0
+
+func builder_bonus() -> float:
+	return passive_rank("bearing") * 0.06 if passives.bearing else 0.0
+
 func range_for(id: String) -> float:
 	var result: float = definition(id).attack_range
 	if id == "drone" and passives.optic:

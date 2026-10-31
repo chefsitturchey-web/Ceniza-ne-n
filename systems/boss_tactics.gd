@@ -15,11 +15,22 @@ var walkable: Array[Vector2i] = []
 var route: PackedVector2Array = []
 var route_time: float = 0
 var route_goal: Vector2
+## Memoria de hábitos: cuántas esquivas hace el jugador y si las anticipa.
+var dodges: int = 0
+var since_dodge: float = 99
+var was_dodging: bool = false
+var hidden_time: float = 0
 
 func observe(target: TopdownPlayer, delta: float) -> void:
 	for key: String in cooldowns: cooldowns[key] = maxf(0, float(cooldowns[key]) - delta)
 	route_time -= delta
 	sample_time += delta
+	since_dodge += delta
+	var dodging: bool = target.dodge_remaining > 0
+	if dodging and not was_dodging:
+		dodges += 1
+		since_dodge = 0
+	was_dodging = dodging
 	if not initialized:
 		observed_position = target.global_position
 		initialized = true
@@ -29,6 +40,13 @@ func observe(target: TopdownPlayer, delta: float) -> void:
 	stationary_time = stationary_time + sample_time if movement.length() < 5 else 0
 	observed_position = target.global_position
 	sample_time = 0
+
+## Jugador que esquiva a menudo: conviene retrasar el golpe para cazar la esquiva.
+func dodge_happy() -> bool: return dodges >= 4 and since_dodge < 6
+
+## Actualiza cuánto lleva el jugador fuera de la línea de visión (tras coberturas).
+func track_cover(actor: Node2D, target: Node2D, delta: float) -> void:
+	hidden_time = 0.0 if clear_shot(actor, target.global_position) else hidden_time + delta
 
 func predicted(target: TopdownPlayer, seconds: float = 0.3) -> Vector2:
 	return target.global_position + observed_velocity * minf(seconds, 0.4)

@@ -110,13 +110,13 @@ func options(chest: bool = false) -> Array[Dictionary]:
 			if gear.can_evolve(data.id): choices.append({"id": data.id, "type": "evolve", "title": data.evolution, "text": "Evolucionar " + data.title + ". Consume este núcleo."})
 	for data: ModuleData in ModuleSystem.DATA:
 		if gear.levels[data.id] < 5 and (data.id in gear.equipped or gear.equipped.size() < 2):
-			choices.append({"id": data.id, "type": "weapon", "title": data.title + " · " + ("NUEVO" if gear.levels[data.id] == 0 else "Nv. %d → %d" % [gear.levels[data.id], gear.levels[data.id] + 1]), "text": data.description})
+			choices.append({"id": data.id, "type": "weapon", "title": data.title + " · " + ("NUEVO" if gear.levels[data.id] == 0 else "Nv. %d → %d" % [gear.levels[data.id], gear.levels[data.id] + 1]), "text": ModuleSystem.COLONY_TEXT[data.id] + " Jefes: " + data.description})
 	for id: String in ModuleSystem.PASSIVE_IDS:
 		if gear.passive_rank(id) < 5 and (gear.passives[id] or gear.passive_count() < 4):
-			choices.append({"id": id, "type": "passive", "title": ModuleSystem.PASSIVE_TITLES[id] + " · Nv. %d" % (gear.passive_rank(id) + 1), "text": ModuleSystem.PASSIVE_TEXT[id]})
+			choices.append({"id": id, "type": "passive", "title": ModuleSystem.PASSIVE_TITLES[id] + " · Nv. %d" % (gear.passive_rank(id) + 1), "text": ModuleSystem.COLONY_TEXT[id] + " Jefes: " + ModuleSystem.PASSIVE_TEXT[id]})
 	for id: String in NeuralSystem.IDS:
 		if district.neural.ranks[id] < 3:
-			choices.append({"id": id, "type": "implant", "title": {"blade": "Filo de inducción", "drone": "Enlace de dron", "capacitor": "Capacitor sináptico"}[id], "text": {"blade": "+10 daño de hoja", "drone": "+4 daño de dron y mayor cadencia", "capacitor": "+5 regeneración de resistencia"}[id]})
+			choices.append({"id": id, "type": "implant", "title": {"blade": "Filo de inducción", "drone": "Enlace de dron", "capacitor": "Capacitor sináptico"}[id], "text": {"blade": "Jefes: +10 daño de hoja.", "drone": "Jefes: +4 daño de dron y mayor cadencia.", "capacitor": "Colonia y jefes: +5 regeneración de resistencia."}[id]})
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash(str(level) + ":" + str(pending) + ":" + str(defeated))
 	# Las evoluciones válidas tienen prioridad al abrir un cofre.

@@ -241,6 +241,8 @@ func _ready() -> void:
 	settlements = SettlementSystem.new()
 	settlements.setup(self)
 	add_child(settlements)
+	# Las cartas de nivel (Rodamiento) alteran el ritmo de obra igual que los poblados.
+	neural.changed.connect(settlements.refresh_bonuses)
 	settlement_backdrop = SettlementBackdrop.new()
 	settlement_backdrop.world = self
 	add_child(settlement_backdrop)

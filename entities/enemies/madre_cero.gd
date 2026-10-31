@@ -17,8 +17,11 @@ var guard_cooldown: float = 0
 var support_units: int = 0
 var visual: FinalBossVisual
 var pulse_index: int = 0
+## Último protocolo (30 % de vida): pulsos más rápidos, triples y sin tregua al exponerse.
+var last_protocol: bool = false
+var exposed_pulse: float = 0
 
-func _init() -> void: max_health = 10000
+func _init() -> void: max_health = 16000
 
 func build_visual() -> void:
 	visual = FinalBossVisual.new()
@@ -81,15 +84,25 @@ func _physics_process(delta: float) -> void:
 	var destination: Vector2 = Vector2(320, 215) + Vector2.from_angle(elapsed * 0.3) * 85
 	velocity = Vector2.ZERO if cast_recovery > 0 or casting_time() < 0.65 else tactics.steer(self, destination, 62 if phase == 2 else 45)
 	move_and_slide()
+	if not last_protocol and health <= max_health * 0.3:
+		last_protocol = true
+		cue_requested.emit("alarm")
+		phase_changed.emit(phase)
 	if exposure > 0:
 		exposure = maxf(0, exposure - delta)
 		state = State.RECOVER
+		if last_protocol:
+			exposed_pulse -= delta
+			if exposed_pulse <= 0:
+				exposed_pulse = 2.0
+				marks.append({"position": target.global_position.clamp(Vector2(90, 75), Vector2(550, 405)), "time": 1.1, "relay": -1})
 	else:
 		state = State.APPROACH
 		if active_relays() >= 2: charge += delta * (1.15 if support_units >= 4 else 1.0)
 		if charge >= 18:
 			charge = 0
-			exposure = 7
+			exposure = 5.0 if last_protocol else 7.0
+			exposed_pulse = 1.5
 			marks.clear()
 			cue_requested.emit("upgrade")
 		pulse -= delta
@@ -98,8 +111,9 @@ func _physics_process(delta: float) -> void:
 			var point: Vector2 = relays[index].global_position if index >= 0 else tactics.predicted(target).clamp(Vector2(90, 75), Vector2(550, 405))
 			marks.append({"position": point, "time": 1.5, "relay": index})
 			if phase == 2 and index >= 0: marks.append({"position": tactics.predicted(target).clamp(Vector2(90, 75), Vector2(550, 405)), "time": 1.3, "relay": -1})
+			if last_protocol: marks.append({"position": target.global_position.clamp(Vector2(90, 75), Vector2(550, 405)), "time": 1.0, "relay": -1})
 			pulse_index += 1
-			pulse = 1.8 if phase == 2 else 2.6
+			pulse = 1.3 if last_protocol else (1.8 if phase == 2 else 2.6)
 			cue_requested.emit("alarm")
 	for index: int in range(marks.size() - 1, -1, -1):
 		marks[index].time -= delta
@@ -130,6 +144,6 @@ func choose_relay() -> int:
 	return int(choice) if not choice.is_empty() else (int(scores.keys()[0]) if not scores.is_empty() else -1)
 
 func status_text() -> String:
-	if core_exposed: return "MADRE CERO VULNERABLE: rompe el protocolo"
+	if core_exposed: return "MADRE CERO VULNERABLE: sigue moviéndote" if last_protocol else "MADRE CERO VULNERABLE: rompe el protocolo"
 	if active_relays() < 2: return "Reconecta relés: acércate y pulsa E (25 resistencia)"
 	return "Protege 2 relés · Enlace %d/18 · E reparar · Q escudo (%ds)" % [int(charge), ceili(guard_cooldown)]

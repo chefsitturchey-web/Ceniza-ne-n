@@ -9,8 +9,8 @@ signal hit_feedback(blocked: bool)
 signal ground_impact(point: Vector2, radius: float, strength: float)
 enum State { APPROACH, CLAW_WINDUP, CLAW, VOLLEY_WINDUP, VOLLEY, CHARGE_WINDUP, CHARGE, STUNNED, RECOVER, DEAD }
 ## Around 20 exposed windows at base damage; target 3-5 minutes with flank hits.
-@export var max_health: int = 10000
-var health: int = 10000
+@export var max_health: int = 9000
+var health: int = 9000
 var phase: int = 1
 var state: State = State.APPROACH
 var timer: float = 2.5
@@ -196,7 +196,8 @@ func _physics_process(delta: float) -> void:
 func begin_charge() -> void:
 	charge_direction = (tactics.predicted(target, 0.25) - global_position).normalized()
 	facing = charge_direction
-	change_state(State.CHARGE_WINDUP, 0.8)
+	# Contra quien esquiva por anticipado, alterna una carga retardada en fase 2.
+	change_state(State.CHARGE_WINDUP, (1.2 if tactics.decisions % 2 == 0 else 0.6) if phase == 2 and tactics.dodge_happy() else 0.8)
 
 func choose_attack(distance: float) -> void:
 	var visible: bool = tactics.clear_shot(self, target.global_position)

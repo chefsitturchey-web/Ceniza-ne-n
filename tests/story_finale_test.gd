@@ -124,7 +124,7 @@ func run_checks() -> void:
 			prefect.facing = Vector2.DOWN
 			prefect.change_state(Recaudador.State.APPROACH, 2)
 			verify(prefect.receive_hit(prefect.position + Vector2(0, 40), 100) == 0, "El escudo del Prefecto bloquea el frente")
-			verify(prefect.receive_hit(prefect.position - Vector2(0, 40), 100) == 40, "El flanco tiene respuesta distinta")
+			verify(prefect.receive_hit(prefect.position - Vector2(0, 40), 100) == 30, "El flanco tiene respuesta distinta")
 			prefect.change_state(Recaudador.State.RECOVER, 3)
 			verify(prefect.receive_hit(prefect.position, 100) == 200, "La recuperación abre una ventana de castigo")
 			prefect.health = prefect.max_health / 2 + 10

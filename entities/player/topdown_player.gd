@@ -7,6 +7,9 @@ signal dodged
 signal stepped(origin: Vector2)
 signal slash(origin: Vector2, direction: Vector2, amount: int, reach: float)
 
+## Ritmo de arena más cercano al de la colonia: duelos más pausados y exigentes.
+const ARENA_PACE: float = 0.75
+const ARENA_STAMINA_REGEN: float = 0.7
 var health: int = Player.MAX_HEALTH
 var debug_invincible: bool = false
 var stamina: float = Player.MAX_STAMINA
@@ -73,7 +76,7 @@ func _physics_process(delta: float) -> void:
 	cooldown = maxf(0, cooldown - delta)
 	slash_remaining = maxf(0, slash_remaining - delta)
 	attack_anim_remaining = maxf(0, attack_anim_remaining - delta)
-	stamina = minf(Player.MAX_STAMINA, stamina + (Player.STAMINA_REGEN + neural_regen) * delta)
+	stamina = minf(Player.MAX_STAMINA, stamina + (Player.STAMINA_REGEN + neural_regen) * ARENA_STAMINA_REGEN * delta)
 	var direction: Vector2 = Input.get_vector("move_left", "move_right", "arena_up", "arena_down")
 	if dodge_remaining <= 0 and direction.length() > Player.MOVE_THRESHOLD:
 		facing = direction.normalized()
@@ -87,7 +90,7 @@ func _physics_process(delta: float) -> void:
 		velocity = dodge_direction * Player.DODGE_SPEED
 		dodge_remaining = maxf(0, dodge_remaining - delta)
 	else:
-		velocity = direction * speed * terrain_speed_factor * (0.65 if attack_anim_remaining > 0 else 1.0) + knockback
+		velocity = direction * speed * ARENA_PACE * terrain_speed_factor * (0.65 if attack_anim_remaining > 0 else 1.0) + knockback
 	knockback = knockback.move_toward(Vector2.ZERO, 900 * delta)
 	move_and_slide()
 	step_timer = maxf(0, step_timer - delta)
