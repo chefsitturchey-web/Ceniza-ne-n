@@ -37,7 +37,8 @@ var refresh_left: float = 0
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 100
-	enabled = OS.is_debug_build() or "--debug-tools" in OS.get_cmdline_user_args()
+	# Solo para el desarrollador: editor o --debug-tools. Nunca en builds exportadas, aunque sean de depuración.
+	enabled = OS.has_feature("editor") or "--debug-tools" in OS.get_cmdline_user_args()
 	if not enabled:
 		set_process(false)
 		set_process_input(false)
