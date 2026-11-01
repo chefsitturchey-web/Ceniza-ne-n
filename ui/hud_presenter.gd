@@ -196,6 +196,11 @@ func publish() -> void:
 		if (player.health == Player.MAX_HEALTH or core.tier == 0) and core.tier < 3 and not core.ordered and core.upgrade_blocker().is_empty():
 			context += " · %d piezas" % core.parts_cost()
 		if core.tier == 0: context = "Levantar núcleo · 12 piezas" if not core.ordered else "Construyendo el primer núcleo"
+		if interaction.night_call_available():
+			# La razón del bloqueo sigue visible: el jugador sabe qué le falta antes de saltar el día.
+			context = "Adelantar la noche · " + core.upgrade_blocker()
+			context_key = true
+			context_cost = -1
 		context_screen = core.get_global_transform_with_canvas() * Vector2(0, -24 if core.tier == 0 else -FortressArt.CORE_HEIGHTS[core.tier - 1])
 	elif target >= 0:
 		var site: ConstructionSite = construction.sites[target]

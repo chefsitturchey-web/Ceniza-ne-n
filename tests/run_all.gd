@@ -4,7 +4,7 @@ const SUITES: Array[String] = [
 	"invasion_integration_test", "frontier_progression_test", "settlement_world_test", "colony_boss_polish_test", "seeded_world_test", "progression_balance_test", "music_handoff_test",
 	"environment_depth_test",
 	"static_check", "native_combat_art_test", "boss_pressure_test", "boss_hud_test", "debug_tools_test", "boss_tactics_test", "depot_life_test", "unit_animation_test", "visual_novel_test", "fortress_progression_test", "mobility_test", "commander_test", "story_finale_test", "expansion_test", "campaign_bosses_test", "polish_integration_test", "menu_settings_test", "key_remap_test", "modules_test", "machine_rig_test", "neural_audio_test", "expedition_test", "recaudador_test",
-	"save_system_test", "effects_test", "hud_clean_test", "enemies_gdd_test", "touch_controls_test",
+	"save_system_test", "effects_test", "hud_clean_test", "enemies_gdd_test", "touch_controls_test", "night_call_test",
 	"combat_smoke", "siege_smoke", "errante_animation_smoke",
 	"health_component_test", "resource_test", "director_test", "visual_integration_test",
 	"fresh_colony_simulation", "fresh_colony_simulation --foundry", "fresh_colony_simulation --flooded", "fresh_colony_simulation --citadel", "fresh_colony_simulation --network", "fresh_colony_simulation --seeded", "session_simulation", "session_simulation --assist"

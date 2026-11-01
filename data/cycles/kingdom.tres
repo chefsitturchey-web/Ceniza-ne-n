@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://data/cycle_config.gd" id="1"]
 [resource]
 script = ExtResource("1")
-day_duration = 180.0
+day_duration = 120.0
+first_day_duration = 300.0
 warning_duration = 20.0
 night_duration = 90.0

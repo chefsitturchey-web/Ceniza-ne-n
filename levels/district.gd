@@ -54,8 +54,6 @@ func _ready() -> void:
 			copy.offset = zone.wall_offset if copy.blocks_enemies else zone.turret_offset
 			blueprints.append(copy)
 		construction.blueprints = blueprints
-		cycle.config = cycle.config.duplicate() as CycleConfig
-		cycle.config.day_duration = 360 + zone_index * 30
 		director.waves.assign(zone.waves)
 	var invasion_waves: Array[WaveData] = []
 	for original: WaveData in director.waves:
@@ -290,5 +288,7 @@ func _configure_frontier_map() -> void:
 	$LeftRepeater.position.x = -6820 + zone_index * 20
 	$RightRepeater.position.x = 6900 - zone_index * 25
 	$Station.position.x = 6640 - zone_index * 35
-	cycle.config = cycle.config.duplicate()
-	cycle.config.day_duration = 360 + zone_index * 30
+	cycle.config = cycle.config.duplicate() as CycleConfig
+	# La duración del día vive en los datos: la zona manda y, si no la fija (Periferia), rige kingdom.tres.
+	if zone.day_duration > 0: cycle.config.day_duration = zone.day_duration
+	if zone.first_day_duration > 0: cycle.config.first_day_duration = zone.first_day_duration

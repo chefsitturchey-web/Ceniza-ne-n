@@ -70,7 +70,7 @@ func run_checks() -> void:
 	world = create_world()
 	save = world.session.save_system
 	verify(JSON.stringify(save._snapshot()) == expected, "Reabrir restaura sin duplicar habitantes ni premios")
-	verify(world.cycle.phase_remaining == world.cycle.config.day_duration, "Reanudar al inicio del día conservando duración de pruebas")
+	verify(world.cycle.phase_remaining == world.cycle.config.day_length(world.cycle.day), "Reanudar al inicio del día conservando duración de pruebas")
 	for corrupt: String in ["{roto", "[]", '{"version":99}', '{"version":1}']:
 		write_file(corrupt)
 		verify(not save.load_game(), "Rechazar JSON corrupto, incompleto o versión desconocida")

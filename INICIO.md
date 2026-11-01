@@ -80,4 +80,4 @@ Con núcleo de nivel 2 puedes comprar una plataforma eléctrica por 45 junto al 
 - Laboratorio con presupuesto de práctica: `levels/zones/expansion_playground.tscn`. Esa escena no guarda sobre tu partida.
 - Batería automática: `godot --headless --path . --script res://tests/run_all.gd` (sustituye `godot` por tu ejecutable de consola).
 
-Se conservan los tiempos de 180 s de día, 20 de aviso y 90 de noche. [Historia, objetivos, arte y estado real de duración](docs/design/HISTORIA_Y_CAMPANA.md). [Reglas de comandante y estudio de Kingdom Two Crowns](docs/gameplay/COMANDANTE_Y_PORTALES.md).
+El día de fundación (día 1) dura 300 s en la Periferia y 15 s más por zona (hasta 360 s en la Red); los demás días duran 120 s, con 20 de aviso y 90 de noche. **¿Listo antes?** De día, con el núcleo encendido y sin mejora disponible, mantén E (o el botón táctil Operar) 2 s en el núcleo para **adelantar la noche**; el aviso de 20 s se conserva. [Historia, objetivos, arte y estado real de duración](docs/design/HISTORIA_Y_CAMPANA.md). [Reglas de comandante y estudio de Kingdom Two Crowns](docs/gameplay/COMANDANTE_Y_PORTALES.md).

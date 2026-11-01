@@ -403,7 +403,7 @@ func colony_action(world: District, action: String) -> void:
 		"day", "night":
 			world.cycle.day = int(panel.day_number.value)
 			world.cycle.phase = "DÍA" if action == "day" else "NOCHE"
-			world.cycle.phase_remaining = world.cycle.config.day_duration if action == "day" else world.cycle.config.night_duration
+			world.cycle.phase_remaining = world.cycle.config.day_length(world.cycle.day) if action == "day" else world.cycle.config.night_duration
 			if action == "night": world.director.start(world.cycle.day)
 			world.cycle.phase_changed.emit(world.cycle.phase, world.cycle.day)
 		"tier":
@@ -421,7 +421,7 @@ func colony_action(world: District, action: String) -> void:
 			world.story.relay_progress = 6
 			world.cycle.day = maxi(2, world.cycle.day)
 			world.cycle.phase = "DÍA"
-			world.cycle.phase_remaining = world.cycle.config.day_duration
+			world.cycle.phase_remaining = world.cycle.config.day_length(world.cycle.day)
 			for site: ConstructionSite in world.construction.sites: site.complete_work()
 			world.expansion.sites[2].hp = 180
 			for portal: EnemyRepeater in world.civic.gates + world.expedition.repeaters: portal.restore(true)

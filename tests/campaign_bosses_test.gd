@@ -176,7 +176,7 @@ func run_checks() -> void:
 	world.story.present_dialogue = false
 	current_scene = world
 	freeze(world)
-	verify(world.player.speed == 220 and world.player.attack_damage == 50 and world.cycle.config.day_duration == 360, "Conserva personaje y ofrece preparación de colonia")
+	verify(world.player.speed == 220 and world.player.attack_damage == 50 and world.cycle.config.day_length(1) == 300 and world.cycle.config.day_duration == 120, "Conserva personaje y ofrece preparación de colonia")
 	world.neural.kills = 60
 	verify(world.neural.install("blade") and world.neural.upgrade_module("tesla"), "Prepara mejoras para traslado")
 	world.colony.add_worker(&"collector")
@@ -213,7 +213,7 @@ func run_checks() -> void:
 	freeze(world)
 	verify(world.bank.scrap >= 90 and world.bank.scrap <= 130 and world.colony.workers.size() == 3, "Nueva colonia conserva habitantes y presupuesto")
 	verify(world.neural.ranks.blade == 1 and world.modules.levels.tesla == 1 and world.player.neural_damage == 10, "Mejoras y módulos sobreviven al viaje")
-	verify(world.cycle.config.day_duration == 390 and world.construction.sites[0].data.offset in [300.0, 220.0], "Fundición usa preparación y geometría propias")
+	verify(world.cycle.config.day_length(1) == 315 and world.cycle.config.day_duration == 120 and world.construction.sites[0].data.offset in [300.0, 220.0], "Fundición usa preparación y geometría propias")
 	verify(world.session.save_system.save_path == PATH and not CampaignRoute.pending.has("campaign"), "Consume traslado y conserva ruta del guardado")
 	verify(world.session.save_system.save_game() and world.session.save_system.load_game(), "Guardado completo de segunda zona admite ida y vuelta")
 	var protected_save: String = FileAccess.get_file_as_string(PATH)
@@ -263,7 +263,7 @@ func run_checks() -> void:
 	await process_frame
 	world = current_scene as District
 	freeze(world)
-	verify(world.zone_index == 2 and world.cycle.config.day_duration == 420, "Segunda victoria conduce al Barrio inundado")
+	verify(world.zone_index == 2 and world.cycle.config.day_length(1) == 330 and world.cycle.config.day_duration == 120, "Segunda victoria conduce al Barrio inundado")
 	world.player.set_physics_process(true)
 	world.player.position = Vector2(400, GameRules.FLOOR_Y)
 	await physics_frame

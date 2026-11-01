@@ -141,7 +141,7 @@ func load_game() -> bool:
 		session.expedition.restore(data.get("expedition", {}))
 	session.cycle.day = int(data.day)
 	session.cycle.phase = data.phase
-	session.cycle.phase_remaining = session.cycle.config.day_duration
+	session.cycle.phase_remaining = session.cycle.config.day_length(session.cycle.day)
 	session.bank.scrap = int(data.scrap)
 	session.bank.stored_parts = int(data.get("stored_parts", 0))
 	session.bank.energy_capacity = int(data.energy_capacity)

@@ -23,6 +23,8 @@ var trap_system: TrapSystem
 var workshop: WorkshopSystem
 var corpse_system: CorpseSystem
 const MOBILITY_TARGET: int = -5
+## Mantener E más tiempo que una obra: adelantar la noche no debe dispararse por accidente.
+const NIGHT_CALL_HOLD: float = 2.0
 var committed_target: int = GameRules.NO_TARGET
 var hold_time: float = 0.0
 var hold_target: int = GameRules.NO_TARGET
@@ -125,6 +127,7 @@ func perform_interaction(target: int) -> bool:
 			player.health = Player.MAX_HEALTH
 			notice_requested.emit("Salud restaurada")
 			return true
+		if night_call_available(): return cycle.skip_day()
 		if colony.core != null: return colony.core.request_upgrade()
 		if colony.workers.size() >= GameRules.POPULATION:
 			notice_requested.emit("Colonia completa")
@@ -146,7 +149,16 @@ func perform_interaction(target: int) -> bool:
 			return construction.repair_short(site)
 	return construction.order(target)
 
+## Núcleo encendido, de día y sin nada que hacer en él (mejora bloqueada o al máximo):
+## mantener E en el núcleo adelanta la noche. Curar y mejorar siguen teniendo prioridad.
+func night_call_available() -> bool:
+	var core: ColonyCore = colony.core if colony != null else null
+	if core == null or core.tier == 0 or core.ordered or cycle == null or not cycle.can_skip_day(): return false
+	if player.health < Player.MAX_HEALTH: return false
+	return not core.upgrade_blocker().is_empty()
+
 func required_hold(target: int) -> float:
+	if target == -1 and night_call_available(): return NIGHT_CALL_HOLD
 	if target <= SettlementSystem.CACHE_BASE: return 2.5
 	if target <= -500 and target > -700 and scavenge != null:
 		var index: int = ScavengeSystem.TARGET_BASE - target

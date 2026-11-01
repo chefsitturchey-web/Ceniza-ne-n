@@ -14,7 +14,18 @@ var phase_remaining: float = 0.0
 var debug_frozen: bool = false
 
 func initialize() -> void:
-	phase_remaining = config.day_duration
+	phase_remaining = config.day_length(day)
+
+## El jugador puede adelantar la noche solo de día; el AVISO se conserva entero.
+func can_skip_day() -> bool:
+	return phase == "DÍA" and not debug_frozen
+
+## Salta el resto del día y entra en AVISO con sus señales habituales.
+func skip_day() -> bool:
+	if not can_skip_day(): return false
+	phase_remaining = 0.0
+	update_phase(0.0)
+	return phase == "AVISO"
 
 func update_phase(delta: float) -> void:
 	if debug_frozen: return
@@ -38,7 +49,7 @@ func update_phase(delta: float) -> void:
 		else:
 			day = day + 1 if boss_required else mini(day + 1, config.nights)
 			phase = "DÍA"
-			phase_remaining = config.day_duration
+			phase_remaining = config.day_length(day)
 			dawn.emit(config)
 			notice_requested.emit("+25 chatarra")
 	if phase != previous_phase:

@@ -44,7 +44,10 @@ func run_checks() -> void:
 	verify(world.bank.energy_used() == 2, "reservar energía en obra")
 	verify(world.civic.interact(-300) and world.civic.interact(-300) and world.civic.interact(-320) and world.civic.interact(-321), "reclutar personas y pagar herramientas")
 	for step: int in range(160): world.civic.tick(0.1)
-	verify(world.colony.workers.size() == 4 and not world.interaction.perform_interaction(-1), "Las profesiones llegan por herramientas y no por invocación en el núcleo")
+	# Con la mejora bloqueada (sin generador), E en el núcleo adelanta la noche en vez de invocar habitantes.
+	world.interaction.perform_interaction(-1)
+	verify(world.colony.workers.size() == 4 and world.cycle.phase == "AVISO", "Las profesiones llegan por herramientas y no por invocación en el núcleo")
+	world.cycle.phase = "DÍA"
 	world.player.position.x = -100
 	world.overload.activate_overload()
 	verify(world.overload.overload_left == 6.0 and world.overload.overload_right == 0.0, "sobrecarga por frente")

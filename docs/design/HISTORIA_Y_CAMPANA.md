@@ -32,7 +32,7 @@ El Coro también recibe un sprite original detallado, con antenas, corrosión, c
 
 **Cuatro horas todavía no están demostradas ni garantizadas.** El GDD original propone incluso 10–14 horas para una primera campaña; esa cifra también era una meta. Este bloque añade dos zonas, dos jefes, quince operaciones, historia y un final, pero no convierte por sí solo el prototipo en una campaña de cuatro horas de contenido variado.
 
-Se conservan los tiempos del proyecto: 180 segundos de día, 20 de aviso y 90 de noche. Las simulaciones de asedio de tres noches duran 870,5 segundos en cada zona; omiten exploración narrativa y no miden una primera partida humana. Alargar esos temporizadores para afirmar una duración sería una validación insuficiente.
+Tiempos actuales: día de fundación de 300–360 segundos según zona, días siguientes de 120, 20 de aviso y 90 de noche; la noche puede adelantarse desde el núcleo. Las simulaciones de asedio de tres noches duran 870,5 segundos en cada zona; omiten exploración narrativa y no miden una primera partida humana. Alargar esos temporizadores para afirmar una duración sería una validación insuficiente.
 
 Para alcanzar la duración solicitada falta medir partidas completas y ampliar los momentos que resulten cortos: operaciones exclusivas por distrito, nuevas composiciones de asedio, elecciones con consecuencias y expediciones opcionales con recompensas únicas. No se publica una estimación de cuatro horas como si ya estuviera verificada. Las entradas siguen siendo puntos prefijados, no mapas por semilla; el remapeo completo, los perfiles iniciales y todo el catálogo de armas del GDD continúan pendientes.
 

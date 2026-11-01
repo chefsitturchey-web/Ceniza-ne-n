@@ -7,6 +7,8 @@ extends Resource
 @export var boss_title: String = "EL RECAUDADOR"
 @export var briefing: String = "Provoca su embestida contra una cobertura y golpea el núcleo expuesto."
 @export var day_duration: float = 0
+## Día de fundación propio de la zona; 0 = el de kingdom.tres.
+@export var first_day_duration: float = 0
 @export var wall_offset: float = 240
 @export var turret_offset: float = 180
 @export var background_path: String = ""

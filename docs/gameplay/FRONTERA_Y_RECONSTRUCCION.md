@@ -41,7 +41,7 @@ Los checkpoints anteriores se migran: se conservan los edificios, las primeras p
 
 ## Dificultad e historia
 
-Los días permiten 360–480 segundos de preparación según distrito. El trabajo es más lento, el territorio obliga a planificar viajes y las oleadas tienen menor intervalo entre apariciones. En las zonas posteriores, la vida de los invasores crece un 18 % por distrito y su daño un 8 %, con valores fijos por capítulo; estas reglas se aplican a instancias de colonia y no a jefes.
+El día de fundación permite 300–360 segundos de preparación según distrito (`first_day_duration`); los días siguientes duran 120 segundos (`day_duration`) y el jugador puede adelantar la noche manteniendo E en el núcleo. El trabajo es más lento, el territorio obliga a planificar viajes y las oleadas tienen menor intervalo entre apariciones. En las zonas posteriores, la vida de los invasores crece un 18 % por distrito y su daño un 8 %, con valores fijos por capítulo; estas reglas se aplican a instancias de colonia y no a jefes.
 
 Hay un comienzo de novela visual incluso al abrir directamente la escena del distrito. Los cinco capítulos reciben diálogos propios al encender un núcleo y recuperar el primer solar. Son **40 conversaciones** contando las 30 existentes, con retratos, transiciones y repetición en L. El objetivo del HUD guía desde las piezas iniciales hasta rescate, relé, escolta, portales, tren y jefe. El último combate conserva el desenlace de la campaña; no se promete una duración de cuatro horas sin medirla con jugadores.
 
