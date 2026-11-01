@@ -57,8 +57,26 @@ static func frames(id: String) -> SpriteFrames:
 			texture.region = Rect2(Vector2(index % 8, index / 8) * size, Vector2.ONE * size)
 			texture.filter_clip = true
 			result.add_frame(key, texture, float(clip.timing[position]) if clip.has("timing") else 1.0)
+	if id == "portador": add_run_clips(result, size)
 	cache[id] = result
 	return result
+
+## Carrera cuadro por cuadro (PixelLab): fila 0 este, fila 1 oeste. Ver tools/art/integrar_portador_pixellab.py.
+static func add_run_clips(result: SpriteFrames, size: int) -> void:
+	var path: String = "res://assets/characters/combat/portador_correr.png"
+	if not ResourceLoader.exists(path): return
+	var sheet: Texture2D = load(path)
+	for row: int in 2:
+		var key: StringName = &"run_east" if row == 0 else &"run_west"
+		result.add_animation(key)
+		result.set_animation_loop(key, true)
+		result.set_animation_speed(key, 14)
+		for column: int in sheet.get_width() / size:
+			var texture: AtlasTexture = AtlasTexture.new()
+			texture.atlas = sheet
+			texture.region = Rect2(Vector2(column, row) * size, Vector2.ONE * size)
+			texture.filter_clip = true
+			if texture.get_image().get_used_rect().has_area(): result.add_frame(key, texture)
 
 static func direction(facing: Vector2) -> String:
 	if absf(facing.x) > absf(facing.y): return "east" if facing.x > 0 else "west"

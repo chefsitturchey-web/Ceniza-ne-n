@@ -140,7 +140,9 @@ func check_walks() -> void:
 				unique[hash(image.get_data())] = true
 				var translated: Rect2i = crop
 				translated.position.y += roundi(cos(frame * PI / 2) * height * 0.012)
-				verify(hash(image.get_region(translated).get_data()) == head, "Cabeza estable, sin redibujarse entre pasos: %s/%s/%d" % [id, direction, frame])
+				# La marcha lateral del Portador es cuadro por cuadro (PixelLab): la cabeza se redibuja a propósito.
+				if not (id == "portador" and direction in ["east", "west"]):
+					verify(hash(image.get_region(translated).get_data()) == head, "Cabeza estable, sin redibujarse entre pasos: %s/%s/%d" % [id, direction, frame])
 				var sprite: Sprite2D = Sprite2D.new()
 				sprite.texture = texture
 				sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST

@@ -85,6 +85,8 @@ func pose_player() -> void:
 		var ratio: float = clampf(1 - remaining / Player.ATTACK_ANIM_DURATION, 0, 1)
 		if ratio < 0.25: set_pose("windup", aim, ratio / 0.25)
 		else: set_pose("attack", aim, (ratio - 0.25) / 0.75)
+	elif moving and side and actor.sprinting and sprite.sprite_frames.has_animation(StringName("run_" + CombatSpriteLibrary.direction(facing))):
+		set_pose("run", facing, fposmod(travel / 96.0, 1))
 	elif moving and not (side and actor.riding): set_pose("walk", facing, fposmod(travel / (64.0 if side else 56.0), 1))
 	else: set_pose("exposed" if actor.stamina < 30 else "idle", facing)
 
