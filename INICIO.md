@@ -26,6 +26,8 @@ Para revisar las animaciones de aliados y profesiones, abre `levels/story/unit_a
 | Pausar | Esc | Start |
 | Atacar, solo en arenas de jefe | J | X |
 
+Puedes cambiar la tecla y el botón de cada acción en **Opciones → Controles**: pulsa «Cambiar» y después la tecla o el botón nuevo (Esc cancela). Si ya lo usaba otra acción, ambas se intercambian. «Restablecer predeterminados» devuelve esta tabla; los cambios se guardan en `user://opciones.cfg`.
+
 En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora, recoge datos, esquiva y activa sobrecargas. Los datos que sueltan los enemigos te suben de nivel y eliges una mejora, como en Vampire Survivors. **Cada carta actúa en la colonia y contra los jefes.** En la colonia: dron, daño de torretas; Tesla, murallas electrificadas; orbital, blindaje de tropas; óptica, alcance de torretas; batería, energía; rodamiento, velocidad de obra. Contra los jefes son tus armas automáticas.
 
 En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y trayectoria; observa los avisos y sus ventanas de recuperación. **E** cerca de las consolas cian activa carga, refrigeración, interferencia o parapeto, según el recinto. En Madre Cero, E repara relés y Q los protege. Los refuerzos pueden recibir daño de tu hoja y módulos. [Los cinco jefes, mecanismos y escenas para probar con F6](docs/gameplay/JEFES_TACTICAS_Y_ARENAS.md).

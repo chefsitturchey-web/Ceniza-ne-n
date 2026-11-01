@@ -6,6 +6,8 @@ const DEFAULTS: Dictionary = {"master": 1.0, "music": 1.0, "sfx": 1.0, "muted": 
 	"fullscreen": false, "window_size": 0, "reduced_flashes": false, "particles": true}
 const SIZES: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1600, 900), Vector2i(1920, 1080)]
 var values: Dictionary = DEFAULTS.duplicate()
+## Teclas y botones personalizados por acción; ver KeyRemap. Vacío significa predeterminados.
+var bindings: Dictionary = {}
 var config_path: String = "user://opciones.cfg"
 var base_volumes: Dictionary = {}
 var last_error: Error = OK
@@ -41,8 +43,14 @@ func _ready() -> void:
 func load_settings() -> void:
 	var config: ConfigFile = ConfigFile.new()
 	values = DEFAULTS.duplicate()
+	bindings = {}
 	if config.load(config_path) != OK:
 		return
+	if config.has_section("controls"):
+		for action: String in config.get_section_keys("controls"):
+			var entry: Variant = config.get_value("controls", action)
+			if KeyRemap.valid_binding(action, entry):
+				bindings[action] = entry
 	for key: String in DEFAULTS:
 		var value: Variant = config.get_value("preferences", key, DEFAULTS[key])
 		if valid_value(key, value):
@@ -69,6 +77,8 @@ func save_settings() -> bool:
 	var config: ConfigFile = ConfigFile.new()
 	for key: String in values:
 		config.set_value("preferences", key, values[key])
+	for action: String in bindings:
+		config.set_value("controls", action, bindings[action])
 	last_error = config.save(config_path)
 	return last_error == OK
 
