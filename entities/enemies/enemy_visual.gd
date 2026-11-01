@@ -16,6 +16,7 @@ func bind(value: AnimatedSprite2D) -> void:
 		# Anchor the idle contact point, preserving the authored walking bounce.
 		if actor.data.id == &"errante": sprite.position.y = -18
 		elif actor.data.id == &"corredor": sprite.position.y = -21
+		elif actor.data.id == &"ariete": sprite.position.y = -26 # Sprite propio (PixelLab): botas en y = 58.
 		elif actor.data.id == &"blindado": sprite.position.y = -28 # Sprite propio (PixelLab): botas en y = 60 del lienzo.
 	if actor.data.id in [&"artillero", &"saboteador"]:
 		field_rig = FieldUnitVisual.new()
@@ -24,7 +25,7 @@ func bind(value: AnimatedSprite2D) -> void:
 		actor.add_child(field_rig)
 		hide()
 		if sprite != null: sprite.hide()
-	if actor.detailed_silhouette and actor.data.id in [&"saltador", &"ariete"]:
+	if actor.detailed_silhouette and actor.data.id in [&"saltador"]:
 		rig = MachineRig.new()
 		rig.actor = actor
 		rig.kind = String(actor.data.id)
