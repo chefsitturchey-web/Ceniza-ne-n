@@ -22,6 +22,8 @@ static func configure_input() -> void:
 	add_action("overload", KEY_Q, JOY_BUTTON_LEFT_SHOULDER)
 	add_action("pause", KEY_ESCAPE, JOY_BUTTON_START)
 	add_action("restart", KEY_R, JOY_BUTTON_BACK)
+	# Las teclas elegidas en Opciones > Controles sustituyen a las predeterminadas.
+	KeyRemap.apply_saved()
 
 static func add_action(action: StringName, keycode: Key, button: JoyButton) -> void:
 	if InputMap.has_action(action):
@@ -33,3 +35,4 @@ static func add_action(action: StringName, keycode: Key, button: JoyButton) -> v
 	var pad: InputEventJoypadButton = InputEventJoypadButton.new()
 	pad.button_index = button
 	InputMap.action_add_event(action, pad)
+	KeyRemap.apply_action(action)
