@@ -56,8 +56,7 @@ func target_at_x(x: float, planning: bool = false) -> int:
 		return STATION_TARGET
 	if absf(x) < GameRules.CORE_INTERACT_RANGE:
 		return -1
-	var workshop_target: int = workshop.target_at(x) if workshop != null else GameRules.NO_TARGET
-	if workshop_target != GameRules.NO_TARGET: return workshop_target
+	# Pala y trampa se compran solo en el catálogo del Arsenal, no con un aviso suelto en la calle.
 	var corpse_target: int = corpse_system.target_at(x) if corpse_system != null else GameRules.NO_TARGET
 	if corpse_target != GameRules.NO_TARGET: return corpse_target
 	var best: int = GameRules.NO_TARGET
