@@ -62,11 +62,34 @@ Ojo con el tamaño: el `.pck` pesa 98 MB (sobre todo `assets/characters`, `asset
 ### Opciones de hosting (no se ha publicado nada)
 
 **itch.io** (lo más simple para un juego):
-1. Comprimir el **contenido** de `build/web/` en un zip (el `index.html` tiene que quedar en la raíz del zip, no dentro de una carpeta).
-2. En itch.io: crear proyecto → *Kind of project: HTML* → subir el zip → marcar *This file will be played in the browser*.
-3. Tamaño de ventana: 1280×720, activar *Fullscreen button*. **No** hace falta activar *SharedArrayBuffer support* (porque la versión es sin hilos).
-4. Límites de itch: un archivo como máximo de 200 MB dentro del zip y como máximo 1000 archivos. Ahora entramos (el más grande es el `.pck`, de 98 MB).
-5. Se puede dejar como *Draft* o *Restricted* (con contraseña) para probar en privado.
+
+Preparar el zip (el `index.html` tiene que quedar en la **raíz** del zip, no dentro de una carpeta):
+```powershell
+Compress-Archive -Path build\web\* -DestinationPath build\CenizaNeon-web-0.1.0-alpha.zip -Force
+```
+Resultado (1/11/2026): `build/CenizaNeon-web-0.1.0-alpha.zip` de **107 MB** (106 657 730 bytes), 9 archivos. El más grande es `index.pck` (97,8 MB); después `index.wasm` (39,5 MB). Límites de itch: máximo 200 MB por archivo dentro del zip y máximo 1000 archivos, así que entra.
+
+Subida por la web (no se ha subido nada todavía):
+1. itch.io → *Upload new project*.
+2. *Kind of project*: **HTML**.
+3. *Uploads* → subir `CenizaNeon-web-0.1.0-alpha.zip` → marcar **This file will be played in the browser**.
+4. *Embed options*:
+   - *Viewport dimensions*: **1280 × 720** (el proyecto es 640×360 con `canvas_items` y ventana de 1280×720, así que escala exacto ×2).
+   - Activar **Mobile friendly** solo cuando haya controles táctiles (ahora no hay).
+   - Activar **Fullscreen button**.
+   - **No** activar *SharedArrayBuffer support*: la versión web es sin hilos (`variant/thread_support=false`) y no lo necesita.
+5. *Visibility*: dejarlo en **Draft** o **Restricted** (con contraseña) para probar en privado antes de publicarlo.
+
+Alternativa con **butler** (la herramienta de línea de comandos de itch; sube solo lo que cambió, útil para actualizaciones):
+```powershell
+# Instalar butler en D: (no en C:): descargar https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
+# y descomprimir en D:\DevTools\butler
+D:\DevTools\butler\butler.exe login
+D:\DevTools\butler\butler.exe push build\web USUARIO/ceniza-neon:html5 --userversion 0.1.0-alpha
+```
+- Se puede empujar la carpeta `build/web` directamente (no hace falta el zip).
+- El canal se llama `html5` (cualquier nombre con "html" sirve). Después de la primera subida hay que entrar en la página del proyecto y marcar ese archivo como *This file will be played in the browser* (solo la primera vez).
+- `butler login` guarda la clave en `%USERPROFILE%\.config\itch`. Para dejarla en D: se puede usar `--identity D:\DevTools\butler\butler_creds` en `login` y en `push`.
 
 **Cloudflare** (ya lo usas para Casa H&L):
 - Límite importante: **25 MiB por archivo** en Pages y en los assets estáticos de Workers. `index.wasm` (39,5 MB) y `index.pck` (98 MB) **lo superan**, así que no se pueden subir directamente.
@@ -86,56 +109,70 @@ Ojo con el tamaño: el `.pck` pesa 98 MB (sobre todo `assets/characters`, `asset
 
 ## Android
 
-### Qué falta (bloqueante)
+### Herramientas instaladas (todo en D:, 1/11/2026)
 
-Al exportar sale este error:
+| Herramienta | Ruta | Tamaño |
+|---|---|---|
+| JDK 17 (Eclipse Temurin 17.0.20.1+1, zip x64) | `D:\DevTools\jdk-17` | 303 MB |
+| Android SDK mínimo | `D:\DevTools\android-sdk` | 410 MB |
+| ↳ cmdline-tools 19.0 | `D:\DevTools\android-sdk\cmdline-tools\latest` | |
+| ↳ platform-tools 37.0.1 (`adb`) | `D:\DevTools\android-sdk\platform-tools` | |
+| ↳ build-tools 35.0.1 (`apksigner`, `zipalign`) | `D:\DevTools\android-sdk\build-tools\35.0.1` | |
+| ↳ platforms android-35 | `D:\DevTools\android-sdk\platforms\android-35` | |
+| Keystore de depuración | `D:\DevTools\android-keystore\debug.keystore` (alias `androiddebugkey`, contraseña `android`) | 3 KB |
+| Caché de las herramientas Android | `D:\DevTools\android-user-home` (`ANDROID_USER_HOME`) | 3 MB |
+| Caché de Gradle (vacía, sin uso aún) | `D:\DevTools\gradle-user-home` (`GRADLE_USER_HOME`) | 0 |
+
+El NDK y CMake **no** están instalados: no hacen falta porque el preset no usa la compilación Gradle (`gradle_build/use_gradle_build=false`). Solo harían falta para un AAB (ver *Release*).
+
+El SDK viejo de **C:** (`%LOCALAPPDATA%\Android\Sdk`, 4,3 GB) sigue ahí sin tocar; Godot ya no lo usa.
+
+Cómo se instaló (por si hay que repetirlo o añadir paquetes):
+```cmd
+REM JDK: https://api.adoptium.net/v3/binary/latest/17/ga/windows/x64/jdk/hotspot/normal/eclipse  -> descomprimir en D:\DevTools\jdk-17
+REM cmdline-tools: https://dl.google.com/android/repository/commandlinetools-win-13114758_latest.zip -> D:\DevTools\android-sdk\cmdline-tools\latest
+set JAVA_HOME=D:\DevTools\jdk-17
+set ANDROID_USER_HOME=D:\DevTools\android-user-home
+set GRADLE_USER_HOME=D:\DevTools\gradle-user-home
+set SM=D:\DevTools\android-sdk\cmdline-tools\latest\bin\sdkmanager.bat
+%SM% --sdk_root=D:\DevTools\android-sdk --licenses
+%SM% --sdk_root=D:\DevTools\android-sdk "platform-tools" "build-tools;35.0.1" "platforms;android-35"
 ```
-Se requiere una ruta válida para el SDK de Java en la Configuración del Editor.
+Conviene definir `ANDROID_USER_HOME` y `GRADLE_USER_HOME` siempre que se use `sdkmanager`, `adb` o Gradle, para que no escriban en `C:\Users\...`.
+
+### Configuración del editor de Godot
+
+En `%APPDATA%\Godot\editor_settings-4.7.tres` (Editor → Configuración del editor → Exportar → Android):
+- `export/android/java_sdk_path` = `D:/DevTools/jdk-17`
+- `export/android/android_sdk_path` = `D:/DevTools/android-sdk`
+- `export/android/debug_keystore` = `D:/DevTools/android-keystore/debug.keystore` (usuario `androiddebugkey`, que es el valor por defecto, y contraseña `android`)
+
+La keystore de depuración se creó a mano con:
+```cmd
+D:\DevTools\jdk-17\bin\keytool -genkeypair -v -keystore D:\DevTools\android-keystore\debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
 ```
 
-Estado de las dependencias (revisado el 1/11/2026):
+### APK de prueba (debug)
 
-| Dependencia | Estado |
-|---|---|
-| JDK 17 | **No hay.** En D: solo está `D:\DevTools\jdk-25.0.4.1+1`. Godot pide oficialmente JDK 17 para las herramientas de Android. |
-| Android SDK en D: | **No hay.** Hay uno de 4,3 GB en **C:** (`%LOCALAPPDATA%\Android\Sdk`, con build-tools 34–36, platform-tools, cmdline-tools y NDK 28). La configuración del editor de Godot ya apunta ahí. |
-| Plantillas Android | Ya están (dentro de las plantillas 4.7.2, en D:). |
-| Keystore de depuración | Godot la crea sola al exportar en debug. |
-| Keystore de release | No hay. Hace falta para `--export-release` y para publicar. |
+```bash
+"$G" --headless --path . --export-debug "Android" build/android/CenizaNeon.apk
+```
+Resultado (1/11/2026): `build/android/CenizaNeon.apk` de **126 MB** (126 445 819 bytes), solo arm64-v8a, firmado con la keystore de depuración (`apksigner verify` sin errores). No hizo falta tocar el preset.
 
-### Pasos para dejarlo funcionando (todo en D:)
+Instalar en el móvil (con la depuración USB activada):
+```cmd
+D:\DevTools\android-sdk\platform-tools\adb install -r build\android\CenizaNeon.apk
+```
+### Release
 
-1. **JDK 17** (Eclipse Temurin, zip para Windows x64): ~190 MB de descarga y ~320 MB descomprimido.
-   - Descargar desde `https://adoptium.net/temurin/releases/?version=17` (o con la API: `https://api.adoptium.net/v3/binary/latest/17/ga/windows/x64/jdk/hotspot/normal/eclipse`).
-   - Descomprimir en `D:\DevTools\jdk-17` (sin instalador, sin tocar C:).
-2. **Android SDK**. Elegir una opción:
-   - **A (sin descargar nada):** usar el SDK que ya está en C:. Funciona, pero rompe la regla de "todo en D:".
-   - **B (recomendada):** moverlo a D:. Cerrar Android Studio, Flutter y Gradle; mover `%LOCALAPPDATA%\Android\Sdk` a `D:\DevTools\Android\Sdk` (4,3 GB) y, si otras herramientas lo usan, dejar una unión: `mklink /J "%LOCALAPPDATA%\Android\Sdk" "D:\DevTools\Android\Sdk"`.
-   - **C (mínimo y limpio en D:):** instalar solo lo que necesita Godot, unos **0,6–1 GB**:
-     ```cmd
-     REM cmdline-tools (~150 MB) descomprimidos en D:\DevTools\Android\Sdk\cmdline-tools\latest
-     set JAVA_HOME=D:\DevTools\jdk-17
-     D:\DevTools\Android\Sdk\cmdline-tools\latest\bin\sdkmanager.bat --sdk_root=D:\DevTools\Android\Sdk "platform-tools" "build-tools;35.0.1" "platforms;android-35"
-     ```
-     El NDK y CMake **no** hacen falta, porque el preset no usa la compilación Gradle (`gradle_build/use_gradle_build=false`).
-3. **Configurar Godot**: Editor → Configuración del editor → Exportar → Android:
-   - `java_sdk_path` = `D:/DevTools/jdk-17`
-   - `android_sdk_path` = `D:/DevTools/Android/Sdk` (o la ruta de C: si se eligió la opción A)
-   - `debug_keystore`: por defecto queda en `%APPDATA%\Godot\keystores\debug.keystore` (C:, pesa 2 KB). Se puede mover a D: y cambiar la ruta aquí.
-4. **Exportar APK de prueba** (firmado con la keystore de depuración):
-   ```bash
-   "$G" --headless --path . --export-debug "Android" build/android/CenizaNeon.apk
-   ```
-   Instalar en el móvil: `adb install -r build/android/CenizaNeon.apk` (con la depuración USB activada).
-5. **Release** (para repartirlo o subirlo a una tienda): crear una keystore propia, guardarla **fuera del repo** y **nunca** subirla a git:
-   ```cmd
-   D:\DevTools\jdk-17\bin\keytool -genkeypair -v -keystore D:\DevTools\keys\ceniza-release.keystore -alias ceniza -keyalg RSA -keysize 2048 -validity 10000
-   ```
-   No guardes la contraseña en `export_presets.cfg` (que está en git). Pásala por variables de entorno al exportar:
-   `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD`, y luego `--export-release "Android" ...`.
-   Para Google Play hace falta un AAB (`gradle_build/use_gradle_build=true` + `export_format=1`). Eso exige instalar la plantilla Gradle, el NDK y CMake (+2–3 GB). Para alfa por APK no hace falta.
+Para repartirlo o subirlo a una tienda hace falta una keystore propia (todavía no existe). Guardarla **fuera del repo** y **nunca** subirla a git:
+```cmd
+D:\DevTools\jdk-17\bin\keytool -genkeypair -v -keystore D:\DevTools\keys\ceniza-release.keystore -alias ceniza -keyalg RSA -keysize 2048 -validity 10000
+```
+No guardes la contraseña en `export_presets.cfg` (que está en git). Pásala por variables de entorno al exportar:
+`GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD`, y luego `--export-release "Android" ...`.
 
-Total aproximado para la opción C: **~1–1,3 GB en D:** (JDK 17 + SDK mínimo).
+Para Google Play hace falta un AAB (`gradle_build/use_gradle_build=true` + `export_format=1`). Eso exige instalar la plantilla Gradle, el NDK `ndk;28.1.13356709` y `cmake;3.10.2.4988404` (+2–3 GB, también en `D:\DevTools\android-sdk`). Para alfa por APK no hace falta.
 
 ### Controles táctiles: PENDIENTE
 
