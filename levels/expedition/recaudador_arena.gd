@@ -62,6 +62,14 @@ func _ready() -> void:
 	var scripts: Array[String] = ["recaudador", "santa_caldera", "coro_sumergido", "el_prefecto", "madre_cero"]
 	boss = load("res://entities/enemies/" + scripts[zone_index] + ".gd").new() as Recaudador
 	configure_controls()
+	add_to_group(&"boss_arena")
+	# Pantallas anchas: la arena de 640 px queda centrada sobre un fondo opaco a todo el ancho.
+	var side_fill: ColorRect = ColorRect.new()
+	side_fill.name = "SideFill"
+	side_fill.color = Color("050c17")
+	side_fill.size = Vector2(640, 360)
+	side_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(side_fill)
 	var screen: SubViewportContainer = SubViewportContainer.new()
 	screen.size = Vector2(640, 360)
 	screen.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -159,6 +167,7 @@ func _ready() -> void:
 	novel.panel_opened.connect(func() -> void: sound.set_ducked(true))
 	novel.panel_closed.connect(func() -> void: sound.set_ducked(false))
 	add_child(novel)
+	ScreenFit.fit_layer(self, [side_fill, result_shade, damage_edges])
 	if present_story: novel.play(VisualStory.scene(zone_index, "encounter"))
 
 func configure_controls() -> void:

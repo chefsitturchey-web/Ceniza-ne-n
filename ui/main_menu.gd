@@ -20,8 +20,10 @@ func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	InputSetup.configure_input()
 	get_tree().paused = false
+	# En móviles con notch el panel se aparta del recorte izquierdo.
+	var inset: float = roundf(float(ScreenFit.safe_margins(self).left))
 	var frame: Panel = Panel.new()
-	frame.position = Vector2(24, 14)
+	frame.position = Vector2(24 + inset, 14)
 	frame.size = Vector2(320, 328)
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	frame.add_theme_stylebox_override("panel", MenuSkin.panel())
@@ -30,7 +32,7 @@ func _ready() -> void:
 	if ResourceLoader.exists("res://assets/ui/menu/ruinas_menu.png"):
 		illustration = load("res://assets/ui/menu/ruinas_menu.png") as Texture2D
 	var content: VBoxContainer = VBoxContainer.new()
-	content.position = Vector2(38, 23)
+	content.position = Vector2(38 + inset, 23)
 	content.size = Vector2(300, 310)
 	content.add_theme_constant_override("separation", 7)
 	add_child(content)
@@ -139,15 +141,18 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	draw_rect(Rect2(0, 0, 640, 360), Color("0b1322"))
+	# Ancho visible: 640 en 16:9; en móviles anchos la ilustración cubre todo sin deformarse.
+	var width: float = maxf(640.0, get_viewport_rect().size.x)
+	draw_rect(Rect2(0, 0, width, 360), Color("0b1322"))
 	if illustration != null:
-		draw_texture_rect(illustration, Rect2(0, 0, 640, 360), false)
+		var cover: Vector2 = Vector2(640, 360) * (width / 640.0)
+		draw_texture_rect(illustration, Rect2(0, (360 - cover.y) / 2.0, cover.x, cover.y), false)
 	# Velo graduado: la ilustración no compite con el texto interactivo.
 	draw_polygon(PackedVector2Array([Vector2.ZERO, Vector2(390, 0), Vector2(390, 360), Vector2(0, 360)]),
 		PackedColorArray([Color("0b1322", 0.98), Color("0b1322", 0.15), Color("0b1322", 0.15), Color("0b1322", 0.98)]))
 	if GamePreferences.current().particles:
 		for index: int in range(30):
-			var x: float = fposmod(index * 79.0 + elapsed * 6, 640)
+			var x: float = fposmod(index * 79.0 + elapsed * 6, width)
 			var y: float = fposmod(index * 37.0 + elapsed * 10, 360)
 			draw_rect(Rect2(roundf(x), roundf(y), 1, 1), Color("ffce75", 0.22))
-	draw_line(Vector2(38, 345), Vector2(602, 345), Color("304356"), 1)
+	draw_line(Vector2(38, 345), Vector2(width - 38, 345), Color("304356"), 1)

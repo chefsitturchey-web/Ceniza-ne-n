@@ -55,6 +55,7 @@ func _ready() -> void:
 	UiSound.attach(begin_button)
 	rows.add_child(begin_button)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
 
 func open_panel() -> void:
 	opened = true

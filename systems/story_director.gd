@@ -52,9 +52,14 @@ func _ready() -> void:
 	button.add_theme_font_size_override("font_size", 10)
 	button.pressed.connect(journal.open_panel)
 	hud.add_child(button)
+	# Esquina derecha también en pantallas anchas, respetando el notch.
+	var place: Callable = func() -> void:
+		button.position.x = ScreenFit.visible_size(self).x - 108 - float(ScreenFit.safe_margins(self).right)
+	get_viewport().size_changed.connect(place)
+	place.call()
 
 func _process(_delta: float) -> void:
-	hud.visible = not get_tree().paused and not district.expedition.active and not district.session.finished
+	hud.visible = not get_tree().paused and not district.expedition.active and not district.session.finished and not TouchOverlay.showing()
 	if present_dialogue and not dialogue_queue.is_empty() and not novel.opened and not get_tree().paused and not district.expedition.active and not district.session.finished:
 		if Engine.get_process_frames() > GamePreferences.current().input_block_frame:
 			novel.play(dialogue_queue.pop_front())

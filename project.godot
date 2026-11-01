@@ -21,6 +21,11 @@ config/windows_native_icon="res://assets/ui/app_icon.ico"
 
 Preferences="*res://systems/game_preferences.gd"
 DebugTools="*res://systems/game_debug.gd"
+TouchControls="*res://ui/touch_controls.gd"
+
+[audio]
+
+driver/output_latency.android=10
 
 [debug]
 
@@ -34,7 +39,12 @@ window/size/viewport_height=360
 window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="canvas_items"
+window/stretch/aspect="keep_height"
 window/handheld/orientation=0
+
+[input_devices]
+
+pointing/emulate_mouse_from_touch=true
 
 [gui]
 

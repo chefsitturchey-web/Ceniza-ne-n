@@ -106,6 +106,7 @@ func _ready() -> void:
 		voices.append(player)
 	rng.randomize()
 	hide()
+	ScreenFit.fit_layer(self, [opaque_back, background, veil, curtain])
 
 func portrait(at: Vector2) -> TextureRect:
 	var result: TextureRect = TextureRect.new()

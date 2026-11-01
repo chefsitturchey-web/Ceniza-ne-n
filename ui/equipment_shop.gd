@@ -101,6 +101,7 @@ func _ready() -> void:
 	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(glow)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
 
 func open_panel() -> bool:
 	if opened or get_tree().paused or district.core.tier == 0: return false

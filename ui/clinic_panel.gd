@@ -96,6 +96,7 @@ func _ready() -> void:
 	UiSound.attach(close)
 	rows.add_child(close)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
 
 func open_panel() -> bool:
 	if opened or district.cycle.phase != "DÍA" or district.session.finished or district.player.health <= 0 or get_tree().paused:

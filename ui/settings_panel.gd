@@ -65,7 +65,7 @@ func _ready() -> void:
 			number.text = "%d%%" % int(value)
 			_set_option(pair[0], value / 100.0))
 	first = sliders.master.slider
-	for pair: Array in [["muted", "Silenciar todo  [M]"], ["fullscreen", "Pantalla completa"], ["reduced_flashes", "Reducir destellos y sacudidas"], ["particles", "Partículas ambientales y de combate"]]:
+	for pair: Array in [["muted", "Silenciar todo  [M]"], ["fullscreen", "Pantalla completa"], ["reduced_flashes", "Reducir destellos y sacudidas"], ["particles", "Partículas ambientales y de combate"], ["touch_controls", "Controles táctiles en pantalla"]]:
 		var toggle: CheckButton = CheckButton.new()
 		toggle.text = pair[1]
 		toggle.custom_minimum_size.y = 20
@@ -78,6 +78,12 @@ func _ready() -> void:
 		window_size.add_item(caption)
 	window_size.item_selected.connect(func(index: int) -> void: _set_option("window_size", index))
 	rows.add_child(window_size)
+	# En móvil la ventana la gestiona el sistema; en escritorio sin pantalla táctil sobra el panel táctil.
+	if OS.has_feature("mobile"):
+		toggles.fullscreen.hide()
+		window_size.hide()
+	elif not TouchOverlay.touch_device():
+		toggles.touch_controls.hide()
 	status = Label.new()
 	status.text = "Los ajustes se guardan automáticamente."
 	rows.add_child(status)
@@ -97,6 +103,7 @@ func _ready() -> void:
 	_build_controls(margin)
 	GamePreferences.current().changed.connect(refresh)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
 
 func refresh() -> void:
 	for key: String in sliders:

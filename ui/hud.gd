@@ -24,6 +24,9 @@ var poison_label: Label
 var result_actions: HBoxContainer
 var result_was_visible: bool = false
 var pause_was_visible: bool = false
+var resources_row: HBoxContainer
+## Ancho lógico visible: 640 en 16:9 y más en móviles anchos (stretch keep_height).
+var screen_width: float = 640.0
 signal restart_requested
 signal menu_requested
 @onready var pause_panel: PausePanel = $PausePanel
@@ -39,6 +42,7 @@ func _ready() -> void:
 	poison_label.text = "ENVENENADO"
 	poison_label.hide()
 	var resources: HBoxContainer = HBoxContainer.new()
+	resources_row = resources
 	resources.position = Vector2(10, 337)
 	resources.add_theme_constant_override("separation", 6)
 	$Gameplay.add_child(resources)
@@ -104,6 +108,28 @@ func _ready() -> void:
 		button.pressed.connect(pair[1])
 		result_actions.add_child(button)
 	result_actions.hide()
+	get_viewport().size_changed.connect(layout_screen)
+	layout_screen()
+
+## Reparte el HUD por todo el ancho visible y respeta el notch en móviles.
+func layout_screen() -> void:
+	screen_width = ScreenFit.visible_size(self).x
+	var shift: float = roundf(maxf(0.0, screen_width - 640.0) / 2.0)
+	var safe: Dictionary = ScreenFit.safe_margins(self)
+	var left: float = safe.left
+	var right: float = safe.right
+	objective.position.x = 10 + left
+	objective.size.x = screen_width - 20 - left - right
+	poison_label.position.x = 10 + left
+	resources_row.position.x = 10 + left
+	icons.sobrecarga.position.x = screen_width - 24 - right
+	toast.position.x = roundf((screen_width - toast.size.x) / 2.0)
+	left_arrow.position.x = 4 + left
+	right_arrow.position.x = screen_width - 12 - right
+	result_actions.position.x = 190 + shift
+	$Result.position.x = 64 + shift
+	pause_panel.position.x = 48 + shift
+	$DamageEdges.size = Vector2(screen_width, 360)
 
 func _label(parent: Node) -> Label:
 	var label: Label = Label.new()
@@ -172,7 +198,7 @@ func display_dashboard(data: Dictionary) -> void:
 	context_cost.text = str(cost) if cost >= 0 else ""
 	context_row.reset_size()
 	var anchor: Vector2 = data.get("context_screen", Vector2.ZERO)
-	context_row.position = Vector2(clampf(anchor.x - context_row.size.x / 2, 8, 632 - context_row.size.x), clampf(anchor.y - 24, 50, 280)).round()
+	context_row.position = Vector2(clampf(anchor.x - context_row.size.x / 2, 8, screen_width - 8 - context_row.size.x), clampf(anchor.y - 24, 50, 280)).round()
 	var progress: float = clampf(data.get("context_progress", 0.0), 0, 1)
 	context_progress.visible = context_row.visible and progress > 0
 	context_progress.position = context_row.position + Vector2(0, context_row.size.y + 2)
@@ -189,7 +215,7 @@ func _process(delta: float) -> void:
 	phase_remaining = maxf(0, phase_remaining - delta)
 	phase_banner.visible = phase_remaining > 0
 	phase_banner.modulate.a = minf(1, phase_remaining / 0.65)
-	phase_banner.position = ((Vector2(640, 360) - phase_banner.size) / 2).round()
+	phase_banner.position = ((Vector2(screen_width, 360) - phase_banner.size) / 2).round()
 	left_arrow.modulate.a = _threat_alpha(left_count)
 	right_arrow.modulate.a = _threat_alpha(right_count)
 

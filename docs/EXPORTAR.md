@@ -75,7 +75,7 @@ Subida por la web (no se ha subido nada todavía):
 3. *Uploads* → subir `CenizaNeon-web-0.1.0-alpha.zip` → marcar **This file will be played in the browser**.
 4. *Embed options*:
    - *Viewport dimensions*: **1280 × 720** (el proyecto es 640×360 con `canvas_items` y ventana de 1280×720, así que escala exacto ×2).
-   - Activar **Mobile friendly** solo cuando haya controles táctiles (ahora no hay).
+   - **Mobile friendly**: ya hay controles táctiles (ver «Móvil» en la sección Android).
    - Activar **Fullscreen button**.
    - **No** activar *SharedArrayBuffer support*: la versión web es sin hilos (`variant/thread_support=false`) y no lo necesita.
 5. *Visibility*: dejarlo en **Draft** o **Restricted** (con contraseña) para probar en privado antes de publicarlo.
@@ -157,7 +157,7 @@ D:\DevTools\jdk-17\bin\keytool -genkeypair -v -keystore D:\DevTools\android-keys
 ```bash
 "$G" --headless --path . --export-debug "Android" build/android/CenizaNeon.apk
 ```
-Resultado (1/11/2026): `build/android/CenizaNeon.apk` de **126 MB** (126 445 819 bytes), solo arm64-v8a, firmado con la keystore de depuración (`apksigner verify` sin errores). No hizo falta tocar el preset.
+Resultado (1/11/2026, con controles táctiles): `build/android/CenizaNeon.apk` de **126 MB** (126 426 018 bytes), solo arm64-v8a, firmado con la keystore de depuración (`apksigner verify` sin errores). No hizo falta tocar el preset.
 
 Instalar en el móvil (con la depuración USB activada):
 ```cmd
@@ -174,9 +174,25 @@ No guardes la contraseña en `export_presets.cfg` (que está en git). Pásala po
 
 Para Google Play hace falta un AAB (`gradle_build/use_gradle_build=true` + `export_format=1`). Eso exige instalar la plantilla Gradle, el NDK `ndk;28.1.13356709` y `cmake;3.10.2.4988404` (+2–3 GB, también en `D:\DevTools\android-sdk`). Para alfa por APK no hace falta.
 
-### Controles táctiles: PENDIENTE
+### Móvil: controles táctiles, pantalla ancha y audio
 
-El juego **no tiene controles táctiles**: no hay `TouchScreenButton`, `VirtualJoystick` ni manejo de `InputEventScreenTouch` en el código del juego. En Android se podrá abrir, pero sin teclado ni mando no se podrá jugar bien. Antes de repartir el APK hay que implementar los controles táctiles (por ejemplo con el `VirtualJoystick` de Godot 4.7 y botones en pantalla). Para usarlo en móvil desde la versión web también hacen falta.
+**Controles táctiles** (`ui/touch_controls.gd`, autoload `TouchControls`, clase `TouchOverlay`):
+- Aparecen solo si hay pantalla táctil (`DisplayServer.is_touchscreen_available()` u `OS.has_feature("mobile")`), durante el juego y sin pausa. En escritorio sin pantalla táctil no se ven. Opciones → «Controles táctiles en pantalla» los oculta (preferencia `touch_controls` en `user://opciones.cfg`).
+- Izquierda: joystick flotante (nace donde apoyas el pulgar, en el 45 % izquierdo de la pantalla). En las zonas solo mueve izquierda/derecha; en las arenas de jefe también arriba/abajo (`arena_up`/`arena_down`, analógico).
+- Derecha, en zonas: Operar (mantener E), Esquivar, Correr (mantener), Asaltar (F), Sobrecargar (Q), Torreta (T), Plataforma (V). En arenas: Atacar (J), Esquivar, Correr, Operar, Sobrecargar.
+- Arriba a la derecha: Pausa y Diario (Diario solo en zonas; con el panel táctil se oculta el botón «L · Diario» del HUD para no repetirlo).
+- Inyectan `InputEventAction` con `Input.parse_input_event`, así que funcionan igual que el teclado tanto para `Input.is_action_*` como para `_input`/`_unhandled_input`. Multitáctil; al pausar, perder el foco o cambiar de modo se sueltan todas las acciones.
+- Menús y paneles: los toques llegan a los botones como ratón emulado (`input_devices/pointing/emulate_mouse_from_touch=true`); lo comprueba `tests/touch_controls_test.gd`.
+
+**Pantalla ancha** (antes quedaban franjas negras en un 20:9):
+- `window/stretch/aspect="keep_height"`: el alto lógico sigue siendo 360 y el ancho crece (≈800 en 20:9). En 16:9 (escritorio 1280×720) todo queda igual que antes.
+- `core/screen_fit.gd`: los paneles de diseño fijo (opciones, diario, clínica, tienda, informe, elección de nivel, novela) y la arena de jefe se centran y su fondo cubre todo el ancho. El HUD se reparte por el ancho visible y el menú principal estira la ilustración sin deformarla.
+- Notch: el preset Android tiene `screen/edge_to_edge=true` y `ScreenFit.safe_margins()` (usa `DisplayServer.get_display_safe_area()`, solo en móvil) aparta del recorte el HUD, el menú y los controles táctiles.
+
+**Retraso del sonido**:
+- `audio/driver/output_latency.android=10` (por defecto 15 ms). Ojo: Android usa el driver OpenSL ES de Godot, que puede ignorar este ajuste y fijar su propio búfer; además el sistema y el hardware añaden su propia latencia (en muchos móviles 50–150 ms), que el juego no puede quitar. Si se oyen chasquidos, subirlo a 15–20.
+- `UiSound`: los WAV de interfaz se cargan al arrancar (antes se leían del disco en el primer toque) y el clic suena al apretar (`button_down`), no al levantar el dedo. En pantallas táctiles no suenan además el «roce» y el «láser» de foco encima del clic.
+- Los efectos de juego (`GameSound.CUES`) ya estaban precargados y sin llamadas diferidas; los WAV no tienen silencio inicial (medido: < 10 ms salvo dos ambientes en bucle).
 
 ## Comprobaciones rápidas después de exportar
 

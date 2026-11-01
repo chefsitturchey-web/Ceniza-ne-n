@@ -76,6 +76,7 @@ func _ready() -> void:
 	UiSound.attach(close)
 	buttons.add_child(close)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
 
 func refresh() -> void:
 	var data: Dictionary = CampaignStory.chapter(chapter_index)

@@ -3,7 +3,8 @@ extends Node
 ## Ajustes globales de presentación; nunca guardan estado de una partida.
 signal changed
 const DEFAULTS: Dictionary = {"master": 1.0, "music": 1.0, "sfx": 1.0, "muted": false,
-	"fullscreen": false, "window_size": 0, "reduced_flashes": false, "particles": true}
+	"fullscreen": false, "window_size": 0, "reduced_flashes": false, "particles": true,
+	"touch_controls": true}
 const SIZES: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1600, 900), Vector2i(1920, 1080)]
 var values: Dictionary = DEFAULTS.duplicate()
 ## Teclas y botones personalizados por acción; ver KeyRemap. Vacío significa predeterminados.
@@ -90,7 +91,8 @@ func apply_all(display: bool = true) -> void:
 		var amount: float = values[pair[1]]
 		AudioServer.set_bus_volume_db(index, float(base_volumes.get(pair[0], 0.0)) + linear_to_db(maxf(amount, 0.0001)))
 		AudioServer.set_bus_mute(index, amount == 0 or (pair[0] == "Master" and muted))
-	if not display or DisplayServer.get_name() == "headless":
+	# En móvil la ventana siempre ocupa la pantalla: tamaño y modo los decide el sistema.
+	if not display or DisplayServer.get_name() == "headless" or OS.has_feature("mobile"):
 		return
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if values.fullscreen else DisplayServer.WINDOW_MODE_WINDOWED)
 	if not values.fullscreen:

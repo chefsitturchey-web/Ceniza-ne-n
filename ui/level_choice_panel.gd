@@ -25,6 +25,7 @@ func _ready() -> void:
 	rows.add_theme_constant_override("separation", 12)
 	add_child(rows)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
 
 func open_choices(is_chest: bool) -> void:
 	opened = true

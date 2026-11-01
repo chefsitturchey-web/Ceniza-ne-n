@@ -32,9 +32,10 @@ func _draw() -> void:
 	var red: float = maxf(pulse, player_flash / 0.28 * 0.45)
 	if GamePreferences.current().reduced_flashes:
 		red = 0.07 if low_health else 0.0
+	var area: Vector2 = size if size.x >= 1.0 else Vector2(640, 360)
 	for edge: int in range(20):
 		var fade: float = pow(1.0 - edge / 20.0, 2)
 		if red > 0:
-			draw_rect(Rect2(edge, edge, 640 - edge * 2, 360 - edge * 2), Color("dd6482", red * fade), false, 1)
+			draw_rect(Rect2(edge, edge, area.x - edge * 2, area.y - edge * 2), Color("dd6482", red * fade), false, 1)
 		if core_flash > 0 and not GamePreferences.current().reduced_flashes:
-			draw_line(Vector2(0, 359 - edge), Vector2(640, 359 - edge), Color("ffce75", core_flash / 0.22 * 0.55 * fade), 1)
+			draw_line(Vector2(0, area.y - 1 - edge), Vector2(area.x, area.y - 1 - edge), Color("ffce75", core_flash / 0.22 * 0.55 * fade), 1)
