@@ -4,10 +4,11 @@ Mismo espíritu que sfxr/jsfxr, pero con parámetros en unidades físicas:
 frecuencias en Hz, tiempos en segundos y barridos en octavas por segundo.
 Los números no coinciden con los deslizadores de jsfxr; el resultado buscado sí.
 
-Uso:  python tools/generar_efectos.py
+Uso:  python tools/generar_efectos.py [nombre ...]  (sin nombres, regenera todo)
 Salida: assets/audio/sfx/8bit/*.wav
 """
 import pathlib
+import sys
 import wave
 
 import numpy as np
@@ -614,11 +615,64 @@ AMBIENCE = {
     ]),
 }
 
+# --- Jefes: cada poder tiene su propio timbre para reconocerlo sin mirar ---
+PRESETS.update({
+    # Disparo enemigo: más grave y hueco que el del jugador.
+    "boss_shot": dict(wave="square", duty=0.25, attack=0.0, sustain=0.012, decay=0.090, start=1100.0,
+                      min=140.0, slide=-18.0, punch=0.2, lowpass=3200.0, resonance=0.2, seed=301),
+    # Prefecto: duelista, metal agudo y afilado.
+    "prefecto_estocada": dict(wave="saw", attack=0.020, sustain=0.050, decay=0.200, start=500.0,
+                              min=200.0, slide=2.4, punch=0.15, highpass=500.0, drive=1.6, peak_db=-8.0, seed=311),
+    "prefecto_barrido": dict(wave="noise", attack=0.060, sustain=0.040, decay=0.260, start=3000.0,
+                             min=400.0, slide=-4.0, highpass=900.0, highpass_sweep=-1200.0, flanger=1.5,
+                             flanger_sweep=4.0, drive=1.8, peak_db=-8.0, seed=313),
+    "prefecto_salva": dict(wave="square", duty=0.125, arp_mult=1.5, arp_speed=0.04, attack=0.0, sustain=0.090,
+                           decay=0.100, start=1500.0, min=300.0, slide=-1.0, highpass=500.0, peak_db=-9.0, seed=317),
+    "dash_prefecto": dict(seconds=1.2, start=520.0, min=90.0, slide=-1.0, lowpass=1100.0, resonance=0.35,
+                          highpass=140.0, tremolo=0.5, tremolo_rate=11.0, drive=2.2, peak_db=-9.0, seed=319),
+    # Santa Caldera: fuego y escoria, grave con crepitar.
+    "caldera_calor": dict(wave="noise", attack=0.200, sustain=0.300, decay=0.450, start=420.0, min=60.0,
+                          slide=-1.0, noise_mix=0.4, lowpass=1500.0, lowpass_sweep=-600.0, resonance=0.2,
+                          highpass=90.0, drive=2.4, peak_db=-8.0, seed=331),
+    "caldera_carga": dict(wave="triangle", attack=0.050, sustain=0.250, decay=0.300, start=70.0, min=30.0,
+                          slide=0.6, noise_mix=0.35, lowpass=500.0, resonance=0.3, drive=3.0, peak_db=-7.0, seed=333),
+    "caldera_salva": dict(wave="noise", attack=0.0, sustain=0.040, decay=0.220, start=420.0, min=50.0,
+                          slide=-2.5, punch=0.3, lowpass=900.0, lowpass_sweep=-300.0, resonance=0.3,
+                          drive=2.8, peak_db=-8.0, seed=337),
+    # Madre Cero: electrónica fría, pulsos digitales.
+    "madre_marca": dict(wave="square", duty=0.5, arp_mult=2.0, arp_speed=0.05, attack=0.0, sustain=0.120,
+                        decay=0.200, start=420.0, min=100.0, slide=0.8, vibrato=1.5, vibrato_speed=18.0,
+                        lowpass=3500.0, peak_db=-8.0, seed=341),
+    "madre_expone": dict(wave="triangle", attack=0.010, sustain=0.200, decay=0.550, start=220.0, min=60.0,
+                         slide=1.6, vibrato=2.0, vibrato_speed=9.0, flanger=2.0, flanger_sweep=6.0,
+                         peak_db=-7.0, seed=343),
+    # Coro Sumergido: agua y eco, ondas largas.
+    "coro_onda": dict(wave="triangle", attack=0.100, sustain=0.250, decay=0.800, start=260.0, min=80.0,
+                      slide=-0.8, vibrato=3.0, vibrato_speed=5.0, noise_mix=0.15, lowpass=1500.0,
+                      resonance=0.3, flanger=3.0, flanger_sweep=-2.0, peak_db=-8.0, seed=351),
+    "coro_marca": dict(wave="triangle", attack=0.0, sustain=0.040, decay=0.250, start=900.0, min=250.0,
+                       slide=-4.0, punch=0.25, lowpass=2200.0, resonance=0.25, flanger=2.5, peak_db=-9.0, seed=353),
+})
+
+# --- Variantes: el mismo golpe con otra semilla evita el efecto ametralladora ---
+for _base, _count in (("hit", 3), ("shot", 3), ("step", 3)):
+    for _n in range(2, _count + 1):
+        PRESETS["%s_%d" % (_base, _n)] = dict(PRESETS[_base], seed=PRESETS[_base]["seed"] + 100 * (_n - 1))
+for _n in (2, 3):
+    PRESETS["slash_%d" % _n] = dict(PRESETS["slash"], sfxr=dict(
+        PRESETS["slash"]["sfxr"], p_base_freq=PRESETS["slash"]["sfxr"]["p_base_freq"] + 0.04 * (_n - 1) * (1 if _n == 2 else -1),
+        p_lpf_freq=PRESETS["slash"]["sfxr"]["p_lpf_freq"] + 0.01 * _n))
+
+BOSS_CUES = ["boss_shot", "prefecto_estocada", "prefecto_barrido", "prefecto_salva", "dash_prefecto",
+             "caldera_calor", "caldera_carga", "caldera_salva", "madre_marca", "madre_expone",
+             "coro_onda", "coro_marca"]
+VARIANT_CUES = ["hit_2", "hit_3", "shot_2", "shot_3", "step_2", "step_3", "slash_2", "slash_3"]
+
 GROUPS = {
     "combate": ["slash", "shot", "hit", "step", "dodge", "alarm", "upgrade", "destroy", "dash", "dash_caldera",
                 "sonar", "shield", "fire_pulse", "telegraph_claw", "telegraph_charge", "telegraph_volley",
                 "wall_destroy", "artillery_shot", "saboteur_hit", "turret_on", "turret_off",
-                "sentinel_shot", "sentinel_deploy", "ground_impact", "cover_break"],
+                "sentinel_shot", "sentinel_deploy", "ground_impact", "cover_break"] + BOSS_CUES + VARIANT_CUES,
     "economia": ["denied", "pickup", "build_order", "build_done", "repair", "recruit", "purchase",
                  "debris_clear", "parts_pickup"],
     "hitos": ["overload", "portal_destroyed", "boss_phase", "player_death", "respawn", "train_arrive", "phase_dawn"],
@@ -629,8 +683,12 @@ GROUPS = {
 
 
 def main():
+    # Con nombres como argumento solo se regeneran esos efectos.
+    only = set(sys.argv[1:])
     for group, names in GROUPS.items():
         for name in names:
+            if only and name not in only:
+                continue
             spec = PRESETS[name]
             if "amb" in spec:
                 data = render_ambience(dict(spec["amb"], peak_db=spec.get("peak_db", -20.0)))
@@ -643,6 +701,8 @@ def main():
             path = save(group, name, data)
             print("%-9s %-21s %6.1f ms" % (group, name, len(data) / RATE * 1000.0))
     for name, spec in AMBIENCE.items():
+        if only:
+            break
         data = render_ambience(spec)
         save("ambiente", name, data)
         print("%-9s %-21s %6.1f ms" % ("ambiente", name, len(data) / RATE * 1000.0))

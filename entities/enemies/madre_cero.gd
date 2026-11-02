@@ -91,7 +91,7 @@ func _physics_process(delta: float) -> void:
 			charge = 0
 			exposure = 7
 			marks.clear()
-			cue_requested.emit("upgrade")
+			cue_requested.emit("madre_expone")
 		pulse -= delta
 		if pulse <= 0 and not relays.is_empty():
 			var index: int = choose_relay()
@@ -100,7 +100,7 @@ func _physics_process(delta: float) -> void:
 			if phase == 2 and index >= 0: marks.append({"position": tactics.predicted(target).clamp(Vector2(90, 75), Vector2(550, 405)), "time": 1.3, "relay": -1})
 			pulse_index += 1
 			pulse = 1.8 if phase == 2 else 2.6
-			cue_requested.emit("fire_pulse")
+			cue_requested.emit("madre_marca")
 	for index: int in range(marks.size() - 1, -1, -1):
 		marks[index].time -= delta
 		if marks[index].time > 0: continue

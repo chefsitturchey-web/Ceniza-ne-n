@@ -12,6 +12,7 @@ const DAMAGE_EDGES: Script = preload("res://ui/damage_edges.gd")
 const THEME: Theme = preload("res://ui/theme.tres")
 const DASH: AudioStream = preload("res://assets/audio/sfx/8bit/combate/dash.wav")
 const DASH_CALDERA: AudioStream = preload("res://assets/audio/sfx/8bit/combate/dash_caldera.wav")
+const DASH_PREFECTO: AudioStream = preload("res://assets/audio/sfx/8bit/combate/dash_prefecto.wav")
 var completed: bool = false
 var ending: bool = false
 var ending_victory: bool = false
@@ -147,7 +148,7 @@ func _ready() -> void:
 	add_child(sound)
 	dash_player.bus = &"SFX"
 	dash_player.volume_db = -60.0
-	dash_player.stream = DASH_CALDERA if zone_index == 1 else DASH
+	dash_player.stream = DASH_CALDERA if zone_index == 1 else (DASH_PREFECTO if zone_index == 3 else DASH)
 	add_child(dash_player)
 	boss.dash_changed.connect(_on_dash)
 	modules.fired.connect(func() -> void: sound.play_cue("shot", -5))
@@ -406,7 +407,7 @@ func strike(origin: Vector2, direction: Vector2, amount: int, reach: float) -> v
 		boss.receive_hit(origin, amount)
 
 func spawn_bullet(origin: Vector2, direction: Vector2) -> void:
-	sound.play_cue("shot", -6)
+	sound.play_cue("boss_shot", -6)
 	var bullet: RecaudadorBullet = RecaudadorBullet.new()
 	bullet.position = origin
 	bullet.velocity = direction * (190 if boss.phase == 2 else 155)

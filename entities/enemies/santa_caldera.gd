@@ -15,6 +15,9 @@ func build_visual() -> void:
 	machine.kind = "caldera"
 	puppet.add_child(machine)
 
+func windup_cue(power: String) -> String:
+	return {"claw": "caldera_calor", "charge": "caldera_carga", "volley": "caldera_salva"}[power]
+
 func is_core_exposed() -> bool:
 	return state == State.RECOVER
 

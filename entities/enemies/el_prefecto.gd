@@ -6,6 +6,9 @@ var chained_thrust: bool = false
 
 func _init() -> void: max_health = 8000
 
+func windup_cue(power: String) -> String:
+	return {"claw": "prefecto_barrido", "charge": "prefecto_estocada", "volley": "prefecto_salva"}[power]
+
 func build_visual() -> void:
 	visual = FinalBossVisual.new()
 	visual.actor = self

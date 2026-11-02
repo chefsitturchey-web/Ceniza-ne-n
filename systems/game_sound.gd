@@ -49,7 +49,33 @@ const CUES: Dictionary = {
 	"ui_hover": preload("res://assets/audio/sfx/8bit/interfaz/ui_hover.wav"),
 	"ui_move": preload("res://assets/audio/sfx/8bit/interfaz/ui_move.wav"),
 	"ui_back": preload("res://assets/audio/sfx/8bit/interfaz/ui_back.wav"),
-	"dialogue": preload("res://assets/audio/sfx/8bit/voz/dialogue.wav")
+	"dialogue": preload("res://assets/audio/sfx/8bit/voz/dialogue.wav"),
+	"boss_shot": preload("res://assets/audio/sfx/8bit/combate/boss_shot.wav"),
+	"prefecto_estocada": preload("res://assets/audio/sfx/8bit/combate/prefecto_estocada.wav"),
+	"prefecto_barrido": preload("res://assets/audio/sfx/8bit/combate/prefecto_barrido.wav"),
+	"prefecto_salva": preload("res://assets/audio/sfx/8bit/combate/prefecto_salva.wav"),
+	"caldera_calor": preload("res://assets/audio/sfx/8bit/combate/caldera_calor.wav"),
+	"caldera_carga": preload("res://assets/audio/sfx/8bit/combate/caldera_carga.wav"),
+	"caldera_salva": preload("res://assets/audio/sfx/8bit/combate/caldera_salva.wav"),
+	"madre_marca": preload("res://assets/audio/sfx/8bit/combate/madre_marca.wav"),
+	"madre_expone": preload("res://assets/audio/sfx/8bit/combate/madre_expone.wav"),
+	"coro_onda": preload("res://assets/audio/sfx/8bit/combate/coro_onda.wav"),
+	"coro_marca": preload("res://assets/audio/sfx/8bit/combate/coro_marca.wav"),
+	"hit_2": preload("res://assets/audio/sfx/8bit/combate/hit_2.wav"),
+	"hit_3": preload("res://assets/audio/sfx/8bit/combate/hit_3.wav"),
+	"shot_2": preload("res://assets/audio/sfx/8bit/combate/shot_2.wav"),
+	"shot_3": preload("res://assets/audio/sfx/8bit/combate/shot_3.wav"),
+	"step_2": preload("res://assets/audio/sfx/8bit/combate/step_2.wav"),
+	"step_3": preload("res://assets/audio/sfx/8bit/combate/step_3.wav"),
+	"slash_2": preload("res://assets/audio/sfx/8bit/combate/slash_2.wav"),
+	"slash_3": preload("res://assets/audio/sfx/8bit/combate/slash_3.wav")
+}
+## Cada cue repetido alterna entre sus variantes para no sonar a ametralladora.
+const VARIANTS: Dictionary = {
+	"hit": ["hit", "hit_2", "hit_3"],
+	"shot": ["shot", "shot_2", "shot_3"],
+	"step": ["step", "step_2", "step_3"],
+	"slash": ["slash", "slash_2", "slash_3"]
 }
 const VOICES: int = 12
 ## Ambiente por zona: archivo de bucle, sin eventos ni melodía.
@@ -65,9 +91,11 @@ const AMBIENCE_VOLUME: float = -14.0
 const DEFEAT_START: float = 3.0
 ## Los avisos que el jugador necesita oír no deben quedarse sin voz.
 const PRIORITY_HIGH: Array[String] = ["alarm", "telegraph_claw", "telegraph_charge", "telegraph_volley",
-	"boss_phase", "player_death", "train_arrive", "wall_destroy", "portal_destroyed", "ground_impact"]
+	"boss_phase", "player_death", "train_arrive", "wall_destroy", "portal_destroyed", "ground_impact",
+	"prefecto_estocada", "prefecto_barrido", "caldera_calor", "caldera_carga", "madre_expone", "coro_onda"]
 const PRIORITY_MID: Array[String] = ["shot", "slash", "hit", "destroy", "shield", "sonar", "fire_pulse",
-	"sentinel_shot", "cover_break", "sentinel_deploy", "dash", "dash_caldera"]
+	"sentinel_shot", "cover_break", "sentinel_deploy", "boss_shot", "prefecto_salva", "caldera_salva",
+	"coro_marca", "madre_marca"]
 const PRIORITY_LOW: Array[String] = ["step", "rat_chew", "rat_squeak", "ui_hover"]
 ## Baja la música mientras hay un panel de lectura abierto.
 const DUCK_DB: float = -30.0
@@ -203,9 +231,10 @@ func play_cue(id: String, gain_db: float = 0.0) -> void:
 func _start_cue(index: int, id: String, gain_db: float) -> void:
 	var voice: AudioStreamPlayer = voices[index]
 	voice_ids[index] = id
-	voice.stream = CUES[id]
+	var variants: Array = VARIANTS.get(id, [])
+	voice.stream = CUES[variants[rng.randi() % variants.size()] if not variants.is_empty() else id]
 	voice.volume_db = -9.0 + gain_db
-	voice.pitch_scale = 1.0 + sin(elapsed * 7.3) * 0.035
+	voice.pitch_scale = rng.randf_range(0.93, 1.07)
 	voice.play()
 
 func _priority(id: String) -> int:

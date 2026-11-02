@@ -115,13 +115,17 @@ func piece(asset: String, offset: Vector2) -> Sprite2D:
 	pieces.append(sprite)
 	return sprite
 
+## Cada jefe sobrescribe el aviso de sus poderes: "claw", "charge" o "volley".
+func windup_cue(power: String) -> String:
+	return "telegraph_" + power
+
 func change_state(value: State, duration: float) -> void:
 	if value == State.CLAW_WINDUP:
-		cue_requested.emit("telegraph_claw")
+		cue_requested.emit(windup_cue("claw"))
 	elif value == State.CHARGE_WINDUP:
-		cue_requested.emit("telegraph_charge")
+		cue_requested.emit(windup_cue("charge"))
 	elif value == State.VOLLEY_WINDUP:
-		cue_requested.emit("telegraph_volley")
+		cue_requested.emit(windup_cue("volley"))
 	elif value == State.STUNNED:
 		cue_requested.emit("hit")
 	if value == State.CHARGE and state != State.CHARGE:

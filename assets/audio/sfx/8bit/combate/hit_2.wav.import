@@ -2,13 +2,13 @@
 
 importer="wav"
 type="AudioStreamWAV"
-uid="uid://7sou7e5idjie"
-path="res://.godot/imported/2222.wav-7286bbd765eaf749ad78b0b8a97120cd.sample"
+uid="uid://5avbgl5e3gn1"
+path="res://.godot/imported/hit_2.wav-ded98e84f2a55afa142bebebc557b4fa.sample"
 
 [deps]
 
-source_file="res://assets/audio/sfx/8bit/combate/2222.wav"
-dest_files=["res://.godot/imported/2222.wav-7286bbd765eaf749ad78b0b8a97120cd.sample"]
+source_file="res://assets/audio/sfx/8bit/combate/hit_2.wav"
+dest_files=["res://.godot/imported/hit_2.wav-ded98e84f2a55afa142bebebc557b4fa.sample"]
 
 [params]
 
