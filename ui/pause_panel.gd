@@ -121,6 +121,7 @@ func _fill_controls() -> void:
 		name_label.text = pair[1]
 		name_label.add_theme_font_size_override("font_size", 10)
 		name_label.add_theme_color_override("font_color", Color("9fb4c4"))
+		TextMarks.attach(name_label)
 		entry.add_child(name_label)
 		controls.add_child(entry)
 	_fit.call_deferred()

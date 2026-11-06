@@ -53,13 +53,14 @@ func _ready() -> void:
 	# Bajo el panel de vida del jugador, sin tapar su texto.
 	timer_label.position = Vector2(14, 52)
 	timer_label.size = Vector2(220, 18)
-	timer_label.add_theme_font_override("font", ThemeDB.fallback_font)
+	timer_label.add_theme_font_override("font", TextMarks.FONT)
 	timer_label.add_theme_font_size_override("font_size", 12)
 	timer_label.add_theme_color_override("font_color", Color("dcf6ee"))
 	timer_label.add_theme_constant_override("outline_size", 4)
 	timer_label.add_theme_color_override("font_outline_color", Color("08111c"))
 	timer_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	overlay.add_child(timer_label)
+	TextMarks.attach(timer_label)
 	ScreenFit.fit_layer(overlay)
 	start_fight(0)
 
@@ -150,12 +151,13 @@ func build_panel(heading: String, color: Color) -> VBoxContainer:
 func line(rows: VBoxContainer, text: String, color: Color = Color("dcf6ee")) -> Label:
 	var row: Label = Label.new()
 	row.text = text
-	row.add_theme_font_override("font", ThemeDB.fallback_font)
+	row.add_theme_font_override("font", TextMarks.FONT)
 	row.add_theme_font_size_override("font_size", 12)
 	row.add_theme_color_override("font_color", color)
 	row.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	rows.add_child(row)
+	TextMarks.attach(row)
 	return row
 
 func button(rows: VBoxContainer, text: String, action: Callable) -> Button:

@@ -27,6 +27,7 @@ func _ready() -> void:
 	caption_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	caption_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	surface.add_child(caption_label)
+	TextMarks.attach(caption_label)
 	surface.draw.connect(_draw_hint)
 	guide.completed.connect(func(_step: int, reward: int) -> void:
 		flash = 0.5
@@ -112,7 +113,7 @@ func _draw_hint() -> void:
 	else:
 		# Recuadro de tecla a la medida del nombre: "E", "Y", "RB" o "Cruceta arriba".
 		_draw_keycap(InputGlyphs.action_name(action), color)
-	caption_label.modulate = color
+	caption_label.modulate = Color(1, 1, 1, color.a)
 	_draw_arrow(width, color)
 	if flash > 0 and last_reward > 0:
 		var reward_y: float = maxf(92, guide.world.hud_stack.bottom + 16)

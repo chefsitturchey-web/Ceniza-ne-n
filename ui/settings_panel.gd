@@ -68,9 +68,10 @@ func _ready() -> void:
 			number.text = "%d%%" % int(value)
 			_set_option(pair[0], value / 100.0))
 	first = sliders.master.slider
-	for pair: Array in [["muted", "Silenciar todo  [M]"], ["fullscreen", "Pantalla completa"], ["reduced_flashes", "Reducir destellos y sacudidas"], ["particles", "Partículas ambientales y de combate"], ["touch_controls", "Controles táctiles en pantalla"]]:
+	for pair: Array in [["muted", "Silenciar todo  [{mute}]"], ["fullscreen", "Pantalla completa"], ["reduced_flashes", "Reducir destellos y sacudidas"], ["particles", "Partículas ambientales y de combate"], ["touch_controls", "Controles táctiles en pantalla"]]:
 		var toggle: CheckButton = CheckButton.new()
-		toggle.text = pair[1]
+		InputGlyphs.bind(toggle, pair[1])
+		if pair[0] == "muted": TextMarks.attach(toggle)
 		toggle.custom_minimum_size.y = 20
 		rows.add_child(toggle)
 		toggles[pair[0]] = toggle
@@ -96,6 +97,7 @@ func _ready() -> void:
 	status = Label.new()
 	status.text = "Los ajustes se guardan automáticamente."
 	rows.add_child(status)
+	TextMarks.attach(status)
 	var buttons: HBoxContainer = HBoxContainer.new()
 	rows.add_child(buttons)
 	controls_button = Button.new()
@@ -114,6 +116,7 @@ func _ready() -> void:
 		status.text = "Guía lista")
 	buttons.add_child(reset_guide)
 	var back: Button = Button.new()
+	TextMarks.attach(back)
 	InputGlyphs.bind(back, "Volver  [{pause}]")
 	back.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	back.pressed.connect(close_panel)
@@ -172,9 +175,11 @@ func _build_controls(margin: MarginContainer) -> void:
 		var key_label: Label = Label.new()
 		key_label.custom_minimum_size.x = 70
 		grid.add_child(key_label)
+		key_label.add_theme_color_override("font_color", Color(TextMarks.KEY))
 		var pad_label: Label = Label.new()
 		pad_label.custom_minimum_size.x = 96
 		grid.add_child(pad_label)
+		pad_label.add_theme_color_override("font_color", Color(TextMarks.KEY))
 		var change: Button = Button.new()
 		change.text = "Cambiar"
 		change.custom_minimum_size.x = 64
@@ -186,6 +191,7 @@ func _build_controls(margin: MarginContainer) -> void:
 	controls_status.text = "Pulsa «Cambiar» y luego una tecla o un botón del mando."
 	controls_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	controls.add_child(controls_status)
+	TextMarks.attach(controls_status)
 	var buttons: HBoxContainer = HBoxContainer.new()
 	controls.add_child(buttons)
 	var reset: Button = Button.new()

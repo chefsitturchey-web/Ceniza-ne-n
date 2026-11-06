@@ -37,7 +37,8 @@ func _ready() -> void:
 	objective.position = Vector2(10, 10)
 	objective.size = Vector2(620, 20)
 	objective.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	objective.add_theme_color_override("font_color", Color("8299a8"))
+	objective.add_theme_color_override("font_color", Color("dcf6ee"))
+	TextMarks.attach(objective)
 	poison_label = _label($Gameplay)
 	poison_label.position = Vector2(10, 33)
 	poison_label.add_theme_color_override("font_color", Color("7dd84f"))
@@ -83,9 +84,11 @@ func _ready() -> void:
 	context_keycap.add_theme_stylebox_override("panel", key_style)
 	context_row.add_child(context_keycap)
 	context_key_label = _label(context_keycap)
+	context_key_label.add_theme_color_override("font_color", Color(TextMarks.KEY))
 	context_key_label.text = InputGlyphs.action_name("interact")
 	context_label = _label(context_row)
-	context_label.add_theme_color_override("font_color", Color("ffce75"))
+	context_label.add_theme_color_override("font_color", Color("dcf6ee"))
+	TextMarks.attach(context_label)
 	context_icon = _icon(context_row, "chatarra")
 	context_cost = _label(context_row)
 	context_progress = ColorRect.new()
@@ -93,6 +96,7 @@ func _ready() -> void:
 	context_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	$Gameplay.add_child(context_progress)
 	toast = _label($Gameplay)
+	TextMarks.attach(toast)
 	toast.position = Vector2(100, 303)
 	toast.size = Vector2(440, 30)
 	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

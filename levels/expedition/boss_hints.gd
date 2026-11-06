@@ -6,7 +6,9 @@ extends Node
 const DURATION: float = 4.5
 const URGENT: Array[String] = ["expuesto", "melee", "lunge"]
 ## Recuerda el último dispositivo entre arenas (Boss Rush encadena varias).
-static var last_pad: bool = false
+static var last_pad: bool:
+	get: return InputGlyphs.last_pad
+	set(value): InputGlyphs.last_pad = value
 var arena: RecaudadorArena
 var boss: Recaudador
 var shown: Dictionary = {}
@@ -29,9 +31,9 @@ func _ready() -> void:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.add_theme_font_override("font", ThemeDB.fallback_font)
+	label.add_theme_font_override("font", TextMarks.FONT)
 	label.add_theme_font_size_override("font_size", 12)
-	label.add_theme_color_override("font_color", Color("ffce75"))
+	label.add_theme_color_override("font_color", Color("dcf6ee"))
 	label.add_theme_constant_override("outline_size", 4)
 	label.add_theme_color_override("font_outline_color", Color("08111c"))
 	var backing: StyleBoxFlat = StyleBoxFlat.new()
@@ -44,6 +46,7 @@ func _ready() -> void:
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.modulate.a = 0
 	arena.add_child(label)
+	TextMarks.attach(label)
 	# Debajo de la pausa, las opciones y la pantalla de resultados.
 	arena.move_child(label, arena.combat_hud.get_index() + 1)
 	boss.hit_feedback.connect(func(blocked: bool) -> void:
@@ -52,16 +55,11 @@ func _ready() -> void:
 		if number == 2: push("fase"))
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf((event as InputEventJoypadMotion).axis_value) > 0.5):
-		last_pad = true
-	elif event is InputEventKey or event is InputEventMouseButton:
-		last_pad = false
+	InputGlyphs.observe(event)
 
 ## Nombre visible de la acción según el dispositivo: teclado o mando.
 static func control(action: String) -> String:
-	var binding: Dictionary = KeyRemap.binding(action)
-	if binding.is_empty(): return action
-	return "[%s]" % (KeyRemap.pad_name(int(binding.pad)) if last_pad else KeyRemap.key_name(int(binding.key)))
+	return "[%s]" % InputGlyphs.action_name(action)
 
 func text_for(id: String) -> String:
 	match id:
@@ -96,10 +94,10 @@ func push(id: String) -> void:
 	else:
 		queue.append(id)
 
-## Una línea centrada si cabe; si no, dos líneas a todo el ancho, siempre sobre la barra del jefe.
+## Una línea centrada si cabe; si no, hasta tres líneas a todo el ancho, siempre sobre la barra del jefe.
 func fit_label() -> void:
-	var width: float = ThemeDB.fallback_font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 20
-	label.size = Vector2(width, 20) if width <= 470 else Vector2(470, 36)
+	var width: float = TextMarks.FONT.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 20
+	label.size = Vector2(width, 20) if width <= 470 else Vector2(520, 54)
 	label.position = Vector2(320 - label.size.x / 2, 300 - label.size.y)
 
 func advance(delta: float) -> void:
@@ -123,4 +121,9 @@ func advance(delta: float) -> void:
 			label.text = text_for(current)
 			fit_label()
 			left = DURATION
+	if not current.is_empty():
+		var updated: String = text_for(current)
+		if label.text != updated:
+			label.text = updated
+			fit_label()
 	label.modulate.a = move_toward(label.modulate.a, 1.0 if not current.is_empty() and left > 0.25 else 0.0, delta * 5)

@@ -49,6 +49,7 @@ func _ready() -> void:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.add_theme_font_size_override("font_size", 12)
 		rows.add_child(label)
+		TextMarks.attach(label, text)
 	begin_button = Button.new()
 	begin_button.text = "Comenzar"
 	begin_button.custom_minimum_size.y = 24

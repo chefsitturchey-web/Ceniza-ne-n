@@ -322,7 +322,8 @@ func build_hud() -> void:
 	add_child(combat_hud)
 	combat_hud.configure(zone_index, zone.boss_title, player, boss)
 	boss_status = label(zone.briefing, Rect2(243, 12, 383, 45))
-	boss_status.add_theme_font_override("font", ThemeDB.fallback_font)
+	boss_status.add_theme_font_override("font", TextMarks.FONT)
+	TextMarks.attach(boss_status)
 	boss_status.add_theme_font_size_override("font_size", 12)
 	boss_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	boss_status.add_theme_constant_override("outline_size", 4)

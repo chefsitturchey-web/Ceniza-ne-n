@@ -39,6 +39,7 @@ func _ready() -> void:
 	rows.add_child(title)
 	status = Label.new()
 	rows.add_child(status)
+	TextMarks.attach(status)
 	tabs = TabContainer.new()
 	tabs.custom_minimum_size.y = 166
 	rows.add_child(tabs)
@@ -70,6 +71,7 @@ func _ready() -> void:
 		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		detail.custom_minimum_size.x = 410
 		equipment_rows.add_child(detail)
+		TextMarks.attach(detail)
 		var actions: GridContainer = GridContainer.new()
 		actions.columns = 2
 		equipment_rows.add_child(actions)
@@ -92,6 +94,7 @@ func _ready() -> void:
 		passive_grid.add_child(toggle)
 		passive_buttons[id] = toggle
 	var close: Button = Button.new()
+	TextMarks.attach(close)
 	InputGlyphs.bind(close, "Volver  [{pause}]")
 	close.pressed.connect(close_panel)
 	UiSound.attach(close)

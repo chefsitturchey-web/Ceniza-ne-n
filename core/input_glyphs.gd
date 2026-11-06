@@ -46,6 +46,7 @@ static func using_pad() -> bool:
 
 ## Tecla o botón de la acción para el dispositivo activo; con controles táctiles, su botón.
 static func action_name(action: String) -> String:
+	if action == "mute": return KeyRemap.key_name(KEY_M)
 	if TouchOverlay.showing():
 		if action in ["move", "move_left", "move_right"]: return "Stick"
 		if action == "journal": return "Diario"
@@ -66,6 +67,7 @@ static func fill(text: String) -> String:
 	for action: String in KeyRemap.DEFAULTS:
 		var token: String = "{%s}" % action
 		if token in text: text = text.replace(token, action_name(action))
+	text = text.replace("{mute}", action_name("mute"))
 	if "{move}" in text: text = text.replace("{move}", action_name("move"))
 	return text
 
