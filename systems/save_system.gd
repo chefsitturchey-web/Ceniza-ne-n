@@ -4,6 +4,27 @@ extends Node
 ## Instantánea de preparación. Las referencias las proporciona SessionController.
 var session: SessionController
 var save_path: String = "user://partida.json"
+## Perfil separado del checkpoint: persiste incluso al comenzar otra campaña.
+static var engagement_path: String = "user://progreso_pixel.cfg"
+
+static func engagement_profile() -> Dictionary:
+	var config: ConfigFile = ConfigFile.new()
+	config.load(engagement_path)
+	var result: Dictionary = {"guide": 0, "record": 0, "achievements": []}
+	for key: String in result:
+		var value: Variant = config.get_value("progress", key, result[key])
+		if key == "achievements":
+			if value is Array: result[key] = value.filter(func(id: Variant) -> bool: return id is String)
+		elif (value is int or value is float) and is_finite(float(value)):
+			result[key] = clampi(int(value), 0, 11 if key == "guide" else 2147483647)
+	return result
+
+static func store_engagement(profile: Dictionary) -> bool:
+	var config: ConfigFile = ConfigFile.new()
+	for key: String in profile: config.set_value("progress", key, profile[key])
+	var pending: String = engagement_path + ".tmp"
+	if config.save(pending) != OK: return false
+	return DirAccess.rename_absolute(ProjectSettings.globalize_path(pending), ProjectSettings.globalize_path(engagement_path)) == OK
 const PLAYER_FIELDS: Array[String] = ["health", "stamina", "facing", "attack_facing", "cooldown_remaining", "slash_remaining", "invulnerable", "dodge_remaining", "dodge_direction", "respawn_remaining"]
 const OVERLOAD_FIELDS: Array[String] = ["overload_left", "overload_right", "cooldown_left", "cooldown_right"]
 

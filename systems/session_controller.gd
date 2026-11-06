@@ -160,6 +160,8 @@ func _process(delta: float) -> void:
 		terrain.tick(delta)
 	defenses.update_defenses(delta)
 	interaction.update_interaction(delta)
+	if world != null and world.first_steps != null: world.first_steps.tick(delta)
+	if world != null and world.engagement != null: world.engagement.tick(delta)
 	if Input.is_action_just_pressed("toggle_power") and player.health > 0:
 		var target: int = interaction.interaction_target()
 		if target >= 0 and target < interaction.construction.sites.size():

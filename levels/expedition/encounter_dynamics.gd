@@ -142,6 +142,8 @@ func spawn_sentinel(at: Vector2) -> EncounterSentinel:
 	unit.side = -1 if summons_total % 2 == 0 else 1
 	unit.tactics.configure_navigation(ArenaLayout.boundary(arena.zone_index), obstacle_rects, 15)
 	arena.actors.add_child(unit)
+	unit.damaged.connect(func(amount: int, remaining: int) -> void:
+		if arena.impact != null: arena.impact.hit(unit.global_position, amount, remaining == 0))
 	sentinels.append(unit)
 	summons_total += 1
 	return unit

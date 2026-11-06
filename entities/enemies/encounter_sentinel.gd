@@ -1,5 +1,6 @@
 class_name EncounterSentinel
 extends CharacterBody2D
+signal damaged(amount: int, remaining: int)
 ## Dron de escolta: se abre, fija la puntería y dispara; nunca daña por contacto.
 var encounter: RecaudadorArena
 var tactics: BossTactics = BossTactics.new()
@@ -81,6 +82,7 @@ func receive_hit(_origin: Vector2, amount: int) -> int:
 	if health <= 0: return 0
 	var damage: int = mini(health, maxi(0, amount))
 	health -= damage
+	damaged.emit(damage, maxi(0, health))
 	encounter.boss.effects.emit_pixels(global_position, 5, Color("ffce75"))
 	if health <= 0:
 		encounter.player.stamina = minf(100, encounter.player.stamina + 8)

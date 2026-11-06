@@ -148,7 +148,7 @@ git clone https://github.com/chefsitturchey-web/Ceniza-ne-n.git
 
 1. Abre Godot y pulsa **Importar**; elige `project.godot` dentro de la carpeta.
 2. Espera la importación inicial (la primera vez importa fuentes, sprites y audio).
-3. Pulsa **F5**, elige **Nueva partida** o **Continuar**. Una nueva colonia muestra la explicación con el reloj detenido; pulsa **Comenzar**. **Opciones** permite ajustar audio, ventana y efectos; también está en la pausa de colonia y jefe.
+3. Pulsa **F5**, elige **Nueva partida** o **Continuar**. La primera campaña empieza jugando: sigue la flecha y mantén la tecla indicada. **Opciones** permite reiniciar la guía y ajustar audio, ventana y efectos; también está en la pausa de colonia y jefe.
 
 También puedes usar **Code → Download ZIP**. Este repositorio no incluye ejecutable: el juego se prueba desde el editor.
 

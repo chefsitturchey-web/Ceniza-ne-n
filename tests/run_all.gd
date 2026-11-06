@@ -1,7 +1,7 @@
 extends SceneTree
 
 const SUITES: Array[String] = [
-	"invasion_integration_test", "frontier_progression_test", "settlement_world_test", "colony_boss_polish_test", "seeded_world_test", "progression_balance_test", "music_handoff_test",
+	"first_steps_test", "guide_walkthrough_test", "guide_walkthrough_test --seeded", "impact_feedback_test", "round_engagement_test", "invasion_integration_test", "frontier_progression_test", "settlement_world_test", "colony_boss_polish_test", "seeded_world_test", "progression_balance_test", "music_handoff_test",
 	"environment_depth_test",
 	"static_check", "native_combat_art_test", "boss_pressure_test", "boss_hud_test", "debug_tools_test", "boss_tactics_test", "depot_life_test", "unit_animation_test", "visual_novel_test", "fortress_progression_test", "mobility_test", "commander_test", "story_finale_test", "expansion_test", "campaign_bosses_test", "polish_integration_test", "menu_settings_test", "key_remap_test", "modules_test", "machine_rig_test", "neural_audio_test", "expedition_test", "recaudador_test",
 	"save_system_test", "effects_test", "hud_clean_test", "enemies_gdd_test", "touch_controls_test", "night_call_test",
@@ -29,11 +29,11 @@ func run_all() -> void:
 			arguments.append_array(["--", parts[1]])
 		var output: Array = []
 		var code: int = OS.execute(OS.get_executable_path(), arguments, output, true)
-		# El archivo conserva UTF-8 también cuando OS.execute usa la página ANSI de Windows.
+		# El archivo conserva UTF-8 tambiÃ©n cuando OS.execute usa la pÃ¡gina ANSI de Windows.
 		var transcript: String = FileAccess.get_file_as_string(log_path) if FileAccess.file_exists(log_path) else "".join(output)
 		print("--- %s (salida %d) ---" % [suite, code])
 		print(transcript.strip_edges())
-		# El sandbox de Windows puede negar su almacén de certificados; no es GDScript.
+		# El sandbox de Windows puede negar su almacÃ©n de certificados; no es GDScript.
 		var errors: String = transcript.replace("ERROR: Failed to read the root certificate store.", "")
 		var completed: bool = "PASS:" in transcript or "0 fallos" in transcript or "fallos: 0" in transcript or "victoria=" in transcript
 		var passed: bool = code == 0 and completed and not "ERROR:" in errors and not "WARNING:" in errors
