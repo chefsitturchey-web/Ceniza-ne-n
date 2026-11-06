@@ -72,8 +72,44 @@ func heat(area: Rect2, active: bool) -> void:
 			draw_line(point - Vector2(5, 3), point + Vector2(5, 3), Color("e1ae7a", 0.7), 2)
 			draw_line(point - Vector2(5, -3), point + Vector2(5, -3), Color("e1ae7a", 0.7), 2)
 
+## Golpes cuerpo a cuerpo: rojo propio y forma exacta del daño, que se llena hasta el impacto.
+func melee_warning() -> void:
+	var move: Dictionary = boss.melee
+	var color: Color = Color("ff5a4a")
+	var winding: bool = boss.melee_winding()
+	var progress: float = boss.melee_progress() if winding else 1.0
+	var strength: float = glow(float(move.time)) if winding else 1.0
+	var direction: Vector2 = move.direction
+	var reach: float = float(move.reach)
+	match String(move.kind):
+		"swing":
+			var arc: float = float(move.arc)
+			var start: float = direction.angle() - arc
+			var outer: PackedVector2Array = PackedVector2Array([boss.position])
+			var inner: PackedVector2Array = PackedVector2Array([boss.position])
+			for index: int in 33:
+				var ray: Vector2 = Vector2.from_angle(start + arc * 2 * index / 32.0)
+				outer.append(boss.position + ray * reach)
+				inner.append(boss.position + ray * maxf(2, reach * progress))
+			draw_colored_polygon(outer, Color(color, 0.1 if winding else 0.3))
+			draw_colored_polygon(inner, Color(color, 0.16))
+			draw_arc(boss.position, reach + 3, start, start + arc * 2, 48, Color(color, 0.35 * strength), 6)
+			draw_arc(boss.position, reach, start, start + arc * 2, 48, Color(color, 0.9), 2)
+			for side: int in [-1, 1]:
+				draw_line(boss.position + direction.rotated(arc * side) * 26, boss.position + direction.rotated(arc * side) * reach, Color(color, 0.7), 1)
+		"slam", "shove":
+			draw_circle(boss.position, reach, Color(color, 0.08 + (0.14 * progress if winding else 0.25)))
+			draw_arc(boss.position, reach + 3, 0, TAU, 64, Color(color, 0.35 * strength), 6)
+			draw_arc(boss.position, reach, 0, TAU, 64, Color(color, 0.9), 2)
+			draw_arc(boss.position, maxf(2, reach * progress), 0, TAU, 64, Color(color, 0.55), 2)
+		"lunge":
+			if winding:
+				corridor_glow(boss.position, direction, float(move.travel) + 30, reach, color, strength)
+				corridor(boss.position, direction, float(move.travel) + 30, reach, color)
+
 func _draw() -> void:
 	if not is_instance_valid(boss) or boss.health <= 0: return
+	if boss.melee_active(): melee_warning()
 	if boss is MadreCero:
 		var mother: MadreCero = boss as MadreCero
 		for relay: NetworkRelay in mother.relays:

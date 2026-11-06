@@ -8,6 +8,7 @@ var navigation_enabled: bool = true
 var continue_button: Button
 var new_button: Button
 var options_button: Button
+var boss_rush_button: Button
 var status: Label
 var options: SettingsPanel = SettingsPanel.new()
 var confirm: ConfirmationDialog
@@ -84,6 +85,7 @@ func _ready() -> void:
 	content.add_child(buttons)
 	continue_button = _button(buttons, "Continuar", _continue_game)
 	new_button = _button(buttons, "Nueva partida", request_new_game)
+	boss_rush_button = _button(buttons, "Boss Rush", start_boss_rush)
 	options_button = _button(buttons, "Opciones", options.open_panel)
 	_button(buttons, "Salir", func() -> void: get_tree().quit())
 	status = Label.new()
@@ -200,6 +202,12 @@ func request_new_game() -> void:
 		confirm.popup_centered()
 	else:
 		_launch(true)
+
+## Los cinco jefes seguidos; no lee ni modifica la partida guardada.
+func start_boss_rush() -> void:
+	if navigation_enabled:
+		get_tree().paused = false
+		ScreenFade.change_scene(get_tree(), "res://levels/expedition/boss_rush.tscn")
 
 func _continue_game() -> void:
 	if not SaveSystem.checkpoint_info(checkpoint_path).is_empty():

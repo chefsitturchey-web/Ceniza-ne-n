@@ -7,6 +7,9 @@ signal menu_requested
 signal practice_exit_requested
 signal practice_retry_requested
 var debug_practice: bool = false
+## Boss Rush: la arena solo emite resolved; el modo decide transiciones y resultados.
+var rush: bool = false
+var hints: BossHints
 
 const DAMAGE_EDGES: Script = preload("res://ui/damage_edges.gd")
 const THEME: Theme = preload("res://ui/theme.tres")
@@ -156,6 +159,9 @@ func _ready() -> void:
 	boss.ground_impact.connect(_on_ground_impact)
 	build_lighting()
 	build_hud()
+	hints = BossHints.new()
+	hints.arena = self
+	add_child(hints)
 	add_child(options)
 	options.closed.connect(func() -> void:
 		if pause_panel.visible:
@@ -404,7 +410,7 @@ func return_to_menu() -> void:
 		practice_exit_requested.emit()
 		return
 	get_tree().paused = false
-	if configured:
+	if configured or rush:
 		menu_requested.emit()
 	else:
 		get_tree().change_scene_to_file("res://ui/main_menu.tscn")
@@ -476,6 +482,7 @@ func _process(delta: float) -> void:
 		return
 	combat_hud.update_values(player, boss)
 	combat_hud.advance(delta)
+	hints.advance(delta)
 	# El rumor sigue a la embestida: entra de golpe y se apaga al terminar.
 	if not dash_active:
 		dash_player.volume_db = move_toward(dash_player.volume_db, -60.0, delta * 150.0)
@@ -491,7 +498,7 @@ func _process(delta: float) -> void:
 		if ending_timer <= 0:
 			emitted = true
 			resolved.emit(ending_victory)
-			if not configured:
+			if not configured and not rush:
 				if ending_victory:
 					show_completed()
 				else:

@@ -49,10 +49,11 @@ func tick(delta: float) -> void:
 		hazards.clear()
 		cooldown = maxf(cooldown, 1.4)
 	else:
-		cooldown -= delta
+		# Mientras avisa un golpe cercano no se superpone una trampa nueva: presión legible.
+		if not boss.melee_winding(): cooldown -= delta
 		if cooldown <= 0:
 			request_combo()
-			cooldown = [7.0, 6.2, 5.6, 4.7, 4.2][arena.zone_index] * (0.76 if boss.phase == 2 else 1.0)
+			cooldown = [6.2, 5.6, 5.0, 4.4, 4.0][arena.zone_index] * (0.76 if boss.phase == 2 else 1.0)
 	for hazard: Dictionary in hazards.duplicate():
 		hazard.time -= delta
 		if hazard.time <= 0 and not hazard.hit:

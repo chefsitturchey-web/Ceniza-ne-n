@@ -40,6 +40,19 @@ func active_relays() -> int:
 
 func is_core_exposed() -> bool: return exposure > 0
 
+## La red también golpea de cerca: látigos de enlace, agarre que roba aliento y saltos de nodo.
+func melee_profile() -> Dictionary:
+	return {"close": 100.0, "band": Vector2(150, 260), "cooldown": 1.8,
+		"combo": [
+			{"kind": "swing", "name": "Látigo de enlace", "windup": 0.7, "reach": 120.0, "arc": 1.1, "damage": 16, "push": 180.0},
+			{"kind": "swing", "name": "Segundo látigo", "windup": 0.55, "reach": 120.0, "arc": 1.1, "damage": 16, "push": 180.0}],
+		"finisher": {"kind": "shove", "name": "Abrazo de la red", "windup": 0.65, "reach": 88.0, "damage": 16, "push": 300.0, "stamina": 35.0},
+		"lunge": {"kind": "lunge", "name": "Salto de nodo", "windup": 0.75, "reach": 42.0, "travel": 190.0, "damage": 20, "push": 220.0},
+		"shove": {"kind": "slam", "name": "Pulso de nodo", "windup": 0.55, "reach": 95.0, "damage": 14, "push": 320.0}}
+
+func melee_tempo() -> float:
+	return 0.75 if last_protocol else (0.85 if phase == 2 else 1.0)
+
 func hit_multiplier(_origin: Vector2) -> float: return 2.0 if core_exposed else 0.0
 
 func clear_hazards() -> void: marks.clear()
@@ -76,10 +89,14 @@ func _physics_process(delta: float) -> void:
 	guard_cooldown = maxf(0, guard_cooldown - delta)
 	if Input.is_action_just_pressed("interact"): repair_nearest()
 	if Input.is_action_just_pressed("overload"): overload_relays()
-	facing = (target.global_position - global_position).normalized()
-	var destination: Vector2 = Vector2(320, 215) + Vector2.from_angle(elapsed * 0.3) * 85
-	velocity = Vector2.ZERO if cast_recovery > 0 or casting_time() < 0.65 else tactics.steer(self, destination, 62 if phase == 2 else 45)
-	move_and_slide()
+	var meleeing: bool = tick_melee(delta)
+	if not meleeing and exposure <= 0 and cast_recovery <= 0 and casting_time() >= 0.65:
+		meleeing = try_melee(global_position.distance_to(target.global_position))
+	if not meleeing:
+		facing = (target.global_position - global_position).normalized()
+		var destination: Vector2 = Vector2(320, 215) + Vector2.from_angle(elapsed * 0.3) * 85
+		velocity = Vector2.ZERO if cast_recovery > 0 or casting_time() < 0.65 else tactics.steer(self, destination, 70 if phase == 2 else 52)
+		move_and_slide()
 	if not last_protocol and health <= max_health * 0.3:
 		last_protocol = true
 		cue_requested.emit("alarm")
@@ -97,11 +114,12 @@ func _physics_process(delta: float) -> void:
 		if active_relays() >= 2: charge += delta * (1.15 if support_units >= 4 else 1.0)
 		if charge >= 18:
 			charge = 0
-			exposure = 5.0 if last_protocol else 7.0
+			cancel_melee()
+			exposure = 4.5 if last_protocol else 6.0
 			exposed_pulse = 1.5
 			marks.clear()
 			cue_requested.emit("upgrade")
-		pulse -= delta
+		if not melee_winding(): pulse -= delta
 		if pulse <= 0 and not relays.is_empty():
 			var index: int = choose_relay()
 			var point: Vector2 = relays[index].global_position if index >= 0 else tactics.predicted(target).clamp(Vector2(90, 75), Vector2(550, 405))
@@ -109,7 +127,7 @@ func _physics_process(delta: float) -> void:
 			if phase == 2 and index >= 0: marks.append({"position": tactics.predicted(target).clamp(Vector2(90, 75), Vector2(550, 405)), "time": 1.3, "relay": -1})
 			if last_protocol: marks.append({"position": target.global_position.clamp(Vector2(90, 75), Vector2(550, 405)), "time": 1.0, "relay": -1})
 			pulse_index += 1
-			pulse = 1.3 if last_protocol else (1.8 if phase == 2 else 2.6)
+			pulse = 1.2 if last_protocol else (1.6 if phase == 2 else 2.2)
 			cue_requested.emit("fire_pulse")
 	for index: int in range(marks.size() - 1, -1, -1):
 		marks[index].time -= delta
@@ -139,6 +157,7 @@ func choose_relay() -> int:
 	return int(choice) if not choice.is_empty() else (int(scores.keys()[0]) if not scores.is_empty() else -1)
 
 func status_text() -> String:
+	if melee_active(): return melee_status()
 	if core_exposed: return "MADRE CERO VULNERABLE: sigue moviéndote" if last_protocol else "MADRE CERO VULNERABLE: rompe el protocolo"
 	if active_relays() < 2: return "Reconecta relés: acércate y pulsa E (25 resistencia)"
 	return "Protege 2 relés · Enlace %d/18 · E reparar · Q escudo (%ds)" % [int(charge), ceili(guard_cooldown)]

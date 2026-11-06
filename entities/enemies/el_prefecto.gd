@@ -16,6 +16,20 @@ func build_visual() -> void: pass
 
 func is_core_exposed() -> bool: return state == State.RECOVER
 
+## Esgrima de cerca: tres cortes con avisos breves y estocada corta de remate.
+func melee_profile() -> Dictionary:
+	return {"close": 100.0, "band": Vector2(150, 250), "cooldown": 1.3,
+		"combo": [
+			{"kind": "swing", "name": "Corte alto", "windup": 0.55, "reach": 104.0, "arc": 0.8, "damage": 18, "push": 150.0},
+			{"kind": "swing", "name": "Corte bajo", "windup": 0.45, "reach": 104.0, "arc": 0.8, "damage": 18, "push": 150.0},
+			{"kind": "swing", "name": "Tajo cruzado", "windup": 0.5, "reach": 108.0, "arc": 1.05, "damage": 20, "push": 190.0}],
+		"finisher": {"kind": "lunge", "name": "Estocada corta", "windup": 0.6, "reach": 36.0, "travel": 160.0, "damage": 24, "push": 220.0},
+		"lunge": {"kind": "lunge", "name": "Paso de duelista", "windup": 0.6, "reach": 38.0, "travel": 200.0, "damage": 22, "push": 200.0},
+		"shove": {"kind": "shove", "name": "Empujón de escudo", "windup": 0.45, "reach": 80.0, "damage": 12, "push": 340.0, "stamina": 25.0}}
+
+func melee_tempo() -> float:
+	return 0.72 if last_guard else (0.85 if phase == 2 else 1.0)
+
 func hit_multiplier(origin: Vector2) -> float:
 	if core_exposed: return 2.0
 	return 0.0 if facing.dot((origin - global_position).normalized()) > 0.25 else 0.3
@@ -31,7 +45,7 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 		last_guard = true
 		cue_requested.emit("alarm")
 		phase_changed.emit(phase)
-	if dealt == 0 and health > 0 and target != null and riposte_cooldown <= 0 and state == State.APPROACH:
+	if dealt == 0 and health > 0 and target != null and riposte_cooldown <= 0 and state == State.APPROACH and not melee_active():
 		riposte_cooldown = 4.0 if phase == 2 else 6.0
 		charges_left = 1
 		facing = (target.global_position - global_position).normalized()
@@ -50,8 +64,14 @@ func _physics_process(delta: float) -> void:
 	tactics.observe(target, delta)
 	tactics.track_cover(self, target, delta)
 	riposte_cooldown = maxf(0, riposte_cooldown - delta)
+	if tick_melee(delta):
+		update_puppet(delta)
+		return
 	timer -= delta
 	var difference: Vector2 = target.global_position - global_position
+	if state == State.APPROACH and try_melee(difference.length()):
+		update_puppet(delta)
+		return
 	match state:
 		State.APPROACH:
 			facing = difference.normalized()
@@ -128,13 +148,14 @@ func _physics_process(delta: float) -> void:
 		State.RECOVER:
 			if timer <= 0:
 				next_pattern += 1
-				change_state(State.APPROACH, 0.9 if last_guard else 1.25)
+				change_state(State.APPROACH, 0.75 if last_guard else 1.0)
 	update_puppet(delta)
 
 func update_puppet(_delta: float) -> void:
 	queue_redraw()
 
 func status_text() -> String:
+	if melee_active(): return melee_status()
 	match state:
 		State.RECOVER: return "ESCUDO AGOTADO: castiga su recuperación"
 		State.CHARGE_WINDUP: return "ESTOCADA: abandona la línea dorada; puede retrasarla"

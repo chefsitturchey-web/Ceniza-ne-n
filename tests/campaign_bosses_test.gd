@@ -143,7 +143,7 @@ func run_checks() -> void:
 	for link: ChoirRelay in choir.relays:
 		if link.health > 0:
 			arena.strike(link.position + Vector2.DOWN * 35, Vector2.UP, 180, 42)
-	verify(choir.core_exposed and choir.exposure_left == 6.0, "Romper tres enlaces abre ventana de seis segundos")
+	verify(choir.core_exposed and choir.exposure_left == 5.0, "Romper tres enlaces abre ventana de cinco segundos")
 	verify(choir.marks.is_empty() and choir.waves.is_empty(), "Ventana elimina peligros anteriores")
 	verify(choir.receive_hit(Vector2.ZERO, 50) == 100, "Coro abierto recibe daño doble")
 	choir.phase = 2
