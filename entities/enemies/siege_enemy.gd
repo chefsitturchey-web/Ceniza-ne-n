@@ -104,7 +104,7 @@ func take_damage(amount: int) -> void:
 			sprite.modulate = visual.base_tint
 			visual.play_visual(&"destruccion")
 			death_remaining = visual.animation_duration(&"destruccion") + DEATH_VISUAL_GRACE
-		elif data.id in [&"artillero", &"saboteador"]:
+		elif data.id == &"saboteador":
 			death_remaining = 1.2
 		else:
 			queue_free()

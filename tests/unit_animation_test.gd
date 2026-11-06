@@ -88,7 +88,15 @@ func run_checks() -> void:
 	var civic_data: Dictionary = world.civic.snapshot()
 	civic_data.villagers[0].recover = "invalid"
 	verify(not CivicSystem.valid(civic_data, world.civic.gates.size()), "Recuperación corrupta no entra al guardado")
-	for id: String in ["artillero", "saboteador"]:
+	var gunner: SiegeEnemy = world.director.spawn_enemy(1, load("res://data/enemies/artillero.tres"))
+	gunner.set_physics_process(false)
+	verify(gunner.visual.field_rig == null and gunner.sprite.visible and gunner.sprite.modulate == Color.WHITE, "Artillero usa su sprite propio sin FieldUnitVisual")
+	verify(String(gunner.sprite.sprite_frames.get_frame_texture(&"caminar", 0).resource_path).contains("/artillero/"), "Artillero no reutiliza cuadros ajenos")
+	for animation: StringName in [&"reposo", &"caminar", &"ataque", &"daño", &"destruccion"]:
+		verify(gunner.sprite.sprite_frames.has_animation(animation), "Artillero tiene la animación " + String(animation))
+	gunner.take_damage(10000)
+	verify(gunner.sprite.animation == &"destruccion" and gunner.death_remaining > 0.8 and not gunner.is_in_group(GameRules.ENEMIES), "Artillero muestra su destrucción sin seguir atacando")
+	for id: String in ["saboteador"]:
 		var enemy: SiegeEnemy = world.director.spawn_enemy(1, load("res://data/enemies/%s.tres" % id))
 		enemy.set_physics_process(false)
 		verify(enemy.visual.field_rig != null and enemy.visual.field_rig.sprite.sprite_frames == UnitSpriteLibrary.frames(id), "El enemigo usa fotogramas completos: " + id)

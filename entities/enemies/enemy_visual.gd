@@ -18,8 +18,9 @@ func bind(value: AnimatedSprite2D) -> void:
 		elif actor.data.id == &"corredor": sprite.position.y = -21
 		elif actor.data.id == &"ariete": sprite.position.y = -26 # Sprite propio (PixelLab): botas en y = 58.
 		elif actor.data.id == &"saltador": sprite.position.y = -22 # Sprite propio (PixelLab): patas en y = 54 del lienzo.
+		elif actor.data.id == &"artillero": sprite.position.y = -28 # Sprite propio (PixelLab): botas en y = 60 del lienzo.
 		elif actor.data.id == &"blindado": sprite.position.y = -28 # Sprite propio (PixelLab): botas en y = 60 del lienzo.
-	if actor.data.id in [&"artillero", &"saboteador"]:
+	if actor.data.id == &"saboteador":
 		field_rig = FieldUnitVisual.new()
 		field_rig.actor = actor
 		field_rig.role = String(actor.data.id)

@@ -12,3 +12,4 @@ windup = 0.9
 cooldown = 1.8
 attack_visual_duration = 0.95
 scene = ExtResource("2")
+move_animation = &"caminar"
