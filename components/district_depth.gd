@@ -31,7 +31,8 @@ static func draw_architecture(canvas: CanvasItem, texture: Texture2D, camera_x: 
 	var top: float = GameRules.FLOOR_Y - (216 if periphery else 360)
 	var first: int = floori(camera_x * ARCHITECTURE_SCROLL / width)
 	for tile: int in range(first - 1, first + 2):
-		var x: float = roundf(origin(camera_x, tile, width, ARCHITECTURE_SCROLL))
+		# Sin redondear: la cámara frena con pasos de subpíxel y un fondo redondeado salta 1 px (temblor al parar).
+		var x: float = origin(camera_x, tile, width, ARCHITECTURE_SCROLL)
 		var mirrored: bool = posmod(tile, 2) == 1
 		var frame: Transform2D = Transform2D(0, Vector2(-1 if mirrored else 1, 1), 0, Vector2(x + (width if mirrored else 0), 0))
 		canvas.draw_set_transform_matrix(frame)

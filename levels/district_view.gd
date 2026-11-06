@@ -74,7 +74,7 @@ func _process(delta: float) -> void:
 	var camera: Camera2D = get_viewport().get_camera_2d()
 	if camera != null:
 		var camera_x: float = camera.get_screen_center_position().x
-		if absf(camera_x - last_camera_x) > 0.5:
+		if absf(camera_x - last_camera_x) > 0.01:
 			last_camera_x = camera_x
 			queue_redraw()
 	redraw_clock += delta

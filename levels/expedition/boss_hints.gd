@@ -3,7 +3,7 @@ extends Node
 ## Pistas breves de controles y mecánicas durante cada combate de jefe. Cada pista sale
 ## una sola vez por pelea, con la tecla o el botón del último dispositivo usado.
 ## La arena llama a advance() desde su _process: con pausa o novela abierta no avanza.
-const DURATION: float = 4.5
+const DURATION: float = 3.0
 const URGENT: Array[String] = ["expuesto", "melee", "lunge"]
 ## Recuerda el último dispositivo entre arenas (Boss Rush encadena varias).
 static var last_pad: bool:
@@ -61,22 +61,23 @@ func _input(event: InputEvent) -> void:
 static func control(action: String) -> String:
 	return "[%s]" % InputGlyphs.action_name(action)
 
+## Pistas cortas tipo "[J] Atacar": tapan poco y se leen de un vistazo.
 func text_for(id: String) -> String:
 	match id:
-		"controles": return "Ataca con %s y esquiva con %s: durante la esquiva eres invulnerable." % [control("attack"), control("dodge")]
+		"controles": return "%s Atacar   %s Esquivar   %s Interactuar" % [control("attack"), control("dodge"), control("interact")]
 		"mecanica":
 			match arena.zone_index:
-				0: return "Su frente bloquea tus golpes: atácalo por los lados o la espalda. Si embiste contra un pilar queda aturdido."
-				1: return "Su coraza resiste. Después de las rejillas de fuego purga vapor y su núcleo queda expuesto."
-				2: return "Solo recibe daño con el núcleo abierto: rompe las tres antenas con %s y cruza los pulsos por su hueco." % control("attack")
-				3: return "Golpear su escudo provoca un contraataque. Espera a que termine un ataque y castiga su recuperación."
-				4: return "Protege dos relés: junto a uno pulsa %s para repararlo y %s para blindarlos. Al llenarse el enlace queda expuesta." % [control("interact"), control("overload")]
-		"melee": return "Golpe cercano: la zona roja es su alcance exacto. Sal de ella o esquiva con %s justo antes del impacto." % control("dodge")
-		"lunge": return "Embestida corta: la línea roja marca su recorrido. Apártate de lado."
-		"expuesto": return "Núcleo expuesto: acércate y ataca con %s. Ahora recibe el doble de daño." % control("attack")
-		"bloqueo": return "Golpe bloqueado. Si insistes contra su defensa te empujará: busca otro ángulo o espera la apertura."
-		"marcas": return "Las runas del suelo estallan cuando su anillo se cierra: sal del círculo a tiempo."
-		"fase": return "Segunda fase: avisos más cortos y un golpe más en cada combo."
+				0: return "Golpéalo por los lados o la espalda"
+				1: return "Tras el fuego su núcleo se abre"
+				2: return "%s Rompe las 3 antenas" % control("attack")
+				3: return "No golpees su escudo: castiga tras su ataque"
+				4: return "%s Reparar relé   %s Blindar" % [control("interact"), control("overload")]
+		"melee": return "Zona roja: sal o %s Esquiva" % control("dodge")
+		"lunge": return "Línea roja: apártate de lado"
+		"expuesto": return "Núcleo expuesto: %s Ataca, daño doble" % control("attack")
+		"bloqueo": return "Bloqueado: busca otro ángulo"
+		"marcas": return "Sal de las runas antes de que estallen"
+		"fase": return "Fase 2: más rápido"
 	return ""
 
 ## Encola una pista si aún no salió en esta pelea. Las urgentes pasan delante.

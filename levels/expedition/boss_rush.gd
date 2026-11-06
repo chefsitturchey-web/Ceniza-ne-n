@@ -13,6 +13,8 @@ const HEAL: float = 0.5
 const DAMAGE_STEP: int = 15
 ## Mejor tiempo en un archivo propio, separado de partida.json y de opciones.cfg.
 static var record_path: String = "user://boss_rush.cfg"
+const RANKING_SIZE: int = 10
+const MAX_NAME: int = 12
 var index: int = 0
 var elapsed: float = 0
 var hits: int = 0
@@ -20,24 +22,63 @@ var health: int = Player.MAX_HEALTH
 var stage: String = "fight"
 var victory: bool = false
 var new_record: bool = false
+## Puesto del último intento en el ranking (-1 si no entró).
+var place: int = -1
 var arena: RecaudadorArena
 var overlay: CanvasLayer = CanvasLayer.new()
 var timer_label: Label
 var panel: Control
 var focus_button: Button
+var name_edit: LineEdit
+var ranking_rows: VBoxContainer
 
 static func best_time() -> float:
+	var entries: Array[Dictionary] = ranking()
+	return float(entries[0].time) if not entries.is_empty() else 0.0
+
+## Ranking local: los 10 mejores tiempos con nombre. Lee también el récord antiguo sin nombre.
+static func ranking() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
 	var config: ConfigFile = ConfigFile.new()
-	if config.load(record_path) != OK: return 0.0
-	var value: Variant = config.get_value("boss_rush", "best_time", 0.0)
-	return float(value) if (value is float or value is int) and is_finite(float(value)) and float(value) > 0 else 0.0
+	if config.load(record_path) != OK: return result
+	var stored: Variant = config.get_value("boss_rush", "ranking", [])
+	if stored is Array:
+		for entry: Variant in stored:
+			if entry is Dictionary and entry.has("time") and (entry.time is float or entry.time is int) and is_finite(float(entry.time)) and float(entry.time) > 0:
+				result.append({"name": str(entry.get("name", "Portador")).left(MAX_NAME), "time": float(entry.time), "hits": int(entry.get("hits", 0))})
+	var legacy: Variant = config.get_value("boss_rush", "best_time", 0.0)
+	if result.is_empty() and (legacy is float or legacy is int) and is_finite(float(legacy)) and float(legacy) > 0:
+		result.append({"name": "Portador", "time": float(legacy), "hits": 0})
+	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.time < b.time)
+	return result
+
+static func last_name() -> String:
+	var config: ConfigFile = ConfigFile.new()
+	if config.load(record_path) != OK: return "Portador"
+	return str(config.get_value("boss_rush", "name", "Portador")).left(MAX_NAME)
+
+## Inserta un tiempo y devuelve su puesto (0 = primero) o -1 si no entra en el ranking.
+static func submit(player: String, seconds: float, hit_count: int) -> int:
+	var clean: String = player.strip_edges().left(MAX_NAME)
+	if clean.is_empty(): clean = "Portador"
+	var entries: Array[Dictionary] = ranking()
+	var entry: Dictionary = {"name": clean, "time": seconds, "hits": hit_count}
+	entries.append(entry)
+	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.time < b.time)
+	var place: int = entries.find(entry)
+	entries.resize(mini(entries.size(), RANKING_SIZE))
+	if place >= RANKING_SIZE: return -1
+	var config: ConfigFile = ConfigFile.new()
+	config.set_value("boss_rush", "ranking", entries)
+	config.set_value("boss_rush", "name", clean)
+	config.set_value("boss_rush", "best_time", float(entries[0].time))
+	var pending: String = record_path + ".tmp"
+	if config.save(pending) != OK: return -1
+	if DirAccess.rename_absolute(ProjectSettings.globalize_path(pending), ProjectSettings.globalize_path(record_path)) != OK: return -1
+	return place
 
 static func store_best(seconds: float) -> bool:
-	var config: ConfigFile = ConfigFile.new()
-	config.set_value("boss_rush", "best_time", seconds)
-	var pending: String = record_path + ".tmp"
-	if config.save(pending) != OK: return false
-	return DirAccess.rename_absolute(ProjectSettings.globalize_path(pending), ProjectSettings.globalize_path(record_path)) == OK
+	return submit(last_name(), seconds, 0) >= 0
 
 static func format_time(seconds: float) -> String:
 	var total: int = int(seconds * 10)
@@ -194,25 +235,71 @@ func show_results(won: bool, last_title: String) -> void:
 	update_timer()
 	var best: float = best_time()
 	new_record = won and (best <= 0 or elapsed < best)
-	if new_record:
-		store_best(elapsed)
-		best = elapsed
+	place = submit(last_name(), elapsed, hits) if won else -1
 	var rows: VBoxContainer = build_panel("BOSS RUSH COMPLETADO" if won else "SEÑAL PERDIDA", Color("ffce75") if won else Color("dd6482"))
 	if not won: line(rows, "Caíste ante %s." % last_title, Color("dd6482"))
-	line(rows, "Jefes derrotados: %d/%d" % [index + (1 if won else 0), CampaignRoute.COUNT])
-	line(rows, "Tiempo total: %s" % format_time(elapsed))
-	line(rows, "Golpes recibidos: %d" % hits)
+	line(rows, "Jefes %d/%d   Tiempo %s   Golpes %d" % [index + (1 if won else 0), CampaignRoute.COUNT, format_time(elapsed), hits])
 	if new_record: line(rows, "NUEVO RÉCORD", Color("ffce75"))
-	line(rows, "Mejor tiempo: %s" % (format_time(best) if best > 0 else "sin marca"), Color("8299a8"))
+	if place >= 0:
+		# El nombre se puede cambiar aquí mismo; se guarda al pulsar Intro o al salir.
+		var name_row: HBoxContainer = HBoxContainer.new()
+		name_row.alignment = BoxContainer.ALIGNMENT_CENTER
+		rows.add_child(name_row)
+		var caption: Label = Label.new()
+		caption.text = "Puesto %d. Tu nombre:" % (place + 1)
+		caption.add_theme_font_override("font", TextMarks.FONT)
+		caption.add_theme_font_size_override("font_size", 10)
+		name_row.add_child(caption)
+		name_edit = LineEdit.new()
+		name_edit.text = last_name()
+		name_edit.max_length = MAX_NAME
+		name_edit.custom_minimum_size = Vector2(110, 0)
+		name_edit.text_submitted.connect(func(_text: String) -> void: rename_entry(); show_ranking_rows())
+		name_row.add_child(name_edit)
+	ranking_rows = VBoxContainer.new()
+	ranking_rows.add_theme_constant_override("separation", 0)
+	rows.add_child(ranking_rows)
+	show_ranking_rows()
 	focus_button = button(rows, "Volver al menú", return_to_menu)
 	button(rows, "Reintentar", retry)
 	focus_button.grab_focus()
 	run_finished.emit(won)
 
+## Ranking de los 5 mejores; la marca propia sale en dorado.
+func show_ranking_rows() -> void:
+	if not is_instance_valid(ranking_rows): return
+	for child: Node in ranking_rows.get_children(): child.queue_free()
+	var entries: Array[Dictionary] = ranking()
+	if entries.is_empty():
+		line(ranking_rows, "Ranking vacío: termina el Boss Rush para entrar", Color("8299a8"))
+		return
+	for position: int in mini(5, entries.size()):
+		var entry: Dictionary = entries[position]
+		var row: Label = line(ranking_rows, "%d. %s  %s  (%d golpes)" % [position + 1, entry.name, format_time(entry.time), entry.hits], Color("ffce75") if position == place else Color("9fb4c4"))
+		row.add_theme_font_size_override("font_size", 10)
+
+## Cambia el nombre de la marca recién conseguida.
+func rename_entry() -> void:
+	if place < 0 or not is_instance_valid(name_edit): return
+	var entries: Array[Dictionary] = ranking()
+	if place >= entries.size(): return
+	var clean: String = name_edit.text.strip_edges().left(MAX_NAME)
+	if clean.is_empty() or clean == entries[place].name: return
+	entries[place].name = clean
+	var config: ConfigFile = ConfigFile.new()
+	config.set_value("boss_rush", "ranking", entries)
+	config.set_value("boss_rush", "name", clean)
+	config.set_value("boss_rush", "best_time", float(entries[0].time))
+	var pending: String = record_path + ".tmp"
+	if config.save(pending) == OK:
+		DirAccess.rename_absolute(ProjectSettings.globalize_path(pending), ProjectSettings.globalize_path(record_path))
+
 func retry() -> void:
+	rename_entry()
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 func return_to_menu() -> void:
+	rename_entry()
 	close_arena()
 	ScreenFade.change_scene(get_tree(), MENU)

@@ -45,7 +45,7 @@ func _process(delta: float) -> void:
 			if active:
 				var mouth: Vector2 = mouths[mouth_index]
 				var x: float = (1 - mouth.x if posmod(tile, 2) == 1 else mouth.x) * width
-				emitter.position = Vector2(DistrictDepth.origin(camera_x, tile, width, DistrictDepth.ARCHITECTURE_SCROLL) + x, top + mouth.y * height).round()
+				emitter.position = Vector2(DistrictDepth.origin(camera_x, tile, width, DistrictDepth.ARCHITECTURE_SCROLL) + x, top + mouth.y * height)
 				active = absf(emitter.position.x - camera_x) < 620
 				# Deriva lenta; el CPU recibe una brisa equivalente a turbulencia leve.
 				if emitter is CPUParticles2D: emitter.gravity.x = 0.7 + sin(clock * 0.4 + index) * 0.35
