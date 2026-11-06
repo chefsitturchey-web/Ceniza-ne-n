@@ -2,6 +2,7 @@ class_name SettingsPanel
 extends CanvasLayer
 
 signal closed
+signal guide_reset_requested
 var opened: bool = false
 var closed_frame: int = -1
 var was_paused: bool = false
@@ -94,6 +95,15 @@ func _ready() -> void:
 	controls_button.pressed.connect(show_controls)
 	UiSound.attach(controls_button)
 	buttons.add_child(controls_button)
+	var reset_guide: Button = Button.new()
+	reset_guide.text = "Reiniciar guía"
+	reset_guide.pressed.connect(func() -> void:
+		var profile: Dictionary = SaveSystem.engagement_profile()
+		profile.guide = 0
+		SaveSystem.store_engagement(profile)
+		guide_reset_requested.emit()
+		status.text = "Guía lista")
+	buttons.add_child(reset_guide)
 	var back: Button = Button.new()
 	back.text = "Volver  [Esc / Start]"
 	back.size_flags_horizontal = Control.SIZE_EXPAND_FILL

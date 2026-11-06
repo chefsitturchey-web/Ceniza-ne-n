@@ -87,7 +87,10 @@ func update_interaction(delta: float) -> void:
 		hold_time = 0.0
 		hold_target = target
 		return
-	if committed_target == target: return
+	# Las baterías tienen varias cargas: mantener Operar sigue extrayendo.
+	# Obras, viajes y compras conservan una sola operación por pulsación.
+	var repeated_salvage: bool = scavenge != null and target <= ScavengeSystem.TARGET_BASE and target > ScavengeSystem.TARGET_BASE - scavenge.props.size()
+	if committed_target == target and not repeated_salvage: return
 	if target == GameRules.NO_TARGET:
 		return
 	hold_time += delta

@@ -2,6 +2,7 @@ class_name Recaudador
 extends CharacterBody2D
 
 signal died
+signal damaged(amount: int, remaining: int)
 signal fired(origin: Vector2, direction: Vector2)
 signal cue_requested(id: String)
 signal phase_changed(number: int)
@@ -250,6 +251,7 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 		cue_requested.emit("shield")
 	effects.emit_pixels(global_position + (origin - global_position).normalized() * 28, 5, Color("ffce75"))
 	health = maxi(0, health - damage)
+	damaged.emit(damage, health)
 	if damage > 0 and combat_visual != null: combat_visual.pulse_hurt()
 	if phase == 1 and health <= max_health * 0.5:
 		phase = 2

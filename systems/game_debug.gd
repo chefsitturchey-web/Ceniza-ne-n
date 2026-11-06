@@ -162,7 +162,7 @@ func apply_cheats() -> void:
 	var arena: RecaudadorArena = active_arena()
 	var district: District = active_district() if arena == null else null
 	var player: CharacterBody2D = arena.player if arena != null else (district.player if district != null else null)
-	if god_mode or infinite_stamina or freeze_ai or core_god or freeze_cycle or Engine.time_scale != 1:
+	if god_mode or infinite_stamina or freeze_ai or core_god or freeze_cycle or (Engine.time_scale != 1 and ImpactFeedback.hit_stops == 0):
 		if arena == null or not arena.debug_practice: isolate(active_district())
 	if player is TopdownPlayer: player.debug_invincible = god_mode
 	elif player is Player: player.health_component.debug_invincible = god_mode

@@ -36,6 +36,8 @@ En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y 
 
 ## Primeros pasos
 
+**Sigue la flecha.** La primera partida guía con una línea, la tecla o el icono táctil y premios de chatarra. Enseña piezas, núcleo, murallas, generador y dos torretas antes de la primera noche. Puedes repetirla en **Opciones > Reiniciar guía**. Las bajas encadenadas dan hasta x5 chatarra; cada amanecer muestra tus resultados. [Guía, efectos, logros y pruebas](docs/gameplay/PRIMEROS_PASOS_Y_RONDAS.md).
+
 **El mapa tiene poblados recuperables.** Consulta **L → Poblados** para encontrar componentes especiales y restaurar talleres, armerías o dispensarios. Necesitan materiales y constructores; mejoran obras, daño aliado o curación local. [Ubicaciones, costes y bonificaciones](docs/gameplay/POBLADOS_Y_TECNOLOGIA.md).
 
 1. Empiezas con un constructor y un recolector, sin núcleo. Las dos baterías junto al punto de llegada contienen las primeras piezas. Mantén E para extraerlas.

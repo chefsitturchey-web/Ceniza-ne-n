@@ -60,6 +60,7 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	hud.visible = not get_tree().paused and not district.expedition.active and not district.session.finished and not TouchOverlay.showing()
+	if district.first_steps != null and district.first_steps.enabled and district.first_steps.step < FirstSteps.COUNT: return
 	if present_dialogue and not dialogue_queue.is_empty() and not novel.opened and not get_tree().paused and not district.expedition.active and not district.session.finished:
 		if Engine.get_process_frames() > GamePreferences.current().input_block_frame:
 			novel.play(dialogue_queue.pop_front())

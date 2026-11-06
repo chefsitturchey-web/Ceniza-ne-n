@@ -46,6 +46,7 @@ var phase_notice: Label
 var phase_notice_time: float = 0.0
 var dynamics: EncounterDynamics
 var combat_effects: BossCombatEffects
+var impact: ImpactFeedback
 
 func configure(source: Player, index: int = 0) -> void:
 	configured = true
@@ -144,6 +145,12 @@ func _ready() -> void:
 	combat_effects = BossCombatEffects.new()
 	combat_effects.arena = self
 	world.add_child(combat_effects)
+	impact = ImpactFeedback.new()
+	world.add_child(impact)
+	boss.damaged.connect(func(amount: int, remaining: int) -> void: impact.hit(boss.global_position, amount, remaining == 0))
+	player.damaged.connect(func() -> void: combat_effects.shake = maxf(combat_effects.shake, 3))
+	boss.damaged.connect(func(amount: int, _remaining: int) -> void:
+		if amount > 0 and not GamePreferences.current().reduced_flashes: combat_effects.shake = maxf(combat_effects.shake, 0.8))
 	boss.ground_impact.connect(combat_effects.impact)
 	boss.ground_impact.connect(_on_ground_impact)
 	build_lighting()

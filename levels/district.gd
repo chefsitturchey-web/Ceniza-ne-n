@@ -40,6 +40,10 @@ var settlement_backdrop: SettlementBackdrop
 var frontier: FrontierSystem
 var workshop: WorkshopSystem
 var equipment_shop: EquipmentShop
+var first_steps: FirstSteps
+var impact: ImpactFeedback
+var engagement: RoundEngagement
+var rewards_hud: RoundRewardsHud
 
 func _ready() -> void:
 	player.combat_enabled = false
@@ -250,17 +254,45 @@ func _ready() -> void:
 	var arriving: bool = not CampaignRoute.pending.is_empty()
 	session.initialize()
 	clinic.visible = core.tier > 0
-	if core.tier == 0: presenter.show_notice("Empieza por las baterías cercanas; mantén E para recuperar piezas")
+	if core.tier == 0: presenter.show_notice("Sigue la flecha")
 	if session.save_system == null: frontier.restore({})
-	story.queue_dialogue("opening")
+	first_steps = FirstSteps.new()
+	first_steps.setup(self)
+	add_child(first_steps)
+	var guide_hud: FirstStepsHud = FirstStepsHud.new()
+	guide_hud.guide = first_steps
+	add_child(guide_hud)
+	options.guide_reset_requested.connect(first_steps.restart)
+	if not first_steps.enabled or first_steps.step >= FirstSteps.COUNT: story.queue_dialogue("opening")
 	sound.district = self
 	add_child(sound)
+	impact = ImpactFeedback.new()
+	impact.camera = $Player/Camera2D
+	add_child(impact)
+	player.health_component.damaged.connect(func(amount: int, _remaining: int) -> void:
+		impact.number(player.global_position, str(amount), Color("dd6482"))
+		impact.kick(3))
+	director.spawned.connect(func(enemy: SiegeEnemy, _side: float) -> void:
+		enemy.health_component.damaged.connect(func(amount: int, remaining: int) -> void:
+			if absf(enemy.position.x - player.position.x) < 420: impact.hit(enemy.global_position, amount, remaining == 0)))
+	scavenge.collected.connect(func(at: Vector2, scrap: int, parts: int) -> void:
+		impact.collect(at, scrap)
+		impact.collect(at + Vector2(0, -16), parts, true))
+	engagement = RoundEngagement.new()
+	engagement.setup(self)
+	add_child(engagement)
+	engagement.reward_awarded.connect(func(at: Vector2, amount: int) -> void:
+		if absf(at.x - player.position.x) < 420: impact.collect(at, amount))
+	rewards_hud = RoundRewardsHud.new()
+	rewards_hud.progress = engagement
+	add_child(rewards_hud)
 	session.finished_changed.connect(func(victory: bool) -> void: sound.play_outcome(victory))
 	player.health_component.died.connect(func() -> void: sound.play_cue("player_death"))
 	player.respawned.connect(func() -> void: sound.play_cue("respawn"))
 	presenter.publish()
-	if GamePreferences.current().briefing_requested or arriving:
-		GamePreferences.current().briefing_requested = false
+	var requested_briefing: bool = GamePreferences.current().briefing_requested
+	GamePreferences.current().briefing_requested = false
+	if (requested_briefing and (not first_steps.enabled or first_steps.step >= FirstSteps.COUNT)) or arriving:
 		briefing = BriefingPanel.new()
 		briefing.zone = zone
 		briefing.closed.connect(func() -> void: story.queue_dialogue("opening"))
