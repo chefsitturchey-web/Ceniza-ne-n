@@ -129,6 +129,8 @@ func run_checks() -> void:
 			verify(prefect.receive_hit(prefect.position, 100) == 200, "La recuperación abre una ventana de castigo")
 			prefect.health = prefect.max_health / 2 + 10
 			prefect.receive_hit(prefect.position, 100)
+			# Los pasos de antes pueden dejar un golpe cercano en curso; la prueba fuerza la estocada.
+			prefect.cancel_melee()
 			prefect.change_state(Recaudador.State.CHARGE_WINDUP, 0)
 			prefect._physics_process(0.01)
 			verify(prefect.phase == 2 and prefect.charges_left == 2, "Segunda fase encadena dos estocadas")
