@@ -2,7 +2,18 @@
 extends Node2D
 var boss: Recaudador
 
-func _process(_delta: float) -> void: queue_redraw()
+var clock: float = 0
+
+func _process(delta: float) -> void:
+	clock += delta
+	queue_redraw()
+
+## Brillo de aviso de los jefes finales: halo ancho que late y se vuelve más rápido al final.
+## Con destellos reducidos el halo queda fijo.
+func glow(remaining: float) -> float:
+	if GamePreferences.current().reduced_flashes: return 0.5
+	var urgency: float = 1.0 - clampf(remaining / 0.9, 0, 1)
+	return 0.35 + 0.65 * absf(sin(clock * lerpf(6, 22, urgency)))
 
 func rune(point: Vector2, radius: float, time: float, maximum: float, color: Color) -> void:
 	draw_circle(point, radius, Color(color, 0.08))
@@ -27,6 +38,14 @@ func corridor(origin: Vector2, direction: Vector2, length: float, width: float, 
 	for index: int in count:
 		var point: Vector2 = origin.lerp(end, (index + 0.5) / count)
 		draw_polyline(PackedVector2Array([point - direction * 7 - normal * 6, point, point - direction * 7 + normal * 6]), Color(color, 0.8), 2)
+
+func corridor_glow(origin: Vector2, direction: Vector2, length: float, width: float, color: Color, strength: float) -> void:
+	var normal: Vector2 = direction.orthogonal()
+	var end: Vector2 = origin + direction * length
+	var hit: Dictionary = get_world_2d().direct_space_state.intersect_ray(PhysicsRayQueryParameters2D.create(origin, end, 1))
+	if not hit.is_empty(): end = hit.position
+	for side: int in [-1, 1]: draw_line(origin + normal * (width + 3) * side, end + normal * (width + 3) * side, Color(color, 0.35 * strength), 6)
+	draw_line(origin, end, Color(color, 0.18 * strength), 4)
 
 func sweep_warning(radius: float, span: float, color: Color) -> void:
 	var start: float = boss.facing.angle() - span * 0.5
@@ -60,7 +79,11 @@ func _draw() -> void:
 		for relay: NetworkRelay in mother.relays:
 			if relay.health > 0: draw_line(mother.position, relay.position, Color("47dacb", 0.2), 1)
 			if mother.guard_time > 0: rune(relay.position, 28, mother.guard_time, 4, Color("47dacb"))
-		for mark: Dictionary in mother.marks: rune(mark.position, 42, mark.time, 1.5, Color("e888b0"))
+		for mark: Dictionary in mother.marks:
+			var strength: float = glow(mark.time)
+			draw_circle(mark.position, 42, Color("ed4fa0", 0.06 + 0.14 * (1.0 - clampf(mark.time / 1.5, 0, 1))))
+			draw_arc(mark.position, 46, 0, TAU, 48, Color("e888b0", 0.35 * strength), 6)
+			rune(mark.position, 42, mark.time, 1.5, Color("e888b0"))
 	elif boss is CoroSumergido:
 		var choir: CoroSumergido = boss as CoroSumergido
 		for relay: ChoirRelay in choir.relays:
@@ -87,8 +110,14 @@ func _draw() -> void:
 	else:
 		var prefect: bool = boss is ElPrefecto
 		var color: Color = Color("9dc9f0") if prefect else Color("ecc087")
-		if boss.state == Recaudador.State.CHARGE_WINDUP: corridor(boss.position, boss.charge_direction, 520, 46 if prefect else 52, color)
-		elif boss.state == Recaudador.State.CLAW_WINDUP: sweep_warning(boss.melee_reach(), 3.54 if prefect else 3.42, color)
+		if boss.state == Recaudador.State.CHARGE_WINDUP:
+			if prefect: corridor_glow(boss.position, boss.charge_direction, 520, 46, color, glow(boss.timer))
+			corridor(boss.position, boss.charge_direction, 520, 46 if prefect else 52, color)
+		elif boss.state == Recaudador.State.CLAW_WINDUP:
+			if prefect:
+				var start: float = boss.facing.angle() - 1.77
+				draw_arc(boss.position, boss.melee_reach() + 3, start, start + 3.54, 48, Color(color, 0.35 * glow(boss.timer)), 7)
+			sweep_warning(boss.melee_reach(), 3.54 if prefect else 3.42, color)
 		elif boss.state == Recaudador.State.VOLLEY_WINDUP:
 			for index: int in (7 if boss.phase == 2 else 5):
 				var direction: Vector2 = boss.facing.rotated((index - (3 if boss.phase == 2 else 2)) * 0.19)
