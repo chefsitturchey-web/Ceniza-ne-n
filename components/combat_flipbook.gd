@@ -96,7 +96,8 @@ func pose_boss(boss: Recaudador) -> void:
 		previous_state = boss.state
 		state_duration = maxf(0.01, boss.timer)
 	var direction: Vector2 = boss.facing
-	if boss.state == Recaudador.State.DEAD: set_pose("death", direction)
+	# Los jefes finales caen siempre de perfil: su caída cuadro por cuadro está pintada en este y oeste.
+	if boss.state == Recaudador.State.DEAD: set_pose("death", Vector2(1.0 if direction.x >= 0 else -1.0, 0) if actor_id in ["prefecto", "madre"] else direction)
 	elif boss.core_exposed: set_pose("exposed", direction)
 	elif boss is MadreCero and boss.cast_recovery > 0: set_pose("attack", direction, 1 - boss.cast_recovery / 0.35)
 	elif boss is MadreCero and boss.casting_time() < 0.65: set_pose("windup", direction, 1 - maxf(0, boss.casting_time()) / 0.65)

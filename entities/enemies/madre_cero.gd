@@ -15,7 +15,6 @@ var pulse: float = 2
 var guard_time: float = 0
 var guard_cooldown: float = 0
 var support_units: int = 0
-var visual: FinalBossVisual
 var pulse_index: int = 0
 ## Último protocolo (30 % de vida): pulsos más rápidos, triples y sin tregua al exponerse.
 var last_protocol: bool = false
@@ -23,11 +22,8 @@ var exposed_pulse: float = 0
 
 func _init() -> void: max_health = 16000
 
-func build_visual() -> void:
-	visual = FinalBossVisual.new()
-	visual.actor = self
-	visual.index = 1
-	puppet.add_child(visual)
+## El cuerpo es el flipbook cuadro por cuadro (CombatFlipbook); no hay marioneta ni imagen fija superpuesta.
+func build_visual() -> void: pass
 
 func install_relays(parent: Node2D) -> void:
 	for point: Vector2 in [Vector2(145, 135), Vector2(495, 135), Vector2(320, 345)]:
@@ -130,7 +126,6 @@ func _physics_process(delta: float) -> void:
 	update_puppet(delta)
 
 func update_puppet(_delta: float) -> void:
-	visual.queue_redraw()
 	queue_redraw()
 
 func choose_relay() -> int:

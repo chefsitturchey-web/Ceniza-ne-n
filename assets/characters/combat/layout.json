@@ -936,20 +936,20 @@
       "locomotion": "native_joint_mesh_8"
     },
     "prefecto": {
-      "cell": 320,
+      "cell": 144,
       "anchor": [
-        160,
-        228
+        72,
+        103
       ],
-      "render_scale": 0.5,
+      "render_scale": 1.3333,
       "camera": "three_quarter",
       "texture": "res://assets/characters/combat/prefecto.png",
       "source": "res://assets/characters/combat/sources/prefecto.ase",
       "idle_body_bounds": [
-        117,
-        112,
-        212,
-        228
+        57,
+        50,
+        99,
+        103
       ],
       "key_poses": 64,
       "directions": [
@@ -962,23 +962,23 @@
         "base",
         "attack"
       ],
-      "locomotion": "native_joint_mesh_8"
+      "locomotion": "painted_keys_pixellab"
     },
     "madre": {
-      "cell": 320,
+      "cell": 144,
       "anchor": [
-        160,
-        196
+        72,
+        88
       ],
-      "render_scale": 0.5,
+      "render_scale": 1.3333,
       "camera": "three_quarter",
       "texture": "res://assets/characters/combat/madre.png",
       "source": "res://assets/characters/combat/sources/madre.ase",
       "idle_body_bounds": [
-        103,
-        53,
-        211,
-        196
+        48,
+        24,
+        97,
+        88
       ],
       "key_poses": 48,
       "directions": [
@@ -990,7 +990,7 @@
       "pose_sheets": [
         "base"
       ],
-      "locomotion": "native_joint_mesh_8"
+      "locomotion": "painted_keys_pixellab"
     },
     "recaudador": {
       "cell": 320,
