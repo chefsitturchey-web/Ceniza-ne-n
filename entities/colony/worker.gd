@@ -38,6 +38,11 @@ func apply_dps(dps: float, delta: float) -> void:
 		damage_accum -= whole
 		health_component.take_damage(whole)
 
+## Los ataques enemigos usan la misma salud que el peligro por proximidad.
+func take_damage(amount: int) -> void:
+	health_component.take_damage(amount)
+	if hp <= 0 and is_in_group(GameRules.NIGHT_WORKERS): remove_from_group(GameRules.NIGHT_WORKERS)
+
 func update_visual(previous_x: float, working: bool) -> void:
 	var moving: bool = not is_equal_approx(previous_x, x)
 	visual.walking = moving
@@ -45,6 +50,10 @@ func update_visual(previous_x: float, working: bool) -> void:
 	if moving:
 		visual.face(x < previous_x)
 	var colony: ColonySystem = get_parent() as ColonySystem
-	visual.fleeing = colony != null and colony.unsafe_at(previous_x)
+	# Solo una orden nocturna expone trabajadores como objetivos de combate.
+	var exposed: bool = colony != null and colony.night_active() and hp > 0
+	if exposed and not is_in_group(GameRules.NIGHT_WORKERS): add_to_group(GameRules.NIGHT_WORKERS)
+	elif not exposed and is_in_group(GameRules.NIGHT_WORKERS): remove_from_group(GameRules.NIGHT_WORKERS)
+	visual.fleeing = colony != null and colony.flee_at(previous_x)
 	visual.refresh_state()
 	visual.queue_redraw()

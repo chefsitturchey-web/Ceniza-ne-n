@@ -21,6 +21,9 @@ var corpse_system: CorpseSystem
 ## Corpse reported by the player that a builder must bury before resuming work.
 var work_factor: float = 1.0
 var burial_target: Corpse
+## Una orden nocturna habilita el trabajo bajo riesgo hasta el amanecer.
+var night_authorized: bool = false
+var night_warned: bool = false
 
 func add_worker(role: StringName) -> void:
 	var data: WorkerData = builder_data if role == &"builder" else collector_data
@@ -33,6 +36,9 @@ func add_worker(role: StringName) -> void:
 	worker_added.emit(worker)
 
 func update_workers(delta: float) -> void:
+	if cycle.phase == "DÍA":
+		night_authorized = false
+		night_warned = false
 	var core_crew: int = 0
 	var burial_crew: int = 0
 	var dead: Array[ColonyWorker] = []
@@ -48,18 +54,18 @@ func update_workers(delta: float) -> void:
 				worker.update_visual(previous_x, false)
 				continue
 			var gather_destination: float
-			if unsafe_at(worker.x):
+			if flee_at(worker.x):
 				gather_destination = safe_spot(worker.x)
-			elif cycle.phase == "DÍA" and worker.cargo == 0:
+			elif working_hours() and worker.cargo == 0:
 				gather_destination = worker.side * worker.data.gather_distance
-			elif cycle.phase == "DÍA":
+			elif working_hours():
 				gather_destination = worker.side * worker.data.home_distance
 			else:
 				gather_destination = _wander_destination(worker, delta)
-			if unsafe_at(gather_destination): gather_destination = safe_spot(worker.x)
-			worker.x = move_toward(worker.x, gather_destination, worker.data.speed * delta)
+			if flee_at(gather_destination): gather_destination = safe_spot(worker.x)
+			worker.x = move_toward(worker.x, gather_destination, worker.data.speed * _speed() * delta)
 			if absf(worker.x - gather_destination) < GameRules.GATHER_ARRIVAL_DISTANCE:
-				if cycle.phase == "DÍA" and absf(gather_destination) > GameRules.COLLECTOR_OUTSIDE_THRESHOLD:
+				if working_hours() and absf(gather_destination) > GameRules.COLLECTOR_OUTSIDE_THRESHOLD:
 					worker.gather += delta
 					if worker.gather >= worker.data.gather_time:
 						worker.cargo = worker.data.cargo
@@ -67,22 +73,22 @@ func update_workers(delta: float) -> void:
 				else:
 					bank.deposit(worker.cargo)
 					worker.cargo = 0
-			var gathering: bool = cycle.phase == "DÍA" and worker.cargo == 0 and absf(gather_destination) > GameRules.COLLECTOR_OUTSIDE_THRESHOLD and absf(worker.x - gather_destination) < GameRules.GATHER_ARRIVAL_DISTANCE
+			var gathering: bool = working_hours() and worker.cargo == 0 and absf(gather_destination) > GameRules.COLLECTOR_OUTSIDE_THRESHOLD and absf(worker.x - gather_destination) < GameRules.GATHER_ARRIVAL_DISTANCE
 			worker.update_visual(previous_x, gathering)
 			continue
 		# Si un enemigo se acerca, el constructor se repliega tras la torreta.
-		if unsafe_at(worker.x):
+		if flee_at(worker.x):
 			worker.job = -1
 			worker.external_job = -1
-			worker.x = move_toward(worker.x, safe_spot(worker.x), worker.data.speed * delta)
+			worker.x = move_toward(worker.x, safe_spot(worker.x), worker.data.speed * _speed() * delta)
 			worker.update_visual(previous_x, false)
 			continue
 		# Un solo constructor entierra; espera si el cadáver sigue en zona peligrosa.
-		if burial_target != null and is_instance_valid(burial_target) and not burial_target.buried and burial_crew < 1 and cycle.phase == "DÍA" and not unsafe_at(burial_target.position.x):
+		if burial_target != null and is_instance_valid(burial_target) and not burial_target.buried and burial_crew < 1 and working_hours() and not flee_at(burial_target.position.x):
 			burial_crew += 1
 			worker.job = -1
 			worker.external_job = -1
-			worker.x = move_toward(worker.x, burial_target.position.x, worker.data.speed * delta)
+			worker.x = move_toward(worker.x, burial_target.position.x, worker.data.speed * _speed() * delta)
 			var arrived: bool = absf(worker.x - burial_target.position.x) < GameRules.BUILD_ARRIVAL_DISTANCE
 			if arrived:
 				burial_target.bury_progress += delta
@@ -94,14 +100,14 @@ func update_workers(delta: float) -> void:
 			worker.update_visual(previous_x, arrived)
 			continue
 		# Una reserva por obra impide que los constructores dupliquen tareas.
-		if core != null and core.ordered and core_crew < 2 and not unsafe_at(core.position.x):
+		if core != null and core.ordered and core_crew < 2 and not flee_at(core.position.x):
 			core_crew += 1
 			worker.job = -1
 			worker.external_job = -1
-			worker.x = move_toward(worker.x, core.position.x, worker.data.speed * delta)
+			worker.x = move_toward(worker.x, core.position.x, worker.data.speed * _speed() * delta)
 			var arrived: bool = absf(worker.x - core.position.x) < GameRules.BUILD_ARRIVAL_DISTANCE
 			if arrived:
-				core.progress = minf(ColonyCore.BUILD_TIME, core.progress + delta * work_factor)
+				core.progress = minf(ColonyCore.BUILD_TIME, core.progress + delta * work_factor * _pace())
 				if core.progress >= ColonyCore.BUILD_TIME: core.complete_work()
 			worker.update_visual(previous_x, arrived)
 			continue
@@ -109,11 +115,11 @@ func update_workers(delta: float) -> void:
 			continue
 		if worker.job >= 0:
 			var job: ConstructionSite = sites[worker.job]
-			if not job.ordered or unsafe_at(job.x):
+			if not job.ordered or flee_at(job.x):
 				worker.job = -1
 		if worker.job == -1:
 			for site_index: int in range(sites.size()):
-				if not sites[site_index].ordered or unsafe_at(sites[site_index].x):
+				if not sites[site_index].ordered or flee_at(sites[site_index].x):
 					continue
 				var reserved: bool = false
 				for other: ColonyWorker in workers:
@@ -127,10 +133,10 @@ func update_workers(delta: float) -> void:
 			destination = sites[worker.job].x
 		else:
 			destination = _wander_destination(worker, delta)
-		worker.x = move_toward(worker.x, destination, worker.data.speed * delta)
+		worker.x = move_toward(worker.x, destination, worker.data.speed * _speed() * delta)
 		if worker.job >= 0 and absf(worker.x - destination) < GameRules.BUILD_ARRIVAL_DISTANCE:
 			var job: ConstructionSite = sites[worker.job]
-			job.progress += delta * work_factor * (GameRules.OVERLOAD_WORK_RATE if overload.overloaded(job.x) else 1.0)
+			job.progress += delta * work_factor * _pace() * (GameRules.OVERLOAD_WORK_RATE if overload.overloaded(job.x) else 1.0)
 			if job.progress >= GameRules.BUILD_TIME:
 				job.complete_work()
 				worker.job = -1
@@ -175,6 +181,31 @@ func _wander_destination(worker: ColonyWorker, delta: float) -> float:
 		worker.wander_timer = randf_range(2.0, 4.5)
 	return worker.wander_target
 
+## De día, o de noche con permiso del jugador: la gente sale a trabajar.
+func working_hours() -> bool:
+	return cycle.phase == "DÍA" or night_active()
+
+func night_active() -> bool:
+	return night_authorized and cycle.phase != "DÍA"
+
+func _pace() -> float:
+	return GameRules.NIGHT_WORK_PACE if night_active() else 1.0
+
+func _speed() -> float:
+	return _pace()
+
+## Se llama solo al aceptar una orden: el aviso no bloquea el trabajo.
+func authorize_night_work() -> void:
+	if cycle == null or cycle.phase != "NOCHE": return
+	night_authorized = true
+	if not night_warned:
+		night_warned = true
+		notice_requested.emit("De noche: tu gente puede morir")
+
+## De noche con permiso nadie se esconde: el trabajo sigue aunque haya enemigos cerca.
+func flee_at(x: float) -> bool:
+	return not night_active() and unsafe_at(x)
+
 func unsafe_at(x: float) -> bool:
 	for enemy: Node2D in get_tree().get_nodes_in_group(GameRules.ENEMIES):
 		if absf(enemy.position.x - x) < GameRules.UNSAFE_RANGE:
@@ -183,7 +214,7 @@ func unsafe_at(x: float) -> bool:
 
 func work_external(worker: ColonyWorker, delta: float) -> bool:
 	for base: ConstructionSite in sites:
-		if base.ordered and not unsafe_at(base.x):
+		if base.ordered and not flee_at(base.x):
 			worker.external_job = -1
 			return false
 	var candidates: Array[Node2D] = civic.jobs()
@@ -191,11 +222,11 @@ func work_external(worker: ColonyWorker, delta: float) -> bool:
 		if worker.external_job >= candidates.size(): worker.external_job = -1
 	if worker.external_job >= 0:
 		var current: Node2D = candidates[worker.external_job]
-		if not current.ordered or unsafe_at(current.position.x): worker.external_job = -1
+		if not current.ordered or flee_at(current.position.x): worker.external_job = -1
 	if worker.external_job < 0:
 		for index: int in range(candidates.size()):
 			var candidate: Node2D = candidates[index]
-			if not candidate.ordered or unsafe_at(candidate.position.x) or not civic.safe_to_build(candidate.position.x): continue
+			if not candidate.ordered or flee_at(candidate.position.x) or not civic.safe_to_build(candidate.position.x): continue
 			var assigned: int = 0
 			for other: ColonyWorker in workers:
 				if other.external_job == index: assigned += 1
@@ -205,10 +236,10 @@ func work_external(worker: ColonyWorker, delta: float) -> bool:
 	if worker.external_job < 0: return false
 	var site: Node2D = candidates[worker.external_job]
 	var previous: float = worker.x
-	worker.x = move_toward(worker.x, site.position.x, worker.data.speed * delta)
+	worker.x = move_toward(worker.x, site.position.x, worker.data.speed * _speed() * delta)
 	var arrived: bool = absf(worker.x - site.position.x) < GameRules.BUILD_ARRIVAL_DISTANCE
 	if arrived:
-		site.progress += delta * work_factor * (GameRules.OVERLOAD_WORK_RATE if overload.overloaded(site.position.x) else 1)
+		site.progress += delta * work_factor * _pace() * (GameRules.OVERLOAD_WORK_RATE if overload.overloaded(site.position.x) else 1)
 		if site is ConstructionSite and site.progress >= GameRules.BUILD_TIME:
 			site.complete_work()
 			worker.external_job = -1

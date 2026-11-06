@@ -56,6 +56,7 @@ func request_upgrade() -> bool:
 	progress = 0
 	district.presenter.show_notice("Núcleo encargado: espera a los constructores")
 	district.play("build_order")
+	district.colony.authorize_night_work()
 	return true
 
 func complete_work() -> void:

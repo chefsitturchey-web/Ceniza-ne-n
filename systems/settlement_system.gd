@@ -125,6 +125,7 @@ func interact(target: int) -> bool:
 	site.ordered = true
 	site.progress = 0
 	world.presenter.show_notice("Restauración encargada: espera a los constructores")
+	world.colony.authorize_night_work()
 	world.expansion.checkpoint()
 	return true
 

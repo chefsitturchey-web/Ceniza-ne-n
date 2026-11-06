@@ -143,7 +143,7 @@ func _physics_process(delta: float) -> void:
 	var moving: bool = false
 	if choose_special_target(delta): return
 	ally_target = null
-	for ally: Node in get_tree().get_nodes_in_group(GameRules.ALLIES):
+	for ally: Node in get_tree().get_nodes_in_group(GameRules.ALLIES) + get_tree().get_nodes_in_group(GameRules.NIGHT_WORKERS):
 		if absf(ally.position.x - position.x) < 30 and ally.position.y >= GameRules.FLOOR_Y - 20:
 			ally_target = ally as Node2D
 			break
