@@ -54,7 +54,6 @@ func _physics_process(delta: float) -> void:
 			ground_y = position.y
 			crouch = CROUCH_TIME
 			face_toward(0.0)
-			if sprite != null:
-				sprite.scale = Vector2(rest_scale.x, rest_scale.y * 0.8)
+			visual.play_visual(&"salto")
 			return
 	super._physics_process(delta)

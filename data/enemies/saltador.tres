@@ -10,4 +10,4 @@ speed = 50.0
 damage = 8
 reward = 4
 scene = ExtResource("2")
-move_animation = &"correr"
+move_animation = &"caminar"

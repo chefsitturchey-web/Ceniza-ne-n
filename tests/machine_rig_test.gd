@@ -37,8 +37,8 @@ func run_checks() -> void:
 	studio.add_child(camera)
 	camera.make_current()
 	var actors: Array[SiegeEnemy] = []
-	# Blindado y Ariete ya tienen sprite propio cuadro por cuadro; se comprueban aparte.
-	var ids: Array[String] = ["saltador"]
+	# Todas las máquinas ya tienen sprite propio cuadro por cuadro; se comprueban aparte.
+	var ids: Array[String] = []
 	for index: int in range(ids.size()):
 		var data: EnemyData = load("res://data/enemies/%s.tres" % ids[index])
 		var enemy: SiegeEnemy = world.director.spawn_enemy(1, data)
@@ -79,7 +79,7 @@ func run_checks() -> void:
 		enemy.take_damage(100000)
 		enemy.visual.rig._process(0.3)
 		verify(enemy.visual.rig.death_time > 0 and not enemy.is_in_group(GameRules.ENEMIES), "Destrucción visual sin prolongar amenaza")
-	for id: String in ["blindado", "ariete"]:
+	for id: String in ["blindado", "ariete", "saltador"]:
 		var own: SiegeEnemy = world.director.spawn_enemy(1, load("res://data/enemies/%s.tres" % id))
 		verify(own.visual.rig == null and own.sprite.visible and own.sprite.modulate == Color.WHITE, "Sprite propio sin tinte: " + id)
 		verify(String(own.sprite.sprite_frames.get_frame_texture(&"caminar", 0).resource_path).contains("/%s/" % id), "No reutiliza los cuadros del Errante: " + id)
