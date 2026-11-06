@@ -69,6 +69,7 @@ func interact(target: int) -> bool:
 	plot.ordered = true
 	district.presenter.show_notice("Despeje encargado: un constructor debe llegar y trabajar")
 	district.expansion.checkpoint()
+	district.colony.authorize_night_work()
 	return true
 
 func describe(target: int) -> Dictionary:

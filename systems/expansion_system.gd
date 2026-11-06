@@ -78,6 +78,7 @@ func interact(target: int) -> bool:
 	district.presenter.show_notice("Obra pagada: los constructores acudirán")
 	district.play("build_order")
 	checkpoint()
+	district.colony.authorize_night_work()
 	return true
 
 func checkpoint() -> void:

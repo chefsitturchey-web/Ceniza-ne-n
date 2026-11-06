@@ -22,7 +22,7 @@ func choose_special_target(delta: float) -> bool:
 		if session.expansion != null:
 			for site: ExpansionOutpost in session.expansion.sites:
 				if site.hp > 0: candidates.append(site)
-		for ally: Node in get_tree().get_nodes_in_group(GameRules.ALLIES): candidates.append(ally as Node2D)
+		for ally: Node in get_tree().get_nodes_in_group(GameRules.ALLIES) + get_tree().get_nodes_in_group(GameRules.NIGHT_WORKERS): candidates.append(ally as Node2D)
 		for candidate: Node2D in candidates:
 			var distance: float = absf(candidate.position.x - position.x)
 			if distance < nearest:

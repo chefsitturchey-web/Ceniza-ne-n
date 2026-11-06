@@ -22,6 +22,8 @@ const UNSAFE_RANGE: float = 110.0
 const WORKER_DANGER_RANGE: float = 40.0
 const WORKER_HEALTH: int = 60
 const WORKER_DANGER_DPS: float = 12.0
+## Ritmo de los trabajadores que salen de noche por orden del jugador.
+const NIGHT_WORK_PACE: float = 0.8
 const OVERLOAD_DURATION: float = 6.0
 const OVERLOAD_COOLDOWN: float = 24.0
 const OVERLOAD_WORK_RATE: float = 2.0
@@ -33,3 +35,6 @@ const DRONE_RANGE: float = 105.0
 const DRONE_DAMAGE: int = 12
 const DRONE_INTERVAL: float = 1.2
 const BEAM_DURATION: float = 0.1
+
+## Trabajadores expuestos por una orden nocturna del jugador.
+const NIGHT_WORKERS: StringName = &"night_workers"
