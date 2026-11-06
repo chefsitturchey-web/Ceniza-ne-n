@@ -55,6 +55,13 @@ func run_checks() -> void:
 	verify(world.bank.scrap == scrap + 8 * FirstSteps.COUNT, "Recompensas sin duplicados")
 	guide.restart()
 	verify(guide.step == 0 and SaveSystem.engagement_profile().guide == 0, "Opciones reinicia guía")
+	var done: Dictionary = SaveSystem.engagement_profile()
+	done.guide = FirstSteps.COUNT
+	done.tips = ["journal"]
+	SaveSystem.store_engagement(done)
+	MainMenu.reset_guide()
+	var fresh: Dictionary = SaveSystem.engagement_profile()
+	verify(fresh.guide == 0 and fresh.tips.is_empty() and fresh.record == done.record, "Partida nueva vuelve a mostrar la guía y conserva el récord")
 	world.free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SaveSystem.engagement_path))
 	print("PASS: first_steps; fallos: %d" % failures)

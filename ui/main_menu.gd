@@ -213,12 +213,20 @@ func _continue_game() -> void:
 	if not SaveSystem.checkpoint_info(checkpoint_path).is_empty():
 		_launch(false)
 
+## Una partida nueva vuelve a enseñar la guía con flechas; récord y logros se conservan.
+static func reset_guide() -> void:
+	var profile: Dictionary = SaveSystem.engagement_profile()
+	profile.guide = 0
+	profile.tips = []
+	SaveSystem.store_engagement(profile)
+
 func _launch(fresh: bool) -> void:
 	if fresh and not SaveSystem.archive_checkpoint(checkpoint_path):
 		status.text = "No se pudo archivar la partida. Tu guardado sigue intacto."
 		return
 	launch_requested.emit(fresh)
 	if navigation_enabled:
+		if fresh: reset_guide()
 		GamePreferences.current().briefing_requested = fresh
 		get_tree().paused = false
 		CampaignRoute.pending.clear()

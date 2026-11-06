@@ -9,6 +9,7 @@ var details: Node2D = Node2D.new()
 var masks: Dictionary = {}
 var active: bool = true
 var tick: float = 0
+var last_camera: float = INF
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -37,7 +38,11 @@ func _process(delta: float) -> void:
 	shader_material.set_shader_parameter("night", float(view.light.lamps))
 	shader_material.set_shader_parameter("steady", float(GamePreferences.current().reduced_flashes))
 	tick += delta
-	if tick >= 0.05 or delta == 0:
+	# El parallax se calcula con la cámara al dibujar: si la cámara se mueve hay que
+	# redibujar ese mismo cuadro o el fondo se queda atrás y salta (vibra al caminar).
+	var camera: float = camera_x()
+	if tick >= 0.05 or delta == 0 or camera != last_camera:
+		last_camera = camera
 		tick = 0
 		queue_redraw()
 		sky.queue_redraw()
