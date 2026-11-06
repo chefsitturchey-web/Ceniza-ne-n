@@ -5,10 +5,10 @@ Los cinco distritos separan cielo y nubes, horizonte distante, arquitectura tran
 | Distrito | Movimiento ambiental |
 | --- | --- |
 | Periferia | Vapor de chimeneas, ventiladores, tren y ventanas industriales |
-| Fundición | Humo de hornos, caída de metal fundido, chispas y carro de servicio |
-| Barrio inundado | Lluvia, bombas de desagüe y ondas de agua |
-| Ciudadela | Estandartes articulados, polvo y luces de los edificios |
-| Red | Anillos del reactor, paquetes luminosos en los conductos y vapor |
+| Fundición | Humo de hornos, colada enmascarada, metal hirviendo, brasas y ventanas |
+| Barrio inundado | Lluvia, vapor de bombas, reflejos y oleaje que excluye los pilotes |
+| Ciudadela | Cascadas con flujo, espuma y bruma al pie, agua, estandartes y velas |
+| Red | Neones, ventanas, pulsos en tiras LED, vapor y drones |
 
 La niebla separa los planos; las decoraciones cercanas quedan detrás de los edificios del jugador. Las arenas incorporan el arte de su distrito fuera del contorno transitable, conservando las señales y obstáculos del combate. La primera mantiene su composición propia de depósito y canales.
 
@@ -35,6 +35,22 @@ El generador detecta modificaciones manuales de los ASE y se detiene para conser
 
 Con F5, camina por los distritos y compara las velocidades de los edificios al cambiar de dirección. Comprueba las animaciones y pausa. Desde F1 abre los cinco jefes para comparar sus marcos y los exteriores de las arenas. La guía de [interfaz de combate](../interface/INTERFAZ_COMBATE.md) describe las barras.
 
-`environment_depth_test.gd` verifica 27 condiciones: tres velocidades, transparencia y fuentes de las cinco zonas, pausa, presentación sin desplazamiento físico y seis aperturas sin píxeles que tapen la vida. `-- --capture`, con renderizado gráfico, guarda capturas en `build/validation/latest/`. La batería completa contiene 41 suites; también se revisaron capturas OpenGL de los cinco distritos y cinco jefes.
+`environment_depth_test.gd` verifica 27 condiciones: tres velocidades, transparencia y fuentes de las cinco zonas, pausa, presentación sin desplazamiento físico y seis aperturas sin píxeles que tapen la vida. `-- --capture`, con renderizado gráfico, guarda capturas en `build/validation/latest/`. La batería completa contiene 61 suites; también se revisaron capturas OpenGL de los cinco distritos y cinco jefes.
 
 Referencia técnica: [parallax 2D de Godot](https://docs.godotengine.org/en/4.5/tutorials/2d/2d_parallax.html). Referencia de lectura y ornamentación: [galería oficial de Elden Ring](https://it.bandainamcoent.eu/elden-ring/elden-ring/media). El arte producido es original del proyecto.
+
+## Movimiento pintado por distrito
+
+`components/animated_backdrop.gd` mantiene tres lienzos: cielo escalonado, arquitectura con shader y detalles. Comparten la camara y el espejo de cada tesela; los detalles usan las mismas coordenadas de origen que el PNG de 1024 x 576. No se crean nodos durante la animacion. El tiempo se cuantiza a 12 pasos por segundo y los detalles se redibujan a 20 Hz. Se conserva el humo existente.
+
+`tools/art/build_backdrop_masks.py` muestrea los PNG mediante PIL y NumPy. Las mascaras lossless de `assets/world/backgrounds/masks/` guardan tipo, semilla y distancia en RGB. El shader usa nearest, centros de texel, desplazamientos enteros y trama ordenada. Las cascadas de Ciudadela estan en x=295..323 y 350..377, y la inferior en x=281..327; la colada de Fundicion, x=172..192. Los ventiladores de Periferia giran dentro de sus discos originales, centrados en (191,319) y (852,333). El tren cruza la via y=244 durante 13 de cada 38 segundos. Las luces varian con la hora; aves diurnas y drones nocturnos cruzan todos los distritos.
+
+Con particulas desactivadas, el shader devuelve el arte original y los detalles dejan de dibujarse. `WorldParticles.budget` limita lluvia, ceniza, espuma, bruma y siluetas. Destellos reducidos elimina el zumbido y los cortes de neon, estabiliza las balizas y reduce los efectos. Pausar detiene el tiempo del fondo.
+
+Para regenerar las mascaras y sus vistas de inspeccion:
+
+```powershell
+python tools/art/build_backdrop_masks.py --preview build/capturas/fondos
+```
+
+`tests/backdrop_motion_test.gd` comprueba las cinco mascaras, varios tipos de movimiento en cada distrito, tiempo, particulas desactivadas y destellos reducidos. Se incluye en `run_all`. Las capturas de revision estan en `build/capturas/fondos/`: cinco cuadros separados por 0.15 s para cada distrito y cada hora, GIFs y hojas `*_contacto.png`. El script temporal `capture.gd` carga `levels/main.tscn`, mueve al jugador con `Input.action_press` y captura el viewport con renderizado en ventana.

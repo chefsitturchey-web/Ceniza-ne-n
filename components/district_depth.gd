@@ -24,22 +24,23 @@ static func draw_far(canvas: CanvasItem, camera_x: float, time: float, zone_id: 
 		var left: float = origin(camera_x, tile, 900, FAR_SCROLL)
 		canvas.draw_texture_rect(SKYLINE, Rect2(left, GameRules.FLOOR_Y - 265, 914, 225), false, Color(tint, 0.46))
 
-static func draw_architecture(canvas: CanvasItem, texture: Texture2D, camera_x: float, time: float, zone_id: String) -> void:
+static func draw_architecture(canvas: CanvasItem, texture: Texture2D, camera_x: float, time: float, zone_id: String, details: bool = true, art: bool = true) -> void:
 	var periphery: bool = zone_id == "periphery"
 	var width: float = 512 if periphery else 640
 	var height: float = 288 if periphery else 360
 	var top: float = GameRules.FLOOR_Y - (216 if periphery else 360)
 	var first: int = floori(camera_x * ARCHITECTURE_SCROLL / width)
 	for tile: int in range(first - 1, first + 2):
-		var x: float = origin(camera_x, tile, width, ARCHITECTURE_SCROLL)
+		var x: float = roundf(origin(camera_x, tile, width, ARCHITECTURE_SCROLL))
 		var mirrored: bool = posmod(tile, 2) == 1
 		var frame: Transform2D = Transform2D(0, Vector2(-1 if mirrored else 1, 1), 0, Vector2(x + (width if mirrored else 0), 0))
 		canvas.draw_set_transform_matrix(frame)
-		canvas.draw_texture_rect(texture, Rect2(0, top, width, height), false, Color(0.86, 0.89, 0.96))
-		BackdropLife.draw_zone(canvas, zone_id, time, top, width, height, frame)
+		if art: canvas.draw_texture_rect(texture, Rect2(0, top, width, height), false, Color(0.86, 0.89, 0.96))
+		if details: BackdropLife.draw_zone(canvas, zone_id, time, top, width, height, frame)
 	canvas.draw_set_transform_matrix(Transform2D.IDENTITY)
 
 static func draw_near(canvas: CanvasItem, camera_x: float, time: float, zone_id: String) -> void:
+	var motion_time: float = time if GamePreferences.current().particles else 0.0
 	var first: int = floori(camera_x * NEAR_SCROLL / 720)
 	var index: int = ["periphery", "foundry", "flooded", "citadel", "network"].find(zone_id)
 	var tint: Color = ZONE_TINTS.get(zone_id, ZONE_TINTS.periphery).darkened(0.45)
@@ -55,4 +56,4 @@ static func draw_near(canvas: CanvasItem, camera_x: float, time: float, zone_id:
 		if zone_id == "flooded" or zone_id == "periphery":
 			for ripple: int in 8:
 				var point: Vector2 = Vector2(x + ripple * 18, 268 + ripple % 3 * 3)
-				canvas.draw_line(point, point + Vector2(8 + sin(time * 1.7 + ripple) * 3, 0), Color(tint.lightened(0.5), 0.16), 1)
+				canvas.draw_line(point, point + Vector2(8 + sin(motion_time * 1.7 + ripple) * 3, 0), Color(tint.lightened(0.5), 0.16), 1)
