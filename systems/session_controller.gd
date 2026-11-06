@@ -94,7 +94,7 @@ func restart() -> void:
 
 func return_to_menu() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://ui/main_menu.tscn")
+	ScreenFade.change_scene(get_tree(), "res://ui/main_menu.tscn")
 
 func resume_game() -> void:
 	get_tree().paused = false

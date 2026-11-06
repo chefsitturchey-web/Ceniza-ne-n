@@ -31,6 +31,7 @@ func _ready() -> void:
 	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
 	add_child(shade)
+	MenuFx.polish_layer(self)
 	var panel: Panel = Panel.new()
 	panel.theme = preload("res://ui/theme.tres")
 	panel.position = Vector2(24, 18)

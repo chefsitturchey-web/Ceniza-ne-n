@@ -19,6 +19,7 @@ func _ready() -> void:
 	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
 	add_child(shade)
+	MenuFx.polish_layer(self)
 	panel = PanelContainer.new()
 	panel.theme = preload("res://ui/theme.tres")
 	panel.add_theme_stylebox_override("panel", MenuSkin.panel())

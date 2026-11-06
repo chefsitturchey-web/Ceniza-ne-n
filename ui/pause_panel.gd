@@ -15,6 +15,20 @@ var resume_button: Button
 
 func _ready() -> void:
 	add_theme_stylebox_override("panel", MenuSkin.panel())
+	# Velo detras del panel: oscurece la partida y aparece junto con el.
+	var dim: MenuBackdrop = MenuBackdrop.new()
+	dim.visible = false
+	dim.size = Vector2(640, 360)
+	get_parent().add_child.call_deferred(dim)
+	get_parent().move_child.call_deferred(dim, get_index())
+	visibility_changed.connect(func() -> void:
+		dim.visible = visible
+		if visible:
+			dim.size = Vector2(maxf(640.0, get_viewport_rect().size.x), 360)
+			MenuFx.enter(dim, 0.0))
+	MenuFx.polish_control(self, 24.0)
+	custom_minimum_size.x = 544
+	_fit.call_deferred()
 	rows = VBoxContainer.new()
 	rows.add_theme_font_size_override("font_size", 10)
 	rows.add_theme_constant_override("separation", 6)
@@ -70,17 +84,24 @@ func _ready() -> void:
 		controls.add_child(label)
 	var actions: HBoxContainer = _row()
 	resume_button = Button.new()
+	resume_button.theme_type_variation = &"MenuEntry"
 	resume_button.text = "Continuar"
 	resume_button.pressed.connect(func() -> void: resume_requested.emit())
 	UiSound.attach(resume_button)
 	actions.add_child(resume_button)
 	for pair: Array in [["Opciones", func() -> void: options_requested.emit()], ["Menú principal", func() -> void: menu_requested.emit()]]:
 		var button: Button = Button.new()
+		button.theme_type_variation = &"MenuEntry"
 		button.text = pair[0]
 		button.pressed.connect(pair[1])
 		UiSound.attach(button)
 		actions.add_child(button)
 
+
+## El panel ocupa lo que necesita su contenido y se centra en vertical.
+func _fit() -> void:
+	reset_size()
+	position.y = roundf((360.0 - size.y) / 2.0)
 
 func _row() -> HBoxContainer:
 	var row: HBoxContainer = HBoxContainer.new()

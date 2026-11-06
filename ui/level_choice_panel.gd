@@ -12,6 +12,7 @@ func _ready() -> void:
 	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
 	add_child(shade)
+	MenuFx.polish_layer(self)
 	var frame: Panel = Panel.new()
 	frame.position = Vector2(18, 10)
 	frame.size = Vector2(604, 340)
