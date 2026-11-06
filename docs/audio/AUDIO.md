@@ -1,13 +1,19 @@
 # Audio actual
 
-`systems/music_library.gd` define el repertorio activo: 21 OGG en `assets/audio/music/`. Hay pistas de menú, día por distrito, noche, aviso, victoria, derrota y nueve alternativas de jefe. Los temas de jefe se eligen de una bolsa compartida; no corresponden exclusivamente al nombre de su archivo.
+`systems/music_library.gd` carga 21 OGG desde `assets/audio/music/`: menú, siete variantes de día repartidas entre cinco distritos, noche, aviso, victoria, derrota y nueve temas de jefe. Cualquier jefe puede recibir cualquiera de esos nueve temas; el nombre del archivo no lo fija a un encuentro.
 
-`systems/game_sound.gd` administra las voces, la mezcla y los efectos. Los efectos están en `assets/audio/sfx/`, con su licencia CC0 de Kenney. Los controles de volumen se gestionan mediante los buses Master, Music y SFX y las opciones del juego.
+`systems/game_sound.gd` carga los efectos activos de `assets/audio/sfx/8bit/`, organizados en combate, economía, hitos, interfaz, plagas y voz. Usa voces limitadas y prioridades para los avisos, audio espacial del mundo y ambientes por zona. `systems/ui_sound.gd` comparte clic, foco, roce y regreso de los paneles; precarga su caché mediante `warm_up()` y dispara el clic al presionar.
 
-Los OGG sintéticos `asedio.ogg` y `ruinas.ogg` y su generador anterior se retiraron porque el repertorio actual no los carga. Las herramientas vigentes de preparación e importación están en `tools/audio/`. El juego no depende de servicios de generación en línea.
+`systems/voice_library.gd` selecciona sonidos breves de diálogo: cinco timbres, cuatro emociones y cinco variantes de altura, con asignación por hablante. `ui/novel_panel.gd` los reproduce durante la revelación del texto. Son sonidos sintéticos, no locución de frases ni sincronización labial.
 
-Para probar: F5, comprueba los volúmenes en Opciones, inicia una colonia y entra a un jefe con F1. Victoria y derrota son cierres sin bucle; el resto de fondos musicales se repite según su configuración de importación.
+Master, Music y SFX se ajustan desde Opciones; **M** alterna silencio global. La novela atenúa la música. El relevo de temas usa salida y entrada gradual. Los audios y sus ajustes de importación están versionados junto con sus licencias; no atribuir todo el repertorio activo a los antiguos efectos CC0.
 
-El repertorio procede de la integración local de `origin/audio/musica-8bit`, commit `41e9613`. El informe separado de esa prueba se consolidó aquí para mantener una sola guía de audio.
+## Herramientas y prueba
 
-[Herramientas](../../tools/README.md)
+`tools/audio/importar_musica.py` y `preparar_sonidos.py` contienen importación/preparación. Los generadores actuales de efectos y voces están en `tools/generar_efectos.py` y `tools/generar_voces.py`; el segundo importa el primero. No son scripts sobrantes ni deben borrarse por carecer de llamadas desde Godot.
+
+F5: escuchar menú y colonia, cambiar volúmenes y abrir una conversación. F1 en editor/depuración permite comparar los jefes. Para comprobar transiciones escuchar aviso, noche, victoria y derrota. Las pruebas sin ventana no sustituyen esta escucha: `GameSound` desactiva reproducción con el controlador headless.
+
+Validar mediante `tools/maintenance/validate.ps1`; `neural_audio_test` y `music_handoff_test` están en las 67 ejecuciones de `tests/run_all.gd`. Registros en `build/validation/latest/`.
+
+[Herramientas](../../tools/README.md).

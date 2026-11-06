@@ -8,7 +8,7 @@ Cada portal responde al primer impacto y al cruzar 200 y 100 puntos de vida. El 
 
 El generador inicial se sitúa a 360 unidades del núcleo: no exige atravesar la puerta que necesitas energía para asaltar. Las colonias avanzadas empiezan con la primera composición nocturna y aumentan hasta la tercera, dando tiempo para reclutar.
 
-## Referencias revisadas
+## Referencias de diseño
 
 - [Descripción oficial de Kingdom Two Crowns](https://kingdomthegame.com/kingdom-two-crowns/): papel del monarca, contratación, construcción y campaña.
 - [Portales](https://kingdomthegame.fandom.com/wiki/Portal), [arqueros](https://kingdomthegame.fandom.com/wiki/Archer) y [caballeros](https://kingdomthegame.fandom.com/wiki/Knight): asalto de tropas, protección de tiradores y defensa reactiva.
@@ -19,6 +19,6 @@ Se adaptan esos principios al GDD propio, conservando la identidad y los recurso
 
 ## Arte y verificación
 
-Atlas originales nuevos para ocho unidades, cuatro edificios y dieciséis iconos. Las unidades de campo separan torso y piernas para caminar, retroceden al disparar y caen al ser desarmadas. Campamentos y brechas añaden brasas y energía animada. Los sprites originales de constructores y recuperadores se conservan.
+Las unidades actuales utilizan `UnitSpriteLibrary` y sus nueve variantes; los edificios e iconos se consultan en las bibliotecas de arte. Las unidades de campo separan torso y piernas para caminar, retroceden al disparar y caen al ser desarmadas. Campamentos y brechas añaden brasas y energía animada. Constructores y recuperadores usan las variantes actuales en `assets/characters/units/`.
 
-Pruebas: 26 suites existentes y 13 comprobaciones nuevas sobre bloqueo de ataques, defensores, botín, iconos y combate durante un asalto. Las tres colonias se pueden defender en la simulación desde cero, pagando obras, herramientas y reclutas sin regalar recursos y sin ataques personales. Esto valida esa estrategia; no equivale a una prueba humana de toda la campaña ni demuestra cuatro horas de duración.
+Fuentes: `entities/player/player.gd`, `systems/civic_system.gd`, `entities/structures/enemy_repeater.gd` y `systems/module_system.gd`. `commander_test` y las simulaciones de cinco distritos forman parte de las 67 ejecuciones de `tests/run_all.gd`. Validar mediante `tools/maintenance/validate.ps1`. Una simulación no mide la duración de una primera campaña humana.

@@ -1,85 +1,61 @@
 # CENIZA NEÓN: cómo jugar
 
-Abre `project.godot` en Godot 4 y pulsa **F5**. Nueva partida inicia la campaña; Continuar recupera tu colonia y operaciones. Hay guardado al amanecer y al completar operaciones. Perder el núcleo permite recuperar el último guardado. La campaña tiene cinco capítulos y un final; **la meta de cuatro horas aún necesita más contenido y pruebas de duración**.
+Importa `project.godot` en Godot 4.7.2 y pulsa **F5**. **Nueva partida** inicia una campaña y reinicia su guía; **Continuar** carga el checkpoint. **Boss Rush** abre los cinco jefes seguidos sin historia y conserva sus marcas en un archivo separado.
 
-**Para probar libremente: pulsa F1.** El laboratorio permite entrar a los cinco jefes sin requisitos, elegir fase y equipo, activar invulnerabilidad, cámara lenta, crear unidades y preparar colonias. **F2** invulnerabilidad, **F3** congelar enemigos, **F4** colisiones y rutas. Los trucos marcan la sesión como práctica y conservan el checkpoint normal. [Guía del laboratorio](docs/interface/LABORATORIO_DEPURACION.md).
+## Colonia y primeros pasos
 
-**Nuevo arte ilustrado y animado:** Portador y jefes basados en sus retratos manga, con materiales detallados y poses completas. El Portador conserva unos 35 píxeles de altura de mundo y tiene marcha, estocada, reacción, voltereta y caída para ambas cámaras. Pulsa **F6 en `levels/story/combat_animation_preview.tscn`**; activa **Giro**, pulsa **1–6** para detalle y **0** para volver al conjunto. Alterna cámara para compararlo con el guardián. [Fuentes de LibreSprite, prompts y diseño](docs/art/ARTE_COMBATE_ILUSTRADO.md).
+La novela de llegada se reproduce automáticamente, también con la guía activa. **E / Intro / Espacio / clic** avanza y **Esc** omite. Después sigue la flecha y mantén la acción indicada: sus avisos respetan el teclado, mando, táctil y reasignaciones.
 
-La historia se presenta con retratos manga a color, conversaciones y fundidos. **E / Enter / Espacio** avanza; **Esc** omite. En **L → Ver conversación** puedes releer escenas. Para probar todo el guion con F6, abre `levels/story/novel_preview.tscn`. [Detalles y dirección visual](docs/art/NOVELA_VISUAL_Y_COHERENCIA.md).
+1. Empiezas con un constructor, un recuperador y 90 de chatarra, sin núcleo construido. Extrae piezas de las baterías cercanas manteniendo **E**.
+2. Encarga el núcleo central por **12 piezas y 20 de chatarra**. Necesita 24 segundos de trabajo; el asedio espera a que se encienda.
+3. Levanta las dos murallas, despeja una parcela de generador y construye el generador.
+4. El núcleo Nv.2 cuesta **60 de chatarra y 10 piezas** y requiere ambas murallas y generación. Desbloquea torretas, apoyo y transporte.
+5. Descarga las piezas al acercarte al núcleo: la mochila admite 24. El exceso cae y puede romperse. El depósito queda en ese distrito.
+6. Recluta en campamentos y compra herramientas en el Arsenal izquierdo. Los habitantes recogen las herramientas cuando hay plaza para su profesión. **F** ordena asaltar tu frente; otra pulsación retira las tropas.
+
+Las tropas y torretas combaten en la colonia. El Portador dirige, recoge recursos, esquiva y activa la sobrecarga. Aceptar una obra o reparación de noche autoriza el trabajo nocturno: aparece «De noche: tu gente puede morir». Los trabajadores salen al 80 % de ritmo y quedan expuestos hasta el amanecer.
+
+[Guía y rondas](docs/gameplay/PRIMEROS_PASOS_Y_RONDAS.md) · [Frontera](docs/gameplay/FRONTERA_Y_RECONSTRUCCION.md) · [Trabajo nocturno](docs/gameplay/TRABAJO_NOCTURNO.md).
 
 ## Controles
 
-Para revisar las animaciones de aliados y profesiones, abre `levels/story/unit_animation_preview.tscn` y pulsa **F6**. [Guía de personajes y archivos de LibreSprite](docs/art/PERSONAJES_Y_ANIMACIONES.md).
-
 | Acción | Teclado | Mando Xbox |
-|---|---|---|
-| Mover | A/D o flechas | Stick izquierdo / cruceta |
-| Correr (gasta estamina) | Mantener Shift | Cruceta abajo |
-| Construir, reclutar, comprar herramientas, operar | Mantener E | Mantener Y |
-| Asaltar el frente donde estás / retirar tropas | F | Cruceta arriba |
+| --- | --- | --- |
+| Mover | A/D o flechas; W/S en arena | Stick / cruceta |
+| Correr | Mantener Shift | Cruceta abajo |
+| Construir / operar | Mantener E | Mantener Y |
+| Asaltar / retirar | F | Cruceta arriba |
 | Esquivar | Espacio | A |
-| Sobrecargar el frente | Q | LB |
-| Alimentación de una torreta cercana | T | B |
-| Subir o bajar de la plataforma cercana | V | Pulsar stick izquierdo |
-| Diario y objetivo | L | RB |
-| Pausar | Esc | Start |
-| Atacar, solo en arenas de jefe | J | X |
+| Sobrecargar | Q | LB |
+| Alimentar torreta | T | B |
+| Subir / bajar de plataforma | V | Pulsar stick izquierdo |
+| Diario | L | RB |
+| Pausa | Esc | Start |
+| Atacar en arena | J | X |
 
-Puedes cambiar la tecla y el botón de cada acción en **Opciones → Controles**: pulsa «Cambiar» y después la tecla o el botón nuevo (Esc cancela). Si ya lo usaba otra acción, ambas se intercambian. «Restablecer predeterminados» devuelve esta tabla; los cambios se guardan en `user://opciones.cfg`.
+La pausa de colonia muestra controles; las pausas de colonia y jefe ofrecen Opciones. **Opciones → Controles** permite cambiar tecla y botón; **Avisos de teclas** fija Automático, Teclado o Mando. `TextMarks` resalta las entradas en dorado. En pantallas táctiles aparecen joystick y botones durante el juego. **M** silencia el audio.
 
-En móvil (o con pantalla táctil) aparecen controles en pantalla: joystick a la izquierda (en las arenas también sube y baja), botones de acción a la derecha y Pausa/Diario arriba a la derecha. Se ocultan en **Opciones → Controles táctiles en pantalla**.
+## Historia y jefes
 
-En la colonia **tus tropas y torretas combaten**. El Portador organiza, explora, recoge datos, esquiva y activa sobrecargas. Los datos que sueltan los enemigos te suben de nivel y eliges una mejora, como en Vampire Survivors. **Cada carta actúa en la colonia y contra los jefes.** En la colonia: dron, daño de torretas; Tesla, murallas electrificadas; orbital, blindaje de tropas; óptica, alcance de torretas; batería, energía; rodamiento, velocidad de obra. Contra los jefes son tus armas automáticas.
+La ruta es Periferia → Fundición → Barrio inundado → Ciudadela → Núcleo de la red. En cada distrito completa rescate, relé y convoy, cierra las entradas y estabiliza la colonia; toma el tren de día. **L** muestra el objetivo, las conversaciones desbloqueadas y la pestaña Poblados con instalaciones y tecnología recuperable. Las posiciones varían por la semilla guardada de campaña.
 
-En arenas te mueves también con **W/S**. Los jefes reaccionan a tu posición y trayectoria; observa los avisos y sus ventanas de recuperación. **E** cerca de las consolas cian activa carga, refrigeración, interferencia o parapeto, según el recinto. En Madre Cero, E repara relés y Q los protege. Los refuerzos pueden recibir daño de tu hoja y módulos. [Los cinco jefes, mecanismos y escenas para probar con F6](docs/gameplay/JEFES_TACTICAS_Y_ARENAS.md).
+En los jefes combate con **J**, esquiva con **Espacio** y utiliza **E** en los mecanismos. Las pistas cortas explican controles y oportunidades. Los ataques cuerpo a cuerpo anuncian arcos, círculos o líneas antes del daño. Busca las ventanas de núcleo expuesto.
 
-## Primeros pasos
+- Recaudador: rodea el escudo y aprovecha sus choques contra cobertura.
+- Santa Caldera: evita el calor y aprovecha la purga.
+- Coro Sumergido: rompe las tres antenas.
+- Prefecto: evita el escudo y castiga la recuperación; al 30 % entra en última guardia.
+- Madre Cero: mantén dos relés activos; E repara y Q protege. Al 30 % activa el último protocolo.
 
-**Sigue la flecha.** La primera partida guía con una línea, la tecla o el icono táctil y premios de chatarra. Enseña piezas, núcleo, murallas, generador y dos torretas antes de la primera noche. Puedes repetirla en **Opciones > Reiniciar guía**. Las bajas encadenadas dan hasta x5 chatarra; cada amanecer muestra tus resultados. [Guía, efectos, logros y pruebas](docs/gameplay/PRIMEROS_PASOS_Y_RONDAS.md).
+En historia, la entrada se lee antes de la presentación de combate y el desenlace tras la muerte, antes de resolver la expedición. El diario permite releer lo desbloqueado. Boss Rush omite ambas novelas: sus resultados muestran tiempo, golpes y top 5; las diez mejores victorias se guardan con nombre.
 
-**El mapa tiene poblados recuperables.** Consulta **L → Poblados** para encontrar componentes especiales y restaurar talleres, armerías o dispensarios. Necesitan materiales y constructores; mejoran obras, daño aliado o curación local. [Ubicaciones, costes y bonificaciones](docs/gameplay/POBLADOS_Y_TECNOLOGIA.md).
+[Historia completa](docs/gameplay/HISTORIA_FLUJO.md) · [Tácticas](docs/gameplay/JEFES_TACTICAS_Y_ARENAS.md) · [Boss Rush](docs/gameplay/BOSS_RUSH.md).
 
-1. Empiezas con un constructor y un recolector, sin núcleo. Las dos baterías junto al punto de llegada contienen las primeras piezas. Mantén E para extraerlas.
-2. Con 12 piezas y 20 de chatarra, mantén E en el cimiento central. El constructor levanta el núcleo en 24 segundos. Hasta encenderlo, el asedio y la recolección automática esperan.
-3. Construye las dos murallas centrales. Encarga con E el despeje de una parcela de generador; cuesta 5 de chatarra y requiere que llegue un constructor. Después paga su construcción.
-4. Murallas, generador, 60 de chatarra y 10 piezas permiten encargar el núcleo Nv.2. Entonces se desbloquean las torretas. Las defensas tardan 16 segundos y las instalaciones 24, además del viaje del trabajador.
-5. La mochila lleva 24 piezas. El exceso cae y cada pieza tiene un 25 % de probabilidad de romperse. E recoge los montones si queda espacio. Regresa al núcleo para descargar automáticamente al depósito.
-6. Recluta en los campamentos y compra herramientas en el taller izquierdo. Un cuartel permite formar tropas; F ordena atacar el portal de ese frente y otra F las retira. Cierra los portales para abrir las parcelas exteriores.
-7. El núcleo Nv.3 exige una noche resistida, dos instalaciones, 120 de chatarra y 18 piezas. Amplía la capacidad de energía y las mejoras de defensas. L muestra el objetivo y permite releer la historia.
+## Probar funciones
 
-Cada distrito mide 14.400 píxeles y tiene su propio trazado. **Cada campaña nueva genera su propio mapa**: murallas, brechas, solares, poblados y operaciones cambian de sitio dentro de límites que mantienen el orden de avance. La semilla se guarda con la partida. Shift permite correr; el transporte se desbloquea con núcleo Nv.2. [Reglas completas, diseños de LibreSprite y guardados](docs/gameplay/FRONTERA_Y_RECONSTRUCCION.md).
+- **F1** abre el laboratorio en editor/depuración: práctica de cinco jefes, fases y equipo. F2 activa invulnerabilidad, F3 congela IA y F4 muestra geometría. Los trucos de colonia desactivan su guardado de campaña.
+- **F6** ejecuta la escena abierta: `levels/story/novel_preview.tscn`, `unit_animation_preview.tscn` o `combat_animation_preview.tscn` son galerías.
+- Observa los fondos al caminar, pausa y cambia Partículas o Reducir destellos. El audio se ajusta por Master, Music y SFX.
+- Para validar, usa `tools/maintenance/validate.ps1` con `-GodotPath` al ejecutable de consola. `tests/run_all.gd` contiene 67 ejecuciones; resultados en `build/validation/latest/`.
 
-## Historia, operaciones y tren
-
-**L abre el diario.** La ruta es Periferia → Fundición → Barrio inundado → Ciudadela → Núcleo de la red. Mara, Ivo, Vera, Nox y ECO revelan por qué las máquinas siguen ejecutando una emergencia que nunca terminó.
-
-Cada capítulo exige rescatar la baliza occidental, recuperar el relé oriental y escoltar el transporte hasta el núcleo; el objetivo del HUD indica la distancia de cada uno. El relé necesita energía, 30 de chatarra y un técnico que llegue y trabaje. El transporte espera a su escolta: la emboscada salta cuando llegan los soldados del frente izquierdo y avanza si el Portador va a su lado. Una avería se repara con E por 25.
-
-**El objetivo del HUD siempre muestra el siguiente paso concreto y dónde hacerlo** (por ejemplo, qué parcela despejar o qué herramienta comprar). En el último minuto del día te avisa si conviene reparar, reforzar o subir el núcleo a Nv.3 antes de la noche, y te advierte si te quedas sin constructores. Al anochecer, las tropas en asalto vuelven solas a las murallas.
-
-Cierra las entradas con tus tropas, completa las tres operaciones y estabiliza la colonia: dos murallas centrales, generación y al menos una noche resistida. Después toma el tren de día con E. Los días siguen avanzando después del tercero y reponen reclutas. El daño y vida de los enemigos no crecen indefinidamente por tardar.
-
-## Jefes
-
-- **Recaudador:** haz que embista una cobertura y golpea su núcleo expuesto.
-- **Santa Caldera:** evita franjas calientes, salvas y arremetidas; ataca durante la purga.
-- **Coro Sumergido:** corta sus tres enlaces y aprovecha la apertura. En segunda fase, romper una antena atrae marcas sobre ti.
-- **Prefecto:** duelista. Golpear su escudo provoca un contraataque; si esquivas por anticipado, retrasa la estocada y corrige su rumbo. Castiga solo durante su recuperación. Al 30 % entra en su **última guardia**: tres estocadas seguidas y ventanas más cortas.
-- **MADRE CERO:** mantén al menos dos relés activos. E cerca de uno repara a cambio de resistencia; Q protege de los pulsos. El enlace abre la ventana para atacar. Tus soldados de la colonia aportan apoyo a los relés. Al 30 % activa su **último protocolo**: pulsos triples y ataques incluso mientras está expuesta.
-
-Las arenas permiten movimiento en ocho direcciones y combate personal, con un ritmo más pausado que antes y una resistencia que se recarga más despacio. Cada jefe resiste más que el anterior (9.000 a 16.000 de integridad) y aprende tus hábitos de esquiva. Vencer a MADRE CERO muestra el epílogo y los créditos. Si pierdes vuelves a la colonia; si ganas continúas con tus mejoras y habitantes económicos. La última victoria cierra la historia.
-
-## Transporte opcional
-
-Con núcleo de nivel 2 puedes comprar una plataforma eléctrica por 45 junto al taller de x=-880. E compra o monta; V sube y baja cerca de ella. Aumenta la velocidad de viaje un 45 %. Detente en el núcleo o en ese taller para recargar la batería. Queda aparcada al bajar y viaja contigo en tren. Contra los jefes vas a pie. [Niveles, medidas, desbloqueos y pruebas](docs/gameplay/ESCALA_NIVELES_Y_MOVILIDAD.md).
-
-## Pruebas rápidas en Godot
-
-- Niveles, diseños y transporte: **F6 en `levels/zones/fortress_playground.tscn`**. Ofrece presupuesto, generador y defensas de práctica, sin guardar en campaña.
-- Colonias finales: F6 en `levels/zones/citadel.tscn` o `network.tscn`.
-- Jefes: F6 en `levels/expedition/recaudador_arena.tscn`, `caldera_arena.tscn`, `choir_arena.tscn`, `prefect_arena.tscn` o `mother_arena.tscn`.
-- Laboratorio con presupuesto de práctica: `levels/zones/expansion_playground.tscn`. Esa escena no guarda sobre tu partida.
-- Batería automática: `godot --headless --path . --script res://tests/run_all.gd` (sustituye `godot` por tu ejecutable de consola).
-
-El día de fundación (día 1) dura 300 s en la Periferia y 15 s más por zona (hasta 360 s en la Red); los demás días duran 120 s, con 20 de aviso y 90 de noche. **¿Listo antes?** De día, con el núcleo encendido y sin mejora disponible, mantén E (o el botón táctil Operar) 2 s en el núcleo para **adelantar la noche**; el aviso de 20 s se conserva. [Historia, objetivos, arte y estado real de duración](docs/design/HISTORIA_Y_CAMPANA.md). [Reglas de comandante y estudio de Kingdom Two Crowns](docs/gameplay/COMANDANTE_Y_PORTALES.md).
+Fuentes: `ui/main_menu.gd`, `core/key_remap.gd`, `core/input_glyphs.gd`, `systems/first_steps.gd`, `entities/structures/colony_core.gd`, `systems/colony_system.gd`, `data/frontier_layout.gd` y `levels/expedition/recaudador_arena.gd`.
