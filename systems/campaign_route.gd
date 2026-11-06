@@ -52,6 +52,12 @@ static func valid_handoff(value: Variant) -> bool:
 	if not value is Dictionary or value.get("version") != 1 or value.get("handoff") != true or value.get("phase") != "DÍA" or value.get("day") != 1:
 		return false
 	if not ExpansionSystem.number(value.get("carried_parts", 0), 0, 24, true): return false
+	var seen: Variant = value.get("story_seen", [])
+	if not seen is Array or seen.size() > 40: return false
+	var unique: Array[String] = []
+	for id: Variant in seen:
+		if not id is String or not VisualStory.valid_key(id) or id in unique: return false
+		unique.append(id)
 	if not valid_state(value.get("campaign")) or value.campaign.zone < 1 or not NeuralSystem.valid(value.get("neural")):
 		return false
 	if not MobilitySystem.valid(value.get("mobility", {})): return false

@@ -44,6 +44,9 @@ static func scene(index: int, section: String) -> Dictionary:
 	var companion: String = ACTORS.get(chapter.voice, "eco")
 	if section in ["encounter", "ending"]:
 		lines = BossDialogue.lines(index, section)
+		if section == "ending":
+			append_text(lines, "narrator", chapter.ending)
+			if index == CampaignRoute.COUNT - 1: append_text(lines, "narrator", CampaignStory.EPILOGUE)
 	else:
 		var text: String = chapter[section]
 		if section == "opening":

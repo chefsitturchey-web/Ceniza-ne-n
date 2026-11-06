@@ -265,7 +265,7 @@ func _ready() -> void:
 	guide_hud.guide = first_steps
 	add_child(guide_hud)
 	options.guide_reset_requested.connect(first_steps.restart)
-	if not first_steps.enabled or first_steps.step >= FirstSteps.COUNT: story.queue_dialogue("opening")
+	story.queue_dialogue("opening")
 	sound.district = self
 	add_child(sound)
 	impact = ImpactFeedback.new()

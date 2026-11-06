@@ -206,6 +206,8 @@ func load_game() -> bool:
 	return true
 
 func apply_handoff(data: Dictionary) -> void:
+	if session.interaction.story != null:
+		session.interaction.story.seen_scenes.assign(data.get("story_seen", []))
 	session.campaign = CampaignRoute.initial_state(int(data.campaign.zone))
 	session.bank.scrap = int(data.scrap)
 	session.bank.parts = int(data.get("carried_parts", 0))

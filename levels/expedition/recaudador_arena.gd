@@ -37,6 +37,12 @@ var dash_active: bool = false
 var configured: bool = false
 var present_story: bool = false
 var novel: NovelPanel
+var campaign_story: StoryDirector
+var spectacle: BossSpectacle
+var story_started: bool = false
+var aftermath_started: bool = false
+## Practica independiente: memoria de sesion, sin modificar la partida.
+static var practice_seen: Array[String] = []
 var modules: ModuleSystem = ModuleSystem.new()
 var options: SettingsPanel = SettingsPanel.new()
 var exit_button: Button
@@ -57,7 +63,9 @@ func configure(source: Player, index: int = 0) -> void:
 	player.copy_from(source)
 	var colony: District = source.get_parent() as District
 	if colony != null and colony.story != null: support_units = colony.story.soldiers()
-	if colony != null and colony.story != null: present_story = colony.story.present_dialogue
+	if colony != null and colony.story != null:
+		campaign_story = colony.story
+		present_story = colony.story.present_dialogue
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -180,15 +188,44 @@ func _ready() -> void:
 	novel = NovelPanel.new()
 	novel.panel_opened.connect(func() -> void: sound.set_ducked(true))
 	novel.panel_closed.connect(func() -> void: sound.set_ducked(false))
+	novel.finished.connect(_story_finished)
 	add_child(novel)
 	ScreenFit.fit_layer(self, [side_fill, result_shade, damage_edges])
 	# Jefes finales: presentación, destellos, transformación y muerte con puesta en escena.
 	if BossSpectacle.wants(boss):
-		var spectacle: BossSpectacle = BossSpectacle.new()
+		spectacle = BossSpectacle.new()
 		spectacle.arena = self
 		world.add_child(spectacle)
 		world.move_child(spectacle, actors.get_index())
-	if present_story: novel.play(VisualStory.scene(zone_index, "encounter"))
+	if configured or present_story or debug_practice or rush:
+		start_story()
+	else:
+		# Al abrir con F6, current_scene se asigna despues de _ready.
+		call_deferred("start_story")
+
+func start_story() -> void:
+	if story_started: return
+	story_started = true
+	if not configured and (get_tree().current_scene == self or debug_practice): present_story = true
+	if not play_story("encounter") and spectacle != null: spectacle.intro()
+
+func play_story(section: String) -> bool:
+	if rush or not present_story: return false
+	var scene: Dictionary = VisualStory.scene(zone_index, section)
+	var seen: Array[String] = campaign_story.seen_scenes if campaign_story != null else practice_seen
+	if scene.id in seen: return false
+	return novel.play(scene)
+
+func _story_finished(id: String) -> void:
+	if rush: return
+	if campaign_story != null:
+		# El desenlace no debe sobrescribir el checkpoint del siguiente distrito.
+		if id not in campaign_story.seen_scenes: campaign_story.seen_scenes.append(id)
+		if id.ends_with(":encounter"): campaign_story.checkpoint()
+	elif id not in practice_seen:
+		practice_seen.append(id)
+	if id.ends_with(":encounter") and spectacle != null and not spectacle.intro_started:
+		spectacle.intro()
 
 func configure_controls() -> void:
 	if not InputMap.has_action("attack"):
@@ -362,10 +399,11 @@ func build_hud() -> void:
 	exit_button.pressed.connect(return_to_menu)
 	rows.add_child(exit_button)
 	var lore: Button = Button.new()
-	lore.text = "Leer presentación"
+	lore.text = "Repetir presentacion"
+	lore.visible = not rush
 	lore.pressed.connect(func() -> void: novel.play(VisualStory.scene(zone_index, "encounter"), true))
 	rows.add_child(lore)
-	if debug_practice:
+	if debug_practice and not rush:
 		var aftermath: Button = Button.new()
 		aftermath.text = "Leer desenlace"
 		aftermath.pressed.connect(func() -> void: novel.play(VisualStory.scene(zone_index, "ending"), true))
@@ -464,7 +502,7 @@ func finish(victory: bool) -> void:
 	dash_active = false
 	sound.play_outcome(victory)
 	ending_victory = victory
-	ending_timer = 2.2 if victory else 1.2
+	ending_timer = (4.1 if spectacle != null else 2.2) if victory else 1.2
 	player.set_physics_process(false)
 	boss.set_physics_process(false)
 	modules.set_physics_process(false)
@@ -497,6 +535,9 @@ func _process(delta: float) -> void:
 		if ending_victory and ending_timer <= 1.6:
 			banner.text = zone.boss_title + " - DERROTADO"
 		if ending_timer <= 0:
+			if ending_victory and not aftermath_started:
+				aftermath_started = true
+				if play_story("ending"): return
 			emitted = true
 			resolved.emit(ending_victory)
 			if not configured and not rush:
@@ -584,4 +625,6 @@ func show_completed(next_zone: String = "") -> void:
 		menu.size = Vector2(150, 25)
 		menu.pressed.connect(return_to_menu)
 		add_child(menu)
-	if present_story: novel.play(VisualStory.scene(zone_index, "ending"))
+	if not aftermath_started:
+		aftermath_started = true
+		play_story("ending")

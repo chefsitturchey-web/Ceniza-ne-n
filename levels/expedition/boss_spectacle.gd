@@ -47,6 +47,7 @@ var death_clock: float = 0
 var slow_active: bool = false
 var previous_scale: float = 1
 var intro_done: bool = false
+var intro_started: bool = false
 
 static func wants(target: Recaudador) -> bool:
 	return target is ElPrefecto or target is MadreCero
@@ -93,7 +94,6 @@ func _ready() -> void:
 	base_zoom = arena.camera.zoom
 	rest = arena.camera.position
 	build_overlay()
-	intro()
 
 func build_overlay() -> void:
 	overlay.size = Vector2(640, 360)
@@ -148,6 +148,8 @@ func build_overlay() -> void:
 
 ## Tarjeta de nombre con barras de cine y acercamiento de cámara al jefe.
 func intro() -> void:
+	if intro_started: return
+	intro_started = true
 	card_title.text = TITLES[id][0]
 	card_subtitle.text = TITLES[id][1]
 	# Bajo el jefe encuadrado: el acercamiento lo deja en el centro de la pantalla.

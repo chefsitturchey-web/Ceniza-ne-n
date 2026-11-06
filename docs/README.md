@@ -4,6 +4,8 @@
 - [Organización, limpieza y carpetas antiguas](ORGANIZACION.md).
 - [Dónde están los sprites y sonidos](../assets/README.md).
 
+- [Flujo completo de historia y novela visual](gameplay/HISTORIA_FLUJO.md).
+
 ## Diseño y campaña
 
 [Documento de diseño](design/CENIZA_NEON_GDD.docx) · [Historia y campaña actual](design/HISTORIA_Y_CAMPANA.md) · [Reglas inspiradas en Kingdom y Vampire Survivors](design/REVISION_GDD_KINGDOM_SURVIVORS.md)
