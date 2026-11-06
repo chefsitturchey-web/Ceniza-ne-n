@@ -2,6 +2,7 @@ class_name SettlementBackdrop
 extends Node2D
 
 var world: District
+var steam_pool: Array[Node2D] = []
 var elapsed: float = 0
 var clock: float = 0
 var art: Texture2D = load("res://assets/world/settlements/ruins.png")
@@ -11,10 +12,30 @@ const ZONE_NAMES: Array[String] = ["ANDÉN", "HORNOS", "DIQUE", "AVENIDA", "ENLA
 
 func _ready() -> void:
 	z_index = -2
+	for index: int in 3:
+		var emitter: Node2D = WorldParticles.smoke(0.55)
+		emitter.name = "SettlementSteam%d" % index
+		emitter.modulate = Color(0.8, 0.88, 0.9, 0.6)
+		add_child(emitter)
+		steam_pool.append(emitter)
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 func _process(delta: float) -> void:
 	elapsed += delta
+	if world != null:
+		var camera: Camera2D = get_viewport().get_camera_2d()
+		var camera_x: float = camera.get_screen_center_position().x if camera != null else 0
+		var nearest: int = roundi((camera_x - (world.zone_index - 2) * 17) / 680)
+		for slot: int in steam_pool.size():
+			var index: int = nearest - 1 + slot
+			var center: float = index * 680 + (world.zone_index - 2) * 17
+			var height: float = 119
+			var ratio: float = height / 144.0
+			# Boca lateral derecha del edificio posterior impar (x=110,y=78).
+			var building_x: float = center + 70 if absi(index) % 2 == 0 else center - 32
+			if absi(index) % 2 == 1: height = 140 + (absi(index) % 3) * 9; ratio = height / 144.0
+			steam_pool[slot].position = Vector2(building_x + (110 - 64) * ratio, GameRules.FLOOR_Y - 4 - height + 81 * ratio).round()
+			WorldParticles.configure(steam_pool[slot], index != 0 and absf(center - camera_x) < 650, 9)
 	clock += delta
 	if clock >= 0.08:
 		clock = 0
@@ -84,10 +105,7 @@ func _draw() -> void:
 		draw_rect(Rect2(center - 42, GameRules.FLOOR_Y - 15, 84, 12), Color("14232e", 0.9))
 		var address: String = "%s %02d" % [ZONE_NAMES[zone], absi(index)] + (" · RED" if recovery > 0 else "")
 		draw_string(font, Vector2(center - 37, GameRules.FLOOR_Y - 6), address, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color("c3b27e") if recovery > 0 else Color("8d9c9f"))
-		if GamePreferences.current().particles:
-			for puff: int in 4:
-				var rise: float = fposmod(elapsed * 5 + puff * 9 + index * 3, 40)
-				draw_circle(Vector2(center + 26 + sin(rise * 0.1) * 3, GameRules.FLOOR_Y - 113 - rise), 3 + rise * 0.08, Color(0.44, 0.5, 0.52, (1 - rise / 40) * 0.09))
+
 	# Foreground route clutter is detailed scenery, kept behind buildable defences.
 	for index: int in range(floori((camera_x - 450) / 190), ceili((camera_x + 450) / 190)):
 		var x: float = index * 190 + 36

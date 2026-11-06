@@ -4,6 +4,8 @@ extends Node2D
 const FONT: Font = preload("res://assets/fonts/Micro5-Regular.ttf")
 static var hit_stops: int = 0
 var camera: Camera2D
+var rings: Array[Dictionary] = []
+var sparks: DebrisEmitter = DebrisEmitter.new()
 var numbers: Array[Dictionary] = []
 var flights: Array[Dictionary] = []
 var shake: float = 0
@@ -15,6 +17,7 @@ var hud_target: Vector2 = Vector2(24, 344)
 var camera_rest: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
+	add_child(sparks)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	z_index = 100
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -26,9 +29,19 @@ func number(at: Vector2, text: String, color: Color = Color.WHITE) -> void:
 	numbers.append({"at": at + Vector2(-10, -35), "text": text, "color": color, "age": 0.0})
 
 func hit(at: Vector2, amount: int, killed: bool = false) -> void:
+	if not active: return
 	number(at, str(amount), Color("ffce75") if killed else Color.WHITE)
 	kick(2.5 if killed else 0.8)
-	if killed: hit_stop()
+	sparks.emit_pixels(at + Vector2(0, -18), 6 if killed else 3, Color("ffce75"))
+	if killed:
+		burst(at + Vector2(0, -18), Color("ffce75"), 26)
+		sparks.emit_pixels(at + Vector2(0, -18), 4, Color("89939e", 0.6), true)
+		hit_stop()
+
+func burst(at: Vector2, color: Color, radius: float = 30) -> void:
+	if not active or not GamePreferences.current().particles: return
+	if rings.size() >= 12: rings.pop_front()
+	rings.append({"at": at, "color": color, "radius": radius, "age": 0.0})
 
 func kick(strength: float) -> void:
 	if active and not GamePreferences.current().reduced_flashes: shake = maxf(shake, strength)
@@ -62,6 +75,8 @@ func _exit_tree() -> void:
 func _process(delta: float) -> void:
 	if get_tree().paused: return
 	clock += delta
+	for ring: Dictionary in rings: ring.age += delta
+	rings = rings.filter(func(ring: Dictionary) -> bool: return ring.age < 0.5)
 	shake = move_toward(shake, 0, delta * 22)
 	if GamePreferences.current().reduced_flashes: shake = 0
 	if is_instance_valid(camera): camera.offset = camera_rest + Vector2(sin(clock * 107), cos(clock * 89)) * shake
@@ -72,6 +87,11 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	for ring: Dictionary in rings:
+		var t: float = float(ring.age) / 0.5
+		var tint: Color = ring.color
+		tint.a = (1 - t) * (0.2 if GamePreferences.current().reduced_flashes else 0.65)
+		draw_arc(to_local(ring.at), lerpf(3, ring.radius, t), 0, TAU, 32, tint, 1)
 	for entry: Dictionary in numbers:
 		var tint: Color = entry.color
 		tint.a = 1.0 - float(entry.age) / 0.75

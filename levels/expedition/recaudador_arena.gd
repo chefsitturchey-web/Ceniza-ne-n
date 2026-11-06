@@ -146,6 +146,7 @@ func _ready() -> void:
 	combat_effects.arena = self
 	world.add_child(combat_effects)
 	impact = ImpactFeedback.new()
+	impact.sparks.planar = true
 	world.add_child(impact)
 	boss.damaged.connect(func(amount: int, remaining: int) -> void: impact.hit(boss.global_position, amount, remaining == 0))
 	player.damaged.connect(func() -> void: combat_effects.shake = maxf(combat_effects.shake, 3))

@@ -142,8 +142,8 @@ func impact(point: Vector2, radius: float, strength: float = 2.0, shards: int = 
 		add_particle(point + Vector2(rng.randf_range(-12, 12), 0), Vector2(rng.randf_range(-10, 10), -30), 0.8, 5, true)
 
 func add_particle(point: Vector2, speed: Vector2, duration: float, size: float, smoke: bool) -> void:
-	if not GamePreferences.current().particles or particles.size() >= PARTICLE_LIMIT: return
-	particles.append({"position": point, "velocity": speed, "age": 0.0, "life": duration, "size": size, "smoke": smoke, "seed": rng.randf() * TAU})
+	if not GamePreferences.current().particles or particles.size() >= WorldParticles.budget(PARTICLE_LIMIT): return
+	particles.append({"position": point, "velocity": speed, "age": 0.0, "life": duration * (1.8 if smoke else 1.0), "size": size, "smoke": smoke, "seed": rng.randf() * TAU})
 
 func _process(delta: float) -> void:
 	clock += delta

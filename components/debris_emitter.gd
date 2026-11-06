@@ -39,6 +39,7 @@ class Pixel extends Node2D:
 			velocity = Vector2(velocity.x * 0.7, -absf(velocity.y) * 0.32)
 		global_position = precise_position.round()
 		rotation += spin * delta
+		if effect_kind == &"smoke": scale = Vector2.ONE * (1.0 + age * 1.2)
 		modulate.a = clampf((lifetime - age) / minf(lifetime, 0.45), 0.0, 1.0)
 
 	func _draw() -> void:
@@ -54,14 +55,19 @@ func _ready() -> void:
 func emit_pixels(origin: Vector2, count: int, color: Color, smoke: bool = false) -> void:
 	if not GamePreferences.current().particles:
 		return
-	for index: int in range(mini(count, LIMIT - live_count)):
+	for index: int in range(mini(count, WorldParticles.budget(LIMIT) - live_count)):
 		var piece: Pixel = _create(origin)
 		piece.tint = color
 		piece.size = Vector2.ONE * rng.randi_range(1, 3)
 		if smoke:
+			piece.effect_kind = &"smoke"
+			piece.texture = WorldParticles.smoke_texture()
+			piece.region = Rect2(0, 0, 16, 16)
+			piece.self_modulate = color
+			piece.size = Vector2(9, 9)
 			piece.gravity = -5.0
 			piece.velocity = Vector2(rng.randf_range(-7, 7), rng.randf_range(-18, -10))
-			piece.lifetime = 1.2
+			piece.lifetime = 2.4
 		else:
 			piece.lifetime = 0.7
 		piece.queue_redraw()
@@ -70,14 +76,14 @@ func emit_fragments(origin: Vector2, texture: Texture2D, count: int, mirrored: b
 	if not GamePreferences.current().particles:
 		return
 	if texture == null:
-		for index: int in range(mini(count, LIMIT - live_count)):
+		for index: int in range(mini(count, WorldParticles.budget(LIMIT) - live_count)):
 			var piece: Pixel = _create(origin + Vector2(0, -20))
 			piece.tint = Color("8299a8")
 			piece.size = Vector2(rng.randi_range(1, 3), 2)
 			piece.spin = rng.randf_range(-4, 4)
 		return
 	var extent: Vector2 = texture.get_size()
-	for index: int in range(mini(count, LIMIT - live_count)):
+	for index: int in range(mini(count, WorldParticles.budget(LIMIT) - live_count)):
 		var region_size: Vector2 = (extent / Vector2(4, 2)).floor() if shatter else Vector2(3, 3)
 		var source: Vector2 = Vector2(index % 4, floorf(index * 0.25)) * region_size if shatter else Vector2(rng.randf_range(0, extent.x - 3), rng.randf_range(0, extent.y - 3)).floor()
 		var anchor: Vector2 = extent * 0.5 if planar else Vector2(extent.x / 2.0, extent.y)
@@ -96,7 +102,7 @@ func emit_fragments(origin: Vector2, texture: Texture2D, count: int, mirrored: b
 func emit_sweat(origin: Vector2) -> void:
 	if not GamePreferences.current().particles:
 		return
-	if live_count >= LIMIT:
+	if live_count >= WorldParticles.budget(LIMIT):
 		return
 	var piece: Pixel = _create(origin)
 	piece.tint = Color("a5f8ff")
@@ -106,7 +112,7 @@ func emit_sweat(origin: Vector2) -> void:
 func emit_dust(origin: Vector2, count: int = 2) -> void:
 	if not GamePreferences.current().particles:
 		return
-	for index: int in range(mini(count, LIMIT - live_count)):
+	for index: int in range(mini(count, WorldParticles.budget(LIMIT) - live_count)):
 		var piece: Pixel = _create(origin + Vector2(rng.randf_range(-4, 4), -2))
 		piece.effect_kind = &"dust"
 		piece.tint = Color("89939e", 0.55)
@@ -118,7 +124,7 @@ func emit_dust(origin: Vector2, count: int = 2) -> void:
 func emit_shot(muzzle: Vector2, direction: float) -> void:
 	if not GamePreferences.current().particles:
 		return
-	if live_count < LIMIT:
+	if live_count < WorldParticles.budget(LIMIT):
 		var flash: Pixel = _create(muzzle)
 		flash.effect_kind = &"muzzle_flash"
 		flash.tint = Color("ffce75")
@@ -126,7 +132,7 @@ func emit_shot(muzzle: Vector2, direction: float) -> void:
 		flash.velocity = Vector2.ZERO
 		flash.gravity = 0.0
 		flash.lifetime = 0.09
-	if live_count < LIMIT:
+	if live_count < WorldParticles.budget(LIMIT):
 		var casing: Pixel = _create(muzzle - Vector2(direction * 10, 0))
 		casing.effect_kind = &"casing"
 		casing.tint = Color("e6b65c")

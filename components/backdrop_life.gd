@@ -21,8 +21,6 @@ static func draw_zone(canvas: CanvasItem, id: String, time: float, top: float, w
 	var steady: bool = GamePreferences.current().reduced_flashes
 	match id:
 		"foundry":
-			for mouth: Vector2 in ANCHORS.foundry:
-				AmbientSteam.draw_plume(canvas, point(mouth, width, height, top), time + mouth.x * 9, 19, 6, Color("b6a49a"))
 			# Molten metal travels inside the drawn furnace opening.
 			var pour: Vector2 = point(Vector2(0.175, 0.53), width, height, top)
 			for index: int in 8:
@@ -70,8 +68,6 @@ static func draw_zone(canvas: CanvasItem, id: String, time: float, top: float, w
 					var at: Vector2 = point(Vector2(fposmod(index * 0.127 + time * 0.012, 1), 0.54 + fposmod(index * 0.11 - time * 0.03, 0.35)), width, height, top)
 					canvas.draw_circle(at, 0.7, Color("d8cba7", 0.35))
 		"network":
-			for index: int in 2:
-				AmbientSteam.draw_plume(canvas, point(ANCHORS.network[index], width, height, top), time + index, -12 if index == 0 else 12, 5, Color("6bacae"))
 			var core: Vector2 = point(ANCHORS.network[2], width, height, top)
 			for ring: int in 3:
 				canvas.draw_arc(core, 43 + ring * 4, time * (0.12 + ring * 0.03) + ring, time * (0.12 + ring * 0.03) + ring + 1.2, 28, Color("6ddbd1", 0.15), 1)
@@ -88,8 +84,6 @@ static func draw_zone(canvas: CanvasItem, id: String, time: float, top: float, w
 
 static func draw_factory(canvas: CanvasItem, time: float, top: float, frame: Transform2D = Transform2D.IDENTITY) -> void:
 	var scale: Vector2 = Vector2(512.0 / 1672.0, 288.0 / 941.0)
-	for mouth: Vector2 in [Vector2(180, 73), Vector2(640, 122), Vector2(1068, 140), Vector2(1415, 170)]:
-		AmbientSteam.draw_plume(canvas, mouth * scale + Vector2(0, top), time + mouth.x * 0.01, 16, 7, Color("9aa8af"))
 	if fan == null:
 		fan = AtlasTexture.new()
 		fan.atlas = DepotArt.PARTS
