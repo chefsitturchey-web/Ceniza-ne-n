@@ -48,6 +48,11 @@ func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 	add_child(daylight)
+	var backdrop: Node2D = preload("res://components/animated_backdrop.gd").new()
+	backdrop.name = "AnimatedBackdrop"
+	backdrop.view = self
+	backdrop.show_behind_parent = true
+	add_child(backdrop)
 	var atmosphere: WorldAtmosphere = WorldAtmosphere.new()
 	atmosphere.name = "WorldAtmosphere"
 	atmosphere.view = self
@@ -80,12 +85,7 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	var camera: Camera2D = get_viewport().get_camera_2d()
 	var camera_x: float = camera.get_screen_center_position().x if camera != null else 0.0
-	_draw_sky(camera_x)
 	var zone_id: String = zone.id if zone != null else "periphery"
-	DistrictDepth.draw_far(self, camera_x, time, zone_id, light["sky_bottom"])
-	if district_background != null:
-		DistrictDepth.draw_architecture(self, district_background, camera_x, time, zone_id)
-		_draw_haze(camera_x, light["far_haze"] * 0.16)
 	DistrictDepth.draw_near(self, camera_x, time, zone_id)
 	for index: int in range(PROPS.size()):
 		var texture: Texture2D = PROPS[index][0]
@@ -131,6 +131,7 @@ func _draw_ash(camera_x: float) -> void:
 		draw_rect(Rect2(roundf(x), roundf(y), 1, 2 if ember else 1), Color(0.9, 0.57, 0.3, 0.45) if ember else Color(0.73, 0.8, 0.85, 0.22))
 
 func _draw_wet_ground(camera_x: float) -> void:
+	var motion_time: float = time if GamePreferences.current().particles else 0.0
 	for index: int in range(floori((camera_x - 450) / 106), ceili((camera_x + 450) / 106)):
 		var x: float = index * 106.0
 		if absf(x - camera_x) > 430:
@@ -143,7 +144,7 @@ func _draw_wet_ground(camera_x: float) -> void:
 			continue
 		var x: float = entry[1] + LAMP.get_width() * 0.5 - 4
 		for line: int in range(7):
-			var half: float = 11 - line + sin(time * 2.0 + line) * 2
+			var half: float = 11 - line + sin(motion_time * 2.0 + line) * 2
 			draw_line(Vector2(x - half, FLOOR_Y + 2 + line * 2), Vector2(x + half, FLOOR_Y + 2 + line * 2), Color(1.0, 0.7, 0.3, light["lamps"] * (0.17 - line * 0.02)), 1)
 	_reflect_actor(player)
 	var count: int = 0
@@ -192,7 +193,7 @@ func _draw_lamp_glow(bulb: Vector2, index: int) -> void:
 	# Parpadeo ocasional distinto por farola, sin aleatoriedad: depende del tiempo y del índice.
 	var flicker: float = 1.0
 	var phase: float = fmod(time * 0.7 + index * 1.37, 6.0)
-	if phase < 0.25 and not GamePreferences.current().reduced_flashes:
+	if phase < 0.25 and GamePreferences.current().particles and not GamePreferences.current().reduced_flashes:
 		flicker = 0.35 if int(phase * 40.0) % 2 == 0 else 1.0
 	var strength: float = light["lamps"] * flicker
 	for ring: int in range(3):
