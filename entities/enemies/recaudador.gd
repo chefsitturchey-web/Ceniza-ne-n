@@ -10,6 +10,8 @@ signal hit_feedback(blocked: bool)
 signal ground_impact(point: Vector2, radius: float, strength: float)
 ## Avisa el principio y el final de una embestida para que el rumor la acompañe.
 signal dash_changed(active: bool)
+## Comienza el aviso de un golpe cuerpo a cuerpo (para pistas y sonido).
+signal melee_started(kind: String)
 enum State { APPROACH, CLAW_WINDUP, CLAW, VOLLEY_WINDUP, VOLLEY, CHARGE_WINDUP, CHARGE, STUNNED, RECOVER, DEAD }
 ## Around 20 exposed windows at base damage; target 3-5 minutes with flank hits.
 @export var max_health: int = 9000
@@ -42,6 +44,18 @@ var tactics: BossTactics = BossTactics.new()
 var last_decision: String = ""
 @export var native_combat_art: bool = true
 var combat_visual: CombatFlipbook
+## Capa cuerpo a cuerpo común a todos los jefes. Cada golpe se avisa con su forma exacta
+## (arco, círculo o corredor) y su dirección queda fija en la segunda mitad del aviso:
+## el daño solo llega al terminar el aviso y una esquiva o un paso fuera lo evitan.
+var melee: Dictionary = {}
+var melee_queue: Array[Dictionary] = []
+var melee_cooldown: float = 1.2
+var melee_combos: int = 0
+## Golpes del jugador contra el escudo seguidos: quien insiste recibe un empujón.
+var blocked_streak: int = 0
+var blocked_clock: float = 0
+## Momento en que terminó el último patrón cuerpo a cuerpo: quien se aleja demasiado rato recibe una embestida corta.
+var melee_last_end: float = 0
 
 func _ready() -> void:
 	health = max_health
@@ -97,6 +111,7 @@ func clear_hazards() -> void:
 	pass
 
 func status_text() -> String:
+	if melee_active(): return melee_status()
 	match state:
 		State.CHARGE_WINDUP: return "EMBESTIDA: esquiva hacia un lado cuando arranque"
 		State.CHARGE: return "Deja que choque contra una pared o cobertura"
@@ -138,13 +153,19 @@ func _physics_process(delta: float) -> void:
 		return
 	elapsed += delta
 	tactics.observe(target, delta)
+	if tick_melee(delta):
+		update_puppet(delta)
+		return
 	timer -= delta
 	var difference: Vector2 = target.global_position - global_position
+	if state in [State.APPROACH, State.RECOVER] and try_melee(difference.length()):
+		update_puppet(delta)
+		return
 	if state in [State.APPROACH, State.VOLLEY_WINDUP, State.VOLLEY, State.RECOVER]:
 		facing = Vector2.from_angle(rotate_toward(facing.angle(), difference.angle(), (1.5 if phase == 1 else 2.0) * delta))
 	match state:
 		State.APPROACH:
-			velocity = tactics.steer(self, target.global_position, 65 if phase == 1 else 85) if difference.length() > 65 else Vector2.ZERO
+			velocity = tactics.steer(self, target.global_position, 82 if phase == 1 else 104) if difference.length() > 65 else Vector2.ZERO
 			move_and_slide()
 			if timer <= 0 or difference.length() < 72:
 				choose_attack(difference.length())
@@ -157,7 +178,7 @@ func _physics_process(delta: float) -> void:
 				target.take_damage(20, difference.normalized() * 180)
 			if timer <= 0:
 				next_pattern = -1
-				change_state(State.RECOVER, 0.9)
+				change_state(State.RECOVER, 0.6 if phase == 2 else 0.75)
 		State.VOLLEY_WINDUP:
 			if timer <= 0:
 				volleys = 0
@@ -171,7 +192,7 @@ func _physics_process(delta: float) -> void:
 				shot_timer = 0.55
 			if timer <= 0:
 				next_pattern = -1
-				change_state(State.RECOVER, 0.8)
+				change_state(State.RECOVER, 0.55 if phase == 2 else 0.65)
 		State.CHARGE_WINDUP:
 			if timer <= 0:
 				change_state(State.CHARGE, 1.8)
@@ -201,7 +222,7 @@ func _physics_process(delta: float) -> void:
 				elif next_pattern == -1:
 					choose_attack(difference.length())
 				else:
-					change_state(State.APPROACH, 2.5)
+					change_state(State.APPROACH, 1.6 if phase == 2 else 2.0)
 	update_puppet(delta)
 
 func begin_charge() -> void:
@@ -227,7 +248,7 @@ func finish_charge() -> void:
 		begin_charge()
 	else:
 		next_pattern = 0
-		change_state(State.RECOVER, 1.1)
+		change_state(State.RECOVER, 0.75 if phase == 2 else 0.9)
 
 func stun() -> void:
 	change_state(State.STUNNED, 2.5)
@@ -241,6 +262,150 @@ func fire_fan() -> void:
 		var direction: Vector2 = facing.rotated(angle)
 		fired.emit(global_position + facing * 42, direction)
 
+
+## Golpes propios de cada jefe. Claves de cada golpe: kind (swing, slam, shove, lunge),
+## windup (aviso en segundos), reach, arc (semiángulo del arco), damage, push, travel y name.
+func melee_profile() -> Dictionary:
+	return {"close": 105.0, "band": Vector2(150, 260), "cooldown": 1.5,
+		"combo": [
+			{"kind": "swing", "name": "Garra derecha", "windup": 0.62, "reach": 112.0, "arc": 1.05, "damage": 18, "push": 170.0},
+			{"kind": "swing", "name": "Garra izquierda", "windup": 0.5, "reach": 112.0, "arc": 1.05, "damage": 18, "push": 170.0}],
+		"finisher": {"kind": "slam", "name": "Pisotón", "windup": 0.7, "reach": 92.0, "damage": 24, "push": 240.0},
+		"lunge": {"kind": "lunge", "name": "Cobro a quemarropa", "windup": 0.7, "reach": 40.0, "travel": 190.0, "damage": 22, "push": 220.0},
+		"shove": {"kind": "shove", "name": "Empujón", "windup": 0.5, "reach": 78.0, "damage": 12, "push": 330.0, "stamina": 25.0}}
+
+## Intensidad: la segunda fase (y la última guardia en los jefes finales) acorta avisos y pausas.
+func melee_tempo() -> float:
+	return 0.85 if phase == 2 else 1.0
+
+func melee_active() -> bool:
+	return not melee.is_empty()
+
+func melee_winding() -> bool:
+	return not melee.is_empty() and float(melee.time) > 0
+
+## Progreso 0..1 del aviso (o del golpe activo), para animación y avisos de suelo.
+func melee_progress() -> float:
+	if melee.is_empty(): return 0.0
+	if float(melee.time) > 0: return 1.0 - float(melee.time) / float(melee.windup)
+	return 1.0 - clampf(float(melee.active) / float(melee.active_total), 0, 1)
+
+func melee_clip() -> String:
+	if melee_winding(): return "windup"
+	return "charge" if melee.kind == "lunge" else "attack"
+
+## Intenta abrir un patrón cuerpo a cuerpo desde un estado neutral. Devuelve true si empieza.
+func try_melee(distance: float) -> bool:
+	if melee_active() or melee_cooldown > 0 or core_exposed or health <= 0 or target == null: return false
+	var profile: Dictionary = melee_profile()
+	var sequence: Array[Dictionary] = []
+	if blocked_streak >= 2 and distance < float(profile.close) + 20 and profile.has("shove"):
+		sequence.append(profile.shove)
+		blocked_streak = 0
+	elif distance < float(profile.close):
+		for move: Dictionary in profile.combo: sequence.append(move)
+		if phase == 2 and not profile.finisher.is_empty(): sequence.append(profile.finisher)
+	elif profile.has("lunge") and distance >= profile.band.x and distance <= profile.band.y and (tactics.stationary_time > 0.8 or elapsed - melee_last_end > 4.0):
+		sequence.append(profile.lunge)
+		# Tras cerrar distancia remata con el primer golpe de su combo.
+		sequence.append(profile.combo[0])
+	else:
+		return false
+	melee_combos += 1
+	melee_queue = sequence
+	next_melee()
+	return true
+
+func next_melee() -> void:
+	if melee_queue.is_empty():
+		melee = {}
+		melee_cooldown = float(melee_profile().cooldown) * melee_tempo()
+		melee_last_end = elapsed
+		return
+	var move: Dictionary = melee_queue.pop_front().duplicate()
+	move.windup = maxf(0.4, float(move.windup) * melee_tempo())
+	move.time = move.windup
+	move.active_total = 0.22 if move.kind == "lunge" else 0.12
+	move.active = move.active_total
+	move.direction = (target.global_position - global_position).normalized() if target != null else facing
+	move.hit = false
+	melee = move
+	facing = move.direction
+	velocity = Vector2.ZERO
+	cue_requested.emit("telegraph_charge" if move.kind == "lunge" else "telegraph_claw")
+	melee_started.emit(String(move.kind))
+
+func cancel_melee() -> void:
+	if not melee.is_empty() and melee.kind == "lunge" and float(melee.time) <= 0: dash_changed.emit(false)
+	melee = {}
+	melee_queue.clear()
+
+## Comprueba si un punto está dentro de la forma exacta que se ve en el suelo.
+func melee_contains(point: Vector2) -> bool:
+	if melee.is_empty(): return false
+	var offset: Vector2 = point - global_position
+	match String(melee.kind):
+		"swing":
+			return offset.length() <= float(melee.reach) and absf(angle_difference(Vector2(melee.direction).angle(), offset.angle())) <= float(melee.arc)
+		"slam", "shove":
+			return offset.length() <= float(melee.reach)
+	return false
+
+## Avanza la capa cuerpo a cuerpo. Mientras devuelva true el resto del patrón espera.
+func tick_melee(delta: float) -> bool:
+	melee_cooldown = maxf(0, melee_cooldown - delta)
+	blocked_clock = maxf(0, blocked_clock - delta)
+	if blocked_clock == 0: blocked_streak = 0
+	if melee.is_empty(): return false
+	if target == null or target.health <= 0 or core_exposed:
+		cancel_melee()
+		return false
+	var difference: Vector2 = target.global_position - global_position
+	velocity = Vector2.ZERO
+	if float(melee.time) > 0:
+		melee.time = float(melee.time) - delta
+		# Sigue al jugador en la primera mitad del aviso; luego la forma queda fija.
+		if float(melee.time) > float(melee.windup) * 0.5 and difference.length() > 1:
+			melee.direction = Vector2.from_angle(rotate_toward(Vector2(melee.direction).angle(), difference.angle(), 3.0 * delta))
+		facing = melee.direction
+		if float(melee.time) <= 0:
+			strike_melee()
+		return true
+	melee.active = float(melee.active) - delta
+	if melee.kind == "lunge":
+		var before: Vector2 = global_position
+		var step: Vector2 = Vector2(melee.direction) * float(melee.travel) / float(melee.active_total) * delta
+		var collision: KinematicCollision2D = move_and_collide(step)
+		var nearest: Vector2 = Geometry2D.get_closest_point_to_segment(target.global_position, before, global_position)
+		if not melee.hit and nearest.distance_to(target.global_position) <= float(melee.reach):
+			melee.hit = true
+			target.take_damage(int(melee.damage), Vector2(melee.direction) * float(melee.push))
+		if collision != null: melee.active = 0.0
+	if float(melee.active) <= 0:
+		if melee.kind == "lunge": dash_changed.emit(false)
+		next_melee()
+	return true
+
+func strike_melee() -> void:
+	if melee.kind == "lunge":
+		dash_changed.emit(true)
+		return
+	var point: Vector2 = global_position + (Vector2(melee.direction) * float(melee.reach) * 0.55 if melee.kind == "swing" else Vector2.ZERO)
+	ground_impact.emit(point, float(melee.reach) * (0.6 if melee.kind == "swing" else 1.0), 2.0 if melee.kind == "swing" else 3.2)
+	if melee_contains(target.global_position):
+		melee.hit = true
+		var away: Vector2 = (target.global_position - global_position).normalized()
+		target.take_damage(int(melee.damage), away * float(melee.push))
+		if melee.has("stamina"): target.stamina = maxf(0, target.stamina - float(melee.stamina))
+
+func melee_status() -> String:
+	match String(melee.kind):
+		"swing": return String(melee.name).to_upper() + ": sal del arco o esquiva hacia un lado"
+		"slam": return String(melee.name).to_upper() + ": aléjate del círculo"
+		"shove": return String(melee.name).to_upper() + ": deja de golpear su escudo"
+		"lunge": return String(melee.name).to_upper() + ": sal de la línea marcada"
+	return ""
+
 func receive_hit(origin: Vector2, amount: int) -> int:
 	if health <= 0 or amount <= 0:
 		return 0
@@ -249,6 +414,9 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 	hit_feedback.emit(damage == 0)
 	if damage == 0:
 		cue_requested.emit("shield")
+		blocked_streak += 1
+		blocked_clock = 2.5
+		if blocked_streak >= 2: melee_cooldown = minf(melee_cooldown, 0.2)
 	effects.emit_pixels(global_position + (origin - global_position).normalized() * 28, 5, Color("ffce75"))
 	health = maxi(0, health - damage)
 	damaged.emit(damage, health)
@@ -258,6 +426,7 @@ func receive_hit(origin: Vector2, amount: int) -> int:
 		phase_changed.emit(phase)
 		cue_requested.emit("alarm")
 	if health == 0:
+		cancel_melee()
 		change_state(State.DEAD, 0)
 		clear_hazards()
 		if combat_visual != null:
