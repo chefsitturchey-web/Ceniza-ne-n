@@ -40,11 +40,11 @@ func _ready() -> void:
 		chapter.voice + ": " + String(chapter.opening).get_slice(".", 0) + ".",
 		"OBJETIVO: sigue el texto superior del HUD. Siempre indica el siguiente paso y dónde hacerlo.",
 		"De día construyes y exploras; de noche resistes tras las murallas. Tú organizas: tus tropas y torretas son las que luchan.",
-		"Empieza recuperando piezas de las baterías junto al núcleo (mantén E) y levántalo." if index == 0 else "Tus mejoras y habitantes vienen contigo. Levanta el núcleo con las piezas del distrito.",
-		"A/D mover - Shift correr - E interactuar - Espacio esquivar - F asaltar o retirar\nL diario - Q sobrecarga - Esc pausa - J atacar (solo contra jefes)"]
+		"Empieza recuperando piezas de las baterías junto al núcleo (mantén {interact}) y levántalo." if index == 0 else "Tus mejoras y habitantes vienen contigo. Levanta el núcleo con las piezas del distrito.",
+		"{move} mover - {sprint} correr - {interact} interactuar - {dodge} esquivar - {escort} asaltar o retirar\n{journal} diario - {overload} sobrecarga - {pause} pausa - {attack} atacar (solo contra jefes)"]
 	for text: String in instructions:
 		var label: Label = Label.new()
-		label.text = text
+		InputGlyphs.bind(label, text)
 		label.custom_minimum_size.x = 528
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.add_theme_font_size_override("font_size", 12)

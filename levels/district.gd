@@ -44,6 +44,8 @@ var first_steps: FirstSteps
 var impact: ImpactFeedback
 var engagement: RoundEngagement
 var rewards_hud: RoundRewardsHud
+var guide_hud: FirstStepsHud
+var hud_stack: HudStack
 
 func _ready() -> void:
 	player.combat_enabled = false
@@ -259,7 +261,7 @@ func _ready() -> void:
 	first_steps = FirstSteps.new()
 	first_steps.setup(self)
 	add_child(first_steps)
-	var guide_hud: FirstStepsHud = FirstStepsHud.new()
+	guide_hud = FirstStepsHud.new()
 	guide_hud.guide = first_steps
 	add_child(guide_hud)
 	options.guide_reset_requested.connect(first_steps.restart)
@@ -286,6 +288,11 @@ func _ready() -> void:
 	rewards_hud = RoundRewardsHud.new()
 	rewards_hud.progress = engagement
 	add_child(rewards_hud)
+	hud_stack = HudStack.new()
+	hud_stack.world = self
+	hud_stack.hud = get_node("HUD") as GameHud
+	hud_stack.guide_hud = guide_hud
+	add_child(hud_stack)
 	session.finished_changed.connect(func(victory: bool) -> void: sound.play_outcome(victory))
 	player.health_component.died.connect(func() -> void: sound.play_cue("player_death"))
 	player.respawned.connect(func() -> void: sound.play_cue("respawn"))

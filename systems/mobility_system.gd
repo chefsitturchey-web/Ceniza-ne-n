@@ -32,7 +32,7 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	hud.visible = owned and not get_tree().paused and not district.expedition.active and not district.session.finished
-	status.text = "PLATAFORMA %d%% - V %s" % [ceili(charge), "bajar" if mounted else "subir cerca"]
+	status.text = "PLATAFORMA %d%% - %s %s" % [ceili(charge), InputGlyphs.action_name("mount"), "bajar" if mounted else "subir cerca"]
 	queue_redraw()
 
 func bob() -> float: return minf(0, roundf(sin(elapsed * 4)))

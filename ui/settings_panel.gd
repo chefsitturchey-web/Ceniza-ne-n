@@ -10,6 +10,7 @@ var status: Label
 var sliders: Dictionary = {}
 var toggles: Dictionary = {}
 var window_size: OptionButton
+var glyphs: OptionButton
 var first: HSlider
 var general: VBoxContainer
 var controls: VBoxContainer
@@ -80,6 +81,12 @@ func _ready() -> void:
 		window_size.add_item(caption)
 	window_size.item_selected.connect(func(index: int) -> void: _set_option("window_size", index))
 	rows.add_child(window_size)
+	# Qué teclas muestran los avisos: el último dispositivo usado o uno fijo.
+	glyphs = OptionButton.new()
+	for caption: String in InputGlyphs.MODES:
+		glyphs.add_item("Avisos de teclas: " + caption)
+	glyphs.item_selected.connect(func(index: int) -> void: _set_option("glyphs", index))
+	rows.add_child(glyphs)
 	# En móvil la ventana la gestiona el sistema; en escritorio sin pantalla táctil sobra el panel táctil.
 	if OS.has_feature("mobile"):
 		toggles.fullscreen.hide()
@@ -101,12 +108,13 @@ func _ready() -> void:
 	reset_guide.pressed.connect(func() -> void:
 		var profile: Dictionary = SaveSystem.engagement_profile()
 		profile.guide = 0
+		profile.tips = []
 		SaveSystem.store_engagement(profile)
 		guide_reset_requested.emit()
 		status.text = "Guía lista")
 	buttons.add_child(reset_guide)
 	var back: Button = Button.new()
-	back.text = "Volver  [Esc / Start]"
+	InputGlyphs.bind(back, "Volver  [{pause}]")
 	back.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	back.pressed.connect(close_panel)
 	UiSound.attach(back)
@@ -124,6 +132,7 @@ func refresh() -> void:
 		toggles[key].set_pressed_no_signal(GamePreferences.current().values[key])
 	window_size.select(GamePreferences.current().values.window_size)
 	window_size.disabled = GamePreferences.current().values.fullscreen
+	glyphs.select(int(GamePreferences.current().values.glyphs))
 	for action: String in binding_rows:
 		var current: Dictionary = KeyRemap.binding(action)
 		binding_rows[action].key.text = KeyRemap.key_name(current.key)
@@ -208,7 +217,7 @@ func show_general() -> void:
 func start_listening(action: String) -> void:
 	listening = action
 	listen_frame = Engine.get_process_frames()
-	controls_status.text = "%s: pulsa una tecla o un botón del mando (Esc cancela)." % KeyRemap.label(action)
+	controls_status.text = "%s: pulsa una tecla o un botón del mando." % KeyRemap.label(action)
 	refresh()
 
 func reset_bindings() -> void:

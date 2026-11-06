@@ -1,6 +1,7 @@
 extends SceneTree
 
 const SUITES: Array[String] = [
+	"ui_guidance_test",
 	"first_steps_test", "guide_walkthrough_test", "guide_walkthrough_test --seeded", "impact_feedback_test", "round_engagement_test", "invasion_integration_test", "frontier_progression_test", "settlement_world_test", "colony_boss_polish_test", "seeded_world_test", "progression_balance_test", "music_handoff_test",
 	"environment_depth_test", "world_atmosphere_test",
 	"static_check", "native_combat_art_test", "boss_pressure_test", "boss_spectacle_test", "boss_hud_test", "debug_tools_test", "boss_tactics_test", "depot_life_test", "unit_animation_test", "visual_novel_test", "fortress_progression_test", "mobility_test", "commander_test", "story_finale_test", "expansion_test", "campaign_bosses_test", "polish_integration_test", "menu_settings_test", "menu_polish_test", "key_remap_test", "modules_test", "machine_rig_test", "neural_audio_test", "expedition_test", "recaudador_test",

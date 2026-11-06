@@ -28,7 +28,7 @@ func _ready() -> void:
 	var title: Label = text_label(self, "LABORATORIO · F1", 19)
 	title.position = Vector2(16, 8)
 	title.add_theme_color_override("font_color", Color("47dacb"))
-	var close_button: Button = action_button(self, "Cerrar [Esc]", "close")
+	var close_button: Button = action_button(self, "Cerrar", "close")
 	close_button.position = Vector2(498, 9)
 	close_button.size.x = 126
 	context_label = text_label(self, "", 12)

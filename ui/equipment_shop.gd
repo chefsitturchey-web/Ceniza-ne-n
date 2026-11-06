@@ -92,7 +92,7 @@ func _ready() -> void:
 	var back: Button = Button.new()
 	back.position = Vector2(420, 280)
 	back.size = Vector2(150, 27)
-	back.text = "Volver  / Esc"
+	InputGlyphs.bind(back, "Volver  [{pause}]")
 	back.pressed.connect(close_panel)
 	panel.add_child(back)
 	glow = ColorRect.new()
