@@ -3,6 +3,7 @@ extends Node2D
 
 signal destroyed
 signal defense_requested(portal: EnemyRepeater)
+var portal_effect: PortalEffect = PortalEffect.new()
 var defense_warning: float = 0
 var defense_pending: int = 0
 const TEXTURE: Texture2D = preload("res://assets/world/expedition/repeater.png")
@@ -24,11 +25,14 @@ func _ready() -> void:
 	add_child(effects)
 	effects.setup(health, TEXTURE)
 	health.died.connect(_destroyed)
+	add_child(portal_effect)
 
 func _destroyed() -> void:
 	defense_warning = 0
 	defense_pending = 0
 	remove_from_group(GameRules.REPEATERS)
+	portal_effect.trigger()
+	portal_effect.active = false
 	effects.shatter()
 	destroyed.emit()
 
@@ -36,6 +40,7 @@ func restore(broken: bool) -> void:
 	defense_warning = 0
 	defense_pending = 0
 	health.reset(0 if broken else 300)
+	portal_effect.active = not broken
 	if broken:
 		remove_from_group(GameRules.REPEATERS)
 	else:
@@ -52,6 +57,7 @@ func receive_assault(amount: int) -> void:
 		if before >= threshold and health.current < threshold:
 			defense_pending += 1
 			defense_warning = 0.8
+			portal_effect.trigger()
 
 func _process(delta: float) -> void:
 	if defense_warning > 0:

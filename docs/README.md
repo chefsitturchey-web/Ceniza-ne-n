@@ -23,6 +23,8 @@
 
 ## Arte
 
+- [Humo, bruma, portales y presupuestos de efectos](art/AMBIENTE_Y_PORTALES.md).
+
 - [Fondos vivos, capas y marcos ornamentales](art/FONDOS_EN_CAPAS.md).
 
 

@@ -24,6 +24,7 @@ func block_gameplay_input() -> void:
 	input_block_frame = Engine.get_process_frames() + 1
 var particles: bool:
 	get: return values.particles
+## Tambien reduce a un tercio los presupuestos de ambiente y escombros.
 var reduced_flashes: bool:
 	get: return values.reduced_flashes
 var muted: bool:

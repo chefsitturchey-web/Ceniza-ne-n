@@ -48,6 +48,10 @@ func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 	add_child(daylight)
+	var atmosphere: WorldAtmosphere = WorldAtmosphere.new()
+	atmosphere.name = "WorldAtmosphere"
+	atmosphere.view = self
+	add_child(atmosphere)
 
 func _process(delta: float) -> void:
 	time += delta
@@ -120,7 +124,7 @@ func _draw_ash(camera_x: float) -> void:
 	if not GamePreferences.current().particles:
 		return
 	# Campo determinista acotado; no usa el RNG de combate ni crea nodos.
-	for index: int in range(54):
+	for index: int in range(WorldParticles.budget(54)):
 		var x: float = fposmod(index * 73.0 + time * (5.0 + index % 4) - camera_x * 0.25, 800.0) + camera_x - 400
 		var y: float = fposmod(index * 47.0 + time * (9.0 + index % 7), 370.0) - 100
 		var ember: bool = index % 11 == 0
