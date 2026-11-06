@@ -159,5 +159,5 @@ func choose_relay() -> int:
 func status_text() -> String:
 	if melee_active(): return melee_status()
 	if core_exposed: return "MADRE CERO VULNERABLE: sigue moviéndote" if last_protocol else "MADRE CERO VULNERABLE: rompe el protocolo"
-	if active_relays() < 2: return "Reconecta relés: acércate y pulsa E (25 resistencia)"
-	return "Protege 2 relés · Enlace %d/18 · E reparar · Q escudo (%ds)" % [int(charge), ceili(guard_cooldown)]
+	if active_relays() < 2: return InputGlyphs.fill("Reconecta relés: acércate y pulsa {interact} (25 resistencia)")
+	return InputGlyphs.fill("Protege 2 relés · Enlace %d/18 · {interact} reparar · {overload} escudo (%ds)" % [int(charge), ceili(guard_cooldown)])

@@ -80,6 +80,7 @@ func _ready() -> void:
 	tagline.text = "Construye de día. Resiste de noche.\nRecupera la ciudad."
 	tagline.add_theme_font_size_override("font_size", 11)
 	content.add_child(tagline)
+	TextMarks.attach(tagline)
 	var buttons: VBoxContainer = VBoxContainer.new()
 	buttons.add_theme_constant_override("separation", 5)
 	content.add_child(buttons)
@@ -95,6 +96,7 @@ func _ready() -> void:
 	status.add_theme_font_override("font", ThemeDB.fallback_font)
 	status.add_theme_font_size_override("font_size", 11)
 	content.add_child(status)
+	TextMarks.attach(status)
 	# Velo de escaneo y vineta sobre todo el menu; ignora el raton.
 	var crt: ColorRect = ColorRect.new()
 	crt.set_anchors_preset(Control.PRESET_FULL_RECT)

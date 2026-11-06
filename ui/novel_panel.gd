@@ -79,7 +79,7 @@ func _ready() -> void:
 	box.add_theme_stylebox_override("panel", MenuSkin.panel())
 	stage.add_child(box)
 	speaker = label("", Vector2(42, 222), Vector2(420, 23), 16)
-	speaker.add_theme_color_override("font_color", Color("ffce75"))
+	speaker.add_theme_color_override("font_color", Color(TextMarks.SPEAKER))
 	body = RichTextLabel.new()
 	body.position = Vector2(42, 248)
 	body.size = Vector2(552, 61)
