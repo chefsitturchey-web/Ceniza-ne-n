@@ -3,7 +3,6 @@ extends Recaudador
 ## Duelista móvil: el escudo, la salva y la estocada tienen respuestas distintas.
 ## Lee al jugador: contraataca golpes al escudo, retrasa estocadas contra quien esquiva
 ## por anticipado, corrige el rumbo a mitad de carga y en su última guardia encadena tres.
-var visual: FinalBossVisual
 var chained_thrust: bool = false
 ## Última guardia (30 % de vida): más rápido, ventanas más cortas y tres estocadas.
 var last_guard: bool = false
@@ -12,10 +11,8 @@ var flank_timer: float = 0
 
 func _init() -> void: max_health = 14000
 
-func build_visual() -> void:
-	visual = FinalBossVisual.new()
-	visual.actor = self
-	puppet.add_child(visual)
+## El cuerpo es el flipbook cuadro por cuadro (CombatFlipbook); no hay marioneta ni imagen fija superpuesta.
+func build_visual() -> void: pass
 
 func is_core_exposed() -> bool: return state == State.RECOVER
 
@@ -135,7 +132,6 @@ func _physics_process(delta: float) -> void:
 	update_puppet(delta)
 
 func update_puppet(_delta: float) -> void:
-	visual.queue_redraw()
 	queue_redraw()
 
 func status_text() -> String:

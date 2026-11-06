@@ -54,13 +54,14 @@ func collect(at: Vector2, amount: int, parts: bool = false) -> void:
 		if flights.size() >= 36: flights.pop_front()
 		flights.append({"at": at + Vector2(index * 3 - 8, -20), "age": -index * 0.035})
 
-func hit_stop() -> void:
+## Congela el tiempo un instante (55 ms por defecto; los jefes finales usan pausas más cortas por golpe).
+func hit_stop(duration: float = 0.055) -> void:
 	if not active or stop_active or GamePreferences.current().reduced_flashes: return
 	previous_scale = Engine.time_scale
 	stop_active = true
 	hit_stops += 1
 	Engine.time_scale = 0.001
-	get_tree().create_timer(0.055, true, false, true).timeout.connect(restore_time)
+	get_tree().create_timer(duration, true, false, true).timeout.connect(restore_time)
 
 func restore_time() -> void:
 	if not stop_active: return

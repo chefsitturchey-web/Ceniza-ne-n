@@ -176,6 +176,12 @@ func _ready() -> void:
 	novel.panel_closed.connect(func() -> void: sound.set_ducked(false))
 	add_child(novel)
 	ScreenFit.fit_layer(self, [side_fill, result_shade, damage_edges])
+	# Jefes finales: presentación, destellos, transformación y muerte con puesta en escena.
+	if BossSpectacle.wants(boss):
+		var spectacle: BossSpectacle = BossSpectacle.new()
+		spectacle.arena = self
+		world.add_child(spectacle)
+		world.move_child(spectacle, actors.get_index())
 	if present_story: novel.play(VisualStory.scene(zone_index, "encounter"))
 
 func configure_controls() -> void:
