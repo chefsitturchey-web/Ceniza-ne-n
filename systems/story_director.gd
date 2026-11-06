@@ -64,18 +64,27 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	hud.visible = not get_tree().paused and not district.expedition.active and not district.session.finished and not TouchOverlay.showing()
-	if district.first_steps != null and district.first_steps.enabled and district.first_steps.step < FirstSteps.COUNT: return
+	if present_dialogue and not district.expedition.active and not district.session.finished:
+		queue_milestones()
 	if present_dialogue and not dialogue_queue.is_empty() and not novel.opened and not get_tree().paused and not district.expedition.active and not district.session.finished:
 		if Engine.get_process_frames() > GamePreferences.current().input_block_frame:
 			novel.play(dialogue_queue.pop_front())
 
+## Reconstruye pendientes tambien al cargar partidas anteriores.
+func queue_milestones() -> void:
+	queue_dialogue("opening")
+	if district.core.tier > 0: queue_dialogue("foundation")
+	if district.frontier.plots.any(func(plot: ClearanceSite) -> bool: return plot.cleared): queue_dialogue("expansion")
+	for index: int in range(3):
+		if completed[index]: queue_dialogue(["rescue", "relay", "convoy"][index])
+
 func queue_dialogue(section: String) -> void:
 	if not present_dialogue: return
-	var scene: Dictionary = VisualStory.scene(district.zone_index, section)
-	if scene.id in seen_scenes: return
+	var id: String = "%d:%s" % [district.zone_index, section]
+	if id in seen_scenes or (novel != null and novel.opened and novel.scene_data.id == id): return
 	for pending: Dictionary in dialogue_queue:
-		if pending.id == scene.id: return
-	dialogue_queue.append(scene)
+		if pending.id == id: return
+	dialogue_queue.append(VisualStory.scene(district.zone_index, section))
 
 func _dialogue_finished(scene_id: String) -> void:
 	if scene_id not in seen_scenes: seen_scenes.append(scene_id)

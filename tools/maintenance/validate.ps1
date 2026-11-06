@@ -2,7 +2,8 @@ param(
     [string]$GodotPath = $env:GODOT_BIN,
     [ValidatePattern('^[a-zA-Z0-9_]+$')][string]$Suite = 'run_all',
     [switch]$ImportOnly,
-    [switch]$Capture
+    [switch]$Capture,
+    [Alias('SuiteArguments')][string[]]$TestArguments = @()
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
@@ -39,6 +40,10 @@ try {
     if ($Capture) {
         # A real renderer is needed for captures; keep the preview off the desktop.
         $suiteArguments = @('--path', $projectRoot, '--position', '20000,20000', '--script', $script, '--log-file', (Join-Path $outputRoot "$Suite.log"), '--', '--capture')
+    }
+    if ($TestArguments.Count -gt 0) {
+        if (-not $Capture) { $suiteArguments += '--' }
+        $suiteArguments += $TestArguments
     }
     $ErrorActionPreference = 'Continue'
     & $GodotPath @suiteArguments *> $consoleOutput

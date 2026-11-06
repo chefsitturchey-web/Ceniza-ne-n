@@ -127,6 +127,8 @@ func run_checks() -> void:
 	arena.novel.close_panel()
 	await wait_transition()
 	verify(not paused and world.expedition.active, "Cerrar el encuentro permite combatir")
+	var saved_encounter: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(saver.save_path))
+	verify("0:encounter" in saved_encounter.story.seen_scenes, "El checkpoint conserva el encuentro para reintentar sin repetir")
 	world.expedition.resolve(true)
 	verify(arena.novel.opened and arena.novel.scene_data.id == "0:ending", "La victoria abre la despedida del distrito")
 	verify(SaveSystem.checkpoint_info(saver.save_path).get("zone") == 1, "La victoria guarda la llegada al distrito siguiente")
