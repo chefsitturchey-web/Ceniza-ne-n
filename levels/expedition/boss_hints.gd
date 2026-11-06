@@ -34,6 +34,14 @@ func _ready() -> void:
 	label.add_theme_color_override("font_color", Color("ffce75"))
 	label.add_theme_constant_override("outline_size", 4)
 	label.add_theme_color_override("font_outline_color", Color("08111c"))
+	var backing: StyleBoxFlat = StyleBoxFlat.new()
+	backing.bg_color = Color("08111c", 0.72)
+	backing.border_color = Color("ffce75", 0.35)
+	backing.border_width_top = 1
+	backing.content_margin_left = 8
+	backing.content_margin_right = 8
+	label.add_theme_stylebox_override("normal", backing)
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.modulate.a = 0
 	arena.add_child(label)
 	# Debajo de la pausa, las opciones y la pantalla de resultados.
@@ -88,6 +96,12 @@ func push(id: String) -> void:
 	else:
 		queue.append(id)
 
+## Una línea centrada si cabe; si no, dos líneas a todo el ancho, siempre sobre la barra del jefe.
+func fit_label() -> void:
+	var width: float = ThemeDB.fallback_font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 20
+	label.size = Vector2(width, 20) if width <= 470 else Vector2(470, 36)
+	label.position = Vector2(320 - label.size.x / 2, 300 - label.size.y)
+
 func advance(delta: float) -> void:
 	if arena.ending or boss.health <= 0:
 		label.modulate.a = move_toward(label.modulate.a, 0, delta * 4)
@@ -107,5 +121,6 @@ func advance(delta: float) -> void:
 			current = queue.pop_front()
 			shown[current] = true
 			label.text = text_for(current)
+			fit_label()
 			left = DURATION
 	label.modulate.a = move_toward(label.modulate.a, 1.0 if not current.is_empty() and left > 0.25 else 0.0, delta * 5)

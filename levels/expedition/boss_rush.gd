@@ -50,7 +50,8 @@ func _ready() -> void:
 	add_child(overlay)
 	timer_label = Label.new()
 	timer_label.name = "RushTimer"
-	timer_label.position = Vector2(12, 8)
+	# Bajo el panel de vida del jugador, sin tapar su texto.
+	timer_label.position = Vector2(14, 52)
 	timer_label.size = Vector2(220, 18)
 	timer_label.add_theme_font_override("font", ThemeDB.fallback_font)
 	timer_label.add_theme_font_size_override("font_size", 12)
@@ -117,14 +118,20 @@ func build_panel(heading: String, color: Color) -> VBoxContainer:
 	shade.color = Color("050c17")
 	shade.size = Vector2(640, 360)
 	panel.add_child(shade)
+	var center: CenterContainer = CenterContainer.new()
+	center.size = Vector2(640, 360)
+	panel.add_child(center)
 	var frame: PanelContainer = PanelContainer.new()
 	frame.add_theme_stylebox_override("panel", MenuSkin.panel())
-	frame.position = Vector2(150, 58)
 	frame.custom_minimum_size = Vector2(340, 0)
-	panel.add_child(frame)
+	center.add_child(frame)
+	var inner: MarginContainer = MarginContainer.new()
+	for side: String in ["left", "right", "top", "bottom"]:
+		inner.add_theme_constant_override("margin_" + side, 18 if side in ["left", "right"] else 14)
+	frame.add_child(inner)
 	var rows: VBoxContainer = VBoxContainer.new()
 	rows.add_theme_constant_override("separation", 6)
-	frame.add_child(rows)
+	inner.add_child(rows)
 	var marker: Label = Label.new()
 	marker.text = "BOSS RUSH"
 	marker.add_theme_font_size_override("font_size", 10)
