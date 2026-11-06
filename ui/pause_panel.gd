@@ -12,6 +12,9 @@ var bars: Dictionary = {}
 var rows: VBoxContainer
 var phase: String = "DÍA"
 var resume_button: Button
+var controls: GridContainer
+const CONTROL_LIST: Array[Array] = [["move_left", "Mover"], ["attack", "Atacar"], ["dodge", "Esquivar"],
+	["interact", "Mantén: usar"], ["sprint", "Correr"], ["overload", "Sobrecarga"]]
 
 func _ready() -> void:
 	add_theme_stylebox_override("panel", MenuSkin.panel())
@@ -70,18 +73,13 @@ func _ready() -> void:
 	var third: HBoxContainer = _row()
 	_item(third, "amenaza")
 	_item(third, "sobrecarga")
-	var controls: GridContainer = GridContainer.new()
-	controls.columns = 4
-	controls.add_theme_constant_override("h_separation", 12)
-	controls.add_theme_constant_override("v_separation", 2)
+	controls = GridContainer.new()
+	controls.columns = 3
+	controls.add_theme_constant_override("h_separation", 18)
+	controls.add_theme_constant_override("v_separation", 4)
 	rows.add_child(controls)
-	for text: String in ["Mover", "A/D / Stick", "Atacar", "J / X", "Esquivar", "Espacio / A",
-		"Interactuar", "Mantén E / Y", "Sobrecarga", "Q / LB", "Continuar", "Esc / Start",
-		"Reintentar", "R / Select", "Audio", "M", "Escolta", "F / Arriba"]:
-		var label: Label = Label.new()
-		label.add_theme_font_size_override("font_size", 10)
-		label.text = text
-		controls.add_child(label)
+	visibility_changed.connect(func() -> void: if visible: _fill_controls())
+	_fill_controls()
 	var actions: HBoxContainer = _row()
 	resume_button = Button.new()
 	resume_button.theme_type_variation = &"MenuEntry"
@@ -97,6 +95,47 @@ func _ready() -> void:
 		UiSound.attach(button)
 		actions.add_child(button)
 
+
+## Solo las acciones básicas, con la tecla real (respeta lo remapeado) o el botón del mando.
+func _fill_controls() -> void:
+	for child: Node in controls.get_children():
+		controls.remove_child(child)
+		child.queue_free()
+	controls.visible = not TouchOverlay.showing()
+	var pad: bool = not Input.get_connected_joypads().is_empty()
+	for pair: Array in CONTROL_LIST:
+		var binding: Dictionary = KeyRemap.binding(pair[0])
+		var key: String = KeyRemap.pad_name(int(binding.pad)) if pad else KeyRemap.key_name(int(binding.key))
+		if pair[0] == "move_left":
+			key = "Stick" if pad else "%s %s" % [key, KeyRemap.key_name(int(KeyRemap.binding("move_right").key))]
+		var entry: HBoxContainer = HBoxContainer.new()
+		entry.add_theme_constant_override("separation", 6)
+		entry.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var chip: Label = Label.new()
+		chip.text = key
+		chip.add_theme_font_size_override("font_size", 10)
+		chip.add_theme_color_override("font_color", Color("ffce75"))
+		chip.add_theme_stylebox_override("normal", _key_chip())
+		entry.add_child(chip)
+		var name_label: Label = Label.new()
+		name_label.text = pair[1]
+		name_label.add_theme_font_size_override("font_size", 10)
+		name_label.add_theme_color_override("font_color", Color("9fb4c4"))
+		entry.add_child(name_label)
+		controls.add_child(entry)
+	_fit.call_deferred()
+
+func _key_chip() -> StyleBoxFlat:
+	var box: StyleBoxFlat = StyleBoxFlat.new()
+	box.bg_color = Color("0b1322")
+	box.border_color = Color("ffce75", 0.55)
+	box.set_border_width_all(1)
+	box.border_width_bottom = 2
+	box.content_margin_left = 4
+	box.content_margin_right = 4
+	box.content_margin_top = 1
+	box.content_margin_bottom = 1
+	return box
 
 ## El panel ocupa lo que necesita su contenido y se centra en vertical.
 func _fit() -> void:

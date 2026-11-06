@@ -69,8 +69,11 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	if not active: return
-	for index: int in WorldParticles.budget(24):
-		var t: float = fposmod(clock * 0.3 + index * 0.618, 1)
-		var angle: float = index * 2.4 - t * 4.5
-		var at: Vector2 = Vector2(cos(angle) * 30, sin(angle) * 39) * (1 - t)
-		draw_rect(Rect2(at.round(), Vector2.ONE), Color(0.4, 0.95, 0.87, sin(t * PI) * 0.8))
+	# Motas que el portal aspira desde fuera; se ven sobre el marco antes de entrar.
+	for index: int in WorldParticles.budget(18):
+		var t: float = fposmod(clock * 0.35 + index * 0.618, 1)
+		var angle: float = index * 2.4 - t * 2.8
+		var at: Vector2 = Vector2(cos(angle) * 21, sin(angle) * 29) * (1.75 - t * 0.85)
+		var tone: Color = Color("ffce75") if index % 5 == 0 else Color("47dacb")
+		tone.a = sin(t * PI) * 0.85
+		draw_rect(Rect2(at.round(), Vector2.ONE), tone)

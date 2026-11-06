@@ -30,6 +30,28 @@ func _process(delta: float) -> void:
 	visible = guide.enabled and not guide.world.session.debug_practice and (guide.step < FirstSteps.COUNT or flash > 0) and not get_tree().paused and not guide.world.expedition.active and not guide.world.session.finished
 	if visible: surface.queue_redraw()
 
+## Encima del objetivo si se ve; en el borde y de lado si está fuera de pantalla.
+## Junto al objetivo se apaga: ya aparece el aviso de interacción y no tapa al jugador.
+func _draw_arrow(width: float, color: Color) -> void:
+	var to_canvas: Transform2D = guide.world.get_global_transform_with_canvas()
+	var target: Vector2 = guide.target()
+	var player: Vector2 = guide.world.player.position
+	var gap: float = absf(target.x - player.x)
+	if gap < 26: return
+	if gap < 60: color.a *= (gap - 26) / 34.0
+	var point: Vector2 = to_canvas * (target + Vector2(0, -78))
+	var bob: float = roundf(sin(clock * 5) * 3)
+	if point.x < 30 or point.x > width - 30:
+		var right: bool = point.x > width - 30
+		var head: Vector2 = to_canvas * (player + Vector2(0, -40))
+		var at: Vector2 = Vector2(width - 18 + bob if right else 18 - bob, clampf(head.y, 60, 280))
+		surface.draw_set_transform(at.round(), -PI / 2 if right else PI / 2)
+		surface.draw_texture_rect(ARROW, Rect2(-8, -10, 16, 20), false, color)
+		surface.draw_set_transform(Vector2.ZERO)
+		return
+	point = Vector2(roundf(point.x - 8), clampf(point.y, 44, 270) + bob)
+	surface.draw_texture_rect(ARROW, Rect2(point, Vector2(16, 20)), false, color)
+
 func _draw_hint() -> void:
 	var width: float = ScreenFit.visible_size(self).x
 	var color: Color = Color("ffce75")
@@ -44,10 +66,6 @@ func _draw_hint() -> void:
 	var key: String = KeyRemap.key_name(int(KeyRemap.binding(action).key))
 	if not touch and not waiting: surface.draw_string(FONT, Vector2(16, 22), key, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, color)
 	surface.draw_string(FONT, Vector2(39, 23), guide.caption(), HORIZONTAL_ALIGNMENT_LEFT, width - 48, 12, color)
-	var point: Vector2 = guide.world.get_global_transform_with_canvas() * (guide.target() + Vector2(0, -65))
-	point.x = clampf(point.x, 20, width - 36)
-	point.y = clampf(point.y, 65, 270)
-	point.y += roundf(sin(clock * 5) * 4)
-	surface.draw_texture_rect(ARROW, Rect2(point, Vector2(16, 20)), false, color)
+	_draw_arrow(width, color)
 	if flash > 0 and last_reward > 0:
 		surface.draw_string(FONT, Vector2(width / 2 - 60, 92), "+%d chatarra" % last_reward, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("47dacb"))
