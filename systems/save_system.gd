@@ -10,10 +10,11 @@ static var engagement_path: String = "user://progreso_pixel.cfg"
 static func engagement_profile() -> Dictionary:
 	var config: ConfigFile = ConfigFile.new()
 	config.load(engagement_path)
-	var result: Dictionary = {"guide": 0, "record": 0, "achievements": []}
+	# "tips": consejos de la guía ya vistos; los perfiles antiguos no lo tienen.
+	var result: Dictionary = {"guide": 0, "record": 0, "achievements": [], "tips": []}
 	for key: String in result:
 		var value: Variant = config.get_value("progress", key, result[key])
-		if key == "achievements":
+		if key in ["achievements", "tips"]:
 			if value is Array: result[key] = value.filter(func(id: Variant) -> bool: return id is String)
 		elif (value is int or value is float) and is_finite(float(value)):
 			result[key] = clampi(int(value), 0, 11 if key == "guide" else 2147483647)

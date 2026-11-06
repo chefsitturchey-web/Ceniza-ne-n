@@ -17,6 +17,7 @@ var dead_seen: bool = false
 var lost: Dictionary = {}
 var status: Label
 var bar: ColorRect
+var bar_back: ColorRect
 var hud: CanvasLayer
 
 func _ready() -> void:
@@ -28,13 +29,13 @@ func _ready() -> void:
 	status.position = Vector2(12, 28)
 	status.add_theme_font_size_override("font_size", 10)
 	hud.add_child(status)
-	var background: ColorRect = ColorRect.new()
-	background.position = Vector2(12, 44)
-	background.size = Vector2(136, 3)
-	background.color = Color("182639")
-	hud.add_child(background)
+	bar_back = ColorRect.new()
+	bar_back.position = Vector2(12, 44)
+	bar_back.size = Vector2(136, 3)
+	bar_back.color = Color("182639")
+	hud.add_child(bar_back)
 	bar = ColorRect.new()
-	bar.position = background.position
+	bar.position = bar_back.position
 	bar.size.y = 3
 	bar.color = Color("47dacb")
 	hud.add_child(bar)
@@ -43,6 +44,15 @@ func _process(_delta: float) -> void:
 	hud.visible = not get_tree().paused and not district.session.finished and not district.expedition.active
 	status.text = "NV.%d · DATOS %d/%d" % [level, xp, needed()]
 	bar.size.x = 136.0 * xp / needed()
+
+## HudStack: línea de nivel en y y barra justo debajo; devuelve el borde inferior.
+func place(top: float) -> float:
+	status.position.y = roundf(top)
+	status.reset_size()
+	var bar_y: float = status.position.y + status.size.y
+	bar_back.position.y = bar_y
+	bar.position.y = bar_y
+	return bar_y + bar_back.size.y
 
 func needed() -> int:
 	return 8 + (level - 1) * 3

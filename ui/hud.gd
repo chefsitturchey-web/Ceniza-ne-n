@@ -11,6 +11,7 @@ var phase_banner: HBoxContainer
 var context_label: Label
 var context_row: HBoxContainer
 var context_keycap: PanelContainer
+var context_key_label: Label
 var context_cost: Label
 var context_icon: TextureRect
 var context_progress: ColorRect
@@ -35,6 +36,7 @@ func _ready() -> void:
 	objective = _label($Gameplay)
 	objective.position = Vector2(10, 10)
 	objective.size = Vector2(620, 20)
+	objective.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	objective.add_theme_color_override("font_color", Color("8299a8"))
 	poison_label = _label($Gameplay)
 	poison_label.position = Vector2(10, 33)
@@ -80,7 +82,8 @@ func _ready() -> void:
 	key_style.content_margin_right = 3
 	context_keycap.add_theme_stylebox_override("panel", key_style)
 	context_row.add_child(context_keycap)
-	_label(context_keycap).text = "E"
+	context_key_label = _label(context_keycap)
+	context_key_label.text = InputGlyphs.action_name("interact")
 	context_label = _label(context_row)
 	context_label.add_theme_color_override("font_color", Color("ffce75"))
 	context_icon = _icon(context_row, "chatarra")
@@ -192,6 +195,7 @@ func display_dashboard(data: Dictionary) -> void:
 	context_label.text = data.get("context", "")
 	context_row.visible = not context_label.text.is_empty() and data.health > 0
 	context_keycap.visible = data.get("context_key", true)
+	context_key_label.text = InputGlyphs.action_name("interact")
 	var cost: int = data.get("context_cost", -1)
 	context_icon.visible = cost >= 0
 	context_cost.visible = cost >= 0

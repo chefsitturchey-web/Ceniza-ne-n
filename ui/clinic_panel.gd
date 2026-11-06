@@ -92,7 +92,7 @@ func _ready() -> void:
 		passive_grid.add_child(toggle)
 		passive_buttons[id] = toggle
 	var close: Button = Button.new()
-	close.text = "Volver  [Esc / Start]"
+	InputGlyphs.bind(close, "Volver  [{pause}]")
 	close.pressed.connect(close_panel)
 	UiSound.attach(close)
 	rows.add_child(close)

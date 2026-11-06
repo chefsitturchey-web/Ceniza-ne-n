@@ -171,7 +171,7 @@ func journal_text() -> String:
 	text += "[color=#47dacb]DEPÓSITOS DE TECNOLOGÍA[/color]\n"
 	for cache: RelicCache in caches:
 		text += "%s · %s %d · %s\n" % [NAMES[cache.kind], "izq." if cache.position.x < 0 else "der.", int(absf(cache.position.x)), "recuperado" if cache.claimed else "sin explorar"]
-	text += "\nLa primera restauración requiere 1 componente. La mejora requiere otro y núcleo Nv.3. Mantén E para encargar; los constructores deben llegar. Las bonificaciones pertenecen a esta colonia."
+	text += "\nLa primera restauración requiere 1 componente. La mejora requiere otro y núcleo Nv.3. Mantén {interact} para encargar; los constructores deben llegar. Las bonificaciones pertenecen a esta colonia."
 	return text
 
 func snapshot() -> Dictionary:

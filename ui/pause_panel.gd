@@ -79,6 +79,9 @@ func _ready() -> void:
 	controls.add_theme_constant_override("v_separation", 4)
 	rows.add_child(controls)
 	visibility_changed.connect(func() -> void: if visible: _fill_controls())
+	# Alternar teclado y mando con la pausa abierta cambia las teclas al momento.
+	GamePreferences.current().device_changed.connect(func() -> void: if is_visible_in_tree(): _fill_controls())
+	GamePreferences.current().changed.connect(func() -> void: if is_visible_in_tree(): _fill_controls())
 	_fill_controls()
 	var actions: HBoxContainer = _row()
 	resume_button = Button.new()
@@ -96,18 +99,15 @@ func _ready() -> void:
 		actions.add_child(button)
 
 
-## Solo las acciones básicas, con la tecla real (respeta lo remapeado) o el botón del mando.
+## Solo las acciones básicas, con la tecla real (respeta lo remapeado) o el botón del mando
+## según el último dispositivo usado (ver InputGlyphs).
 func _fill_controls() -> void:
 	for child: Node in controls.get_children():
 		controls.remove_child(child)
 		child.queue_free()
 	controls.visible = not TouchOverlay.showing()
-	var pad: bool = not Input.get_connected_joypads().is_empty()
 	for pair: Array in CONTROL_LIST:
-		var binding: Dictionary = KeyRemap.binding(pair[0])
-		var key: String = KeyRemap.pad_name(int(binding.pad)) if pad else KeyRemap.key_name(int(binding.key))
-		if pair[0] == "move_left":
-			key = "Stick" if pad else "%s %s" % [key, KeyRemap.key_name(int(KeyRemap.binding("move_right").key))]
+		var key: String = InputGlyphs.action_name("move" if pair[0] == "move_left" else pair[0])
 		var entry: HBoxContainer = HBoxContainer.new()
 		entry.add_theme_constant_override("separation", 6)
 		entry.mouse_filter = Control.MOUSE_FILTER_IGNORE

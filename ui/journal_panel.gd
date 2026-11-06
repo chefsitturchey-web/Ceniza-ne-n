@@ -72,12 +72,14 @@ func _ready() -> void:
 	UiSound.attach(next)
 	buttons.add_child(next)
 	var close: Button = Button.new()
-	close.text = "Volver · L / Esc"
+	InputGlyphs.bind(close, "Volver - {journal} / {pause}")
 	close.pressed.connect(close_panel)
 	UiSound.attach(close)
 	buttons.add_child(close)
 	hide()
 	ScreenFit.fit_layer(self, [shade])
+	GamePreferences.current().device_changed.connect(func() -> void: if opened: refresh())
+	GamePreferences.current().changed.connect(func() -> void: if opened: refresh())
 
 func refresh() -> void:
 	var data: Dictionary = CampaignStory.chapter(chapter_index)
@@ -99,7 +101,7 @@ func refresh() -> void:
 	scene_picker.clear()
 	for section: String in scene_sections: scene_picker.add_item(VisualStory.TITLES[section])
 	settlement_button.text = "Historia" if settlement_view else "Poblados"
-	if settlement_view: page.text = story.district.settlements.journal_text()
+	if settlement_view: page.text = InputGlyphs.fill(story.district.settlements.journal_text())
 
 func replay_scene() -> void:
 	if story.novel.opened or scene_picker.selected < 0: return

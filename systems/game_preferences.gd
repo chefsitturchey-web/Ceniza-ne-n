@@ -2,9 +2,11 @@ class_name GamePreferences
 extends Node
 ## Ajustes globales de presentación; nunca guardan estado de una partida.
 signal changed
+## Cambió el último dispositivo (teclado o mando): los avisos de teclas se redibujan.
+signal device_changed
 const DEFAULTS: Dictionary = {"master": 1.0, "music": 1.0, "sfx": 1.0, "muted": false,
 	"fullscreen": false, "window_size": 0, "reduced_flashes": false, "particles": true,
-	"touch_controls": true}
+	"touch_controls": true, "glyphs": 0}
 const SIZES: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1600, 900), Vector2i(1920, 1080)]
 var values: Dictionary = DEFAULTS.duplicate()
 ## Teclas y botones personalizados por acción; ver KeyRemap. Vacío significa predeterminados.
@@ -65,6 +67,8 @@ func valid_value(key: String, value: Variant) -> bool:
 		return (value is float or value is int) and is_finite(float(value)) and value >= 0 and value <= 1
 	if key == "window_size":
 		return value is int and value >= 0 and value < SIZES.size()
+	if key == "glyphs":
+		return value is int and value >= 0 and value < InputGlyphs.MODES.size()
 	return value is bool
 
 func update_value(key: String, value: Variant) -> bool:
@@ -73,6 +77,7 @@ func update_value(key: String, value: Variant) -> bool:
 	values[key] = value
 	apply_all(key in ["fullscreen", "window_size"])
 	changed.emit()
+	if key == "glyphs": device_changed.emit()
 	return save_settings()
 
 func save_settings() -> bool:
@@ -102,6 +107,9 @@ func apply_all(display: bool = true) -> void:
 		var factor: float = minf(1.0, minf(float(available.size.x) / desired.x, float(available.size.y) / desired.y))
 		DisplayServer.window_set_size(Vector2i(Vector2(desired) * factor))
 		DisplayServer.window_set_position(available.position + (available.size - DisplayServer.window_get_size()) / 2)
+
+func _input(event: InputEvent) -> void:
+	if InputGlyphs.observe(event) and InputGlyphs.mode() == 0: device_changed.emit()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_M:

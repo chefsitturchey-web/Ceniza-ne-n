@@ -23,4 +23,4 @@ func prepare() -> void:
 	world.expansion.sites[2].hp = 180
 	world.expansion.sites[0].hp = 180
 	world.colony.add_worker(&"builder")
-	world.presenter.show_notice("PRÁCTICA: E mejora núcleo y defensas; T energía. Sin guardado.")
+	world.presenter.show_notice("PRÁCTICA: {interact} mejora núcleo y defensas; {toggle_power} energía. Sin guardado.")

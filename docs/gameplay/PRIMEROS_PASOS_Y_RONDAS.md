@@ -12,6 +12,12 @@ Logros: primera baja, diez bajas, cincuenta bajas, cadena de tres, doble muralla
 
 ## Archivos y pruebas
 
+Tras los 11 pasos aparecen consejos de una sola vez: diario, reclutamiento en los campamentos, herramientas y armas en el Arsenal (x=-600), ampliacion del refugio, asalto a portales y sobrecarga nocturna. La flecha indica el destino; para asaltar, situate en el lado del portal y pulsa la accion de escolta, que tambien ordena retirada. Reclutar cuesta 5 de chatarra; las herramientas compradas dan oficio a los habitantes disponibles. Cada consejo resuelto entrega 4 de chatarra. Si lo ignoras durante 45 segundos deja paso al siguiente sin premio. Los consejos usan la clave `tips` del perfil; los pasos antiguos `guide` conservan sus numeros.
+
+Los avisos cambian al ultimo teclado o mando usado y respetan los remapeos. Opciones > Avisos de teclas permite Automatico, Teclado o Mando; el tactil conserva sus iconos. La columna superior mide cartel, objetivo, nivel y barra, plataforma, meta nocturna y veneno. El combo queda debajo, tambien si un nombre largo obliga al cartel a ocupar varias lineas.
+
+`tests/ui_guidance_test.gd` comprueba dispositivos, remapeos en pausa, tactil, compatibilidad y progreso de consejos, y las ocho combinaciones de guia, noche y combo. Las capturas de revision estan en `build/capturas/ui_guia/`.
+
 - `systems/first_steps.gd` y `ui/first_steps_hud.gd`: objetivos y marcador.
 - `components/impact_feedback.gd`: números, vuelo de recursos, sacudida e hit-stop.
 - `systems/round_engagement.gd` y `ui/round_rewards_hud.gd`: combos, meta, resultados y logros.
