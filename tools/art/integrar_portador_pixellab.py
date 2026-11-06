@@ -1,6 +1,6 @@
 """Integra las animaciones cuadro por cuadro del Portador generadas con PixelLab.
 
-Los cuadros de 132x132 en assets/characters/combat/sources/pixellab_portador/{idle,walk,run}
+Los cuadros de 132x132 en assets/characters/combat/sources/pixellab_portador/{idle,walk,run,attack,dodge,hurt,death}
 (indice 0 = pose de referencia, 1..8 = generados) se pegan en las celdas de 192 px de
 portador.png para reposo, marcha, ataque, esquiva y daño este y oeste (espejado). Correr va a portador_correr.png
 (fila 0 = este, fila 1 = oeste). Uso: python tools/art/integrar_portador_pixellab.py
@@ -22,6 +22,8 @@ CLIPS = {
     # El juego ya desplaza al Portador al esquivar o recibir golpe: el cuerpo se queda centrado.
     "dodge": ("dodge", [2, 3, 4, 5, 6, 8], True, False),
     "hurt": ("hurt", [1, 2, 3, 4], True, True),
+    # Cae de rodillas y queda tendido de lado (8 cuadros generados, 1 generacion).
+    "death": ("death", [1, 2, 3, 4, 5, 6, 7, 8], False, False),
 }
 BODY_CENTRE_X = 57
 RUN = [2, 3, 4, 5, 6, 7, 8]
