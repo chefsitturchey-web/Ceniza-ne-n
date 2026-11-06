@@ -2,11 +2,13 @@
 
 # CENIZA NEÓN
 
-Construye de día, resiste de noche y recupera cinco distritos. Proyecto de Godot 4.7.2, versión `0.1.0-alpha`; `project.godot` abre `ui/main_menu.tscn`. La colonia es lateral y los jefes se combaten en arenas cenitales.
+Construye de día, resiste de noche y recupera cinco distritos. Proyecto de Godot 4.7.2, versión `0.2.0-alpha`; `project.godot` abre `ui/main_menu.tscn`. La colonia es lateral y los jefes se combaten en arenas cenitales.
 
 ## Jugar
 
-Importa `project.godot`, espera la importación y pulsa **F5**. El menú ofrece **Nueva partida**, **Continuar**, **Boss Rush** y **Opciones**. [Guía de inicio](INICIO.md) · [Índice de documentación](docs/README.md) · [Exportación](docs/EXPORTAR.md).
+**Alfa 0.2.0:** [descargas para Windows y Android](https://github.com/chefsitturchey-web/Ceniza-ne-n/releases/tag/v0.2.0-alpha) · [jugar en el navegador (itch.io)](https://chefsitturchey.itch.io/ceniza-neon) · [web del juego](https://ceniza-neon.chefsitturchey.workers.dev/).
+
+Desde el código: importa `project.godot`, espera la importación y pulsa **F5**. El menú ofrece **Nueva partida**, **Continuar**, **Boss Rush** y **Opciones**. [Guía de inicio](INICIO.md) · [Índice de documentación](docs/README.md) · [Exportación](docs/EXPORTAR.md).
 
 La campaña conecta Periferia, Fundición, Barrio inundado, Ciudadela y Núcleo de la red. Empiezas con un constructor, un recuperador y el núcleo por construir. Recupera piezas, encarga obras, recluta habitantes y compra herramientas para sus profesiones. Las tropas y torretas defienden la colonia; el Portador combate personalmente en los jefes. Completa rescate, relé y convoy, cierra las entradas y estabiliza la colonia para tomar el tren.
 
