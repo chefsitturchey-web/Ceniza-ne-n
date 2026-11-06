@@ -12,7 +12,7 @@ config_version=5
 
 config/name="CENIZA NEÓN"
 run/main_scene="res://ui/main_menu.tscn"
-config/version="0.1.0-alpha"
+config/version="0.2.0-alpha"
 config/features=PackedStringArray("4.7")
 config/icon="res://assets/ui/app_icon.png"
 config/windows_native_icon="res://assets/ui/app_icon.ico"
