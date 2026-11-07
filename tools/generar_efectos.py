@@ -646,6 +646,21 @@ PRESETS.update({
     "madre_expone": dict(wave="triangle", attack=0.010, sustain=0.200, decay=0.550, start=220.0, min=60.0,
                          slide=1.6, vibrato=2.0, vibrato_speed=9.0, flanger=2.0, flanger_sweep=6.0,
                          peak_db=-7.0, seed=343),
+    # Rayo (Prefecto y Madre Cero): chisporroteo que sube al avisar y latigazo al caer.
+    "rayo_carga": dict(wave="square", duty=0.125, arp_mult=1.5, arp_speed=0.03, attack=0.75, sustain=0.10,
+                       decay=0.10, start=260.0, min=100.0, slide=1.3, vibrato=2.0, vibrato_speed=24.0,
+                       noise_mix=0.45, highpass=250.0, drive=2.2, peak_db=-9.0, seed=361),
+    "rayo_descarga": dict(wave="noise", attack=0.0, sustain=0.030, decay=0.480, start=4200.0, min=180.0,
+                          slide=-5.5, punch=0.6, noise_mix=0.5, highpass=500.0, flanger=1.2,
+                          flanger_sweep=5.0, drive=3.2, peak_db=-5.0, seed=363),
+    # Santa Caldera con el fuego ya encendido: arranque de llamarada y brasas que siguen.
+    "caldera_ignicion": dict(wave="noise", attack=0.010, sustain=0.120, decay=0.550, start=320.0, min=50.0,
+                             slide=-0.8, noise_mix=0.35, lowpass=1900.0, lowpass_sweep=-900.0, resonance=0.2,
+                             highpass=80.0, drive=2.8, peak_db=-6.0, seed=371),
+    # Fuego encendido: siseo continuo con aleteo rápido, se repite en bucle mientras arde.
+    # 18 Hz x 2 s da ciclos enteros, así el bucle no salta al volver al inicio.
+    "caldera_fuego": dict(seconds=2.0, start=3200.0, min=900.0, slide=0.0, lowpass=3600.0, resonance=0.15,
+                          highpass=650.0, tremolo=0.65, tremolo_rate=18.0, drive=1.8, peak_db=-10.0, seed=373),
     # Coro Sumergido: agua y eco, ondas largas.
     "coro_onda": dict(wave="triangle", attack=0.100, sustain=0.250, decay=0.800, start=260.0, min=80.0,
                       slide=-0.8, vibrato=3.0, vibrato_speed=5.0, noise_mix=0.15, lowpass=1500.0,
@@ -665,7 +680,7 @@ for _n in (2, 3):
 
 BOSS_CUES = ["boss_shot", "prefecto_estocada", "prefecto_barrido", "prefecto_salva", "dash_prefecto",
              "caldera_calor", "caldera_carga", "caldera_salva", "madre_marca", "madre_expone",
-             "coro_onda", "coro_marca"]
+             "coro_onda", "coro_marca", "rayo_carga", "rayo_descarga", "caldera_ignicion", "caldera_fuego"]
 VARIANT_CUES = ["hit_2", "hit_3", "shot_2", "shot_3", "step_2", "step_3", "slash_2", "slash_3"]
 
 GROUPS = {

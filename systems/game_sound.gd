@@ -61,6 +61,9 @@ const CUES: Dictionary = {
 	"madre_expone": preload("res://assets/audio/sfx/8bit/combate/madre_expone.wav"),
 	"coro_onda": preload("res://assets/audio/sfx/8bit/combate/coro_onda.wav"),
 	"coro_marca": preload("res://assets/audio/sfx/8bit/combate/coro_marca.wav"),
+	"rayo_carga": preload("res://assets/audio/sfx/8bit/combate/rayo_carga.wav"),
+	"rayo_descarga": preload("res://assets/audio/sfx/8bit/combate/rayo_descarga.wav"),
+	"caldera_ignicion": preload("res://assets/audio/sfx/8bit/combate/caldera_ignicion.wav"),
 	"hit_2": preload("res://assets/audio/sfx/8bit/combate/hit_2.wav"),
 	"hit_3": preload("res://assets/audio/sfx/8bit/combate/hit_3.wav"),
 	"shot_2": preload("res://assets/audio/sfx/8bit/combate/shot_2.wav"),
@@ -92,7 +95,8 @@ const DEFEAT_START: float = 3.0
 ## Los avisos que el jugador necesita oír no deben quedarse sin voz.
 const PRIORITY_HIGH: Array[String] = ["alarm", "telegraph_claw", "telegraph_charge", "telegraph_volley",
 	"boss_phase", "player_death", "train_arrive", "wall_destroy", "portal_destroyed", "ground_impact",
-	"prefecto_estocada", "prefecto_barrido", "caldera_calor", "caldera_carga", "madre_expone", "coro_onda"]
+	"prefecto_estocada", "prefecto_barrido", "caldera_calor", "caldera_carga", "madre_expone", "coro_onda", "rayo_carga", "rayo_descarga",
+	"caldera_ignicion"]
 const PRIORITY_MID: Array[String] = ["shot", "slash", "hit", "destroy", "shield", "sonar", "fire_pulse",
 	"sentinel_shot", "cover_break", "sentinel_deploy", "boss_shot", "prefecto_salva", "caldera_salva",
 	"coro_marca", "madre_marca"]

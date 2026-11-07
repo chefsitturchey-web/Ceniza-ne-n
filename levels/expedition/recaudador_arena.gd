@@ -13,6 +13,7 @@ const THEME: Theme = preload("res://ui/theme.tres")
 const DASH: AudioStream = preload("res://assets/audio/sfx/8bit/combate/dash.wav")
 const DASH_CALDERA: AudioStream = preload("res://assets/audio/sfx/8bit/combate/dash_caldera.wav")
 const DASH_PREFECTO: AudioStream = preload("res://assets/audio/sfx/8bit/combate/dash_prefecto.wav")
+const CALDERA_FIRE: AudioStreamWAV = preload("res://assets/audio/sfx/8bit/combate/caldera_fuego.wav")
 var completed: bool = false
 var ending: bool = false
 var ending_victory: bool = false
@@ -31,6 +32,8 @@ var hit_count: int = 0
 var camera: Camera2D = Camera2D.new()
 var sound: GameSound = GameSound.new()
 var dash_player: AudioStreamPlayer = AudioStreamPlayer.new()
+## Siseo de Santa Caldera mientras sus zonas de calor están encendidas.
+var fire_player: AudioStreamPlayer = AudioStreamPlayer.new()
 var dash_active: bool = false
 var configured: bool = false
 var present_story: bool = false
@@ -150,6 +153,14 @@ func _ready() -> void:
 	dash_player.volume_db = -60.0
 	dash_player.stream = DASH_CALDERA if zone_index == 1 else (DASH_PREFECTO if zone_index == 3 else DASH)
 	add_child(dash_player)
+	fire_player.bus = &"SFX"
+	fire_player.volume_db = -60.0
+	# El bucle se fija en código porque el importador puede ignorar el ajuste.
+	var fire: AudioStreamWAV = CALDERA_FIRE
+	fire.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	fire.loop_end = int(round(fire.get_length() * fire.mix_rate))
+	fire_player.stream = fire
+	add_child(fire_player)
 	boss.dash_changed.connect(_on_dash)
 	modules.fired.connect(func() -> void: sound.play_cue("shot", -5))
 	player.dodged.connect(func() -> void: sound.play_cue("dodge"))
@@ -459,6 +470,11 @@ func _process(delta: float) -> void:
 		dash_player.volume_db = move_toward(dash_player.volume_db, -60.0, delta * 150.0)
 		if dash_player.playing and dash_player.volume_db <= -59.0:
 			dash_player.stop()
+	# El fuego entra rápido al encenderse y se apaga con un fundido breve.
+	var burning: bool = boss is SantaCaldera and boss.state == Recaudador.State.CLAW and not ending
+	if burning and not fire_player.playing: fire_player.play()
+	fire_player.volume_db = move_toward(fire_player.volume_db, -8.0 if burning else -60.0, delta * (220.0 if burning else 90.0))
+	if not burning and fire_player.playing and fire_player.volume_db <= -59.0: fire_player.stop()
 	boss_status.text = boss.status_text() if not ending else ""
 	phase_notice_time = maxf(0, phase_notice_time - delta)
 	phase_notice.visible = phase_notice_time > 0 and not ending

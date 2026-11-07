@@ -106,7 +106,8 @@ func request_combo() -> void:
 			origin = safe_point(predicted + Vector2.from_angle(angle) * (62 if count > 1 else 0))
 			endpoint = origin
 		hazards.append({"origin": origin, "end": endpoint, "kind": kind, "radius": radius, "time": delay, "warning": delay, "hit": false})
-	arena.boss.cue_requested.emit("alarm")
+	var lightning: bool = hazards.any(func(hazard: Dictionary) -> bool: return hazard.kind == "lance")
+	arena.boss.cue_requested.emit("rayo_carga" if lightning else "alarm")
 
 func contains(hazard: Dictionary, point: Vector2) -> bool:
 	if hazard.kind == "lance":
@@ -120,7 +121,7 @@ func resolve(hazard: Dictionary) -> void:
 		if get_world_2d().direct_space_state.intersect_ray(ray).is_empty():
 			player.take_damage(16 + arena.zone_index * 2, (player.position - hazard.origin).normalized() * 160)
 	impact(hazard.origin if hazard.kind == "burst" else hazard.end, hazard.radius if hazard.kind == "burst" else 55, 3.6, 24)
-	arena.boss.cue_requested.emit("hit")
+	arena.boss.cue_requested.emit("rayo_descarga" if hazard.kind == "lance" else "hit")
 
 func muzzle(origin: Vector2, direction: Vector2) -> void:
 	impact(origin, 15, 0, 3)

@@ -65,6 +65,7 @@ func _physics_process(delta: float) -> void:
 		State.CLAW_WINDUP:
 			if timer <= 0:
 				heat_tick = 0
+				cue_requested.emit("caldera_ignicion")
 				change_state(State.CLAW, 2.6)
 		State.CLAW:
 			heat_tick -= delta
