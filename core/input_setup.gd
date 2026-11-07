@@ -24,6 +24,30 @@ static func configure_input() -> void:
 	add_action("restart", KEY_R, JOY_BUTTON_BACK)
 	# Las teclas elegidas en Opciones > Controles sustituyen a las predeterminadas.
 	KeyRemap.apply_saved()
+	# Menús con mando: ✕ acepta y ○ vuelve (Godot solo trae la cruceta para ui_*).
+	add_pad_button("ui_accept", JOY_BUTTON_A)
+	add_pad_button("ui_cancel", JOY_BUTTON_B)
+	add_symbol_fallback()
+
+static func add_pad_button(action: StringName, button: JoyButton) -> void:
+	var pad: InputEventJoypadButton = InputEventJoypadButton.new()
+	pad.button_index = button
+	if not InputMap.action_has_event(action, pad): InputMap.action_add_event(action, pad)
+
+## Las fuentes pixel no tienen ✕ ○ □ △: PadSymbols (subconjunto de DejaVu Sans) las aporta.
+static func add_symbol_fallback() -> void:
+	var symbols: Font = load("res://assets/fonts/PadSymbols.ttf")
+	for path: String in ["res://assets/fonts/Silkscreen-Regular.ttf", "res://assets/fonts/Micro5-Regular.ttf"]:
+		var font: Font = load(path)
+		if symbols not in font.fallbacks:
+			var list: Array[Font] = font.fallbacks
+			list.append(symbols)
+			font.fallbacks = list
+	var fallback: Font = ThemeDB.fallback_font
+	if fallback != null and symbols not in fallback.fallbacks:
+		var list: Array[Font] = fallback.fallbacks
+		list.append(symbols)
+		fallback.fallbacks = list
 
 static func add_action(action: StringName, keycode: Key, button: JoyButton) -> void:
 	if InputMap.has_action(action):

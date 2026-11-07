@@ -61,6 +61,14 @@ static func action_name(action: String) -> String:
 	if binding.is_empty(): return action
 	return KeyRemap.pad_name(int(binding.pad)) if using_pad() else KeyRemap.key_name(int(binding.key))
 
+## Color propio de cada símbolo de PlayStation; transparente si el texto no lo contiene.
+static func pad_color(text: String) -> Color:
+	if "✕" in text: return Color("7fa7ff")
+	if "○" in text: return Color("ff6b6b")
+	if "□" in text: return Color("f59ad8")
+	if "△" in text: return Color("5fe0a8")
+	return Color.TRANSPARENT
+
 ## Sustituye {accion} por su tecla o botón: "Mantén {interact}" -> "Mantén E" o "Mantén Y".
 static func fill(text: String) -> String:
 	if not "{" in text: return text

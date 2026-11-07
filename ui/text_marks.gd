@@ -51,8 +51,11 @@ static func format_text(value: String) -> String:
 			var danger: RegEx = RegEx.new()
 			danger.compile("(?i)^(" + DANGERS + ")$")
 			if danger.search(word) != null: tint = DANGER
+		# Botones de PlayStation con su color: ✕ azul, ○ rojo, □ rosa, △ verde.
+		var pad: Color = InputGlyphs.pad_color(word)
+		if tint == KEY and pad.a > 0: tint = "#" + pad.to_html(false)
 		var marked: String = color_text(escape(word), tint)
-		output += "[bgcolor=#172736]" + marked + "[/bgcolor]" if tint == KEY else marked
+		output += "[bgcolor=#172736]" + marked + "[/bgcolor]" if tint == KEY or pad.a > 0 else marked
 		start = found.get_end()
 	return output + escape(value.substr(start))
 

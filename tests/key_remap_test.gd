@@ -52,7 +52,7 @@ func run_checks() -> void:
 	for action: String in KeyRemap.DEFAULTS:
 		matches = matches and first_key(action) == KeyRemap.DEFAULTS[action].key and first_pad(action) == KeyRemap.DEFAULTS[action].pad
 	verify(matches, "Los predeterminados de KeyRemap coinciden con InputSetup")
-	verify(KeyRemap.key_name(KEY_SPACE) == "Espacio" and KeyRemap.pad_name(JOY_BUTTON_LEFT_SHOULDER) == "LB", "Nombres de teclas y botones en español / Xbox")
+	verify(KeyRemap.key_name(KEY_SPACE) == "Espacio" and KeyRemap.pad_name(JOY_BUTTON_LEFT_SHOULDER) == "L1", "Nombres de teclas y botones en español / PlayStation")
 	var result: Dictionary = KeyRemap.assign("dodge", "key", KEY_K)
 	verify(result.ok and first_key("dodge") == KEY_K and first_pad("dodge") == JOY_BUTTON_A, "Cambia solo la tecla de esquivar")
 	result = KeyRemap.assign("dodge", "pad", JOY_BUTTON_RIGHT_STICK)
@@ -96,7 +96,7 @@ func run_checks() -> void:
 	panel.open_panel()
 	panel.show_controls()
 	verify(panel.controls.visible and not panel.general.visible, "Opciones muestra la sección Controles")
-	verify(panel.binding_rows.size() == KeyRemap.ACTIONS.size() and panel.binding_rows.dodge.key.text == "Espacio" and panel.binding_rows.dodge.pad.text == "A", "Cada acción lista su tecla y su botón")
+	verify(panel.binding_rows.size() == KeyRemap.ACTIONS.size() and panel.binding_rows.dodge.key.text == "Espacio" and panel.binding_rows.dodge.pad.text == "✕", "Cada acción lista su tecla y su botón")
 	panel.start_listening("sprint")
 	verify(panel.binding_rows.sprint.change.text == "...", "Cambiar espera la siguiente entrada")
 	verify(panel.capture_event(key_event(KEY_G)) and first_key("sprint") == KEY_G and panel.binding_rows.sprint.key.text == "G", "Una tecla se asigna desde el menú")

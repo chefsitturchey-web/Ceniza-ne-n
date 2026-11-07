@@ -20,12 +20,14 @@ const DEFAULTS: Dictionary = {
 const RESERVED_KEYS: Array[int] = [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_W, KEY_S, KEY_M, KEY_F1, KEY_F2, KEY_F3, KEY_F4]
 const KEY_NAMES: Dictionary = {KEY_SPACE: "Espacio", KEY_SHIFT: "Shift", KEY_ESCAPE: "Esc", KEY_CTRL: "Ctrl",
 	KEY_ALT: "Alt", KEY_TAB: "Tab", KEY_ENTER: "Intro", KEY_BACKSPACE: "Retroceso", KEY_CAPSLOCK: "Bloq Mayús"}
-const PAD_NAMES: Dictionary = {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y",
-	JOY_BUTTON_LEFT_SHOULDER: "LB", JOY_BUTTON_RIGHT_SHOULDER: "RB", JOY_BUTTON_BACK: "Back",
-	JOY_BUTTON_START: "Start", JOY_BUTTON_GUIDE: "Xbox", JOY_BUTTON_LEFT_STICK: "Pulsar stick izq.",
-	JOY_BUTTON_RIGHT_STICK: "Pulsar stick der.", JOY_BUTTON_DPAD_UP: "Cruceta arriba",
+## Nombres al estilo PlayStation (los mandos que se usan en el evento). Los símbolos salen
+## de la fuente de respaldo PadSymbols y TextMarks los pinta con su color (InputGlyphs.pad_color).
+const PAD_NAMES: Dictionary = {JOY_BUTTON_A: "✕", JOY_BUTTON_B: "○", JOY_BUTTON_X: "□", JOY_BUTTON_Y: "△",
+	JOY_BUTTON_LEFT_SHOULDER: "L1", JOY_BUTTON_RIGHT_SHOULDER: "R1", JOY_BUTTON_BACK: "Share",
+	JOY_BUTTON_START: "Options", JOY_BUTTON_GUIDE: "PS", JOY_BUTTON_LEFT_STICK: "L3",
+	JOY_BUTTON_RIGHT_STICK: "R3", JOY_BUTTON_DPAD_UP: "Cruceta arriba",
 	JOY_BUTTON_DPAD_DOWN: "Cruceta abajo", JOY_BUTTON_DPAD_LEFT: "Cruceta izq.", JOY_BUTTON_DPAD_RIGHT: "Cruceta der.",
-	JOY_BUTTON_MISC1: "Compartir"}
+	JOY_BUTTON_TOUCHPAD: "Panel táctil", JOY_BUTTON_MISC1: "Micrófono"}
 
 static func preferences() -> GamePreferences:
 	var tree: SceneTree = Engine.get_main_loop() as SceneTree

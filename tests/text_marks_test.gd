@@ -36,8 +36,8 @@ func run() -> void:
 	verify(chip.get_parsed_text().contains("H:"), "Plantilla respeta remapeo de teclado")
 	prefs.values.glyphs = 2
 	chip.refresh()
-	verify(chip.get_parsed_text().contains("X:"), "Plantilla respeta mando fijo y remapeo")
-	verify(BossHints.control("interact") == "[X]", "Pista de jefe usa InputGlyphs")
+	verify(chip.get_parsed_text().contains("□:"), "Plantilla respeta mando fijo y remapeo")
+	verify(BossHints.control("interact") == "[□]", "Pista de jefe usa InputGlyphs")
 	prefs.values.glyphs = 1
 	verify(BossHints.control("interact") == "[H]", "Pista de jefe respeta teclado fijo")
 	label.text = "[color=red]Literal[/color]"
@@ -72,7 +72,7 @@ func run() -> void:
 	verify(arena.dynamics.device_hint.text.begins_with("[H]"), "Mecanismo de arena respeta remapeo")
 	prefs.values.glyphs = 2
 	arena.dynamics._physics_process(0)
-	verify(arena.dynamics.device_hint.text.begins_with("[X]"), "Mecanismo de arena respeta mando")
+	verify(arena.dynamics.device_hint.text.begins_with("[□]"), "Mecanismo de arena respeta mando")
 	prefs.values.glyphs = 1
 	for zone: int in 5:
 		arena.zone_index = zone
@@ -92,7 +92,7 @@ func run() -> void:
 		mother.add_child(relay)
 		mother.relays.append(relay)
 	prefs.values.glyphs = 2
-	verify(mother.status_text().contains("X reparar"), "Estado de Madre Cero respeta mando")
+	verify(mother.status_text().contains("□ reparar"), "Estado de Madre Cero respeta mando")
 	mother.free()
 	label.free()
 	chip.source.free()
