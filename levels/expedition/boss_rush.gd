@@ -33,6 +33,8 @@ var name_edit: LineEdit
 var ranking_rows: VBoxContainer
 var online_rows: VBoxContainer
 var online_sent: bool = false
+## Tema de cierre heredado de la arena para que no se corte al liberarla.
+var outcome_player: AudioStreamPlayer = AudioStreamPlayer.new()
 
 static func best_time() -> float:
 	var entries: Array[Dictionary] = ranking()
@@ -91,6 +93,8 @@ func _ready() -> void:
 	get_tree().paused = false
 	overlay.layer = 20
 	add_child(overlay)
+	outcome_player.bus = &"Music"
+	add_child(outcome_player)
 	timer_label = Label.new()
 	timer_label.name = "RushTimer"
 	# Bajo el panel de vida del jugador, sin tapar su texto.
@@ -112,6 +116,7 @@ func _ready() -> void:
 func start_fight(number: int) -> void:
 	index = number
 	stage = "fight"
+	outcome_player.stop()
 	arena = ARENA.instantiate() as RecaudadorArena
 	arena.zone_index = number
 	arena.rush = true
@@ -137,6 +142,7 @@ func _on_resolved(won: bool) -> void:
 	hits += arena.hit_count
 	var remaining: int = arena.player.health
 	var title: String = arena.zone.boss_title
+	carry_outcome()
 	close_arena()
 	if not won:
 		show_results(false, title)
@@ -146,6 +152,15 @@ func _on_resolved(won: bool) -> void:
 		var before: int = remaining
 		health = mini(Player.MAX_HEALTH, remaining + int(Player.MAX_HEALTH * HEAL))
 		show_transition(title, before)
+
+## La arena se libera al resolverse y con ella su música: el tema de victoria o derrota
+## sigue sonando aquí desde el mismo punto para escucharse completo.
+func carry_outcome() -> void:
+	var source: AudioStreamPlayer = arena.sound.outcome
+	if not source.playing: return
+	outcome_player.stream = source.stream
+	outcome_player.volume_db = source.volume_db
+	outcome_player.play(source.get_playback_position())
 
 func close_arena() -> void:
 	if is_instance_valid(arena):
