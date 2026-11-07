@@ -1,6 +1,6 @@
 # Exportar Ceniza Neón
 
-Configuración comprobada en `project.godot` y `export_presets.cfg`: versión `0.2.0-alpha`, base de 640 × 360, ventana de 1280 × 720, `canvas_items`, `keep_height` y renderizador Compatibility. El motor indicado para este proyecto es Godot 4.7.2.
+Configuración comprobada en `project.godot` y `export_presets.cfg`: versión `0.2.1-alpha`, base de 640 × 360, ventana de 1280 × 720, `canvas_items`, `keep_height` y renderizador Compatibility. El motor indicado para este proyecto es Godot 4.7.2.
 
 | Preset | Salida configurada | Configuración |
 | --- | --- | --- |

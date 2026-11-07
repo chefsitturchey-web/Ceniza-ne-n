@@ -42,7 +42,7 @@ func run_checks() -> void:
 	pad.pressed = true
 	pad.button_index = JOY_BUTTON_X
 	prefs._input(pad)
-	verify(InputGlyphs.fill("Mantén {interact}; {journal}") == "Mantén Y; RB", "Boton cambia al mando")
+	verify(InputGlyphs.fill("Mantén {interact}; {journal}") == "Mantén △; R1", "Boton cambia al mando")
 	var drift: InputEventJoypadMotion = InputEventJoypadMotion.new()
 	drift.axis_value = 0.1
 	InputGlyphs.last_pad = false
@@ -57,8 +57,8 @@ func run_checks() -> void:
 	prefs._input(pad)
 	prefs.bindings.interact = {"key": KEY_K, "pad": JOY_BUTTON_X}
 	prefs.changed.emit()
-	verify(InputGlyphs.action_name("interact") == "X", "Remapeo del mando")
-	verify(find_text(world.equipment_shop, "Volver  [Start]"), "Arsenal actualiza cierre")
+	verify(InputGlyphs.action_name("interact") == "□", "Remapeo del mando")
+	verify(find_text(world.equipment_shop, "Volver  [Options]"), "Arsenal actualiza cierre")
 	var hud: GameHud = world.get_node("HUD")
 	hud.pause_panel.show()
 	paused = true
@@ -75,7 +75,7 @@ func run_checks() -> void:
 	await picture("pausa_mando")
 	prefs._input(key)
 	prefs.values.glyphs = 2
-	verify(InputGlyphs.action_name("interact") == "X", "Modo mando fijo")
+	verify(InputGlyphs.action_name("interact") == "□", "Modo mando fijo")
 	prefs.values.glyphs = 1
 	verify(InputGlyphs.action_name("interact") == "H", "Modo teclado fijo")
 	prefs.values.glyphs = 0
