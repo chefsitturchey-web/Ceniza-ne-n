@@ -80,6 +80,8 @@ const VARIANTS: Dictionary = {
 	"step": ["step", "step_2", "step_3"],
 	"slash": ["slash", "slash_2", "slash_3"]
 }
+## Refuerzo de volumen por cue: los barridos de jefe deben oírse sobre el combate.
+const CUE_GAIN: Dictionary = {"telegraph_claw": 5.0, "prefecto_barrido": 5.0}
 const VOICES: int = 12
 ## Ambiente por zona: archivo de bucle, sin eventos ni melodía.
 const AMBIENCE: Dictionary = {
@@ -237,7 +239,7 @@ func _start_cue(index: int, id: String, gain_db: float) -> void:
 	voice_ids[index] = id
 	var variants: Array = VARIANTS.get(id, [])
 	voice.stream = CUES[variants[rng.randi() % variants.size()] if not variants.is_empty() else id]
-	voice.volume_db = -9.0 + gain_db
+	voice.volume_db = -9.0 + gain_db + float(CUE_GAIN.get(id, 0.0))
 	voice.pitch_scale = rng.randf_range(0.93, 1.07)
 	voice.play()
 
