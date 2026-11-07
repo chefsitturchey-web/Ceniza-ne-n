@@ -6,7 +6,7 @@ Construye de día, resiste de noche y recupera cinco distritos. Proyecto de Godo
 
 ## Jugar
 
-**Alfa 0.2.0:** [descargas para Windows y Android](https://github.com/chefsitturchey-web/Ceniza-ne-n/releases/tag/v0.2.1-alpha) · [jugar en el navegador (itch.io)](https://chefsitturchey.itch.io/ceniza-neon) · [web del juego](https://ceniza-neon.chefsitturchey.workers.dev/).
+**Alfa 0.2:** [descargas para Windows y Android](https://github.com/chefsitturchey-web/Ceniza-ne-n/releases) · [jugar en el navegador (itch.io)](https://chefsitturchey.itch.io/ceniza-neon) · [web del juego](https://ceniza-neon.chefsitturchey.workers.dev/).
 
 Desde el código: importa `project.godot`, espera la importación y pulsa **F5**. El menú ofrece **Nueva partida**, **Continuar**, **Boss Rush** y **Opciones**. [Guía de inicio](INICIO.md) · [Índice de documentación](docs/README.md) · [Exportación](docs/EXPORTAR.md).
 
@@ -16,7 +16,7 @@ La campaña conecta Periferia, Fundición, Barrio inundado, Ciudadela y Núcleo 
 
 ## Funciones implementadas
 
-- **Boss Rush:** encadena los cinco jefes sin novela visual. Entre victorias recuperas hasta la mitad de la vida máxima y el filo mejora. Registra los diez mejores tiempos con nombre y golpes en `user://boss_rush.cfg`; los resultados muestran los cinco primeros. [Reglas y prueba](docs/gameplay/BOSS_RUSH.md).
+- **Boss Rush:** encadena los cinco jefes sin novela visual. Entre victorias recuperas hasta la mitad de la vida máxima y el filo mejora. Registra los diez mejores tiempos con nombre y golpes en `user://boss_rush.cfg`; los resultados muestran los cinco primeros y el top 3 online. Las victorias se envían al ranking online de la web; sin conexión quedan en cola y se envían después. [Reglas y prueba](docs/gameplay/BOSS_RUSH.md).
 - **Historia automática:** 40 escenas de novela visual, incluidas entrada y victoria de los cinco jefes. Las escenas vistas se registran y el diario permite releerlas; Boss Rush excluye la narración. [Disparadores y guardado](docs/gameplay/HISTORIA_FLUJO.md).
 - **Pistas y cuerpo a cuerpo:** avisos cortos por combate, teclas según dispositivo y reasignación; combos, golpes de área, empujones y acometidas con anticipación. [Tácticas](docs/gameplay/JEFES_TACTICAS_Y_ARENAS.md).
 - **Guía con flecha:** once pasos y consejos contextuales. Nueva partida reinicia los pasos y consejos; conserva logros y récord del perfil. [Primeros pasos y rondas](docs/gameplay/PRIMEROS_PASOS_Y_RONDAS.md).
@@ -29,21 +29,21 @@ La campaña conecta Periferia, Fundición, Barrio inundado, Ciudadela y Núcleo 
 
 ## Controles predeterminados
 
-| Acción | Teclado | Mando (nombres Xbox) |
+| Acción | Teclado | Mando (estilo PlayStation) |
 | --- | --- | --- |
 | Mover | A/D, flechas; W/S en arena | Stick / cruceta |
 | Correr | Shift | Cruceta abajo |
-| Construir / operar | Mantener E | Mantener Y |
+| Construir / operar | Mantener E | Mantener △ |
 | Asaltar / retirar | F | Cruceta arriba |
-| Atacar en arena | J | X |
-| Esquivar | Espacio | A |
-| Sobrecarga | Q | LB |
-| Alimentación de torreta | T | B |
-| Plataforma | V | Pulsar stick izquierdo |
-| Diario | L | RB |
-| Pausa | Esc | Start |
+| Atacar en arena | J | □ |
+| Esquivar | Espacio | ✕ |
+| Sobrecarga | Q | L1 |
+| Alimentación de torreta | T | ○ |
+| Plataforma | V | L3 (pulsar stick izquierdo) |
+| Diario | L | R1 |
+| Pausa | Esc | Options |
 
-**M** silencia. Opciones permite reasignar la tecla y el botón principales de las acciones. Los avisos siguen el dispositivo y los controles configurados; la pausa permite consultarlos.
+En los menús, **✕** acepta y **○** vuelve; la cruceta o el stick mueven el foco. Los avisos dibujan ✕ ○ □ △ con su color. **M** silencia. Opciones permite reasignar la tecla y el botón principales de las acciones. Los avisos siguen el dispositivo y los controles configurados; la pausa permite consultarlos.
 
 ## Desarrollo y comprobación
 
@@ -52,6 +52,8 @@ powershell -File tools\maintenance\validate.ps1 -GodotPath "D:\descargas\Godot_v
 ```
 
 `tests/run_all.gd` registra **67 ejecuciones de suites**, incluidas variantes con argumentos. El validador importa el proyecto, aísla `APPDATA` y centraliza registros y `summary.json` en `build/validation/latest/`. El resultado se consulta allí; la existencia de las pruebas no demuestra una duración de campaña ni una revisión visual completa.
+
+**¿Vas a hacer cambios?** Lee primero [CONTRIBUIR.md](CONTRIBUIR.md).
 
 [Arquitectura](docs/development/ARQUITECTURA.md) · [Organización](docs/ORGANIZACION.md) · [Recursos](assets/README.md) · [Herramientas](tools/README.md).
 

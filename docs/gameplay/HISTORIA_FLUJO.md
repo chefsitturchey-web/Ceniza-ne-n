@@ -33,7 +33,7 @@ Las cinco arenas comparten `RecaudadorArena`. La novela precede al combate; al g
 
 ## Pausa, escenas vistas y repetición
 
-- `NovelPanel` pausa el árbol y devuelve la pausa previa al cerrar. Bloquea la entrada residual. E, Intro, Espacio, clic y Continuar avanzan; Esc/Start omiten. Anterior permite releer.
+- `NovelPanel` pausa el árbol y devuelve la pausa previa al cerrar. Bloquea la entrada residual. E, Intro, Espacio, clic y Continuar avanzan; Esc/Options omiten. Anterior permite releer.
 - `StoryDirector.seen_scenes` forma parte del checkpoint. Cerrar u omitir registra la escena; cerrar el encuentro guarda ese estado antes del combate. La cola evita duplicados y reconstruye los hitos alcanzados aún no vistos al cargar.
 - El traspaso de campaña incluye `story_seen`; el campo es opcional y validado. El desenlace se registra antes de resolver el viaje, evitando guardar la colonia anterior encima del siguiente distrito.
 - Las arenas independientes y de práctica usan memoria de escenas vistas durante la sesión, sin escribir la campaña. El diario conserva su propia pausa al releer escenas desbloqueadas.

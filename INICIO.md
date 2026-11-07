@@ -19,21 +19,21 @@ Las tropas y torretas combaten en la colonia. El Portador dirige, recoge recurso
 
 ## Controles
 
-| Acción | Teclado | Mando Xbox |
+| Acción | Teclado | Mando (estilo PlayStation) |
 | --- | --- | --- |
 | Mover | A/D o flechas; W/S en arena | Stick / cruceta |
 | Correr | Mantener Shift | Cruceta abajo |
-| Construir / operar | Mantener E | Mantener Y |
+| Construir / operar | Mantener E | Mantener △ |
 | Asaltar / retirar | F | Cruceta arriba |
-| Esquivar | Espacio | A |
-| Sobrecargar | Q | LB |
-| Alimentar torreta | T | B |
-| Subir / bajar de plataforma | V | Pulsar stick izquierdo |
-| Diario | L | RB |
-| Pausa | Esc | Start |
-| Atacar en arena | J | X |
+| Esquivar | Espacio | ✕ |
+| Sobrecargar | Q | L1 |
+| Alimentar torreta | T | ○ |
+| Subir / bajar de plataforma | V | L3 (pulsar stick izquierdo) |
+| Diario | L | R1 |
+| Pausa | Esc | Options |
+| Atacar en arena | J | □ |
 
-La pausa de colonia muestra controles; las pausas de colonia y jefe ofrecen Opciones. **Opciones → Controles** permite cambiar tecla y botón; **Avisos de teclas** fija Automático, Teclado o Mando. `TextMarks` resalta las entradas en dorado. En pantallas táctiles aparecen joystick y botones durante el juego. **M** silencia el audio.
+La pausa de colonia muestra controles; las pausas de colonia y jefe ofrecen Opciones. **Opciones → Controles** permite cambiar tecla y botón; **Avisos de teclas** fija Automático, Teclado o Mando. `TextMarks` resalta las teclas en dorado y los botones ✕ ○ □ △ con su color. En los menús, ✕ acepta y ○ vuelve. En pantallas táctiles aparecen joystick y botones durante el juego. **M** silencia el audio.
 
 ## Historia y jefes
 
@@ -47,7 +47,7 @@ En los jefes combate con **J**, esquiva con **Espacio** y utiliza **E** en los m
 - Prefecto: evita el escudo y castiga la recuperación; al 30 % entra en última guardia.
 - Madre Cero: mantén dos relés activos; E repara y Q protege. Al 30 % activa el último protocolo.
 
-En historia, la entrada se lee antes de la presentación de combate y el desenlace tras la muerte, antes de resolver la expedición. El diario permite releer lo desbloqueado. Boss Rush omite ambas novelas: sus resultados muestran tiempo, golpes y top 5; las diez mejores victorias se guardan con nombre.
+En historia, la entrada se lee antes de la presentación de combate y el desenlace tras la muerte, antes de resolver la expedición. El diario permite releer lo desbloqueado. Boss Rush omite ambas novelas: sus resultados muestran tiempo, golpes y top 5; las diez mejores victorias se guardan con nombre y se envían al ranking online (top 3 en resultados, top 20 en la web).
 
 [Historia completa](docs/gameplay/HISTORIA_FLUJO.md) · [Tácticas](docs/gameplay/JEFES_TACTICAS_Y_ARENAS.md) · [Boss Rush](docs/gameplay/BOSS_RUSH.md).
 

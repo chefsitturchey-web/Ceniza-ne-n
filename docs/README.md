@@ -4,8 +4,9 @@
 - [Organización, limpieza y archivos generados](ORGANIZACION.md).
 - [Dónde están los sprites y sonidos](../assets/README.md).
 - [Flujo completo de historia y novela visual](gameplay/HISTORIA_FLUJO.md).
-- [Boss Rush y ranking local](gameplay/BOSS_RUSH.md).
+- [Boss Rush, ranking local y online](gameplay/BOSS_RUSH.md).
 - [Exportar para Windows, Web y Android](EXPORTAR.md).
+- [Cómo colaborar: ramas, pruebas y versiones](../CONTRIBUIR.md).
 
 ## Diseño y campaña
 

@@ -8,7 +8,19 @@ El cronómetro avanza solo durante el combate activo: excluye pausa, cierre del 
 
 El archivo independiente `user://boss_rush.cfg` conserva las **diez mejores victorias por tiempo**, con nombre y golpes. Los resultados muestran el **top 5**. Si la victoria entra en el ranking, se puede editar el nombre de hasta 12 caracteres; Intro o salir/reintentar guarda el cambio. Una derrota no añade una marca. El lector admite el antiguo récord sin nombre como «Portador».
 
-La escritura usa un archivo `.tmp` y renombrado. Este ranking es local; el código no implementa clasificación en línea.
+La escritura usa un archivo `.tmp` y renombrado.
+
+## Ranking online
+
+`levels/expedition/online_ranking.gd` (`OnlineRanking`) envía cada victoria a `https://ceniza-neon.chefsitturchey.workers.dev/api/ranking` (Worker de Cloudflare con D1, código en el repo `ceniza-neon-web`, carpeta `worker/`). Nunca bloquea el juego:
+
+- Al salir o reintentar tras una victoria, la marca se añade a la cola `user://boss_rush_online.cfg` y se intenta enviar. Sin red queda en cola; se reintenta al abrir el Boss Rush.
+- Una respuesta 2xx o un 4xx (salvo 429) saca la marca de la cola; errores de red o 5xx la conservan.
+- Los resultados muestran el top 3 online («conectando…», «sin conexión» o «aún vacío»). La página de descarga de la web muestra el top 20.
+- En pruebas headless la red está desactivada (`OnlineRanking.enabled`).
+- El servidor valida nombre (1–12), tiempo (30 s–4 h) y limita 20 envíos por hora por IP. Android necesita el permiso `INTERNET` (activo en `export_presets.cfg`).
+
+Limitación conocida: si se cierra el juego con la pantalla de resultados abierta, esa victoria no se encola.
 
 ## Probar
 
