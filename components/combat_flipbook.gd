@@ -85,6 +85,8 @@ func pose_player() -> void:
 		var ratio: float = clampf(1 - remaining / Player.ATTACK_ANIM_DURATION, 0, 1)
 		if ratio < 0.25: set_pose("windup", aim, ratio / 0.25)
 		else: set_pose("attack", aim, (ratio - 0.25) / 0.75)
+	elif moving and side and actor.sprinting and sprite.sprite_frames.has_animation(StringName("run_" + CombatSpriteLibrary.direction(facing))):
+		set_pose("run", facing, fposmod(travel / 96.0, 1))
 	elif moving and not (side and actor.riding): set_pose("walk", facing, fposmod(travel / (64.0 if side else 56.0), 1))
 	else: set_pose("exposed" if actor.stamina < 30 else "idle", facing)
 
@@ -94,8 +96,10 @@ func pose_boss(boss: Recaudador) -> void:
 		previous_state = boss.state
 		state_duration = maxf(0.01, boss.timer)
 	var direction: Vector2 = boss.facing
-	if boss.state == Recaudador.State.DEAD: set_pose("death", direction)
+	# Los jefes finales caen siempre de perfil: su caída cuadro por cuadro está pintada en este y oeste.
+	if boss.state == Recaudador.State.DEAD: set_pose("death", Vector2(1.0 if direction.x >= 0 else -1.0, 0) if actor_id in ["prefecto", "madre"] else direction)
 	elif boss.core_exposed: set_pose("exposed", direction)
+	elif boss.melee_active(): set_pose(boss.melee_clip(), boss.melee.direction, boss.melee_progress())
 	elif boss is MadreCero and boss.cast_recovery > 0: set_pose("attack", direction, 1 - boss.cast_recovery / 0.35)
 	elif boss is MadreCero and boss.casting_time() < 0.65: set_pose("windup", direction, 1 - maxf(0, boss.casting_time()) / 0.65)
 	elif hurt_left > 0: set_pose("hurt", direction, 1 - hurt_left / 0.18)

@@ -8,4 +8,4 @@
 
 Fuentes editables: `sources/*.ase`. Las variantes se disponen horizontalmente en PNG; los editables las conservan como fotogramas separados. Dibujo, muestreo, máscaras de daño y exportación realizados dentro de LibreSprite. El atlas industrial aprobado es la referencia y fuente de textura; permanece sin cambios.
 
-Generador: `tools/art/build_settlement_art.py`, con trabajo nativo en `libresprite_settlements.js`. Los archivos temporales se escriben en `build/art-settlements/`. Las fuentes existentes se preservan. [Mecánicas y costes](../../../docs/gameplay/POBLADOS_Y_TECNOLOGIA.md).
+Generador: `tools/art/build_settlement_art.py`, con trabajo nativo en `libresprite_settlements.js`. Los archivos temporales se escriben en `build/art-settlements/`. Las fuentes existentes se preservan. `systems/settlement_system.gd` carga las reglas y `levels/settlement_backdrop.gd` presenta los barrios; `tests/settlement_world_test.gd` comprueba restauración y guardado mediante el validador de mantenimiento. [Mecánicas y costes](../../../docs/gameplay/POBLADOS_Y_TECNOLOGIA.md).

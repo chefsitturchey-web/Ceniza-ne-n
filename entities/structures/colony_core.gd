@@ -56,6 +56,7 @@ func request_upgrade() -> bool:
 	progress = 0
 	district.presenter.show_notice("Núcleo encargado: espera a los constructores")
 	district.play("build_order")
+	district.colony.authorize_night_work()
 	return true
 
 func complete_work() -> void:
@@ -143,8 +144,9 @@ func _draw() -> void:
 			draw_line(Vector2(side * 44, -5), Vector2(side * 28, -5), Color("47dacb"), 2)
 		if ordered:
 			draw_line(Vector2(-44, -52), Vector2(44, -52), Color("8c674d"), 3)
-			for step: int in 5:
-				if progress / BUILD_TIME > step / 5.0: draw_rect(Rect2(-28 + step * 11, -36, 9, 28), Color("304356"))
+			var raised: int = ceili(progress * 5 / BUILD_TIME)
+			for step: int in raised:
+				draw_rect(Rect2(-28 + step * 11, -36, 9, 28), Color("304356"))
 		return
 	var art: Texture2D = FortressArt.texture("core", tier)
 	var source: Rect2 = ArtScale.source(art)

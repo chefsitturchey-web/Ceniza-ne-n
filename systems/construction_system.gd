@@ -80,6 +80,7 @@ func order_site(site: ConstructionSite) -> bool:
 	site.progress = 0.0
 	notice_requested.emit("Obra encargada")
 	_cue("build_order")
+	if core != null: core.district.colony.authorize_night_work()
 	return true
 
 func toggle_power(site: ConstructionSite) -> bool:

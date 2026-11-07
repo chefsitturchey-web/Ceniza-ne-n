@@ -2,10 +2,15 @@ class_name GamePreferences
 extends Node
 ## Ajustes globales de presentación; nunca guardan estado de una partida.
 signal changed
+## Cambió el último dispositivo (teclado o mando): los avisos de teclas se redibujan.
+signal device_changed
 const DEFAULTS: Dictionary = {"master": 1.0, "music": 1.0, "sfx": 1.0, "muted": false,
-	"fullscreen": false, "window_size": 0, "reduced_flashes": false, "particles": true}
+	"fullscreen": false, "window_size": 0, "reduced_flashes": false, "particles": true,
+	"touch_controls": true, "glyphs": 0}
 const SIZES: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1600, 900), Vector2i(1920, 1080)]
 var values: Dictionary = DEFAULTS.duplicate()
+## Teclas y botones personalizados por acción; ver KeyRemap. Vacío significa predeterminados.
+var bindings: Dictionary = {}
 var config_path: String = "user://opciones.cfg"
 var base_volumes: Dictionary = {}
 var last_error: Error = OK
@@ -21,6 +26,7 @@ func block_gameplay_input() -> void:
 	input_block_frame = Engine.get_process_frames() + 1
 var particles: bool:
 	get: return values.particles
+## Tambien reduce a un tercio los presupuestos de ambiente y escombros.
 var reduced_flashes: bool:
 	get: return values.reduced_flashes
 var muted: bool:
@@ -41,8 +47,14 @@ func _ready() -> void:
 func load_settings() -> void:
 	var config: ConfigFile = ConfigFile.new()
 	values = DEFAULTS.duplicate()
+	bindings = {}
 	if config.load(config_path) != OK:
 		return
+	if config.has_section("controls"):
+		for action: String in config.get_section_keys("controls"):
+			var entry: Variant = config.get_value("controls", action)
+			if KeyRemap.valid_binding(action, entry):
+				bindings[action] = entry
 	for key: String in DEFAULTS:
 		var value: Variant = config.get_value("preferences", key, DEFAULTS[key])
 		if valid_value(key, value):
@@ -55,6 +67,8 @@ func valid_value(key: String, value: Variant) -> bool:
 		return (value is float or value is int) and is_finite(float(value)) and value >= 0 and value <= 1
 	if key == "window_size":
 		return value is int and value >= 0 and value < SIZES.size()
+	if key == "glyphs":
+		return value is int and value >= 0 and value < InputGlyphs.MODES.size()
 	return value is bool
 
 func update_value(key: String, value: Variant) -> bool:
@@ -63,12 +77,15 @@ func update_value(key: String, value: Variant) -> bool:
 	values[key] = value
 	apply_all(key in ["fullscreen", "window_size"])
 	changed.emit()
+	if key == "glyphs": device_changed.emit()
 	return save_settings()
 
 func save_settings() -> bool:
 	var config: ConfigFile = ConfigFile.new()
 	for key: String in values:
 		config.set_value("preferences", key, values[key])
+	for action: String in bindings:
+		config.set_value("controls", action, bindings[action])
 	last_error = config.save(config_path)
 	return last_error == OK
 
@@ -80,7 +97,8 @@ func apply_all(display: bool = true) -> void:
 		var amount: float = values[pair[1]]
 		AudioServer.set_bus_volume_db(index, float(base_volumes.get(pair[0], 0.0)) + linear_to_db(maxf(amount, 0.0001)))
 		AudioServer.set_bus_mute(index, amount == 0 or (pair[0] == "Master" and muted))
-	if not display or DisplayServer.get_name() == "headless":
+	# En móvil la ventana siempre ocupa la pantalla: tamaño y modo los decide el sistema.
+	if not display or DisplayServer.get_name() == "headless" or OS.has_feature("mobile"):
 		return
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if values.fullscreen else DisplayServer.WINDOW_MODE_WINDOWED)
 	if not values.fullscreen:
@@ -89,6 +107,9 @@ func apply_all(display: bool = true) -> void:
 		var factor: float = minf(1.0, minf(float(available.size.x) / desired.x, float(available.size.y) / desired.y))
 		DisplayServer.window_set_size(Vector2i(Vector2(desired) * factor))
 		DisplayServer.window_set_position(available.position + (available.size - DisplayServer.window_get_size()) / 2)
+
+func _input(event: InputEvent) -> void:
+	if InputGlyphs.observe(event) and InputGlyphs.mode() == 0: device_changed.emit()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_M:

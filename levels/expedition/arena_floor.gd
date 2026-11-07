@@ -23,12 +23,16 @@ var dust: CPUParticles2D
 
 func _ready() -> void:
 	_add_dust()
+	var atmosphere: WorldAtmosphere = WorldAtmosphere.new()
+	atmosphere.arena_mode = true
+	atmosphere.theme_id = theme_id
+	add_child(atmosphere)
 	if theme_id == "periphery": add_child(DepotArenaVisual.new())
 
 func _process(delta: float) -> void:
 	if theme_id == "foundry" and int(light_time * 8) != int((light_time + delta) * 8): queue_redraw()
 	if dust != null:
-		dust.emitting = GamePreferences.current().particles
+		WorldParticles.configure(dust, true, 28)
 	# Luces industriales con parpadeos ocasionales y alarma que respira.
 	light_time += delta
 	var index: int = 0
@@ -221,7 +225,7 @@ func _draw_wall_pipes() -> void:
 func _add_dust() -> void:
 	# Polvo y ceniza flotando con la luz.
 	dust = CPUParticles2D.new()
-	dust.emitting = GamePreferences.current().particles
+	WorldParticles.configure(dust, true, 28)
 	dust.amount = 40
 	dust.lifetime = 6.0
 	dust.preprocess = 6.0

@@ -37,7 +37,8 @@ var refresh_left: float = 0
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 100
-	enabled = OS.is_debug_build() or "--debug-tools" in OS.get_cmdline_user_args()
+	# Solo para el desarrollador: editor o --debug-tools. Nunca en builds exportadas, aunque sean de depuración.
+	enabled = OS.has_feature("editor") or "--debug-tools" in OS.get_cmdline_user_args()
 	if not enabled:
 		set_process(false)
 		set_process_input(false)
@@ -161,7 +162,7 @@ func apply_cheats() -> void:
 	var arena: RecaudadorArena = active_arena()
 	var district: District = active_district() if arena == null else null
 	var player: CharacterBody2D = arena.player if arena != null else (district.player if district != null else null)
-	if god_mode or infinite_stamina or freeze_ai or core_god or freeze_cycle or Engine.time_scale != 1:
+	if god_mode or infinite_stamina or freeze_ai or core_god or freeze_cycle or (Engine.time_scale != 1 and ImpactFeedback.hit_stops == 0):
 		if arena == null or not arena.debug_practice: isolate(active_district())
 	if player is TopdownPlayer: player.debug_invincible = god_mode
 	elif player is Player: player.health_component.debug_invincible = god_mode
@@ -402,7 +403,7 @@ func colony_action(world: District, action: String) -> void:
 		"day", "night":
 			world.cycle.day = int(panel.day_number.value)
 			world.cycle.phase = "DÍA" if action == "day" else "NOCHE"
-			world.cycle.phase_remaining = world.cycle.config.day_duration if action == "day" else world.cycle.config.night_duration
+			world.cycle.phase_remaining = world.cycle.config.day_length(world.cycle.day) if action == "day" else world.cycle.config.night_duration
 			if action == "night": world.director.start(world.cycle.day)
 			world.cycle.phase_changed.emit(world.cycle.phase, world.cycle.day)
 		"tier":
@@ -420,7 +421,7 @@ func colony_action(world: District, action: String) -> void:
 			world.story.relay_progress = 6
 			world.cycle.day = maxi(2, world.cycle.day)
 			world.cycle.phase = "DÍA"
-			world.cycle.phase_remaining = world.cycle.config.day_duration
+			world.cycle.phase_remaining = world.cycle.config.day_length(world.cycle.day)
 			for site: ConstructionSite in world.construction.sites: site.complete_work()
 			world.expansion.sites[2].hp = 180
 			for portal: EnemyRepeater in world.civic.gates + world.expedition.repeaters: portal.restore(true)

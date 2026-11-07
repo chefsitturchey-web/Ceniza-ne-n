@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=7 format=3]
+[gd_resource type="Theme" load_steps=9 format=3]
 
 [ext_resource type="FontFile" path="res://assets/fonts/Micro5-Regular.ttf" id="1"]
 [ext_resource type="FontFile" path="res://assets/fonts/Silkscreen-Regular.ttf" id="2"]
@@ -9,42 +9,68 @@ border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.45, 0.47, 0.35, 1)
+border_color = Color(0.51, 0.6, 0.66, 0.8)
 shadow_color = Color(0, 0, 0, 0.5)
 shadow_size = 8
 
 [sub_resource type="StyleBoxFlat" id="Normal"]
-bg_color = Color(0.065, 0.105, 0.145, 1)
+bg_color = Color(0.094, 0.149, 0.224, 0.92)
 border_width_left = 2
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.24, 0.33, 0.36, 1)
-corner_radius_top_left = 3
-corner_radius_bottom_right = 3
-content_margin_left = 8.0
-content_margin_right = 8.0
-content_margin_top = 3.0
-content_margin_bottom = 3.0
+border_color = Color(0.188, 0.263, 0.337, 1)
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="Hover"]
-bg_color = Color(0.12, 0.20, 0.24, 1)
+bg_color = Color(0.13, 0.17, 0.23, 0.96)
 border_width_left = 3
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.66, 0.64, 0.44, 1)
-content_margin_left = 8.0
-content_margin_right = 8.0
-content_margin_top = 3.0
-content_margin_bottom = 3.0
-shadow_color = Color(0.1, 0.5, 0.5, 0.12)
-shadow_size = 3
+border_color = Color(0.91, 0.62, 0.33, 1)
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+shadow_color = Color(0.91, 0.62, 0.33, 0.32)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="Pressed"]
+bg_color = Color(0.91, 0.62, 0.33, 0.28)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.808, 0.459, 1)
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+shadow_color = Color(1, 0.808, 0.459, 0.4)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="Disabled"]
+bg_color = Color(0.094, 0.149, 0.224, 0.45)
+border_width_left = 2
+border_color = Color(0.188, 0.263, 0.337, 0.6)
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="Focus"]
-bg_color = Color(0, 0, 0, 0)
+bg_color = Color(0.91, 0.62, 0.33, 0.1)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.30, 0.82, 0.77, 1)
+border_color = Color(1, 0.808, 0.459, 1)
+shadow_color = Color(1, 0.808, 0.459, 0.38)
+shadow_size = 6
 
 [resource]
 default_font = ExtResource("2")
@@ -64,14 +90,23 @@ SmallTitle/font_sizes/font_size = 10
 
 Button/styles/normal = SubResource("Normal")
 Button/styles/hover = SubResource("Hover")
-Button/styles/pressed = SubResource("Hover")
+Button/styles/pressed = SubResource("Pressed")
 Button/styles/focus = SubResource("Focus")
-Button/styles/disabled = SubResource("Normal")
+Button/styles/disabled = SubResource("Disabled")
 Button/colors/font_color = Color(0.85, 0.89, 0.87, 1)
-Button/colors/font_hover_color = Color(1, 0.88, 0.66, 1)
+Button/colors/font_hover_color = Color(1, 0.808, 0.459, 1)
+Button/colors/font_focus_color = Color(1, 0.808, 0.459, 1)
+Button/colors/font_pressed_color = Color(1, 0.94, 0.78, 1)
+MenuEntry/base_type = &"Button"
+MenuEntry/constants/h_separation = 8
+MenuEntry/font_sizes/font_size = 13
 Panel/styles/panel = SubResource("Panel")
 PanelContainer/styles/panel = SubResource("Panel")
 OptionButton/styles/normal = SubResource("Normal")
 OptionButton/styles/hover = SubResource("Hover")
 OptionButton/styles/focus = SubResource("Focus")
 PopupMenu/styles/panel = SubResource("Panel")
+OptionButton/styles/pressed = SubResource("Pressed")
+OptionButton/styles/disabled = SubResource("Disabled")
+CheckBox/styles/focus = SubResource("Focus")
+HSlider/styles/focus = SubResource("Focus")

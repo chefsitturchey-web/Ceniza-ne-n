@@ -26,6 +26,7 @@ func _ready() -> void:
 func take_damage(amount: int) -> void:
 	if hp <= 0 or amount <= 0: return
 	if role == "guardian": amount = maxi(1, ceili(amount * 0.35))
+	amount = maxi(1, roundi(amount * (1.0 - home.expansion.district.modules.troop_armor())))
 	hp = maxi(0, hp - maxi(0, amount))
 	if hp > 0 and visual != null: visual.pulse_hurt()
 	queue_redraw()

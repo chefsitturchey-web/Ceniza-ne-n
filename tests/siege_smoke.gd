@@ -15,6 +15,7 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	load("res://tests/game_fixture.gd").found_colony(world)
 	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
@@ -22,25 +23,31 @@ func run_checks() -> void:
 	verify(world.interaction.perform_interaction(0), "encargar muralla")
 	verify(world.bank.scrap == 70, "pago único")
 	verify(not world.interaction.perform_interaction(0) and world.bank.scrap == 70, "evitar obra duplicada")
-	for index: int in range(100):
+	for index: int in range(200):
 		world.colony.update_workers(0.1)
 	verify(world.construction.sites[0].hp == 240, "constructor completa obra")
 	world.construction.damage_site(0, 40)
 	verify(world.interaction.perform_interaction(0), "reparación encargada")
-	for index: int in range(100):
+	for index: int in range(200):
 		world.colony.update_workers(0.1)
 	verify(world.construction.sites[0].hp == 240, "reparación completada")
 	world.bank.scrap = 0
 	verify(not world.interaction.perform_interaction(2), "no construir sin fondos")
 	world.bank.scrap = 100
-	world.bank.energy_capacity = 0
+	# Las torretas se desbloquean con el núcleo Nv.2.
+	world.core.restore({"tier": 2, "ordered": false, "progress": 0})
+	# Nv.2 aporta 4 de capacidad: se compensa para comprobar el límite.
+	world.bank.energy_capacity = -4
 	verify(not world.interaction.perform_interaction(1), "límite de energía")
-	world.bank.energy_capacity = 4
+	world.bank.energy_capacity = 0
 	verify(world.interaction.perform_interaction(1), "encargar torreta")
 	verify(world.bank.energy_used() == 2, "reservar energía en obra")
 	verify(world.civic.interact(-300) and world.civic.interact(-300) and world.civic.interact(-320) and world.civic.interact(-321), "reclutar personas y pagar herramientas")
 	for step: int in range(160): world.civic.tick(0.1)
-	verify(world.colony.workers.size() == 4 and not world.interaction.perform_interaction(-1), "Las profesiones llegan por herramientas y no por invocación en el núcleo")
+	# Con la mejora bloqueada (sin generador), E en el núcleo adelanta la noche en vez de invocar habitantes.
+	world.interaction.perform_interaction(-1)
+	verify(world.colony.workers.size() == 4 and world.cycle.phase == "AVISO", "Las profesiones llegan por herramientas y no por invocación en el núcleo")
+	world.cycle.phase = "DÍA"
 	world.player.position.x = -100
 	world.overload.activate_overload()
 	verify(world.overload.overload_left == 6.0 and world.overload.overload_right == 0.0, "sobrecarga por frente")
@@ -97,6 +104,7 @@ func run_checks() -> void:
 	var defeat: District = load("res://levels/main.tscn").instantiate() as District
 	(defeat.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(defeat)
+	load("res://tests/game_fixture.gd").found_colony(defeat)
 	defeat.core.health = 0
 	defeat.session._process(0.1)
 	verify(defeat.session.finished and not defeat.session.won, "derrota por núcleo destruido")

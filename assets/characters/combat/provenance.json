@@ -36,5 +36,9 @@
     "caldera": 48,
     "coro": 48
   },
-  "note": "Timeline holds and secondary poses reuse artwork. 256 timeline frames are NOT 256 independently painted poses."
+  "note": "Timeline holds and secondary poses reuse artwork. 256 timeline frames are NOT 256 independently painted poses.",
+  "frame_by_frame_overrides": {
+    "prefecto": "tools/art/integrar_jefes_pixellab.py: poses pintadas de references/prefecto*.png sin mallas ni rotacion, mas PixelLab PixMiniMax (sources/pixellab_prefecto: idle_south, attack_east -> oeste espejado, attack_south, death_east -> oeste espejado). La hoja PNG ya no es la exportacion de prefecto.ase.",
+    "madre": "tools/art/integrar_jefes_pixellab.py: poses pintadas de references/madre.png sin mallas ni rotacion, mas PixelLab PixMiniMax (sources/pixellab_madre: idle_south, attack_east -> oeste espejado, death_east -> oeste espejado). La hoja PNG ya no es la exportacion de madre.ase."
+  }
 }

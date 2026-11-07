@@ -140,14 +140,19 @@ func check_walks() -> void:
 				unique[hash(image.get_data())] = true
 				var translated: Rect2i = crop
 				translated.position.y += roundi(cos(frame * PI / 2) * height * 0.012)
-				verify(hash(image.get_region(translated).get_data()) == head, "Cabeza estable, sin redibujarse entre pasos: %s/%s/%d" % [id, direction, frame])
+				# La marcha lateral del Portador y la de los jefes finales son cuadro por cuadro (PixelLab y
+				# poses pintadas, ver tools/art/integrar_jefes_pixellab.py): la cabeza se redibuja a propósito.
+				if not (id == "portador" and direction in ["east", "west"]) and not id in ["prefecto", "madre"]:
+					verify(hash(image.get_region(translated).get_data()) == head, "Cabeza estable, sin redibujarse entre pasos: %s/%s/%d" % [id, direction, frame])
 				var sprite: Sprite2D = Sprite2D.new()
 				sprite.texture = texture
 				sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 				sprite.scale = Vector2.ONE * 0.5
 				sprite.position = Vector2(40 + frame * 80, 75 + row * 90) + CombatSpriteLibrary.offset_for(id) * 0.5
 				board.add_child(sprite)
-			verify(unique.size() == 8, "Ocho fases propias de marcha sin reposo intercalado: %s/%s" % [id, direction])
+			# Los jefes finales usan sus cuatro poses de paso pintadas, cada una sostenida dos cuadros.
+			var phases: int = 4 if id in ["prefecto", "madre"] else 8
+			verify(unique.size() >= phases, "%d fases propias de marcha sin reposo intercalado: %s/%s" % [phases, id, direction])
 			row += 1
 		await picture("zancadas_" + direction)
 		board.free()

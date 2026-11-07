@@ -25,7 +25,7 @@ var player_trail: float = 1
 var boss_trail: float = 1
 var player_hold: float = 0
 var boss_hold: float = 0
-var font: Font = ThemeDB.fallback_font
+var font: Font = TextMarks.FONT
 var player_panel: StyleBoxFlat
 
 func _ready() -> void:

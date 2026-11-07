@@ -19,6 +19,7 @@ func _ready() -> void:
 	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
 	add_child(shade)
+	MenuFx.polish_layer(self)
 	panel = PanelContainer.new()
 	panel.theme = preload("res://ui/theme.tres")
 	panel.add_theme_stylebox_override("panel", MenuSkin.panel())
@@ -38,6 +39,7 @@ func _ready() -> void:
 	rows.add_child(title)
 	status = Label.new()
 	rows.add_child(status)
+	TextMarks.attach(status)
 	tabs = TabContainer.new()
 	tabs.custom_minimum_size.y = 166
 	rows.add_child(tabs)
@@ -69,6 +71,7 @@ func _ready() -> void:
 		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		detail.custom_minimum_size.x = 410
 		equipment_rows.add_child(detail)
+		TextMarks.attach(detail)
 		var actions: GridContainer = GridContainer.new()
 		actions.columns = 2
 		equipment_rows.add_child(actions)
@@ -91,11 +94,13 @@ func _ready() -> void:
 		passive_grid.add_child(toggle)
 		passive_buttons[id] = toggle
 	var close: Button = Button.new()
-	close.text = "Volver  [Esc / Start]"
+	TextMarks.attach(close)
+	InputGlyphs.bind(close, "Volver  [{pause}]")
 	close.pressed.connect(close_panel)
 	UiSound.attach(close)
 	rows.add_child(close)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
 
 func open_panel() -> bool:
 	if opened or district.cycle.phase != "DÍA" or district.session.finished or district.player.health <= 0 or get_tree().paused:

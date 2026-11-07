@@ -12,6 +12,7 @@ func _ready() -> void:
 	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
 	add_child(shade)
+	MenuFx.polish_layer(self)
 	var frame: Panel = Panel.new()
 	frame.position = Vector2(18, 10)
 	frame.size = Vector2(604, 340)
@@ -25,6 +26,7 @@ func _ready() -> void:
 	rows.add_theme_constant_override("separation", 12)
 	add_child(rows)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
 
 func open_choices(is_chest: bool) -> void:
 	opened = true
@@ -52,7 +54,7 @@ func open_choices(is_chest: bool) -> void:
 		UiSound.attach(button)
 		rows.add_child(button)
 	var hint: Label = Label.new()
-	hint.text = "Colonia: enlaces a tropas · Jefes: armas propias · 4 pasivas"
+	hint.text = "Cada mejora actúa en la colonia y contra los jefes - 2 armas - 4 pasivas"
 	hint.add_theme_font_size_override("font_size", 10)
 	rows.add_child(hint)
 	show()

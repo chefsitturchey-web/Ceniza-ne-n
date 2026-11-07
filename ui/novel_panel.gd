@@ -79,7 +79,7 @@ func _ready() -> void:
 	box.add_theme_stylebox_override("panel", MenuSkin.panel())
 	stage.add_child(box)
 	speaker = label("", Vector2(42, 222), Vector2(420, 23), 16)
-	speaker.add_theme_color_override("font_color", Color("ffce75"))
+	speaker.add_theme_color_override("font_color", Color(TextMarks.SPEAKER))
 	body = RichTextLabel.new()
 	body.position = Vector2(42, 248)
 	body.size = Vector2(552, 61)
@@ -106,6 +106,7 @@ func _ready() -> void:
 		voices.append(player)
 	rng.randomize()
 	hide()
+	ScreenFit.fit_layer(self, [opaque_back, background, veil, curtain])
 
 func portrait(at: Vector2) -> TextureRect:
 	var result: TextureRect = TextureRect.new()

@@ -20,12 +20,13 @@ var channels: Array[Rect2] = [Rect2(225, 155, 36, 180), Rect2(379, 155, 36, 180)
 func _ready() -> void:
 	device_hint = Label.new()
 	device_hint.position = Vector2(170, 415)
-	device_hint.add_theme_font_size_override("font_size", 13)
-	device_hint.add_theme_font_override("font", ThemeDB.fallback_font)
+	device_hint.add_theme_font_size_override("font_size", 12)
+	device_hint.add_theme_font_override("font", TextMarks.FONT)
 	device_hint.add_theme_constant_override("outline_size", 4)
 	device_hint.add_theme_color_override("font_outline_color", Color("08111c"))
 	device_hint.z_index = 20
 	add_child(device_hint)
+	TextMarks.attach(device_hint)
 	if arena.zone_index == 4: device_positions.clear()
 	for index: int in range(device_positions.size()):
 		var sprite: Sprite2D = Sprite2D.new()
@@ -60,7 +61,7 @@ func _physics_process(delta: float) -> void:
 	device_hint.text = ""
 	for index: int in range(device_positions.size()):
 		if arena.player.position.distance_to(device_positions[index]) < 48:
-			device_hint.text = ("[E] " + device_name()) if device_cooldowns[index] <= 0 else ("Recargando: %ds" % ceili(device_cooldowns[index]))
+			device_hint.text = (InputGlyphs.fill("[{interact}] ") + device_name()) if device_cooldowns[index] <= 0 else ("Recargando: %ds" % ceili(device_cooldowns[index]))
 			if Input.is_action_just_pressed("interact"): activate_device(index)
 			break
 	if barrier_left > 0:
@@ -142,6 +143,8 @@ func spawn_sentinel(at: Vector2) -> EncounterSentinel:
 	unit.side = -1 if summons_total % 2 == 0 else 1
 	unit.tactics.configure_navigation(ArenaLayout.boundary(arena.zone_index), obstacle_rects, 15)
 	arena.actors.add_child(unit)
+	unit.damaged.connect(func(amount: int, remaining: int) -> void:
+		if arena.impact != null: arena.impact.hit(unit.global_position, amount, remaining == 0))
 	sentinels.append(unit)
 	summons_total += 1
 	return unit

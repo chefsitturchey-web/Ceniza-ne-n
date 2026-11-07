@@ -49,10 +49,11 @@ func tick(delta: float) -> void:
 		hazards.clear()
 		cooldown = maxf(cooldown, 1.4)
 	else:
-		cooldown -= delta
+		# Mientras avisa un golpe cercano no se superpone una trampa nueva: presión legible.
+		if not boss.melee_winding(): cooldown -= delta
 		if cooldown <= 0:
 			request_combo()
-			cooldown = [7.0, 6.2, 5.6, 4.7, 4.2][arena.zone_index] * (0.76 if boss.phase == 2 else 1.0)
+			cooldown = [6.2, 5.6, 5.0, 4.4, 4.0][arena.zone_index] * (0.76 if boss.phase == 2 else 1.0)
 	for hazard: Dictionary in hazards.duplicate():
 		hazard.time -= delta
 		if hazard.time <= 0 and not hazard.hit:
@@ -143,8 +144,8 @@ func impact(point: Vector2, radius: float, strength: float = 2.0, shards: int = 
 		add_particle(point + Vector2(rng.randf_range(-12, 12), 0), Vector2(rng.randf_range(-10, 10), -30), 0.8, 5, true)
 
 func add_particle(point: Vector2, speed: Vector2, duration: float, size: float, smoke: bool) -> void:
-	if not GamePreferences.current().particles or particles.size() >= PARTICLE_LIMIT: return
-	particles.append({"position": point, "velocity": speed, "age": 0.0, "life": duration, "size": size, "smoke": smoke, "seed": rng.randf() * TAU})
+	if not GamePreferences.current().particles or particles.size() >= WorldParticles.budget(PARTICLE_LIMIT): return
+	particles.append({"position": point, "velocity": speed, "age": 0.0, "life": duration * (1.8 if smoke else 1.0), "size": size, "smoke": smoke, "seed": rng.randf() * TAU})
 
 func _process(delta: float) -> void:
 	clock += delta

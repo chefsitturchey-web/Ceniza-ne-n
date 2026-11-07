@@ -22,7 +22,7 @@ func run_checks() -> void:
 	enemy.set_physics_process(false)
 	var sprite: AnimatedSprite2D = enemy.get_node("AnimatedSprite2D")
 	verify(sprite.sprite_frames.get_animation_names().size() == 5, "Cinco animaciones cargadas")
-	verify(sprite.position == Vector2(0, -21), "Pies anclados al suelo")
+	verify(sprite.position == Vector2(0, -18), "Pies anclados al suelo")
 	verify(sprite.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "Pixel art sin suavizado")
 	enemy._physics_process(0.1)
 	verify(sprite.animation == &"caminar" and sprite.flip_h, "Caminar hacia la izquierda")

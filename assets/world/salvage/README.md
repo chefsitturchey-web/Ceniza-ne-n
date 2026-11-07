@@ -9,4 +9,6 @@ Píxeles originales dibujados dentro de LibreSprite con `tools/art/libresprite_f
 | `trap.png` | 32×24, tres celdas horizontales | Abierta, cerrada y activada |
 | `parts.png` | 16×16 | Chip, bobina y tuerca |
 
+Los recursos son usados por `ScavengeProp`, `TrapSystem` y `FrontierSystem`; `tests/invasion_integration_test.gd` y `frontier_progression_test.gd` comprueban sus reglas mediante `tools/maintenance/validate.ps1`.
+
 Las fuentes editables están en `sources/*.ase`. La rata animada está en `assets/characters/pests/`, y la mochila de interfaz en `assets/ui/icons/frontier/`, con sus respectivas fuentes. No regenerar sobre una edición manual: el constructor se detiene si encuentra una fuente existente.

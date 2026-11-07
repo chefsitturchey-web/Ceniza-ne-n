@@ -45,13 +45,19 @@ static func handoff(zone: int, neural: Dictionary, scrap: int, workers: Array, m
 	if not transport.is_empty():
 		transport.mounted = false
 		transport.parked_x = 0.0
-	return {"version": 1, "handoff": true, "campaign": initial_state(zone), "phase": "DÍA", "day": 1,
+	return {"version": 1, "handoff": true, "layout_seed": FrontierLayout.active_seed, "campaign": initial_state(zone), "phase": "DÍA", "day": 1,
 		"scrap": GameRules.INITIAL_SCRAP + mini(40, maxi(0, scrap)), "neural": carried, "crew": roles, "mobility": transport}
 
 static func valid_handoff(value: Variant) -> bool:
 	if not value is Dictionary or value.get("version") != 1 or value.get("handoff") != true or value.get("phase") != "DÍA" or value.get("day") != 1:
 		return false
 	if not ExpansionSystem.number(value.get("carried_parts", 0), 0, 24, true): return false
+	var seen: Variant = value.get("story_seen", [])
+	if not seen is Array or seen.size() > 40: return false
+	var unique: Array[String] = []
+	for id: Variant in seen:
+		if not id is String or not VisualStory.valid_key(id) or id in unique: return false
+		unique.append(id)
 	if not valid_state(value.get("campaign")) or value.campaign.zone < 1 or not NeuralSystem.valid(value.get("neural")):
 		return false
 	if not MobilitySystem.valid(value.get("mobility", {})): return false

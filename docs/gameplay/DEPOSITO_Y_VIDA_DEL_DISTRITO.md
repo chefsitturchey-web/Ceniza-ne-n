@@ -14,7 +14,7 @@
 
 La marcha ahora avanza sus fotogramas por distancia: una zancada normal recorre 28 unidades. Los fotogramas de render que ocurren entre dos actualizaciones de movimiento mantienen el apoyo del pie, en lugar de alternar marcha y reposo y reiniciar la secuencia. Al detenerse vuelve la respiración normal. El transporte de carga y la huida tienen cadencias propias.
 
-El Recaudador tiene chasis, orugas, garras, escudo, reactor, compuerta con textura y turbina separados. Las orugas siguen el desplazamiento; la turbina gira; la garra extiende su pistón y la compuerta descubre el reactor durante el aturdimiento. Sus señales, daños, ventanas de ataque y colisiones conservan las reglas de combate. Los fragmentos de destrucción usan la escala y orientación de cada pieza.
+El montaje mecánico alternativo del Recaudador tiene chasis, orugas, garras, escudo, reactor, compuerta con textura y turbina separados. La presentación activa predeterminada usa el atlas ilustrado mediante `CombatFlipbook`; no confundir sus poses con las piezas del montaje alternativo. Las orugas siguen el desplazamiento; la turbina gira; la garra extiende su pistón y la compuerta descubre el reactor durante el aturdimiento. Sus señales, daños, ventanas de ataque y colisiones conservan las reglas de combate. Los fragmentos de destrucción usan la escala y orientación de cada pieza.
 
 La arena representa una estación de cobro junto al canal: grúa suspendida, carga, bombas, vapor, vías y balizas. La maquinaria decorativa queda fuera del espacio de combate; las seis coberturas físicas tienen arte industrial y tamaño correspondiente. El agua se mueve alrededor del muelle. La cámara muestra el contorno y las coberturas.
 
@@ -28,7 +28,7 @@ Se utilizó la **herramienta integrada de generación de imágenes**, siguiendo 
 |---|---|
 | `assets/world/expedition/boss/collector_parts_v2.png` | Seis piezas ensamblables del Recaudador |
 | `assets/world/expedition/arena/depot_props_v2.png` | Estación eléctrica, grúa, bomba y carga |
-| `assets/world/backgrounds/periphery_alive_v2.png` | Ciudad industrial lateral y canal |
+| `assets/world/backgrounds/layers/periphery_alive_v2.png` | Capa de ciudad industrial lateral; pintura de entrada en `backgrounds/references/` |
 
 `tools/art/measure_art.py` mide el alfa y genera recortes; no modifica las imágenes. El atlas del jefe usa celdas explícitas porque las piezas generadas tienen anchuras diferentes. `ArenaLayout` mantiene el contorno físico y visual compartido.
 
@@ -40,6 +40,6 @@ Prompts visuales finales:
 
 ## Validación
 
-`tests/depot_life_test.gd`: 98 comprobaciones sobre recogida automática, reservas, plazas compartidas, taller nocturno, aviso contextual, cadencia entre ticks, pausa ambiental, contornos, aparición, colisión, maquinaria y escala de los fragmentos. Las capturas quedan en `.godot/depot/` al usar `-- --capture`.
+`tests/depot_life_test.gd`: comprobaciones sobre recogida automática, reservas, plazas compartidas, taller nocturno, aviso contextual, cadencia entre ticks, pausa ambiental, contornos, aparición, colisión, maquinaria y escala de los fragmentos. Las capturas quedan en `.godot/depot/` al usar `-- --capture`.
 
-La batería general incluye **40 suites**, también con simulaciones desde cero en las cinco zonas. Las referencias de arte y procedencia se registran en `ASSET_SOURCES.csv`.
+La batería general registra **67 ejecuciones**, incluidas simulaciones de cinco zonas. Usar `tools/maintenance/validate.ps1`; registros en `build/validation/latest/`. La procedencia se registra en `docs/art/ASSET_SOURCES.csv`.

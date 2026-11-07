@@ -64,7 +64,7 @@ func run_checks() -> void:
 	var arena: RecaudadorArena = arena_for(1)
 	var boiler: SantaCaldera = arena.boss as SantaCaldera
 	await physics_frame
-	verify(boiler != null and boiler.max_health == 8500, "Fundición crea Santa Caldera")
+	verify(boiler != null and boiler.max_health == 10500, "Fundición crea Santa Caldera")
 	verify(boiler.receive_hit(Vector2.ZERO, 100) == 35, "Armadura reduce daño al 35 por ciento")
 	boiler.prepare_heat()
 	verify(boiler.heat_areas.size() == 3 and boiler.timer == 1.2, "Tres franjas con aviso de 1.2 segundos")
@@ -93,7 +93,7 @@ func run_checks() -> void:
 	boiler._physics_process(0.81)
 	for step: int in range(20):
 		boiler._physics_process(0.1)
-	verify(fired.size() == 21, "Tres abanicos de siete proyectiles en segunda fase")
+	verify(fired.size() == 28, "Cuatro abanicos de siete proyectiles en segunda fase")
 	boiler.change_state(Recaudador.State.RECOVER, 4)
 	boiler.machine._process(0.1)
 	verify(boiler.machine.opening > 0 and boiler.machine.opening < 1, "Compuertas abren progresivamente")
@@ -143,7 +143,7 @@ func run_checks() -> void:
 	for link: ChoirRelay in choir.relays:
 		if link.health > 0:
 			arena.strike(link.position + Vector2.DOWN * 35, Vector2.UP, 180, 42)
-	verify(choir.core_exposed and choir.exposure_left == 6.0, "Romper tres enlaces abre ventana de seis segundos")
+	verify(choir.core_exposed and choir.exposure_left == 5.0, "Romper tres enlaces abre ventana de cinco segundos")
 	verify(choir.marks.is_empty() and choir.waves.is_empty(), "Ventana elimina peligros anteriores")
 	verify(choir.receive_hit(Vector2.ZERO, 50) == 100, "Coro abierto recibe daño doble")
 	choir.phase = 2
@@ -176,7 +176,7 @@ func run_checks() -> void:
 	world.story.present_dialogue = false
 	current_scene = world
 	freeze(world)
-	verify(world.player.speed == 220 and world.player.attack_damage == 50 and world.cycle.config.day_duration == 180, "Conserva personaje y ofrece preparación de colonia")
+	verify(world.player.speed == 220 and world.player.attack_damage == 50 and world.cycle.config.day_length(1) == 300 and world.cycle.config.day_duration == 120, "Conserva personaje y ofrece preparación de colonia")
 	world.neural.kills = 60
 	verify(world.neural.install("blade") and world.neural.upgrade_module("tesla"), "Prepara mejoras para traslado")
 	world.colony.add_worker(&"collector")
@@ -213,7 +213,7 @@ func run_checks() -> void:
 	freeze(world)
 	verify(world.bank.scrap >= 90 and world.bank.scrap <= 130 and world.colony.workers.size() == 3, "Nueva colonia conserva habitantes y presupuesto")
 	verify(world.neural.ranks.blade == 1 and world.modules.levels.tesla == 1 and world.player.neural_damage == 10, "Mejoras y módulos sobreviven al viaje")
-	verify(world.cycle.config.day_duration == 180 and world.construction.sites[0].data.offset in [300.0, 220.0], "Fundición usa preparación y geometría propias")
+	verify(world.cycle.config.day_length(1) == 315 and world.cycle.config.day_duration == 120 and world.construction.sites[0].data.offset in [300.0, 220.0], "Fundición usa preparación y geometría propias")
 	verify(world.session.save_system.save_path == PATH and not CampaignRoute.pending.has("campaign"), "Consume traslado y conserva ruta del guardado")
 	verify(world.session.save_system.save_game() and world.session.save_system.load_game(), "Guardado completo de segunda zona admite ida y vuelta")
 	var protected_save: String = FileAccess.get_file_as_string(PATH)
@@ -263,7 +263,7 @@ func run_checks() -> void:
 	await process_frame
 	world = current_scene as District
 	freeze(world)
-	verify(world.zone_index == 2 and world.cycle.config.day_duration == 180, "Segunda victoria conduce al Barrio inundado")
+	verify(world.zone_index == 2 and world.cycle.config.day_length(1) == 330 and world.cycle.config.day_duration == 120, "Segunda victoria conduce al Barrio inundado")
 	world.player.set_physics_process(true)
 	world.player.position = Vector2(400, GameRules.FLOOR_Y)
 	await physics_frame

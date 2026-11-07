@@ -98,7 +98,7 @@ func run_checks() -> void:
 		enemy.position.x = turret.x + 70
 		var health: int = enemy.health
 		world.defenses.update_defenses(0)
-		verify(health - enemy.health == roundi(FortressRules.damage(turret) * 1.15), "Armory bonus changes actual turret damage")
+		verify(health - enemy.health == roundi(FortressRules.damage(turret) * 1.15 * world.modules.turret_damage_factor()), "Armory bonus changes actual turret damage")
 		enemy.free()
 		verify(not city.interact(SettlementSystem.TARGET_BASE), "Advanced support upgrades require core level three")
 		world.core.restore({"tier": 3, "ordered": false, "progress": 0})

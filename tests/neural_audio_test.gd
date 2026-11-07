@@ -17,6 +17,7 @@ func run_checks() -> void:
 	world = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	load("res://tests/game_fixture.gd").found_colony(world)
 	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
@@ -24,12 +25,14 @@ func run_checks() -> void:
 	var neural: NeuralSystem = world.neural
 	verify(neural.points() == 0 and not neural.install("blade"), "No se compran mejoras sin datos")
 	var data: EnemyData = load("res://data/enemies/errante.tres")
+	var drop_x: float = 0
 	for index: int in range(6):
 		var enemy: SiegeEnemy = world.director.spawn_enemy(-1, data)
+		drop_x = enemy.position.x
 		enemy.take_damage(10000)
 		enemy.take_damage(10000)
 	world.experience.present_choices = false
-	world.player.position.x = -1440
+	world.player.position.x = drop_x
 	world.experience.tick(0)
 	world.player.position.x = 0
 	verify(world.experience.defeated == 6 and neural.points() == 1, "Las muertes dejan experiencia que se recoge una sola vez")
@@ -70,7 +73,7 @@ func run_checks() -> void:
 	InputSetup.add_action("arena_up", KEY_W, JOY_BUTTON_DPAD_UP)
 	InputSetup.add_action("arena_down", KEY_S, JOY_BUTTON_DPAD_DOWN)
 	capacitor_player._physics_process(0.1)
-	verify(is_equal_approx(capacitor_player.stamina, 23.7), "Regeneración real del capacitor en la arena")
+	verify(is_equal_approx(capacitor_player.stamina, 20 + 3.7 * TopdownPlayer.ARENA_STAMINA_REGEN), "Regeneración real del capacitor en la arena")
 	capacitor_player.free()
 	var saved: Dictionary = neural.snapshot()
 	verify(NeuralSystem.valid(saved), "Estado neuronal válido")

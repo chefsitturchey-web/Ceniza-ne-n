@@ -27,7 +27,7 @@ func setup(district: District) -> void:
 		var site: SettlementSupport = SettlementSupport.new()
 		site.system = self
 		site.kind = index
-		site.position = Vector2(find_space(anchors[index] + world.zone_index * 67), GameRules.FLOOR_Y)
+		site.position = Vector2(find_space(anchors[index] + world.zone_index * 67 + FrontierLayout.offset(world.zone_index, 10 + index, 450)), GameRules.FLOOR_Y)
 		sites.append(site)
 		add_child(site)
 	for index: int in 6:
@@ -35,7 +35,7 @@ func setup(district: District) -> void:
 		cache.system = self
 		cache.kind = index % 3
 		var anchor: float = [-1450.0, 2200.0, -3350.0, 4100.0, -5350.0, 6150.0][index]
-		cache.position = Vector2(find_space(anchor + world.zone_index * 43), GameRules.FLOOR_Y)
+		cache.position = Vector2(find_space(anchor + world.zone_index * 43 + FrontierLayout.offset(world.zone_index, 20 + index, 350)), GameRules.FLOOR_Y)
 		caches.append(cache)
 		add_child(cache)
 
@@ -125,11 +125,12 @@ func interact(target: int) -> bool:
 	site.ordered = true
 	site.progress = 0
 	world.presenter.show_notice("Restauración encargada: espera a los constructores")
+	world.colony.authorize_night_work()
 	world.expansion.checkpoint()
 	return true
 
 func refresh_bonuses() -> void:
-	world.colony.work_factor = 1.0 + sites[0].tier * 0.25
+	world.colony.work_factor = 1.0 + sites[0].tier * 0.25 + world.modules.builder_bonus()
 	world.defenses.settlement_damage_factor = 1.0 + sites[1].tier * 0.15
 
 func recovery_at(x: float) -> float:
@@ -170,7 +171,7 @@ func journal_text() -> String:
 	text += "[color=#47dacb]DEPÓSITOS DE TECNOLOGÍA[/color]\n"
 	for cache: RelicCache in caches:
 		text += "%s · %s %d · %s\n" % [NAMES[cache.kind], "izq." if cache.position.x < 0 else "der.", int(absf(cache.position.x)), "recuperado" if cache.claimed else "sin explorar"]
-	text += "\nLa primera restauración requiere 1 componente. La mejora requiere otro y núcleo Nv.3. Mantén E para encargar; los constructores deben llegar. Las bonificaciones pertenecen a esta colonia."
+	text += "\nLa primera restauración requiere 1 componente. La mejora requiere otro y núcleo Nv.3. Mantén {interact} para encargar; los constructores deben llegar. Las bonificaciones pertenecen a esta colonia."
 	return text
 
 func snapshot() -> Dictionary:

@@ -13,6 +13,7 @@ const DODGE_DURATION: float = 0.22
 ## Correr: multiplica la velocidad de caminar mientras se mantiene "sprint".
 const SPRINT_MULTIPLIER: float = 1.5
 const SPRINT_COST: float = 5.0
+var sprinting: bool = false
 const HIT_INVULNERABILITY: float = 0.6
 const RESPAWN_INVULNERABILITY: float = 2.0
 const RESPAWN_DURATION: float = 4.0
@@ -142,7 +143,7 @@ func _physics_process(delta: float) -> void:
 	var direction: float = Input.get_axis("move_left", "move_right")
 	var was_grounded: bool = is_on_floor()
 	var previous_speed: float = velocity.x
-	var sprinting: bool = InputMap.has_action("sprint") and Input.is_action_pressed("sprint") and stamina > 0.0 and absf(direction) > MOVE_THRESHOLD and dodge_remaining <= 0.0 and not riding
+	sprinting = InputMap.has_action("sprint") and Input.is_action_pressed("sprint") and stamina > 0.0 and absf(direction) > MOVE_THRESHOLD and dodge_remaining <= 0.0 and not riding
 	if sprinting:
 		stamina = maxf(0.0, stamina - SPRINT_COST * delta)
 	else:

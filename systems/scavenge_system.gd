@@ -5,6 +5,7 @@ extends Node
 ## player holds E near a prop that still has charges left.
 
 signal notice_requested(message: String)
+signal collected(at: Vector2, scrap: int, parts: int)
 
 const TARGET_RANGE: float = 42.0
 const TARGET_BASE: int = -500
@@ -68,6 +69,7 @@ func interact(target: int) -> bool:
 		message += ", +%d chatarra" % data.scrap_per_charge
 	# Keep the more useful spill/breakage notice when the backpack overflowed.
 	if overflow == 0: notice_requested.emit(message)
+	collected.emit(prop.global_position, data.scrap_per_charge, data.parts_per_charge - overflow)
 	return true
 
 func describe(target: int) -> Dictionary:

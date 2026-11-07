@@ -32,13 +32,14 @@ func run_checks() -> void:
 	world = load("res://levels/zones/foundry.tscn").instantiate() as District
 	world.get_node("Session").persistence_enabled = false
 	root.add_child(world)
+	load("res://tests/game_fixture.gd").found_colony(world)
 	world.story.present_dialogue = false
 	world.session.set_process(false)
 	world.player.set_physics_process(false)
 	world.modules.set_physics_process(false)
 	world.experience.present_choices = false
 	world.bank.scrap = 2000
-	for site: ConstructionSite in world.construction.sites: site.complete_work()
+	for site: ConstructionSite in world.construction.sites.slice(0, 4): site.complete_work()
 	verify(world.construction.toggle_power(world.construction.sites[1]) and world.bank.energy_used() == 2, "Desactivar torreta libera energía sin destruirla")
 	verify(world.construction.toggle_power(world.construction.sites[1]) and world.bank.energy_used() == 4, "Reactivar comprueba y reserva capacidad")
 	world.player.position.x = world.construction.sites[1].x
@@ -52,19 +53,19 @@ func run_checks() -> void:
 	# El resto de esta suite comprueba profesiones y murallas; la progresión tiene suite propia.
 	world.core.restore({"tier": 3, "ordered": false, "progress": 0})
 	verify(world.civic.gates.size() == 2 and world.expedition.repeaters.size() == 2, "Fundición tiene dos brechas intermedias y dos repetidores terminales")
-	verify(world.civic.entrance(-1) == -1180, "Las oleadas parten de la entrada abierta más cercana")
+	verify(world.civic.entrance(-1) == -float(FrontierLayout.profile(1).gates[0]), "Las oleadas parten de la entrada abierta más cercana")
 	verify(not world.expedition.can_travel(), "No viaja antes de estabilizar colonia y entradas")
-	verify(not world.expansion.interact(-103), "La brecha bloquea construir detrás de su frontera")
+	verify(not world.expansion.interact(-108), "La brecha bloquea construir detrás de su frontera")
 	verify(world.expansion.interact(-102), "Pagar generador dentro de la franja accesible")
 	var generator: ExpansionOutpost = world.expansion.sites[2]
 	world.expansion.tick(30)
 	verify(generator.hp == 0 and generator.progress == 0, "Un módulo no se construye sin trabajadores")
 	work(5)
 	verify(generator.hp == 0, "El constructor debe recorrer la distancia real")
-	work(25)
-	verify(generator.hp == 180 and world.bank.available_capacity() == 6, "Constructor entrega generador operativo")
+	work(45)
+	verify(generator.hp == 180 and world.expansion.energy_bonus() == 6, "Constructor entrega generador operativo")
 	verify(world.expansion.interact(-100), "Paga cuartel con energía disponible")
-	work(25)
+	work(45)
 	var barracks: ExpansionOutpost = world.expansion.sites[0]
 	verify(barracks.hp == 180 and barracks.ally == null, "El cuartel vacío no crea soldados gratis")
 	verify(world.civic.interact(-300) and world.civic.villagers.size() == 1, "Campamento recluta persona sin profesión")
@@ -100,6 +101,7 @@ func run_checks() -> void:
 	verify(medical.ally != null and medical.ally.role == "medic", "Médico ocupa el puesto de salud")
 	world.player.position.x = medical.position.x
 	world.player.health = 60
+	medical.ally.position.x = medical.position.x
 	medical.ally.cooldown = 0
 	medical.ally.tick(0.01)
 	verify(world.player.health == 68, "Sanitario restaura vida con alcance y cadencia")
@@ -109,14 +111,14 @@ func run_checks() -> void:
 	work(15)
 	verify(world.civic.walls[0].hp > 0 or world.civic.walls[0].progress > 0, "La obra exterior avanza de noche si no hay enemigos cerca")
 	world.cycle.phase = "DÍA"
-	work(25)
+	work(40)
 	var wall: ConstructionSite = world.civic.walls[0]
-	verify(wall.hp == 240 and world.civic.frontier(-1) == 600, "Una muralla terminada amplía el perímetro real")
+	verify(wall.hp == 240 and world.civic.frontier(-1) == absf(wall.x), "Una muralla terminada amplía el perímetro real")
 	verify(world.civic.interact(-340), "Encarga mejora de muralla")
-	work(20)
+	work(40)
 	verify(wall.tier == 2 and wall.max_hp == 480, "Mejora por trabajo aumenta integridad y nivel")
 	verify(world.civic.interact(-340), "Encarga tercer nivel")
-	work(20)
+	work(40)
 	verify(wall.tier == 3 and wall.max_hp == 720 and not world.civic.interact(-340), "Tres niveles y tope sin cobros adicionales")
 	verify(world.civic.interact(-360) and world.civic.capacity == 12, "Refugio amplía capacidad de población")
 	var workforce: int = world.colony.workers.size()
@@ -127,7 +129,7 @@ func run_checks() -> void:
 	world.civic.capacity = 12
 	var gate: EnemyRepeater = world.civic.gates[0]
 	gate.hurtbox.receive(300)
-	verify(world.civic.safe_to_build(-1320) and world.civic.entrance(-1) == -1440, "Cerrar brecha recupera terreno y desplaza la entrada")
+	verify(world.civic.safe_to_build(gate.position.x - 120) and world.civic.entrance(-1) == -(GameRules.MAP_HALF_WIDTH - 250), "Cerrar brecha recupera terreno y desplaza la entrada")
 	world.civic.tick(3.1)
 	verify(get_nodes_in_group(GameRules.ENEMIES).size() == 3, "Destruir una brecha provoca contraataque anunciado")
 	for enemy: Node in get_nodes_in_group(GameRules.ENEMIES): enemy.free()

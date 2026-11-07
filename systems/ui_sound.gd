@@ -53,6 +53,15 @@ static func _ensure_voices(tree: SceneTree) -> void:
 		tree.root.call_deferred("add_child", player)
 		voices.append(player)
 
+## Carga los WAV y crea las voces al arrancar: el primer toque no espera a leer el disco
+## (en Android esa lectura se notaba como retraso del primer sonido de cada tipo).
+static func warm_up() -> void:
+	for path: String in [CLICK, HOVER, MOVE, BACK]:
+		load_stream(path)
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null and DisplayServer.get_name() != "headless":
+		_ensure_voices(tree)
+
 static func click() -> void:
 	play(load_stream(CLICK), 0.0)
 
@@ -70,6 +79,10 @@ static func back() -> void:
 static func attach(button: BaseButton) -> void:
 	if button == null:
 		return
-	button.mouse_entered.connect(hover)
-	button.focus_entered.connect(move)
-	button.pressed.connect(click)
+	# En pantallas táctiles cada toque también "entra" y enfoca el botón: roce y láser
+	# sonarían encima del clic, así que allí solo suena el clic.
+	if not DisplayServer.is_touchscreen_available():
+		button.mouse_entered.connect(hover)
+		button.focus_entered.connect(move)
+	# Suena al apretar, no al soltar: con el dedo, esperar a levantarlo se percibe como retraso.
+	button.button_down.connect(click)

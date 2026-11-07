@@ -36,9 +36,18 @@ func _healed(_amount: int, _remaining: int) -> void:
 	queue_redraw()
 
 func repair_sparks() -> void:
+	emit_dust(global_position + Vector2(0, -10), 3)
 	emit_pixels(global_position + Vector2(0, -24), 5, Color("75fff0"))
 
 func shatter() -> void:
+	var ancestor: Node = get_parent()
+	while ancestor != null:
+		if ancestor is District:
+			if ancestor.impact != null:
+				ancestor.impact.burst(global_position + Vector2(0, -14), Color("ffce75"), 40)
+				if absf(global_position.x - ancestor.player.global_position.x) < 420: ancestor.impact.kick(2)
+			break
+		ancestor = ancestor.get_parent()
 	emit_fragments(global_position, texture, 8, mirrored, true)
 	emit_pixels(global_position + Vector2(0, -8), 6, Color("89939e"), true)
 	queue_redraw()

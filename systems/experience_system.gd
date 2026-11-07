@@ -17,6 +17,7 @@ var dead_seen: bool = false
 var lost: Dictionary = {}
 var status: Label
 var bar: ColorRect
+var bar_back: ColorRect
 var hud: CanvasLayer
 
 func _ready() -> void:
@@ -28,13 +29,13 @@ func _ready() -> void:
 	status.position = Vector2(12, 28)
 	status.add_theme_font_size_override("font_size", 10)
 	hud.add_child(status)
-	var background: ColorRect = ColorRect.new()
-	background.position = Vector2(12, 44)
-	background.size = Vector2(136, 3)
-	background.color = Color("182639")
-	hud.add_child(background)
+	bar_back = ColorRect.new()
+	bar_back.position = Vector2(12, 44)
+	bar_back.size = Vector2(136, 3)
+	bar_back.color = Color("182639")
+	hud.add_child(bar_back)
 	bar = ColorRect.new()
-	bar.position = background.position
+	bar.position = bar_back.position
 	bar.size.y = 3
 	bar.color = Color("47dacb")
 	hud.add_child(bar)
@@ -43,6 +44,15 @@ func _process(_delta: float) -> void:
 	hud.visible = not get_tree().paused and not district.session.finished and not district.expedition.active
 	status.text = "NV.%d · DATOS %d/%d" % [level, xp, needed()]
 	bar.size.x = 136.0 * xp / needed()
+
+## HudStack: línea de nivel en y y barra justo debajo; devuelve el borde inferior.
+func place(top: float) -> float:
+	status.position.y = roundf(top)
+	status.reset_size()
+	var bar_y: float = status.position.y + status.size.y
+	bar_back.position.y = bar_y
+	bar.position.y = bar_y
+	return bar_y + bar_back.size.y
 
 func needed() -> int:
 	return 8 + (level - 1) * 3
@@ -111,13 +121,13 @@ func options(chest: bool = false) -> Array[Dictionary]:
 			if gear.can_evolve(data.id): choices.append({"id": data.id, "type": "evolve", "title": data.evolution, "text": "Evolucionar " + data.title + ". Consume este núcleo."})
 	for data: ModuleData in ModuleSystem.DATA:
 		if gear.levels[data.id] < 5 and (data.id in gear.equipped or gear.equipped.size() < 2):
-			choices.append({"id": data.id, "type": "weapon", "title": data.title + " · " + ("NUEVO" if gear.levels[data.id] == 0 else "Nv. %d → %d" % [gear.levels[data.id], gear.levels[data.id] + 1]), "text": data.description})
+			choices.append({"id": data.id, "type": "weapon", "title": data.title + " · " + ("NUEVO" if gear.levels[data.id] == 0 else "Nv. %d → %d" % [gear.levels[data.id], gear.levels[data.id] + 1]), "text": ModuleSystem.COLONY_TEXT[data.id] + " Jefes: " + data.description})
 	for id: String in ModuleSystem.PASSIVE_IDS:
 		if gear.passive_rank(id) < 5 and (gear.passives[id] or gear.passive_count() < 4):
-			choices.append({"id": id, "type": "passive", "title": ModuleSystem.PASSIVE_TITLES[id] + " · Nv. %d" % (gear.passive_rank(id) + 1), "text": ModuleSystem.PASSIVE_TEXT[id]})
+			choices.append({"id": id, "type": "passive", "title": ModuleSystem.PASSIVE_TITLES[id] + " · Nv. %d" % (gear.passive_rank(id) + 1), "text": ModuleSystem.COLONY_TEXT[id] + " Jefes: " + ModuleSystem.PASSIVE_TEXT[id]})
 	for id: String in NeuralSystem.IDS:
 		if district.neural.ranks[id] < 3:
-			choices.append({"id": id, "type": "implant", "title": {"blade": "Filo de inducción", "drone": "Enlace de dron", "capacitor": "Capacitor sináptico"}[id], "text": {"blade": "+10 daño de hoja", "drone": "+4 daño de dron y mayor cadencia", "capacitor": "+5 regeneración de resistencia"}[id]})
+			choices.append({"id": id, "type": "implant", "title": {"blade": "Filo de inducción", "drone": "Enlace de dron", "capacitor": "Capacitor sináptico"}[id], "text": {"blade": "Jefes: +10 daño de hoja.", "drone": "Jefes: +4 daño de dron y mayor cadencia.", "capacitor": "Colonia y jefes: +5 regeneración de resistencia."}[id]})
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash(str(level) + ":" + str(pending) + ":" + str(defeated))
 	# Las evoluciones válidas tienen prioridad al abrir un cofre.

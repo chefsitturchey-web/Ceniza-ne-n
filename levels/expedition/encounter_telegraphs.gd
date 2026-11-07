@@ -2,7 +2,18 @@
 extends Node2D
 var boss: Recaudador
 
-func _process(_delta: float) -> void: queue_redraw()
+var clock: float = 0
+
+func _process(delta: float) -> void:
+	clock += delta
+	queue_redraw()
+
+## Brillo de aviso de los jefes finales: halo ancho que late y se vuelve más rápido al final.
+## Con destellos reducidos el halo queda fijo.
+func glow(remaining: float) -> float:
+	if GamePreferences.current().reduced_flashes: return 0.5
+	var urgency: float = 1.0 - clampf(remaining / 0.9, 0, 1)
+	return 0.35 + 0.65 * absf(sin(clock * lerpf(6, 22, urgency)))
 
 func rune(point: Vector2, radius: float, time: float, maximum: float, color: Color) -> void:
 	draw_circle(point, radius, Color(color, 0.08))
@@ -27,6 +38,14 @@ func corridor(origin: Vector2, direction: Vector2, length: float, width: float, 
 	for index: int in count:
 		var point: Vector2 = origin.lerp(end, (index + 0.5) / count)
 		draw_polyline(PackedVector2Array([point - direction * 7 - normal * 6, point, point - direction * 7 + normal * 6]), Color(color, 0.8), 2)
+
+func corridor_glow(origin: Vector2, direction: Vector2, length: float, width: float, color: Color, strength: float) -> void:
+	var normal: Vector2 = direction.orthogonal()
+	var end: Vector2 = origin + direction * length
+	var hit: Dictionary = get_world_2d().direct_space_state.intersect_ray(PhysicsRayQueryParameters2D.create(origin, end, 1))
+	if not hit.is_empty(): end = hit.position
+	for side: int in [-1, 1]: draw_line(origin + normal * (width + 3) * side, end + normal * (width + 3) * side, Color(color, 0.35 * strength), 6)
+	draw_line(origin, end, Color(color, 0.18 * strength), 4)
 
 func sweep_warning(radius: float, span: float, color: Color) -> void:
 	var start: float = boss.facing.angle() - span * 0.5
@@ -53,14 +72,54 @@ func heat(area: Rect2, active: bool) -> void:
 			draw_line(point - Vector2(5, 3), point + Vector2(5, 3), Color("e1ae7a", 0.7), 2)
 			draw_line(point - Vector2(5, -3), point + Vector2(5, -3), Color("e1ae7a", 0.7), 2)
 
+## Golpes cuerpo a cuerpo: rojo propio y forma exacta del daño, que se llena hasta el impacto.
+func melee_warning() -> void:
+	var move: Dictionary = boss.melee
+	var color: Color = Color("ff5a4a")
+	var winding: bool = boss.melee_winding()
+	var progress: float = boss.melee_progress() if winding else 1.0
+	var strength: float = glow(float(move.time)) if winding else 1.0
+	var direction: Vector2 = move.direction
+	var reach: float = float(move.reach)
+	match String(move.kind):
+		"swing":
+			var arc: float = float(move.arc)
+			var start: float = direction.angle() - arc
+			var outer: PackedVector2Array = PackedVector2Array([boss.position])
+			var inner: PackedVector2Array = PackedVector2Array([boss.position])
+			for index: int in 33:
+				var ray: Vector2 = Vector2.from_angle(start + arc * 2 * index / 32.0)
+				outer.append(boss.position + ray * reach)
+				inner.append(boss.position + ray * maxf(2, reach * progress))
+			draw_colored_polygon(outer, Color(color, 0.1 if winding else 0.3))
+			draw_colored_polygon(inner, Color(color, 0.16))
+			draw_arc(boss.position, reach + 3, start, start + arc * 2, 48, Color(color, 0.35 * strength), 6)
+			draw_arc(boss.position, reach, start, start + arc * 2, 48, Color(color, 0.9), 2)
+			for side: int in [-1, 1]:
+				draw_line(boss.position + direction.rotated(arc * side) * 26, boss.position + direction.rotated(arc * side) * reach, Color(color, 0.7), 1)
+		"slam", "shove":
+			draw_circle(boss.position, reach, Color(color, 0.08 + (0.14 * progress if winding else 0.25)))
+			draw_arc(boss.position, reach + 3, 0, TAU, 64, Color(color, 0.35 * strength), 6)
+			draw_arc(boss.position, reach, 0, TAU, 64, Color(color, 0.9), 2)
+			draw_arc(boss.position, maxf(2, reach * progress), 0, TAU, 64, Color(color, 0.55), 2)
+		"lunge":
+			if winding:
+				corridor_glow(boss.position, direction, float(move.travel) + 30, reach, color, strength)
+				corridor(boss.position, direction, float(move.travel) + 30, reach, color)
+
 func _draw() -> void:
 	if not is_instance_valid(boss) or boss.health <= 0: return
+	if boss.melee_active(): melee_warning()
 	if boss is MadreCero:
 		var mother: MadreCero = boss as MadreCero
 		for relay: NetworkRelay in mother.relays:
 			if relay.health > 0: draw_line(mother.position, relay.position, Color("47dacb", 0.2), 1)
 			if mother.guard_time > 0: rune(relay.position, 28, mother.guard_time, 4, Color("47dacb"))
-		for mark: Dictionary in mother.marks: rune(mark.position, 42, mark.time, 1.5, Color("e888b0"))
+		for mark: Dictionary in mother.marks:
+			var strength: float = glow(mark.time)
+			draw_circle(mark.position, 42, Color("ed4fa0", 0.06 + 0.14 * (1.0 - clampf(mark.time / 1.5, 0, 1))))
+			draw_arc(mark.position, 46, 0, TAU, 48, Color("e888b0", 0.35 * strength), 6)
+			rune(mark.position, 42, mark.time, 1.5, Color("e888b0"))
 	elif boss is CoroSumergido:
 		var choir: CoroSumergido = boss as CoroSumergido
 		for relay: ChoirRelay in choir.relays:
@@ -87,8 +146,14 @@ func _draw() -> void:
 	else:
 		var prefect: bool = boss is ElPrefecto
 		var color: Color = Color("9dc9f0") if prefect else Color("ecc087")
-		if boss.state == Recaudador.State.CHARGE_WINDUP: corridor(boss.position, boss.charge_direction, 520, 46 if prefect else 52, color)
-		elif boss.state == Recaudador.State.CLAW_WINDUP: sweep_warning(boss.melee_reach(), 3.54 if prefect else 3.42, color)
+		if boss.state == Recaudador.State.CHARGE_WINDUP:
+			if prefect: corridor_glow(boss.position, boss.charge_direction, 520, 46, color, glow(boss.timer))
+			corridor(boss.position, boss.charge_direction, 520, 46 if prefect else 52, color)
+		elif boss.state == Recaudador.State.CLAW_WINDUP:
+			if prefect:
+				var start: float = boss.facing.angle() - 1.77
+				draw_arc(boss.position, boss.melee_reach() + 3, start, start + 3.54, 48, Color(color, 0.35 * glow(boss.timer)), 7)
+			sweep_warning(boss.melee_reach(), 3.54 if prefect else 3.42, color)
 		elif boss.state == Recaudador.State.VOLLEY_WINDUP:
 			for index: int in (7 if boss.phase == 2 else 5):
 				var direction: Vector2 = boss.facing.rotated((index - (3 if boss.phase == 2 else 2)) * 0.19)

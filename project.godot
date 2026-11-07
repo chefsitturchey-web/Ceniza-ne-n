@@ -12,12 +12,20 @@ config_version=5
 
 config/name="CENIZA NEÓN"
 run/main_scene="res://ui/main_menu.tscn"
+config/version="0.2.1-alpha"
 config/features=PackedStringArray("4.7")
+config/icon="res://assets/ui/app_icon.png"
+config/windows_native_icon="res://assets/ui/app_icon.ico"
 
 [autoload]
 
 Preferences="*res://systems/game_preferences.gd"
 DebugTools="*res://systems/game_debug.gd"
+TouchControls="*res://ui/touch_controls.gd"
+
+[audio]
+
+driver/output_latency.android=10
 
 [debug]
 
@@ -31,6 +39,12 @@ window/size/viewport_height=360
 window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="canvas_items"
+window/stretch/aspect="keep_height"
+window/handheld/orientation=0
+
+[input_devices]
+
+pointing/emulate_mouse_from_touch=true
 
 [gui]
 
@@ -40,4 +54,5 @@ theme/custom="res://ui/theme.tres"
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.025, 0.035, 0.06, 1)

@@ -100,10 +100,13 @@ func safe_to_build(x: float) -> bool:
 		if gate.health.current > 0 and signf(gate.position.x) == signf(x) and absf(x) > absf(gate.position.x) - 80: return false
 	return true
 
+const SHOP_RANGE: float = 60.0
+
 func target_at(x: float) -> int:
 	for index: int in range(2):
 		if absf(x - (-1340 if index == 0 else 1340)) < 28: return -300 - index
-	if x >= -700 and x <= -425: return InteractionSystem.SHOP_TARGET
+	# Solo frente al edificio del arsenal (dibujado centrado en x = -600).
+	if absf(x + 600) <= SHOP_RANGE: return InteractionSystem.SHOP_TARGET
 	for index: int in range(walls.size()):
 		if absf(x - walls[index].x) < 24: return -340 - index
 	if absf(x - REFUGE_X) < 24: return -360
@@ -217,6 +220,10 @@ func balance_defenders() -> void:
 
 func tick(delta: float) -> void:
 	elapsed += delta
+	if advance_side != 0 and district.cycle.phase != "DÍA":
+		# Como en Kingdom, las tropas vuelven tras las murallas al anochecer.
+		advance_side = 0
+		district.presenter.show_notice("Anochece: las tropas regresan a las murallas")
 	balance_defenders()
 	for index: int in range(retaliation.size() - 1, -1, -1):
 		retaliation[index].time -= delta

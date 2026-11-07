@@ -40,6 +40,12 @@ var settlement_backdrop: SettlementBackdrop
 var frontier: FrontierSystem
 var workshop: WorkshopSystem
 var equipment_shop: EquipmentShop
+var first_steps: FirstSteps
+var impact: ImpactFeedback
+var engagement: RoundEngagement
+var rewards_hud: RoundRewardsHud
+var guide_hud: FirstStepsHud
+var hud_stack: HudStack
 
 func _ready() -> void:
 	player.combat_enabled = false
@@ -54,8 +60,6 @@ func _ready() -> void:
 			copy.offset = zone.wall_offset if copy.blocks_enemies else zone.turret_offset
 			blueprints.append(copy)
 		construction.blueprints = blueprints
-		cycle.config = cycle.config.duplicate() as CycleConfig
-		cycle.config.day_duration = 360 + zone_index * 30
 		director.waves.assign(zone.waves)
 	var invasion_waves: Array[WaveData] = []
 	for original: WaveData in director.waves:
@@ -242,6 +246,8 @@ func _ready() -> void:
 	settlements = SettlementSystem.new()
 	settlements.setup(self)
 	add_child(settlements)
+	# Las cartas de nivel (Rodamiento) alteran el ritmo de obra igual que los poblados.
+	neural.changed.connect(settlements.refresh_bonuses)
 	settlement_backdrop = SettlementBackdrop.new()
 	settlement_backdrop.world = self
 	add_child(settlement_backdrop)
@@ -250,17 +256,50 @@ func _ready() -> void:
 	var arriving: bool = not CampaignRoute.pending.is_empty()
 	session.initialize()
 	clinic.visible = core.tier > 0
-	if core.tier == 0: presenter.show_notice("Empieza por las baterías cercanas; mantén E para recuperar piezas")
+	if core.tier == 0: presenter.show_notice("Sigue la flecha")
 	if session.save_system == null: frontier.restore({})
+	first_steps = FirstSteps.new()
+	first_steps.setup(self)
+	add_child(first_steps)
+	guide_hud = FirstStepsHud.new()
+	guide_hud.guide = first_steps
+	add_child(guide_hud)
+	options.guide_reset_requested.connect(first_steps.restart)
 	story.queue_dialogue("opening")
 	sound.district = self
 	add_child(sound)
+	impact = ImpactFeedback.new()
+	impact.camera = $Player/Camera2D
+	add_child(impact)
+	player.health_component.damaged.connect(func(amount: int, _remaining: int) -> void:
+		impact.number(player.global_position, str(amount), Color("dd6482"))
+		impact.kick(3))
+	director.spawned.connect(func(enemy: SiegeEnemy, _side: float) -> void:
+		enemy.health_component.damaged.connect(func(amount: int, remaining: int) -> void:
+			if absf(enemy.position.x - player.position.x) < 420: impact.hit(enemy.global_position, amount, remaining == 0)))
+	scavenge.collected.connect(func(at: Vector2, scrap: int, parts: int) -> void:
+		impact.collect(at, scrap)
+		impact.collect(at + Vector2(0, -16), parts, true))
+	engagement = RoundEngagement.new()
+	engagement.setup(self)
+	add_child(engagement)
+	engagement.reward_awarded.connect(func(at: Vector2, amount: int) -> void:
+		if absf(at.x - player.position.x) < 420: impact.collect(at, amount))
+	rewards_hud = RoundRewardsHud.new()
+	rewards_hud.progress = engagement
+	add_child(rewards_hud)
+	hud_stack = HudStack.new()
+	hud_stack.world = self
+	hud_stack.hud = get_node("HUD") as GameHud
+	hud_stack.guide_hud = guide_hud
+	add_child(hud_stack)
 	session.finished_changed.connect(func(victory: bool) -> void: sound.play_outcome(victory))
 	player.health_component.died.connect(func() -> void: sound.play_cue("player_death"))
 	player.respawned.connect(func() -> void: sound.play_cue("respawn"))
 	presenter.publish()
-	if GamePreferences.current().briefing_requested or arriving:
-		GamePreferences.current().briefing_requested = false
+	var requested_briefing: bool = GamePreferences.current().briefing_requested
+	GamePreferences.current().briefing_requested = false
+	if (requested_briefing and (not first_steps.enabled or first_steps.step >= FirstSteps.COUNT)) or arriving:
 		briefing = BriefingPanel.new()
 		briefing.zone = zone
 		briefing.closed.connect(func() -> void: story.queue_dialogue("opening"))
@@ -288,5 +327,7 @@ func _configure_frontier_map() -> void:
 	$LeftRepeater.position.x = -6820 + zone_index * 20
 	$RightRepeater.position.x = 6900 - zone_index * 25
 	$Station.position.x = 6640 - zone_index * 35
-	cycle.config = cycle.config.duplicate()
-	cycle.config.day_duration = 360 + zone_index * 30
+	cycle.config = cycle.config.duplicate() as CycleConfig
+	# La duración del día vive en los datos: la zona manda y, si no la fija (Periferia), rige kingdom.tres.
+	if zone.day_duration > 0: cycle.config.day_duration = zone.day_duration
+	if zone.first_day_duration > 0: cycle.config.first_day_duration = zone.first_day_duration

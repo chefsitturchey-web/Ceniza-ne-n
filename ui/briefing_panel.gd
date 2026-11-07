@@ -13,6 +13,7 @@ func _ready() -> void:
 	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
 	add_child(shade)
+	MenuFx.polish_layer(self)
 	var panel: PanelContainer = PanelContainer.new()
 	panel.theme = preload("res://ui/theme.tres")
 	panel.add_theme_stylebox_override("panel", MenuSkin.panel())
@@ -33,23 +34,22 @@ func _ready() -> void:
 		title.text = zone.title.to_upper()
 	title.add_theme_color_override("font_color", Color("47dacb"))
 	rows.add_child(title)
-	var instructions: Array[String] = ["Construye murallas y torretas: mantén E en sus cimientos.", "Recluta en campamentos. Compra herramientas en el taller izquierdo.", "Los constructores viajan a las obras y se retiran si hay peligro.", "Resiste una noche, genera energía y cierra entradas para tomar el tren.", "A/D mover · J: solo jefes · E interactuar · Espacio esquivar\nQ sobrecarga · F escolta · Esc o Start pausa"]
-	if zone != null and zone.id != "periphery":
-		instructions = ["Tus mejoras y habitantes han llegado contigo. Levanta las defensas de esta colonia con E antes del asedio.", "Las rejillas avisan en amarillo antes de quemar durante la noche." if zone.id == "foundry" else "Los charcos frenan tus pasos. Puedes cruzarlos con una esquiva.", "Ordena cerrar los repetidores de ambos extremos y toma el tren de día para desafiar a " + zone.boss_title + ".", zone.briefing, "A/D: mover   J: solo jefes   E: interactuar\nEspacio: esquivar   Q: sobrecarga   Esc: pausa"]
-	if zone != null:
-		var index: int = ["periphery", "foundry", "flooded", "citadel", "network"].find(zone.id)
-		var chapter: Dictionary = CampaignStory.chapter(index)
-		instructions[0] = chapter.voice + ": " + String(chapter.opening).get_slice(".", 0) + "."
-		instructions[3] = "Rescata, recupera el relé y escolta el transporte. L abre la historia y el objetivo actual."
-	instructions[1] = "Recupera 12 piezas y levanta el núcleo con E. La mochila admite 24; el exceso puede romperse al caer."
-	instructions[2] = "Despeja solares con constructores. Murallas y generador abren el núcleo Nv.2 y las torretas."
+	var index: int = maxi(0, ["periphery", "foundry", "flooded", "citadel", "network"].find(zone.id if zone != null else "periphery"))
+	var chapter: Dictionary = CampaignStory.chapter(index)
+	var instructions: Array[String] = [
+		chapter.voice + ": " + String(chapter.opening).get_slice(".", 0) + ".",
+		"OBJETIVO: sigue el texto superior del HUD. Siempre indica el siguiente paso y dónde hacerlo.",
+		"De día construyes y exploras; de noche resistes tras las murallas. Tú organizas: tus tropas y torretas son las que luchan.",
+		"Empieza recuperando piezas de las baterías junto al núcleo (mantén {interact}) y levántalo." if index == 0 else "Tus mejoras y habitantes vienen contigo. Levanta el núcleo con las piezas del distrito.",
+		"{move} mover - {sprint} correr - {interact} interactuar - {dodge} esquivar - {escort} asaltar o retirar\n{journal} diario - {overload} sobrecarga - {pause} pausa - {attack} atacar (solo contra jefes)"]
 	for text: String in instructions:
 		var label: Label = Label.new()
-		label.text = text
+		InputGlyphs.bind(label, text)
 		label.custom_minimum_size.x = 528
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.add_theme_font_size_override("font_size", 12)
 		rows.add_child(label)
+		TextMarks.attach(label, text)
 	begin_button = Button.new()
 	begin_button.text = "Comenzar"
 	begin_button.custom_minimum_size.y = 24
@@ -57,6 +57,7 @@ func _ready() -> void:
 	UiSound.attach(begin_button)
 	rows.add_child(begin_button)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
 
 func open_panel() -> void:
 	opened = true

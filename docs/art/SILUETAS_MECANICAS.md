@@ -14,6 +14,6 @@ Los sprites y animaciones anteriores siguen incluidos y activos para conservar t
 
 F5 → Nueva partida: aparecen Blindado y Saltador desde la segunda noche, y Ariete desde la tercera. El escudo gira hacia el frente del Blindado; atrae al Saltador a una muralla y observa su compresión/salto. El Ariete prepara el pistón antes de golpear.
 
-`tests/machine_rig_test.gd`: 16 comprobaciones de modelos diferenciados, anclajes, filtro, conservación de sprites, independencia entre animación y reglas, destrucción y alternativa del Inspector. Con `-- --capture` genera `.godot/maquinas-siluetas.png`, una comparativa ampliada de los tres modelos; se revisó en OpenGL. La suite completa suma 20 pruebas y conserva las dos simulaciones de balance sin mejoras.
+`tests/machine_rig_test.gd`: 16 comprobaciones de modelos diferenciados, anclajes, filtro, conservación de sprites, independencia entre animación y reglas, destrucción y alternativa del Inspector. Con `-- --capture` genera `.godot/maquinas-siluetas.png`, una comparativa ampliada de los tres modelos; se revisó en OpenGL. `tests/run_all.gd` registra 67 ejecuciones; validar mediante `tools/maintenance/validate.ps1`.
 
-Estos modelos son una presentación animada funcional para el prototipo. Siguen pendientes las animaciones verticales del Portador y la producción artística final que decida el equipo. Los prompts de sprites maestros y entregas externas permanecen en `GUIA_ARTE.md` y `REVISION_Y_AUDIO.md`.
+Estos modelos son una presentación animada funcional para el prototipo. El Portador ya tiene cuatro direcciones en su biblioteca ilustrada. Las pautas para recursos nuevos están en [Guía de arte](../GUIA_ARTE.md); las secuencias actuales, en [Combate ilustrado](ARTE_COMBATE_ILUSTRADO.md).

@@ -20,7 +20,7 @@ La recuperación también cambia el barrio: ventanas iluminadas, fachadas más c
 
 Un taller recuperado activa un transportador automático de suministros. Recorre físicamente el camino entre taller y núcleo, con carga visible y ruedas que giran con el desplazamiento. Entrega como máximo dos repartos por día: cada uno aporta 2 piezas y 8 de chatarra en nivel 1, o 4 piezas y 12 de chatarra en nivel 2. Las piezas se descargan en el depósito, sin ocupar la mochila.
 
-El transportador espera si detecta enemigos en la ruta; de noche se recoge en el refugio más cercano y no inicia recogidas. Puede terminar una entrega si alcanza el núcleo con carga. Es un vehículo logístico, no una unidad de combate. Su posición, carga, espera y entregas realizadas se guardan para evitar premios duplicados al cargar. El estado del reparto aparece en **L → Poblados**.
+El transportador espera si detecta enemigos en la ruta; de noche se recoge en el taller o el muelle del núcleo, según cuál esté más cerca, y no inicia recogidas. Puede terminar una entrega si alcanza el núcleo con carga. Es un vehículo logístico, no una unidad de combate. Su posición, carga, espera y entregas realizadas se guardan para evitar premios duplicados al cargar. El estado del reparto aparece en **L → Poblados**.
 
 ## Componentes especiales y costes
 
@@ -40,7 +40,9 @@ Mantén E en la instalación para encargar el trabajo. Los materiales se reserva
 
 Pulsa **L → Poblados**. El catastro muestra ubicaciones reales, estado, componentes disponibles y bonificaciones; «Historia» vuelve al relato. El HUD añade **TEC** con el número de componentes y un resumen al pasar el cursor por el inventario.
 
-Puedes usar **Continuar**: los checkpoints anteriores incorporan instalaciones dormidas y depósitos sin abrir, conservando sus piezas y edificios. La colocación reserva espacio alrededor de parcelas, botín y misiones; al migrar se consulta el botín ya restaurado. Las restauraciones, mejoras, existencias y depósitos abiertos se guardan. Las instalaciones y su tecnología son locales: el tren conserva el traslado de piezas normales de la mochila, pero no transporta estas bonificaciones.
+Puedes usar **Continuar**: los checkpoints anteriores incorporan instalaciones dormidas y depósitos sin abrir, conservando sus piezas y edificios. La colocación reserva espacio alrededor de parcelas, botín y misiones; al migrar se consulta el botín ya restaurado. Las restauraciones, mejoras, existencias y depósitos abiertos se guardan en los datos de `SettlementSystem`. Las órdenes nocturnas habilitan [trabajo bajo riesgo](TRABAJO_NOCTURNO.md). Las instalaciones y su tecnología son locales: el tren conserva el traslado de piezas normales de la mochila, pero no transporta estas bonificaciones.
+
+Fuentes: `systems/settlement_system.gd`, `entities/structures/settlement_support.gd`, `entities/props/relic_cache.gd` y `entities/props/settlement_courier.gd`.
 
 La validación dirigida utiliza `settlement_world_test`, con restauración mediante trabajadores, daño real de torretas, velocidad de obra, curación local, guardado y compatibilidad en las cinco zonas. `frontier_progression_test` conserva la comprobación del núcleo, parcelas y mochila. Las capturas se revisan con `validate.ps1 -Suite settlement_world_test -Capture` y quedan en `build/validation/latest/`, fuera de Git.
 

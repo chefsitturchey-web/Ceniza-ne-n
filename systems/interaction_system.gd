@@ -23,6 +23,8 @@ var trap_system: TrapSystem
 var workshop: WorkshopSystem
 var corpse_system: CorpseSystem
 const MOBILITY_TARGET: int = -5
+## Mantener E más tiempo que una obra: adelantar la noche no debe dispararse por accidente.
+const NIGHT_CALL_HOLD: float = 2.0
 var committed_target: int = GameRules.NO_TARGET
 var hold_time: float = 0.0
 var hold_target: int = GameRules.NO_TARGET
@@ -56,14 +58,9 @@ func target_at_x(x: float, planning: bool = false) -> int:
 		return STATION_TARGET
 	if absf(x) < GameRules.CORE_INTERACT_RANGE:
 		return -1
-	var workshop_target: int = workshop.target_at(x) if workshop != null else GameRules.NO_TARGET
-	if workshop_target != GameRules.NO_TARGET: return workshop_target
+	# Pala y trampa se compran solo en el catálogo del Arsenal, no con un aviso suelto en la calle.
 	var corpse_target: int = corpse_system.target_at(x) if corpse_system != null else GameRules.NO_TARGET
 	if corpse_target != GameRules.NO_TARGET: return corpse_target
-	if expansion != null:
-		var expansion_target: int = expansion.target_at(x)
-		if expansion_target != GameRules.NO_TARGET:
-			return expansion_target
 	var best: int = GameRules.NO_TARGET
 	var distance: float = GameRules.SITE_INTERACT_RANGE
 	for index: int in range(construction.sites.size()):
@@ -71,6 +68,12 @@ func target_at_x(x: float, planning: bool = false) -> int:
 		if candidate < distance:
 			distance = candidate
 			best = index
+	if expansion != null:
+		var expansion_target: int = expansion.target_at(x)
+		# A supply cache may sit beside a foundation; the nearer one wins so both stay reachable.
+		var cache_closer: bool = expansion_target <= -200 and expansion_target != GameRules.NO_TARGET and absf(ExpansionSystem.CACHE_X[-200 - expansion_target] - x) <= distance
+		if expansion_target != GameRules.NO_TARGET and (best == GameRules.NO_TARGET or expansion_target > -200 or cache_closer):
+			return expansion_target
 	var prop_target: int = scavenge.target_at(x) if scavenge != null else GameRules.NO_TARGET
 	if best == GameRules.NO_TARGET and mobility != null and mobility.target_at(x): return MOBILITY_TARGET
 	if prop_target != GameRules.NO_TARGET and best == GameRules.NO_TARGET: return prop_target
@@ -84,7 +87,10 @@ func update_interaction(delta: float) -> void:
 		hold_time = 0.0
 		hold_target = target
 		return
-	if committed_target == target: return
+	# Las baterías tienen varias cargas: mantener Operar sigue extrayendo.
+	# Obras, viajes y compras conservan una sola operación por pulsación.
+	var repeated_salvage: bool = scavenge != null and target <= ScavengeSystem.TARGET_BASE and target > ScavengeSystem.TARGET_BASE - scavenge.props.size()
+	if committed_target == target and not repeated_salvage: return
 	if target == GameRules.NO_TARGET:
 		return
 	hold_time += delta
@@ -124,6 +130,7 @@ func perform_interaction(target: int) -> bool:
 			player.health = Player.MAX_HEALTH
 			notice_requested.emit("Salud restaurada")
 			return true
+		if night_call_available(): return cycle.skip_day()
 		if colony.core != null: return colony.core.request_upgrade()
 		if colony.workers.size() >= GameRules.POPULATION:
 			notice_requested.emit("Colonia completa")
@@ -145,7 +152,16 @@ func perform_interaction(target: int) -> bool:
 			return construction.repair_short(site)
 	return construction.order(target)
 
+## Núcleo encendido, de día y sin nada que hacer en él (mejora bloqueada o al máximo):
+## mantener E en el núcleo adelanta la noche. Curar y mejorar siguen teniendo prioridad.
+func night_call_available() -> bool:
+	var core: ColonyCore = colony.core if colony != null else null
+	if core == null or core.tier == 0 or core.ordered or cycle == null or not cycle.can_skip_day(): return false
+	if player.health < Player.MAX_HEALTH: return false
+	return not core.upgrade_blocker().is_empty()
+
 func required_hold(target: int) -> float:
+	if target == -1 and night_call_available(): return NIGHT_CALL_HOLD
 	if target <= SettlementSystem.CACHE_BASE: return 2.5
 	if target <= -500 and target > -700 and scavenge != null:
 		var index: int = ScavengeSystem.TARGET_BASE - target

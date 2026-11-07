@@ -16,6 +16,7 @@ func create_world() -> District:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	load("res://tests/game_fixture.gd").found_colony(world)
 	world.story.present_dialogue = false
 	world.experience.present_choices = false
 	world.session.set_process(false)
@@ -27,6 +28,7 @@ func run_checks() -> void:
 		var district: District = load(CampaignRoute.SCENES[zone]).instantiate() as District
 		(district.get_node("Session") as SessionController).persistence_enabled = false
 		root.add_child(district)
+		load("res://tests/game_fixture.gd").found_colony(district)
 		for site: ConstructionSite in district.construction.sites:
 			verify(district.interaction.target_at_x(site.x) == district.construction.sites.find(site), "Industrial loot cannot mask a foundation")
 		for item: ScavengeProp in district.scavenge.props:
@@ -50,7 +52,7 @@ func run_checks() -> void:
 	Input.action_release("interact")
 	verify(world.bank.parts == prop.data.parts_per_charge, "Holding E extracts parts")
 	while not prop.depleted: world.scavenge.interact(ScavengeSystem.TARGET_BASE)
-	world.bank.parts = 37
+	world.bank.parts = 20
 	world.workshop.shovel_ready = true
 	world.cycle.day = 3
 	var corpse: Corpse = world.corpse_system.spawn(Vector2(80, GameRules.FLOOR_Y), &"worker", 1)
@@ -77,7 +79,7 @@ func run_checks() -> void:
 	prop.charges_left = 999
 	verify(save.load_game(), "New mechanics can be restored")
 	verify(JSON.stringify(save._snapshot()) == JSON.stringify(expected), "Exact round trip includes loot, casualties, traps, rats and shorts")
-	verify(world.bank.parts == 37 and prop.depleted and prop.charges_left == 0, "Reloading does not duplicate loot")
+	verify(world.bank.parts == 20 and prop.depleted and prop.charges_left == 0, "Reloading does not duplicate loot")
 	verify(world.colony.workers[0].hp == 23 and turret.shorted and not turret.powered, "Injuries and short circuits persist")
 	var invalid: Dictionary = expected.duplicate(true)
 	invalid.invasion.parts = -1

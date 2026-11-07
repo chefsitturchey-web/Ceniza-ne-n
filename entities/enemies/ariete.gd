@@ -49,5 +49,6 @@ func _physics_process(delta: float) -> void:
 func land_hit() -> void:
 	if target_kind == "wall":
 		construction.damage_site(target_index, damage * STRUCTURE_MULTIPLIER)
+		shock_from_wall()
 	else:
 		super.land_hit()

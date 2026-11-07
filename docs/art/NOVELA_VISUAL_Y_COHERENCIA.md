@@ -1,19 +1,19 @@
 # Novela visual y coherencia de estructuras
 
-## Cinco encuentros conectados · 30/10/2026
+## Cinco encuentros conectados
 
 `data/boss_dialogue.gd` contiene las conversaciones de entrada y victoria de los cinco jefes. Recaudador explica la deuda sin saldo final; Caldera confunde producción con supervivencia; Coro conserva las últimas llamadas de los ahogados; Prefecto defiende su decisión de cerrar la Ciudadela; Madre Cero teme que terminar la emergencia vuelva inútiles las pérdidas. Las victorias enlazan tren, hornos, barrio inundado, autorización de la Ciudadela y transferencia final de autoridad a los asentamientos. No se añadieron recompensas al repetir conversaciones.
 
 Se incorporaron retratos originales del Recaudador, Santa Caldera y Coro Sumergido en `assets/characters/portraits/bosses/`, generados con imagegen usando los retratos manga aprobados como referencia de estilo y los sprites actuales como referencia de identidad. Se mantienen los retratos aprobados del Prefecto y Madre Cero. Las especificaciones reproducibles están en `assets/characters/portraits/bosses/prompts.json`; los PNG originales conservan su transparencia. Estos recursos son ilustraciones de novela y no sustituyen sprites ni animaciones de combate.
 
-La novela cubre completamente el HUD del combate, tiene marco industrial ornamental y conserva fundidos, revelado progresivo, lectura anterior y omisión. Las entradas y despedidas se reproducen en campaña; **Esc → Leer presentación** permite revisar la entrada durante una arena y la práctica también ofrece **Leer desenlace**.
+La novela cubre completamente el HUD del combate, tiene marco industrial ornamental y conserva fundidos, revelado progresivo, lectura anterior y omisión. Las entradas y despedidas se reproducen en campaña; **Esc → Repetir presentacion** permite revisar la entrada durante una arena y la práctica también ofrece **Leer desenlace**.
 
-La revisión actual usa `colony_boss_polish_test` y `boss_pressure_test`. Las descripciones históricas de validación que siguen no certifican una nueva ejecución del conjunto completo.
+El controlador `RecaudadorArena` reproduce automáticamente entrada y desenlace en historia; `rush = true` excluye ambos en Boss Rush. El orden, escenas vistas y guardado se detallan en [Historia: disparadores](../gameplay/HISTORIA_FLUJO.md).
 
 ## Cómo comprobarlo
 
-- En Godot, abre `levels/story/novel_preview.tscn` y pulsa **F6**. Después de cerrar la primera escena, elige capítulo y conversación. La galería permite revisar las 30 escenas sin modificar la partida.
-- En una **Nueva partida**, cierra primero las instrucciones: aparecerá la llegada al distrito. Rescates, relés y convoyes presentan conversaciones al completar la operación. El viaje y la victoria presentan el encuentro y la despedida del jefe.
+- En Godot, abre `levels/story/novel_preview.tscn` y pulsa **F6**. Después de cerrar la primera escena, elige capítulo y conversación. La galería permite revisar las 40 escenas sin modificar la partida.
+- En una **Nueva partida**, la llegada se reproduce automáticamente aunque la guía con flecha esté activa. Rescates, relés y convoyes presentan conversaciones al completar la operación. El viaje y la victoria presentan el encuentro y la despedida del jefe.
 - **E, Enter, Espacio o clic** completan el texto y después avanzan. **Anterior** permite releer. **Omitir / Esc** cierra la escena. El mundo permanece pausado mientras lees. En **L → Ver conversación** puedes repetir las escenas desbloqueadas.
 - Para revisar las construcciones y sus tres niveles, abre `levels/zones/fortress_playground.tscn` y pulsa **F6**.
 
@@ -21,7 +21,7 @@ La revisión actual usa `colony_boss_polish_test` y `boss_pressure_test`. Las de
 
 La referencia `docs/references/diseñoejemplo.jpg` se pudo abrir desde el disco. Su lenguaje es manga de tinta: contorno negro variable, sombras duras, trama fina en ropa y metal, rostro angular y extremidades mecánicas muy detalladas. Los retratos nuevos trasladan esos rasgos a color, con sombras por planos y acentos cian/ámbar. Los personajes son originales del proyecto; la referencia orienta el acabado, sin reproducir su personaje.
 
-El reparto ilustrado incluye Portador, Mara, Ivo, Vera, Nox, ECO, el Prefecto y MADRE CERO. Hay foco en quien habla, movimiento suave, texto progresivo y fundidos. La opción de destellos reducidos reduce también el movimiento de los retratos. No hay voces grabadas ni sincronización labial.
+El reparto ilustrado incluye Portador, Mara, Ivo, Vera, Nox, ECO, el Prefecto y MADRE CERO. Hay foco en quien habla, movimiento suave, texto progresivo y fundidos. La opción de destellos reducidos reduce también el movimiento de los retratos. La lectura utiliza sonidos sintéticos de 8 bits por hablante mediante `VoiceLibrary`; no hay locución de frases ni sincronización labial.
 
 Las estructuras del mundo mantienen pixel art lateral: acero gris oscuro, cobre oxidado, luz cian y ámbar, tornillos, tuberías y bases industriales. El núcleo tiene tres diseños distintos. Las torretas separan pedestal y cabeza móvil; una unión mecánica cubre el pivote. Murallas estrechas y edificios comparten el plano del suelo. El refugio se desplazó para evitar superponerlo con la torreta derecha.
 
@@ -39,4 +39,4 @@ Las conversaciones desarrollan el guion de los cinco capítulos existentes; no a
 
 ## Validación
 
-`tests/visual_novel_test.gd` comprueba pausa, foco, entrada de controles, fundidos, repetición desde el diario, escenas vistas, las 30 escenas sin desbordamiento de texto, ausencia de recompensas duplicadas, viaje al jefe, despedida, conservación del punto de llegada y galería F6. `tests/fortress_progression_test.gd` comprueba niveles, desbloqueos y anclaje de las estructuras. `tests/run_all.gd` ejecuta las 40 suites del proyecto. Las capturas y registros quedan fuera de Git.
+`tests/visual_novel_test.gd` comprueba pausa, foco, entrada de controles, fundidos, repetición desde el diario, escenas vistas, las 40 escenas sin desbordamiento de texto, ausencia de recompensas duplicadas, viaje al jefe, despedida, conservación del punto de llegada y galería F6. `tests/fortress_progression_test.gd` comprueba niveles, desbloqueos y anclaje de las estructuras. `tests/run_all.gd` registra 67 ejecuciones. Validar con `tools/maintenance/validate.ps1`. Las capturas y registros quedan fuera de Git.

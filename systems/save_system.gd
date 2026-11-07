@@ -4,6 +4,28 @@ extends Node
 ## Instantánea de preparación. Las referencias las proporciona SessionController.
 var session: SessionController
 var save_path: String = "user://partida.json"
+## Perfil separado del checkpoint: persiste incluso al comenzar otra campaña.
+static var engagement_path: String = "user://progreso_pixel.cfg"
+
+static func engagement_profile() -> Dictionary:
+	var config: ConfigFile = ConfigFile.new()
+	config.load(engagement_path)
+	# "tips": consejos de la guía ya vistos; los perfiles antiguos no lo tienen.
+	var result: Dictionary = {"guide": 0, "record": 0, "achievements": [], "tips": []}
+	for key: String in result:
+		var value: Variant = config.get_value("progress", key, result[key])
+		if key in ["achievements", "tips"]:
+			if value is Array: result[key] = value.filter(func(id: Variant) -> bool: return id is String)
+		elif (value is int or value is float) and is_finite(float(value)):
+			result[key] = clampi(int(value), 0, 11 if key == "guide" else 2147483647)
+	return result
+
+static func store_engagement(profile: Dictionary) -> bool:
+	var config: ConfigFile = ConfigFile.new()
+	for key: String in profile: config.set_value("progress", key, profile[key])
+	var pending: String = engagement_path + ".tmp"
+	if config.save(pending) != OK: return false
+	return DirAccess.rename_absolute(ProjectSettings.globalize_path(pending), ProjectSettings.globalize_path(engagement_path)) == OK
 const PLAYER_FIELDS: Array[String] = ["health", "stamina", "facing", "attack_facing", "cooldown_remaining", "slash_remaining", "invulnerable", "dodge_remaining", "dodge_direction", "respawn_remaining"]
 const OVERLOAD_FIELDS: Array[String] = ["overload_left", "overload_right", "cooldown_left", "cooldown_right"]
 
@@ -15,7 +37,7 @@ static func checkpoint_info(path: String = "user://partida.json") -> Dictionary:
 		return {}
 	var data: Dictionary = parser.data
 	if data.get("handoff", false) == true:
-		return {"day": 1, "scrap": int(data.scrap), "zone": int(data.campaign.zone)} if CampaignRoute.valid_handoff(data) else {}
+		return {"day": 1, "scrap": int(data.scrap), "zone": int(data.campaign.zone), "seed": layout_seed(data)} if CampaignRoute.valid_handoff(data) else {}
 	if not CampaignRoute.valid_state(data.get("campaign", CampaignRoute.initial_state())):
 		return {}
 	if data.get("version") != 1 or data.get("phase") != "DÍA":
@@ -26,7 +48,12 @@ static func checkpoint_info(path: String = "user://partida.json") -> Dictionary:
 			return {}
 	if not data.get("player") is Dictionary or not data.get("structures") is Array:
 		return {}
-	return {"day": int(data.day), "scrap": int(data.scrap), "zone": int(data.get("campaign", CampaignRoute.initial_state()).zone)}
+	return {"day": int(data.day), "scrap": int(data.scrap), "zone": int(data.get("campaign", CampaignRoute.initial_state()).zone), "seed": layout_seed(data)}
+
+## Semilla de trazado guardada; las partidas anteriores usan el trazado de referencia (0).
+static func layout_seed(data: Dictionary) -> int:
+	var value: Variant = data.get("layout_seed", 0)
+	return int(value) if (value is int or value is float) and is_finite(float(value)) and value >= 0 and value < 2147483647 else 0
 
 static func archive_checkpoint(path: String = "user://partida.json", remove_original: bool = true) -> bool:
 	if not FileAccess.file_exists(path):
@@ -68,7 +95,7 @@ func _snapshot() -> Dictionary:
 	player["y"] = session.player.position.y
 	player["velocity_x"] = session.player.velocity.x
 	player["velocity_y"] = session.player.velocity.y
-	return {"version": 1, "day": session.cycle.day, "phase": session.cycle.phase, "campaign": session.campaign.duplicate(true),
+	return {"version": 1, "layout_seed": FrontierLayout.active_seed, "day": session.cycle.day, "phase": session.cycle.phase, "campaign": session.campaign.duplicate(true),
 		"settlements": (session.get_parent() as District).settlements.snapshot(), "frontier": (session.get_parent() as District).frontier.snapshot(), "stored_parts": session.bank.stored_parts, "invasion": InvasionState.snapshot(session), "scrap": session.bank.scrap, "energy_capacity": session.bank.energy_capacity,
 		"expansion": session.expansion.snapshot() if session.expansion != null else {},
 		"civic": session.civic.snapshot() if session.civic != null else {},
@@ -136,7 +163,7 @@ func load_game() -> bool:
 		session.expedition.restore(data.get("expedition", {}))
 	session.cycle.day = int(data.day)
 	session.cycle.phase = data.phase
-	session.cycle.phase_remaining = session.cycle.config.day_duration
+	session.cycle.phase_remaining = session.cycle.config.day_length(session.cycle.day)
 	session.bank.scrap = int(data.scrap)
 	session.bank.stored_parts = int(data.get("stored_parts", 0))
 	session.bank.energy_capacity = int(data.energy_capacity)
@@ -179,6 +206,8 @@ func load_game() -> bool:
 	return true
 
 func apply_handoff(data: Dictionary) -> void:
+	if session.interaction.story != null:
+		session.interaction.story.seen_scenes.assign(data.get("story_seen", []))
 	session.campaign = CampaignRoute.initial_state(int(data.campaign.zone))
 	session.bank.scrap = int(data.scrap)
 	session.bank.parts = int(data.get("carried_parts", 0))

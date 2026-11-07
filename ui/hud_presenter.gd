@@ -40,7 +40,7 @@ func objective_text() -> String:
 		if site.hp > 0:
 			completed += 1
 	if fortifications < construction.sites.size():
-		return "Construye las defensas de ambos lados - mantener E"
+		return "Construye las defensas de ambos lados - mantén {interact}"
 	if completed < construction.sites.size():
 		return "Las defensas se están construyendo - protege las obras"
 	if session.civic != null and not session.civic.stabilized():
@@ -61,7 +61,7 @@ func objective_text() -> String:
 		if open_gates > 0: return "Cierra las %d brechas de entrada restantes" % open_gates
 	if not expedition.station.train_arrived:
 		return "Antenas destruidas - espera el tren en la estación"
-	return "Tren listo - mantén E en la estación" if cycle.phase == "DÍA" else "Resiste hasta el amanecer para viajar en tren"
+	return "Tren listo - mantén {interact} en la estación" if cycle.phase == "DÍA" else "Resiste hasta el amanecer para viajar en tren"
 
 func _player_damaged(_amount: int, _remaining: int) -> void:
 	player_hit += 1
@@ -193,9 +193,14 @@ func publish() -> void:
 			var reason: String = core.upgrade_blocker()
 			if not reason.is_empty(): context = reason; context_key = false; context_cost = -1
 			if core.ordered: context_progress = core.progress / ColonyCore.BUILD_TIME
-		if (player.health == Player.MAX_HEALTH or core.tier == 0) and core.tier < 3 and not core.ordered:
+		if (player.health == Player.MAX_HEALTH or core.tier == 0) and core.tier < 3 and not core.ordered and core.upgrade_blocker().is_empty():
 			context += " · %d piezas" % core.parts_cost()
 		if core.tier == 0: context = "Levantar núcleo · 12 piezas" if not core.ordered else "Construyendo el primer núcleo"
+		if interaction.night_call_available():
+			# La razón del bloqueo sigue visible: el jugador sabe qué le falta antes de saltar el día.
+			context = "Adelantar la noche · " + core.upgrade_blocker()
+			context_key = true
+			context_cost = -1
 		context_screen = core.get_global_transform_with_canvas() * Vector2(0, -24 if core.tier == 0 else -FortressArt.CORE_HEIGHTS[core.tier - 1])
 	elif target >= 0:
 		var site: ConstructionSite = construction.sites[target]
@@ -219,8 +224,10 @@ func publish() -> void:
 				context_key = false
 				context_cost = -1
 		elif site.kind == &"turret":
-			context = "T: apagar torreta" if site.powered else "T: reactivar torreta"
-		if site.kind == &"turret": context += " - T: energía"
+			context = "{toggle_power}: apagar torreta" if site.powered else "{toggle_power}: reactivar torreta"
+		if site.kind == &"turret": context += " - {toggle_power}: energía"
+	# La fuente pixel del HUD no lleva adornos; los describe() comparten texto con el diario.
+	context = InputGlyphs.fill(context.replace(" · ", " - "))
 	var hint_text: String = context
 	var result_text: String = ""
 	if player.health <= 0:
@@ -228,14 +235,14 @@ func publish() -> void:
 	if get_tree().paused:
 		result_text = ""
 	if session.finished:
-		result_text = ("DISTRITO ESTABILIZADO" if session.won else "NÚCLEO DESTRUIDO") + "\n\n[R] Reintentar"
+		result_text = ("DISTRITO ESTABILIZADO" if session.won else "NÚCLEO DESTRUIDO") + "\n\n[%s] Reintentar" % InputGlyphs.action_name("restart")
 	updated.emit(text, hint_text, result_text)
 	dashboard_updated.emit({
-		"objective": objective_text(),
+		"objective": InputGlyphs.fill(objective_text()),
 		"paused": get_tree().paused, "finished": session.finished,
 		"context": context, "context_cost": context_cost,
 		"context_progress": context_progress, "context_key": context_key, "context_screen": context_screen,
-		"notice": notice if notice_time > 0 else "", "notice_time": notice_time,
+		"notice": InputGlyphs.fill(notice) if notice_time > 0 else "", "notice_time": notice_time,
 		"player_hit": player_hit, "core_hit": core_hit, "health_max": Player.MAX_HEALTH,
 		"offscreen_left": offscreen_left, "offscreen_right": offscreen_right,
 		"phase": cycle.phase, "day": cycle.day, "nights": cycle.config.nights,

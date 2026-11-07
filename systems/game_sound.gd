@@ -108,6 +108,10 @@ const DUCK_DB: float = -30.0
 var district: Node2D
 var voices: Array[AudioStreamPlayer] = []
 var music: Array[AudioStreamPlayer] = []
+## Relevo de música: salida rápida, entrada suave y umbral para no solapar temas.
+const FADE_OUT_DB_PER_S: float = 40.0
+const FADE_IN_DB_PER_S: float = 14.0
+const HANDOFF_DB: float = -40.0
 ## Qué cue ocupa cada voz, en paralelo a `voices`; sirve para robar la menos importante.
 var voice_ids: Array[String] = []
 ## Voces espaciales: solo para sonidos del mundo, así Godot calcula el paneo.
@@ -320,19 +324,24 @@ func _process(delta: float) -> void:
 	var base_db: float = -24.0 if quiet else -12.0
 	if ducked:
 		base_db = DUCK_DB
-	# Cruce por fase: un tema audible a la vez, sin exigir duraciones iguales.
-	var day_db: float = -60.0
-	var night_db: float = -60.0
-	if intensity < 0.05:
-		day_db = base_db
-	elif intensity < 0.95:
-		day_db = -18.0
-		night_db = -17.0
-	else:
-		night_db = base_db
+	# Relevo por fase: nunca suenan dos temas a la vez. Al anochecer el día se apaga, el aviso
+	# suena solo y la noche entra cuando ha terminado; al amanecer, al revés.
 	var current_band: int = 0 if intensity < 0.05 else (1 if intensity < 0.95 else 2)
 	if current_band == 1 and band == 0:
 		play_warning()
 	band = current_band
-	music[0].volume_db = move_toward(music[0].volume_db, -60.0 if muted else day_db, delta * 20.0)
-	music[1].volume_db = move_toward(music[1].volume_db, -60.0 if muted else night_db, delta * 20.0)
+	var wanted: int = 0 if current_band == 0 else 1
+	if current_band == 1 and warning_player.playing:
+		wanted = -1
+	for index: int in 2:
+		var track: AudioStreamPlayer = music[index]
+		var other: AudioStreamPlayer = music[1 - index]
+		var target: float = -60.0
+		# Solo sube cuando el otro tema ya casi no se oye.
+		if index == wanted and not muted and other.volume_db <= HANDOFF_DB:
+			target = base_db if current_band != 1 else base_db - 6.0
+			# El tema entrante empieza desde su inicio, no a mitad de compás.
+			if track.volume_db <= -59.99 and playback_enabled:
+				track.play()
+		var rate: float = FADE_IN_DB_PER_S if target > track.volume_db else FADE_OUT_DB_PER_S
+		track.volume_db = move_toward(track.volume_db, target, delta * rate)

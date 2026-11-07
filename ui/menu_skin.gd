@@ -12,8 +12,4 @@ static func panel() -> StyleBoxTexture:
 	return style
 
 static func button(control: Button) -> void:
-	control.mouse_entered.connect(func() -> void:
-		if control.disabled or GamePreferences.current().reduced_flashes: return
-		control.create_tween().tween_property(control, "modulate", Color("fff1c9"), 0.12))
-	control.mouse_exited.connect(func() -> void:
-		control.create_tween().tween_property(control, "modulate", Color.WHITE, 0.2))
+	MenuFx.juice_button(control)

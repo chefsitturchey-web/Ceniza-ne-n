@@ -7,6 +7,9 @@ signal menu_requested
 signal practice_exit_requested
 signal practice_retry_requested
 var debug_practice: bool = false
+## Boss Rush: la arena solo emite resolved; el modo decide transiciones y resultados.
+var rush: bool = false
+var hints: BossHints
 
 const DAMAGE_EDGES: Script = preload("res://ui/damage_edges.gd")
 const THEME: Theme = preload("res://ui/theme.tres")
@@ -38,6 +41,12 @@ var dash_active: bool = false
 var configured: bool = false
 var present_story: bool = false
 var novel: NovelPanel
+var campaign_story: StoryDirector
+var spectacle: BossSpectacle
+var story_started: bool = false
+var aftermath_started: bool = false
+## Practica independiente: memoria de sesion, sin modificar la partida.
+static var practice_seen: Array[String] = []
 var modules: ModuleSystem = ModuleSystem.new()
 var options: SettingsPanel = SettingsPanel.new()
 var exit_button: Button
@@ -50,6 +59,7 @@ var phase_notice: Label
 var phase_notice_time: float = 0.0
 var dynamics: EncounterDynamics
 var combat_effects: BossCombatEffects
+var impact: ImpactFeedback
 
 func configure(source: Player, index: int = 0) -> void:
 	configured = true
@@ -57,7 +67,9 @@ func configure(source: Player, index: int = 0) -> void:
 	player.copy_from(source)
 	var colony: District = source.get_parent() as District
 	if colony != null and colony.story != null: support_units = colony.story.soldiers()
-	if colony != null and colony.story != null: present_story = colony.story.present_dialogue
+	if colony != null and colony.story != null:
+		campaign_story = colony.story
+		present_story = colony.story.present_dialogue
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -66,6 +78,14 @@ func _ready() -> void:
 	var scripts: Array[String] = ["recaudador", "santa_caldera", "coro_sumergido", "el_prefecto", "madre_cero"]
 	boss = load("res://entities/enemies/" + scripts[zone_index] + ".gd").new() as Recaudador
 	configure_controls()
+	add_to_group(&"boss_arena")
+	# Pantallas anchas: la arena de 640 px queda centrada sobre un fondo opaco a todo el ancho.
+	var side_fill: ColorRect = ColorRect.new()
+	side_fill.name = "SideFill"
+	side_fill.color = Color("050c17")
+	side_fill.size = Vector2(640, 360)
+	side_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(side_fill)
 	var screen: SubViewportContainer = SubViewportContainer.new()
 	screen.size = Vector2(640, 360)
 	screen.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -140,10 +160,20 @@ func _ready() -> void:
 	combat_effects = BossCombatEffects.new()
 	combat_effects.arena = self
 	world.add_child(combat_effects)
+	impact = ImpactFeedback.new()
+	impact.sparks.planar = true
+	world.add_child(impact)
+	boss.damaged.connect(func(amount: int, remaining: int) -> void: impact.hit(boss.global_position, amount, remaining == 0))
+	player.damaged.connect(func() -> void: combat_effects.shake = maxf(combat_effects.shake, 3))
+	boss.damaged.connect(func(amount: int, _remaining: int) -> void:
+		if amount > 0 and not GamePreferences.current().reduced_flashes: combat_effects.shake = maxf(combat_effects.shake, 0.8))
 	boss.ground_impact.connect(combat_effects.impact)
 	boss.ground_impact.connect(_on_ground_impact)
 	build_lighting()
 	build_hud()
+	hints = BossHints.new()
+	hints.arena = self
+	add_child(hints)
 	add_child(options)
 	options.closed.connect(func() -> void:
 		if pause_panel.visible:
@@ -170,8 +200,44 @@ func _ready() -> void:
 	novel = NovelPanel.new()
 	novel.panel_opened.connect(func() -> void: sound.set_ducked(true))
 	novel.panel_closed.connect(func() -> void: sound.set_ducked(false))
+	novel.finished.connect(_story_finished)
 	add_child(novel)
-	if present_story: novel.play(VisualStory.scene(zone_index, "encounter"))
+	ScreenFit.fit_layer(self, [side_fill, result_shade, damage_edges])
+	# Jefes finales: presentación, destellos, transformación y muerte con puesta en escena.
+	if BossSpectacle.wants(boss):
+		spectacle = BossSpectacle.new()
+		spectacle.arena = self
+		world.add_child(spectacle)
+		world.move_child(spectacle, actors.get_index())
+	if configured or present_story or debug_practice or rush:
+		start_story()
+	else:
+		# Al abrir con F6, current_scene se asigna despues de _ready.
+		call_deferred("start_story")
+
+func start_story() -> void:
+	if story_started: return
+	story_started = true
+	if not configured and (get_tree().current_scene == self or debug_practice): present_story = true
+	if not play_story("encounter") and spectacle != null: spectacle.intro()
+
+func play_story(section: String) -> bool:
+	if rush or not present_story: return false
+	var scene: Dictionary = VisualStory.scene(zone_index, section)
+	var seen: Array[String] = campaign_story.seen_scenes if campaign_story != null else practice_seen
+	if scene.id in seen: return false
+	return novel.play(scene)
+
+func _story_finished(id: String) -> void:
+	if rush: return
+	if campaign_story != null:
+		# El desenlace no debe sobrescribir el checkpoint del siguiente distrito.
+		if id not in campaign_story.seen_scenes: campaign_story.seen_scenes.append(id)
+		if id.ends_with(":encounter"): campaign_story.checkpoint()
+	elif id not in practice_seen:
+		practice_seen.append(id)
+	if id.ends_with(":encounter") and spectacle != null and not spectacle.intro_started:
+		spectacle.intro()
 
 func configure_controls() -> void:
 	if not InputMap.has_action("attack"):
@@ -305,7 +371,8 @@ func build_hud() -> void:
 	add_child(combat_hud)
 	combat_hud.configure(zone_index, zone.boss_title, player, boss)
 	boss_status = label(zone.briefing, Rect2(243, 12, 383, 45))
-	boss_status.add_theme_font_override("font", ThemeDB.fallback_font)
+	boss_status.add_theme_font_override("font", TextMarks.FONT)
+	TextMarks.attach(boss_status)
 	boss_status.add_theme_font_size_override("font_size", 12)
 	boss_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	boss_status.add_theme_constant_override("outline_size", 4)
@@ -344,10 +411,11 @@ func build_hud() -> void:
 	exit_button.pressed.connect(return_to_menu)
 	rows.add_child(exit_button)
 	var lore: Button = Button.new()
-	lore.text = "Leer presentación"
+	lore.text = "Repetir presentacion"
+	lore.visible = not rush
 	lore.pressed.connect(func() -> void: novel.play(VisualStory.scene(zone_index, "encounter"), true))
 	rows.add_child(lore)
-	if debug_practice:
+	if debug_practice and not rush:
 		var aftermath: Button = Button.new()
 		aftermath.text = "Leer desenlace"
 		aftermath.pressed.connect(func() -> void: novel.play(VisualStory.scene(zone_index, "ending"), true))
@@ -393,7 +461,7 @@ func return_to_menu() -> void:
 		practice_exit_requested.emit()
 		return
 	get_tree().paused = false
-	if configured:
+	if configured or rush:
 		menu_requested.emit()
 	else:
 		get_tree().change_scene_to_file("res://ui/main_menu.tscn")
@@ -446,7 +514,7 @@ func finish(victory: bool) -> void:
 	dash_active = false
 	sound.play_outcome(victory)
 	ending_victory = victory
-	ending_timer = 2.2 if victory else 1.2
+	ending_timer = (4.1 if spectacle != null else 2.2) if victory else 1.2
 	player.set_physics_process(false)
 	boss.set_physics_process(false)
 	modules.set_physics_process(false)
@@ -465,6 +533,7 @@ func _process(delta: float) -> void:
 		return
 	combat_hud.update_values(player, boss)
 	combat_hud.advance(delta)
+	hints.advance(delta)
 	# El rumor sigue a la embestida: entra de golpe y se apaga al terminar.
 	if not dash_active:
 		dash_player.volume_db = move_toward(dash_player.volume_db, -60.0, delta * 150.0)
@@ -483,9 +552,12 @@ func _process(delta: float) -> void:
 		if ending_victory and ending_timer <= 1.6:
 			banner.text = zone.boss_title + " - DERROTADO"
 		if ending_timer <= 0:
+			if ending_victory and not aftermath_started:
+				aftermath_started = true
+				if play_story("ending"): return
 			emitted = true
 			resolved.emit(ending_victory)
-			if not configured:
+			if not configured and not rush:
 				if ending_victory:
 					show_completed()
 				else:
@@ -533,19 +605,27 @@ func show_completed(next_zone: String = "") -> void:
 	player.attack_anim_remaining = 0
 	player.slash_remaining = 0
 	player.update_visual()
-	banner.text = "DISTRITO %d COMPLETADO" % (zone_index + 1)
+	var finale: bool = next_zone.is_empty() and zone_index == CampaignRoute.COUNT - 1 and not debug_practice
+	banner.text = "FIN DE LA CAMPAÑA" if finale else "DISTRITO %d COMPLETADO" % (zone_index + 1)
 	var ending_text: RichTextLabel = RichTextLabel.new()
 	ending_text.theme = THEME
 	ending_text.position = Vector2(40, 45)
 	ending_text.size = Vector2(560, 85)
 	ending_text.add_theme_font_size_override("normal_font_size", 12)
 	ending_text.text = CampaignStory.chapter(zone_index).ending
+	if finale:
+		ending_text.text = CampaignStory.EPILOGUE
+		ending_text.size.y = 110
+		var credits: Label = label(CampaignStory.CREDITS, Rect2(40, 165, 560, 90))
+		credits.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		credits.modulate.a = 0
+		create_tween().tween_property(credits, "modulate:a", 1.0, 2.5).set_delay(1.5)
 	add_child(ending_text)
-	label("Ruta disponible completada." if next_zone.is_empty() else "Siguiente destino: " + next_zone + ". Equipo y tripulación conservados.", Rect2(40, 178, 560, 16))
+	if not finale: label("Ruta disponible completada." if next_zone.is_empty() else "Siguiente destino: " + next_zone + ". Equipo y tripulación conservados.", Rect2(40, 178, 560, 16))
 	var button: Button = Button.new()
 	button.theme = THEME
 	button.text = ("Volver a mi escena" if debug_practice else "Volver al menú") if next_zone.is_empty() else "Viajar a " + next_zone
-	button.position = Vector2(210, 200)
+	button.position = Vector2(210, 268 if finale else 200)
 	button.size = Vector2(220, 28)
 	button.pressed.connect(func() -> void:
 		if configured:
@@ -562,4 +642,6 @@ func show_completed(next_zone: String = "") -> void:
 		menu.size = Vector2(150, 25)
 		menu.pressed.connect(return_to_menu)
 		add_child(menu)
-	if present_story: novel.play(VisualStory.scene(zone_index, "ending"))
+	if not aftermath_started:
+		aftermath_started = true
+		play_story("ending")

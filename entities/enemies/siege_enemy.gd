@@ -104,7 +104,7 @@ func take_damage(amount: int) -> void:
 			sprite.modulate = visual.base_tint
 			visual.play_visual(&"destruccion")
 			death_remaining = visual.animation_duration(&"destruccion") + DEATH_VISUAL_GRACE
-		elif data.id in [&"artillero", &"saboteador"]:
+		elif data.id == &"saboteador":
 			death_remaining = 1.2
 		else:
 			queue_free()
@@ -143,7 +143,7 @@ func _physics_process(delta: float) -> void:
 	var moving: bool = false
 	if choose_special_target(delta): return
 	ally_target = null
-	for ally: Node in get_tree().get_nodes_in_group(GameRules.ALLIES):
+	for ally: Node in get_tree().get_nodes_in_group(GameRules.ALLIES) + get_tree().get_nodes_in_group(GameRules.NIGHT_WORKERS):
 		if absf(ally.position.x - position.x) < 30 and ally.position.y >= GameRules.FLOOR_Y - 20:
 			ally_target = ally as Node2D
 			break
@@ -183,6 +183,11 @@ func find_wall() -> int:
 			return index
 	return -1
 
+## Módulo Tesla en la colonia: la muralla golpeada devuelve una descarga.
+func shock_from_wall() -> void:
+	var world: District = core.district if core != null else null
+	if world != null and world.modules.wall_shock() > 0 and health > 0: take_damage(world.modules.wall_shock())
+
 func choose_special_target(_delta: float) -> bool:
 	return false
 
@@ -192,6 +197,7 @@ func land_hit() -> void:
 			player.take_damage(damage)
 	elif target_kind == "wall":
 		construction.damage_site(target_index, damage)
+		shock_from_wall()
 	elif target_kind == "core":
 		core.take_damage(damage)
 	elif target_kind == "ally" and is_instance_valid(ally_target) and absf(ally_target.position.x - position.x) < 38:

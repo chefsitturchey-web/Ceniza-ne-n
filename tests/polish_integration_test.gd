@@ -23,6 +23,7 @@ func run_checks() -> void:
 	var world: District = load("res://levels/main.tscn").instantiate() as District
 	(world.get_node("Session") as SessionController).persistence_enabled = false
 	root.add_child(world)
+	load("res://tests/game_fixture.gd").found_colony(world)
 	world.story.present_dialogue = false
 	current_scene = world
 	world.session.set_process(false)
@@ -53,7 +54,7 @@ func run_checks() -> void:
 		site.complete_work()
 		if site.kind == &"turret":
 			turrets.append(site)
-	verify("Estabiliza" in world.presenter.objective_text(), "Con defensas construidas señala la estabilización pendiente")
+	verify("generador" in world.presenter.objective_text(), "Con murallas construidas señala la siguiente infraestructura")
 	var turret: ConstructionSite = turrets[0]
 	var base_position: Vector2 = turret.position
 	verify(turret.turret_visual != null, "Torreta dispone de cabezal articulado")
@@ -63,7 +64,7 @@ func run_checks() -> void:
 	world.defenses.drone_timer = 100
 	var hp: int = enemy.health
 	world.defenses.update_defenses(0)
-	verify(enemy.health == hp - turret.data.damage, "Disparo de torreta aplica el daño configurado")
+	verify(enemy.health == hp - roundi(turret.data.damage * world.modules.turret_damage_factor()), "Disparo de torreta aplica el daño configurado y el refuerzo del dron")
 	verify(turret.turret_visual.facing == -1 and turret.turret_visual.tracking, "Cabezal sigue al enemigo exterior")
 	verify(world.defenses.beams.size() == 1 and world.defenses.beams[0].from.is_equal_approx(turret.muzzle_position()), "Rayo y fogonazo parten de la misma boca de cañón")
 	var previous_angle: float = turret.turret_visual.desired_angle

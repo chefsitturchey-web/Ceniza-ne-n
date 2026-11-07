@@ -18,6 +18,7 @@ func _ready() -> void:
 	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
 	add_child(shade)
+	MenuFx.polish_layer(self)
 	var frame: Panel = Panel.new()
 	frame.position = Vector2(18, 10)
 	frame.size = Vector2(604, 340)
@@ -71,20 +72,24 @@ func _ready() -> void:
 	UiSound.attach(next)
 	buttons.add_child(next)
 	var close: Button = Button.new()
-	close.text = "Volver · L / Esc"
+	TextMarks.attach(close)
+	InputGlyphs.bind(close, "Volver - {journal} / {pause}")
 	close.pressed.connect(close_panel)
 	UiSound.attach(close)
 	buttons.add_child(close)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
+	GamePreferences.current().device_changed.connect(func() -> void: if opened: refresh())
+	GamePreferences.current().changed.connect(func() -> void: if opened: refresh())
 
 func refresh() -> void:
 	var data: Dictionary = CampaignStory.chapter(chapter_index)
 	var current: bool = chapter_index == story.district.zone_index
-	page.text = "[color=#47dacb]" + data.title + "[/color]\n\n" + data.voice + ": " + data.opening
-	if current: page.text += "\n\n[color=#ffce75]OBJETIVO: " + story.objective() + "[/color]"
+	page.text = "[color=#47dacb]" + data.title + "[/color]\n\n" + TextMarks.color_text(data.voice + ":", TextMarks.SPEAKER) + " " + TextMarks.format_text(data.opening)
+	if current: page.text += "\n\n[color=#47dacb]OBJETIVO: " + story.objective() + "[/color]"
 	for index: int in range(3):
-		if not current or story.completed[index]: page.text += "\n\n" + String(data[["rescue", "relay", "convoy"][index]])
-	if not current: page.text += "\n\n" + data.ending
+		if not current or story.completed[index]: page.text += "\n\n" + TextMarks.format_text(String(data[["rescue", "relay", "convoy"][index]]))
+	if not current: page.text += "\n\n" + TextMarks.format_text(data.ending)
 	page.scroll_to_line(0)
 	previous.disabled = chapter_index <= 0
 	next.disabled = chapter_index >= story.district.zone_index
@@ -97,7 +102,7 @@ func refresh() -> void:
 	scene_picker.clear()
 	for section: String in scene_sections: scene_picker.add_item(VisualStory.TITLES[section])
 	settlement_button.text = "Historia" if settlement_view else "Poblados"
-	if settlement_view: page.text = story.district.settlements.journal_text()
+	if settlement_view: page.text = TextMarks.format_text(story.district.settlements.journal_text())
 
 func replay_scene() -> void:
 	if story.novel.opened or scene_picker.selected < 0: return

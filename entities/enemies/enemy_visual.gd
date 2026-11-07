@@ -16,20 +16,17 @@ func bind(value: AnimatedSprite2D) -> void:
 		# Anchor the idle contact point, preserving the authored walking bounce.
 		if actor.data.id == &"errante": sprite.position.y = -18
 		elif actor.data.id == &"corredor": sprite.position.y = -21
-	if actor.data.id in [&"artillero", &"saboteador"]:
+		elif actor.data.id == &"ariete": sprite.position.y = -26 # Sprite propio (PixelLab): botas en y = 58.
+		elif actor.data.id == &"saltador": sprite.position.y = -22 # Sprite propio (PixelLab): patas en y = 54 del lienzo.
+		elif actor.data.id == &"artillero": sprite.position.y = -28 # Sprite propio (PixelLab): botas en y = 60 del lienzo.
+		elif actor.data.id == &"blindado": sprite.position.y = -28 # Sprite propio (PixelLab): botas en y = 60 del lienzo.
+	if actor.data.id == &"saboteador":
 		field_rig = FieldUnitVisual.new()
 		field_rig.actor = actor
 		field_rig.role = String(actor.data.id)
 		actor.add_child(field_rig)
 		hide()
 		if sprite != null: sprite.hide()
-	if actor.detailed_silhouette and actor.data.id in [&"blindado", &"saltador", &"ariete"]:
-		rig = MachineRig.new()
-		rig.actor = actor
-		rig.kind = String(actor.data.id)
-		add_child(rig)
-		if sprite != null:
-			sprite.hide()
 
 var actor: SiegeEnemy
 var effects: DebrisEmitter = DebrisEmitter.new()
@@ -80,25 +77,15 @@ func update_state(moving: bool = false) -> void:
 func _draw() -> void:
 	if actor.health <= 0:
 		return
-	if actor.data.id != &"saltador":
-		draw_set_transform(Vector2(0, -1), 0, Vector2(1, 0.22))
-		draw_circle(Vector2.ZERO, 10 if actor.data.id == &"errante" else 14, Color(0.015, 0.025, 0.04, 0.38))
-		draw_set_transform(Vector2.ZERO)
+	draw_set_transform(Vector2(0, -1), 0, Vector2(1, 0.22))
+	draw_circle(Vector2.ZERO, 10 if actor.data.id == &"errante" else 14, Color(0.015, 0.025, 0.04, 0.38))
+	draw_set_transform(Vector2.ZERO)
 	var color: Color = actor.data.provisional_color
 	if actor.flash > 0.0:
 		color = Color.WHITE
 	var height: float = actor.data.provisional_height
 	if actor.elite:
 		draw_polyline(PackedVector2Array([Vector2(-6, -height - 8), Vector2(0, -height - 12), Vector2(6, -height - 8)]), Color("ffce75"), 1)
-	if actor.data.id == &"saltador" and rig == null:
-		# Resortes y toberas hacen reconocible su función incluso en silueta.
-		var side: float = -actor.facing
-		draw_rect(Rect2(side * 13 - 3, -21, 6, 10), Color("0b1322"))
-		draw_rect(Rect2(side * 13 - 2, -20, 4, 6), Color("8299a8"))
-		for y: int in [-13, -10, -7]:
-			draw_line(Vector2(side * 9, y), Vector2(side * 14, y + 2), Color("e89e54"), 1)
-		if float(actor.get("airborne")) > 0:
-			draw_line(Vector2(side * 13, -13), Vector2(side * 15, -5), Color("ffce75"), 2)
 	if sprite == null:
 		draw_rect(Rect2(-10, -height, 20, height), color)
 		draw_rect(Rect2(-7, -height + 5, 14, 6), Color("271d33"))

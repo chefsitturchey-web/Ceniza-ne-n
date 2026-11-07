@@ -14,14 +14,14 @@ Hay nueve diseños: tirador, guardián, técnico, médica, constructor, recupera
 
 Las poses de anatomía parten de un personaje original y siete clips nativos de PixelLab. Comparten esa base para mantener proporciones; los atuendos, cascos, telas, mochilas, herramientas y armas se editan como píxeles en LibreSprite. No son nueve generaciones independientes de anatomía. El arma del tirador, el escudo, las cruces médicas y los equipos industriales distinguen cada función. La ropa tiene movimiento secundario durante la marcha.
 
-Se conserva el arte anterior en el repositorio. Las animaciones existentes del Portador y de los demás enemigos continúan disponibles; esta entrega sustituye los personajes de apoyo y los dos enemigos que dependían de la ilustración estática.
+El juego carga las nueve variantes actuales desde `assets/characters/units/`. El Portador usa su biblioteca de combate y los otros enemigos conservan sus recursos propios. Las carpetas retiradas de jugador y trabajadores no son dependencias de respaldo.
 
 ## Estados y reglas
 
 - El desplazamiento selecciona la marcha; una herramienta activa selecciona trabajo, atención o ataque. Cargar chatarra tiene fotogramas propios.
 - La reacción al daño tiene prioridad sobre el trabajo y la marcha. La caída tiene prioridad sobre todos los demás estados y termina sin reiniciarse.
 - Caminar, trabajar y combatir acumula cansancio visual. Descansar recupera la respiración; el umbral de recuperación es distinto al de agotamiento para evitar cambios rápidos entre estados. Hay respiración agitada y sudor. Esto presenta el esfuerzo sin cambiar precios, velocidad física, daño o duración de las construcciones.
-- Un aliado derrotado sale inmediatamente del grupo de combate. Se ve la caída y el superviviente se incorpora después; necesita otra herramienta para recuperar la profesión. Los trabajadores y civiles siguen las reglas de retirada de la colonia, sin añadirles una muerte permanente nueva.
+- Un aliado derrotado sale inmediatamente del grupo de combate. Se ve la caída y el superviviente se incorpora después; necesita otra herramienta para recuperar la profesión. Los trabajadores tienen salud y muerte permanente según invasión; una orden nocturna los mantiene expuestos incluso ante amenazas. Los soldados derrotados siguen la transición a superviviente.
 - Los dos enemigos terminan su caída antes de desaparecer y dejan de ser una amenaza al llegar a cero de vida. Los dibujos no infligen daño ni crean recompensas.
 - Durante los diálogos, pausa y expediciones, la animación sigue la suspensión del mundo. Todos los recortes comparten un apoyo en `(32, 56)` dentro de celdas de `64×64`: el equipo no atraviesa el suelo.
 
@@ -41,10 +41,10 @@ La reconstrucción reemplaza los `.ase` de profesión y sus PNG derivados; conse
 
 ## Comprobaciones
 
-`tests/unit_animation_test.gd` comprueba poses distintas, movimiento de piernas, apoyo al suelo en todos los fotogramas, prioridad de estados, recuperación, ausencia de reinicio en la caída, paso de soldado a superviviente, validación del guardado y galería. La batería `tests/run_all.gd` contiene **40 suites**, incluidas las simulaciones de las cinco zonas. Las capturas quedan fuera de Git.
+`tests/unit_animation_test.gd` comprueba poses distintas, movimiento de piernas, apoyo al suelo en todos los fotogramas, prioridad de estados, recuperación, ausencia de reinicio en la caída, paso de soldado a superviviente, validación del guardado y galería. La batería `tests/run_all.gd` registra **67 ejecuciones**, incluidas las simulaciones de las cinco zonas. Las capturas quedan fuera de Git.
 
 Referencias de herramientas: [LibreSprite](https://github.com/LibreSprite/LibreSprite), [formato ASE](https://github.com/aseprite/aseprite/blob/main/docs/ase-file-specs.md).
 
 ## Errante y enemigos originales
 
-El Errante conserva sus cuadros de 48 por 48 en `assets/characters/enemies/errante/`, usados por `entities/enemies/errante.tscn`. `reposo` y `caminar` tienen bucle; `ataque`, `da?o` y `destruccion` se reproducen una vez. Sus secuencias siguen siendo recursos activos, a diferencia de los sprites anteriores del Portador y trabajadores que se retiraron. El controlador `siege_enemy.gd` conserva la anticipacion, da?o y recompensa; editar el arte no debe alterar esas reglas.
+El Errante conserva sus cuadros de 48 por 48 en `assets/characters/enemies/errante/`, usados por `entities/enemies/errante.tscn`. `reposo` y `caminar` tienen bucle; `ataque`, `daño` y `destruccion` se reproducen una vez. Sus secuencias siguen siendo recursos activos, a diferencia de los sprites anteriores del Portador y trabajadores que se retiraron. El controlador `siege_enemy.gd` conserva la anticipación, daño y recompensa; editar el arte no debe alterar esas reglas.

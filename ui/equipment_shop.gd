@@ -31,6 +31,7 @@ func _ready() -> void:
 	var shade: MenuBackdrop = MenuBackdrop.new()
 	shade.size = Vector2(640, 360)
 	add_child(shade)
+	MenuFx.polish_layer(self)
 	var panel: Panel = Panel.new()
 	panel.theme = preload("res://ui/theme.tres")
 	panel.position = Vector2(24, 18)
@@ -47,6 +48,7 @@ func _ready() -> void:
 	stock.position = Vector2(18, 39)
 	stock.add_theme_font_size_override("font_size", 11)
 	panel.add_child(stock)
+	TextMarks.attach(stock)
 	var grid: GridContainer = GridContainer.new()
 	grid.position = Vector2(18, 66)
 	grid.columns = 2
@@ -70,9 +72,10 @@ func _ready() -> void:
 		grid.add_child(item)
 		choices.append(item)
 	detail = RichTextLabel.new()
+	detail.bbcode_enabled = true
 	detail.position = Vector2(326, 72)
 	detail.size = Vector2(245, 145)
-	detail.add_theme_font_override("normal_font", ThemeDB.fallback_font)
+	detail.add_theme_font_override("normal_font", TextMarks.FONT)
 	detail.add_theme_font_size_override("normal_font_size", 14)
 	detail.add_theme_color_override("default_color", Color("dce5e4"))
 	detail.scroll_active = true
@@ -83,15 +86,18 @@ func _ready() -> void:
 	purchase.pressed.connect(buy)
 	MenuSkin.button(purchase)
 	panel.add_child(purchase)
+	TextMarks.attach(purchase)
 	var hint: Label = Label.new()
 	hint.position = Vector2(18, 258)
 	hint.text = "Profesiones: los civiles recogen\nsu equipo en este taller."
 	hint.add_theme_font_size_override("font_size", 10)
 	panel.add_child(hint)
+	TextMarks.attach(hint)
 	var back: Button = Button.new()
 	back.position = Vector2(420, 280)
 	back.size = Vector2(150, 27)
-	back.text = "Volver  / Esc"
+	TextMarks.attach(back)
+	InputGlyphs.bind(back, "Volver  [{pause}]")
 	back.pressed.connect(close_panel)
 	panel.add_child(back)
 	glow = ColorRect.new()
@@ -101,6 +107,7 @@ func _ready() -> void:
 	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(glow)
 	hide()
+	ScreenFit.fit_layer(self, [shade])
 
 func open_panel() -> bool:
 	if opened or get_tree().paused or district.core.tier == 0: return false
@@ -119,7 +126,7 @@ func select_item(index: int) -> void:
 func refresh() -> void:
 	stock.text = "%d CHATARRA    /    %d PIEZAS    /    %d CIVILES SIN PROFESIÓN" % [district.bank.scrap, district.bank.parts + district.bank.stored_parts, district.civic.villagers.size()]
 	var description: Dictionary = district.civic.describe(-320 - selected) if selected < 6 else district.workshop.describe(-700 - (selected - 6))
-	detail.text = DESCRIPTIONS[selected] + "\n\n" + description.text
+	detail.text = TextMarks.format_text(DESCRIPTIONS[selected] + "\n\n" + description.text)
 	var cost: int = CivicSystem.COSTS[selected] if selected < 6 else int(district.workshop.recipes[selected - 6].scrap)
 	var parts: int = 0 if selected < 6 else int(district.workshop.recipes[selected - 6].parts)
 	purchase.text = "Comprar / %d chatarra" % cost if parts == 0 else "Fabricar / %d + %d piezas" % [cost, parts]
