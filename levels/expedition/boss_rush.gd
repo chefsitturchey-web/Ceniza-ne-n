@@ -31,6 +31,8 @@ var panel: Control
 var focus_button: Button
 var name_edit: LineEdit
 var ranking_rows: VBoxContainer
+var online_rows: VBoxContainer
+var online_sent: bool = false
 
 static func best_time() -> float:
 	var entries: Array[Dictionary] = ranking()
@@ -103,6 +105,8 @@ func _ready() -> void:
 	overlay.add_child(timer_label)
 	TextMarks.attach(timer_label)
 	ScreenFit.fit_layer(overlay)
+	# Victorias ganadas sin conexión se envían ahora si ya hay red.
+	OnlineRanking.flush(get_tree())
 	start_fight(0)
 
 func start_fight(number: int) -> void:
@@ -260,6 +264,10 @@ func show_results(won: bool, last_title: String) -> void:
 	ranking_rows.add_theme_constant_override("separation", 0)
 	rows.add_child(ranking_rows)
 	show_ranking_rows()
+	online_rows = VBoxContainer.new()
+	online_rows.add_theme_constant_override("separation", 0)
+	rows.add_child(online_rows)
+	show_online_rows()
 	focus_button = button(rows, "Volver al menú", return_to_menu)
 	button(rows, "Reintentar", retry)
 	focus_button.grab_focus()
@@ -277,6 +285,30 @@ func show_ranking_rows() -> void:
 		var entry: Dictionary = entries[position]
 		var row: Label = line(ranking_rows, "%d. %s  %s  (%d golpes)" % [position + 1, entry.name, format_time(entry.time), entry.hits], Color("ffce75") if position == place else Color("9fb4c4"))
 		row.add_theme_font_size_override("font_size", 10)
+
+## Top online (los 3 primeros). Sin conexión solo avisa; el modo se juega igual.
+func show_online_rows() -> void:
+	line(online_rows, "Top online: conectando...", Color("8299a8")).add_theme_font_size_override("font_size", 10)
+	OnlineRanking.fetch_top(self, func(entries: Variant) -> void:
+		if not is_instance_valid(online_rows): return
+		for child: Node in online_rows.get_children(): child.queue_free()
+		var text: String = "Top online: sin conexión"
+		var color: Color = Color("8299a8")
+		if entries is Array:
+			if entries.is_empty(): text = "Top online: aún vacío"
+			else:
+				var parts: PackedStringArray = []
+				for position: int in mini(3, entries.size()):
+					parts.append("%d. %s %s" % [position + 1, str(entries[position].name), format_time(float(entries[position].seconds))])
+				text = "Top online: " + "   ".join(parts)
+				color = Color("47dacb")
+		line(online_rows, text, color).add_theme_font_size_override("font_size", 10))
+
+## Envía la victoria al ranking online una sola vez, con el nombre final.
+func send_online() -> void:
+	if not victory or online_sent: return
+	online_sent = true
+	OnlineRanking.queue(get_tree(), last_name(), elapsed, hits)
 
 ## Cambia el nombre de la marca recién conseguida.
 func rename_entry() -> void:
@@ -296,10 +328,12 @@ func rename_entry() -> void:
 
 func retry() -> void:
 	rename_entry()
+	send_online()
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 func return_to_menu() -> void:
 	rename_entry()
+	send_online()
 	close_arena()
 	ScreenFade.change_scene(get_tree(), MENU)
